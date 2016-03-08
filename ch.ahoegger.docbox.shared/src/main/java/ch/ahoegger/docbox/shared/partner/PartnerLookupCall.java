@@ -6,11 +6,11 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
 /**
- * <h3>{@link PatnerLookupCall}</h3>
+ * <h3>{@link PartnerLookupCall}</h3>
  *
  * @author aho
  */
-public class PatnerLookupCall extends LookupCall<BigDecimal> {
+public class PartnerLookupCall extends LookupCall<BigDecimal> {
 
   private static final long serialVersionUID = 1L;
 

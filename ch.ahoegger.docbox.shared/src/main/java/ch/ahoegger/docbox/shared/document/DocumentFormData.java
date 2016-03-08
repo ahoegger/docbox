@@ -1,12 +1,14 @@
 package ch.ahoegger.docbox.shared.document;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
 /**
  * <b>NOTE:</b><br>
@@ -21,15 +23,76 @@ public class DocumentFormData extends AbstractFormData {
     return getFieldByClass(Abstract.class);
   }
 
+  public CapturedDate getCapturedDate() {
+    return getFieldByClass(CapturedDate.class);
+  }
+
   public Document getDocument() {
     return getFieldByClass(Document.class);
+  }
+
+  public DocumentDate getDocumentDate() {
+    return getFieldByClass(DocumentDate.class);
+  }
+
+  /**
+   * access method for property DocumentId.
+   */
+  public Long getDocumentId() {
+    return getDocumentIdProperty().getValue();
+  }
+
+  /**
+   * access method for property DocumentId.
+   */
+  public void setDocumentId(Long documentId) {
+    getDocumentIdProperty().setValue(documentId);
+  }
+
+  public DocumentIdProperty getDocumentIdProperty() {
+    return getPropertyByClass(DocumentIdProperty.class);
+  }
+
+  /**
+   * access method for property DocumentPath.
+   */
+  public String getDocumentPath() {
+    return getDocumentPathProperty().getValue();
+  }
+
+  /**
+   * access method for property DocumentPath.
+   */
+  public void setDocumentPath(String documentPath) {
+    getDocumentPathProperty().setValue(documentPath);
+  }
+
+  public DocumentPathProperty getDocumentPathProperty() {
+    return getPropertyByClass(DocumentPathProperty.class);
+  }
+
+  public MyHtml getMyHtml() {
+    return getFieldByClass(MyHtml.class);
+  }
+
+  public OriginalStorage getOriginalStorage() {
+    return getFieldByClass(OriginalStorage.class);
   }
 
   public Partner getPartner() {
     return getFieldByClass(Partner.class);
   }
 
+  public ValidDate getValidDate() {
+    return getFieldByClass(ValidDate.class);
+  }
+
   public static class Abstract extends AbstractValueFieldData<String> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class CapturedDate extends AbstractValueFieldData<Date> {
 
     private static final long serialVersionUID = 1L;
   }
@@ -39,7 +102,37 @@ public class DocumentFormData extends AbstractFormData {
     private static final long serialVersionUID = 1L;
   }
 
+  public static class DocumentDate extends AbstractValueFieldData<Date> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class DocumentIdProperty extends AbstractPropertyData<Long> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class DocumentPathProperty extends AbstractPropertyData<String> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class MyHtml extends AbstractValueFieldData<String> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class OriginalStorage extends AbstractValueFieldData<String> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
   public static class Partner extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class ValidDate extends AbstractValueFieldData<Date> {
 
     private static final long serialVersionUID = 1L;
   }

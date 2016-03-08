@@ -24,16 +24,17 @@ public class DocumentService implements IDocumentService, IDocumentTable {
   public DocumentTableData getTableData(DocumentSearchFormData formData) {
     StringBuilder sqlBuilder = new StringBuilder();
     sqlBuilder.append("SELECT ");
-    sqlBuilder.append(DOCUMENT_NR).append(", ");
-    sqlBuilder.append(ABSTRACT).append(" ");
-    sqlBuilder.append("FROM ").append(TABLE_NAME);
+    sqlBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, ABSTRACT, PARTNER_NR, DOCUMENT_URL));
+    sqlBuilder.append(" FROM ").append(TABLE_NAME);
     sqlBuilder.append(" WHERE 1 = 1");
     if (StringUtility.hasText(formData.getAbstract().getValue())) {
       sqlBuilder.append(" AND ").append(SqlFramentBuilder.whereStringContains(ABSTRACT, formData.getAbstract().getValue()));
     }
     sqlBuilder.append(" INTO ");
     sqlBuilder.append(":{td.documentId}, ");
-    sqlBuilder.append(":{td.abstract} ");
+    sqlBuilder.append(":{td.abstract}, ");
+    sqlBuilder.append(":{td.partner}, ");
+    sqlBuilder.append(":{td.documentPath} ");
     DocumentTableData tableData = new DocumentTableData();
     SQL.selectInto(sqlBuilder.toString(), new NVPair("td", tableData));
     return tableData;
@@ -42,6 +43,16 @@ public class DocumentService implements IDocumentService, IDocumentTable {
   @Override
   public void store(DocumentFormData formData) {
     LOG.debug("Store document.");
+  }
+
+  @Override
+  public DocumentFormData load(DocumentFormData formData) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(ABSTRACT, PARTNER_NR, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE));
+    statementBuilder.append(" FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
+    statementBuilder.append(" INTO ").append(":abstract, :partner, :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage");
+    SQL.selectInto(statementBuilder.toString(), formData);
+    return formData;
 
   }
 }

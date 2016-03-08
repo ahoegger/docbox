@@ -22,4 +22,10 @@ public interface IDocumentService {
    */
   void store(DocumentFormData formData);
 
+  /**
+   * @param formData
+   * @return
+   */
+  DocumentFormData load(DocumentFormData formData);
+
 }

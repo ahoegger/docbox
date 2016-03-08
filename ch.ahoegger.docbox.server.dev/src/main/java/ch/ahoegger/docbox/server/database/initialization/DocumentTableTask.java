@@ -42,7 +42,7 @@ public class DocumentTableTask implements ITableTask, IDocumentTable {
 
   @Override
   public void createRows(IDocboxSqlService sqlService) {
-    createDocumentRow(sqlService, Long.valueOf(0l), "A sample document", Long.valueOf(100l), new Date(), new Date(), new Date(), null, null);
+    createDocumentRow(sqlService, Long.valueOf(0l), "A sample document", Long.valueOf(100l), new Date(), new Date(), new Date(), "2016/2016_03_08_124640.pdf", null);
   }
 
   public void createDocumentRow(IDocboxSqlService sqlService, long documentId, String abstractText, Long companyId, Date documentDate, Date capturedDate, Date validDate, String documentUrl, String originalStorage) {
