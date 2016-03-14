@@ -28,6 +28,7 @@ public class ServerSession extends AbstractServerSession {
 
   @Override
   protected void execLoadSession() {
+
     LOG.info("created a new session for {}", getUserId());
 
   }

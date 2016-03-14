@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
  */
 @ApplicationScoped
 @TunnelToServer
-public interface IFileService {
+public interface IDocumentStoreService {
 
   File store(RemoteFile remoteFile);
 
@@ -22,5 +22,5 @@ public interface IFileService {
    * @param path
    * @return
    */
-  BinaryResource get(String path);
+  BinaryResource getDocument(Long docuemntId);
 }

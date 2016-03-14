@@ -24,4 +24,10 @@ public interface IUserService {
    */
   boolean authenticate(String username, char[] passwordPlainText);
 
+  /**
+   * @param formData
+   * @return
+   */
+  UserFormData load(UserFormData formData);
+
 }

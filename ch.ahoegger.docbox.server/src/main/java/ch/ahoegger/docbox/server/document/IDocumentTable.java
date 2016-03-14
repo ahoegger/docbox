@@ -7,6 +7,7 @@ package ch.ahoegger.docbox.server.document;
  */
 public interface IDocumentTable {
 
+  public static String TABLE_ALIAS = "DOC";
   public static String TABLE_NAME = "DOCUMENT";
 
   // columns

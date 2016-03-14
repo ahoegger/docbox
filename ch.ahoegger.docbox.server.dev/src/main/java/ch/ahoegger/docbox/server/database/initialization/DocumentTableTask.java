@@ -42,7 +42,8 @@ public class DocumentTableTask implements ITableTask, IDocumentTable {
 
   @Override
   public void createRows(IDocboxSqlService sqlService) {
-    createDocumentRow(sqlService, Long.valueOf(0l), "A sample document", Long.valueOf(100l), new Date(), new Date(), new Date(), "2016/2016_03_08_124640.pdf", null);
+    createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT, "A sample document", IDevSequenceNumbers.SEQ_START_PARTNER, new Date(), new Date(), new Date(), "2016/2016_03_08_124640.pdf", null);
+    createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT + 1, "Bobs document", IDevSequenceNumbers.SEQ_START_PARTNER + 1, new Date(), new Date(), new Date(), "2016/2016_03_08_124640.pdf", null);
   }
 
   public void createDocumentRow(IDocboxSqlService sqlService, long documentId, String abstractText, Long companyId, Date documentDate, Date capturedDate, Date validDate, String documentUrl, String originalStorage) {
@@ -59,13 +60,13 @@ public class DocumentTableTask implements ITableTask, IDocumentTable {
     sqlBuilder.append(DOCUMENT_URL).append(", ");
     sqlBuilder.append(ORIGINAL_STORAGE);
     sqlBuilder.append(") VALUES ( ");
-    sqlBuilder.append(":documentId, :abstract, :companyId, :documentDate, :insertDate, :validDate, :documentUrl, :originalStorage");
+    sqlBuilder.append(":documentId, :abstract, :partnerId, :documentDate, :insertDate, :validDate, :documentUrl, :originalStorage");
     sqlBuilder.append(")");
 
     sqlService.insert(sqlBuilder.toString(),
         new NVPair("documentId", documentId),
         new NVPair("abstract", abstractText),
-        new NVPair("companyId", companyId),
+        new NVPair("partnerId", companyId),
         new NVPair("documentDate", documentDate),
         new NVPair("insertDate", capturedDate),
         new NVPair("validDate", validDate),

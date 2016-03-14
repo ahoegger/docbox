@@ -40,8 +40,8 @@ public class PartnerTableTask implements ITableTask, IPartnerTable {
 
   @Override
   public void createRows(IDocboxSqlService sqlService) {
-    createPartnerRow(sqlService, Long.valueOf(100l), "Gorak Inc", "A special company", new Date(), null);
-    createPartnerRow(sqlService, Long.valueOf(101l), "Solan Org", "Some other comapny", new Date(), null);
+    createPartnerRow(sqlService, IDevSequenceNumbers.SEQ_START_PARTNER, "Gorak Inc", "A special company", new Date(), null);
+    createPartnerRow(sqlService, IDevSequenceNumbers.SEQ_START_PARTNER + 1, "Solan Org", "Some other comapny", new Date(), null);
   }
 
   public void createPartnerRow(IDocboxSqlService sqlService, long patnerId, String name, String description, Date startDate, Date endDate) {

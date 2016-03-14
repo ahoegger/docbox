@@ -15,11 +15,13 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.desktop.OpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.html.HTML;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
@@ -31,7 +33,7 @@ import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
-import ch.ahoegger.docbox.shared.document.store.IFileService;
+import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
 import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
 
 /**
@@ -55,6 +57,11 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
   @Override
   protected Class<? extends ISearchForm> getConfiguredSearchForm() {
     return DocumentSearchForm.class;
+  }
+
+  @Override
+  protected IPage<?> execCreateChildPage(ITableRow row) {
+    return new DocumentDetailPage(getTable().getDocumentIdColumn().getValue(row));
   }
 
   public class Table extends AbstractTable {
@@ -173,7 +180,29 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
     }
 
     @Order(2000)
-    public class OpenMenu extends AbstractMenu {
+    public class EditMenu extends AbstractMenu {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("Edit");
+      }
+
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+      }
+
+      @Override
+      protected void execAction() {
+
+        DocumentForm form = new DocumentForm();
+        form.setDocumentId(getDocumentIdColumn().getSelectedValue());
+        form.startEdit();
+      }
+
+    }
+
+    @Order(3000)
+    public class TestMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
         return TEXTS.get("Open");
@@ -186,8 +215,9 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
 
       @Override
       protected void execAction() {
+        BinaryResource document = BEANS.get(IDocumentStoreService.class).getDocument(getDocumentIdColumn().getSelectedValue());
 
-        ClientSession.get().getDesktop().openUri(BEANS.get(IFileService.class).get(getDocumentPathColumn().getSelectedValue()), OpenUriAction.NEW_WINDOW);
+        ClientSession.get().getDesktop().openUri(document, OpenUriAction.NEW_WINDOW);
       }
     }
 

@@ -6,25 +6,21 @@ import java.net.URL;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.scout.rt.platform.CreateImmediately;
-import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.shared.document.store.IFileService;
-
 /**
- * <h3>{@link DevFileService}</h3>
+ * <h3>{@link DevDocumentStoreService}</h3>
  *
  * @author aho
  */
-@Order(-10)
-@CreateImmediately
-public class DevFileService implements IFileService {
-  private static final Logger LOG = LoggerFactory.getLogger(DevFileService.class);
+@Replace
+public class DevDocumentStoreService extends DocumentStoreService {
+  private static final Logger LOG = LoggerFactory.getLogger(DevDocumentStoreService.class);
 
   @PostConstruct
   void init() {
@@ -39,7 +35,7 @@ public class DevFileService implements IFileService {
   }
 
   @Override
-  public BinaryResource get(String path) {
+  public BinaryResource getDocument(String path) {
     BinaryResource result = null;
     URL resource = getClass().getResource(path);
     try {

@@ -3,7 +3,9 @@ package ch.ahoegger.docbox.server.administration.user;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.NVPair;
@@ -12,7 +14,10 @@ import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
 import ch.ahoegger.docbox.server.database.IDocboxSqlService;
+import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
+import ch.ahoegger.docbox.shared.administration.user.IUserTable;
+import ch.ahoegger.docbox.shared.administration.user.UserFormData;
 import ch.ahoegger.docbox.shared.administration.user.UserTablePageData;
 
 /**
@@ -20,7 +25,7 @@ import ch.ahoegger.docbox.shared.administration.user.UserTablePageData;
  *
  * @author aho
  */
-public class UserService implements IUserService {
+public class UserService implements IUserService, IUserTable {
   private static final byte[] SALT = "[B@484b61fc".getBytes();
 
   @Override
@@ -31,27 +36,37 @@ public class UserService implements IUserService {
 
     IDocboxSqlService sqlService = BEANS.get(IDocboxSqlService.class);
 
-    StringBuilder sqlSelect = new StringBuilder("SELECT   USER_NR, "
-        + "         NAME, "
-        + "         FIRSTNAME "
-        + "FROM     DOCBOX_USER "
-        + "INTO     :{page.userId}, "
-        + "         :{page.name}, "
-        + "         :{page.firstname}");
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(USERNAME, NAME, FIRSTNAME)).append(" FROM ").append(TABLE_NAME);
+    statementBuilder.append(" INTO ").append(":{page.username},  :{page.name},   :{page.firstname}");
 
-    sqlService.selectInto(sqlSelect.toString(), new NVPair("page", pageData));
+    sqlService.selectInto(statementBuilder.toString(), new NVPair("page", pageData));
     return pageData;
+  }
 
+  @Override
+  public UserFormData load(UserFormData formData) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(FIRSTNAME, NAME, USERNAME, INSERT_DATE, VALID_DATE));
+    statementBuilder.append(" FROM ").append(TABLE_NAME).append(" WHERE ").append(USERNAME).append(" = :username");
+    statementBuilder.append(" INTO ").append(":firstname, :name, :username, :insertDate, :validDate");
+    SQL.selectInto(statementBuilder.toString(), formData);
+
+    // roles
+    Set<BigDecimal> roleIds = BEANS.get(UserRoleService.class).getRoleIds(formData.getUsername().getValue());
+    formData.getRoleBox().setValue(roleIds);
+
+    return formData;
   }
 
   @Override
   public boolean authenticate(String username, final char[] passwordPlainText) {
     String pwHash = new String(createPasswordHash(passwordPlainText));
 
-    StringBuilder sqlBuilder = new StringBuilder();
-    sqlBuilder.append("SELECT PASSWORD FROM DOCBOX_USER WHERE 1 = 1");
-    sqlBuilder.append(" AND USERNAME = :username");
-    Object[][] result = SQL.select(sqlBuilder.toString(), new NVPair("username", username));
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("SELECT ").append(PASSWORD).append(" FROM ").append(TABLE_NAME);
+    statementBuilder.append(" WHERE ").append(USERNAME).append(" = :username");
+    Object[][] result = SQL.select(statementBuilder.toString(), new NVPair("username", username));
     if (result.length == 1) {
       return result[0][0].equals(pwHash);
     }

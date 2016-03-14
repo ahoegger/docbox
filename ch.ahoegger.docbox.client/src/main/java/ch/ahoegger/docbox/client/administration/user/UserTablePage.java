@@ -2,9 +2,10 @@ package ch.ahoegger.docbox.client.administration.user;
 
 import org.eclipse.scout.rt.client.dto.PageData;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -31,31 +32,35 @@ public class UserTablePage extends AbstractPageWithTable<UserTablePage.Table> {
     importPageData(BEANS.get(IUserService.class).getUserTableData());
   }
 
+  @Override
+  protected IPage<?> execCreateChildPage(ITableRow row) {
+    return new UserDetailPage(getTable().getUsernameColumn().getValue(row));
+  }
+
   public class Table extends AbstractTable {
 
     public FirstnameColumn getFirstnameColumn() {
       return getColumnSet().getColumnByClass(FirstnameColumn.class);
     }
 
+    public UsernameColumn getUsernameColumn() {
+      return getColumnSet().getColumnByClass(UsernameColumn.class);
+    }
+
     public NameColumn getNameColumn() {
       return getColumnSet().getColumnByClass(NameColumn.class);
     }
 
-    public UserIdColumn getUserIdColumn() {
-      return getColumnSet().getColumnByClass(UserIdColumn.class);
-    }
-
     @Order(1000)
-    public class UserIdColumn extends AbstractLongColumn {
-
+    public class UsernameColumn extends AbstractStringColumn {
       @Override
-      protected int getConfiguredWidth() {
-        return 100;
+      protected String getConfiguredHeaderText() {
+        return TEXTS.get("Username");
       }
 
       @Override
-      protected boolean getConfiguredDisplayable() {
-        return false;
+      protected int getConfiguredWidth() {
+        return 200;
       }
     }
 

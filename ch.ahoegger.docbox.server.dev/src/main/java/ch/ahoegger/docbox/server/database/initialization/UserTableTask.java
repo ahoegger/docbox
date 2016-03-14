@@ -1,14 +1,16 @@
 package ch.ahoegger.docbox.server.database.initialization;
 
+import java.util.Date;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.server.administration.user.IUserTable;
 import ch.ahoegger.docbox.server.administration.user.UserService;
 import ch.ahoegger.docbox.server.database.IDocboxSqlService;
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
+import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 
 /**
  * <h3>{@link UserTableTask}</h3>
@@ -23,12 +25,13 @@ public class UserTableTask implements ITableTask, IUserTable {
   public String getCreateStatement() {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("CREATE TABLE ").append(TABLE_NAME).append(" ( ");
-    statementBuilder.append(USER_NR).append(" DECIMAL NOT NULL, ");
-    statementBuilder.append(NAME).append(" VARCHAR(240) NOT NULL, ");
-    statementBuilder.append(FIRSTNAME).append(" VARCHAR(240) NOT NULL, ");
-    statementBuilder.append(USERNAME).append(" VARCHAR(240) NOT NULL, ");
-    statementBuilder.append(PASSWORD).append(" VARCHAR(480) NOT NULL, ");
-    statementBuilder.append("PRIMARY KEY (").append(USER_NR).append(")");
+    statementBuilder.append(USERNAME).append(" VARCHAR(").append(USERNAME_LENGTH).append(") NOT NULL, ");
+    statementBuilder.append(NAME).append(" VARCHAR(").append(NAME_LENGTH).append(") NOT NULL, ");
+    statementBuilder.append(FIRSTNAME).append(" VARCHAR(").append(FIRSTNAME_LENGTH).append(") NOT NULL, ");
+    statementBuilder.append(PASSWORD).append(" VARCHAR(").append(PASSWORD_LENGTH).append(") NOT NULL, ");
+    statementBuilder.append(INSERT_DATE).append(" DATE NOT NULL, ");
+    statementBuilder.append(VALID_DATE).append(" DATE, ");
+    statementBuilder.append("PRIMARY KEY (").append(USERNAME).append(")");
     statementBuilder.append(")");
     return statementBuilder.toString();
   }
@@ -41,21 +44,24 @@ public class UserTableTask implements ITableTask, IUserTable {
 
   @Override
   public void createRows(IDocboxSqlService sqlService) {
-    createUser(sqlService, "Cuttis", "Bolion", "admin", "manager");
+    createUser(sqlService, "Cuttis", "Bolion", "cuttis", "pwd", new Date(), null);
+    createUser(sqlService, "Bob", "Miller", "bob", "pwd", new Date(), null);
+    createUser(sqlService, "Admin", "Manager", "admin", "manager", new Date(), null);
   }
 
-  private static void createUser(IDocboxSqlService sqlService, String name, String firstname, String username, String password) {
+  private void createUser(IDocboxSqlService sqlService, String name, String firstname, String username, String password, Date inserDate, Date validDate) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(SqlFramentBuilder.columns(USER_NR, NAME, FIRSTNAME, USERNAME, PASSWORD));
+    statementBuilder.append(SqlFramentBuilder.columns(NAME, FIRSTNAME, USERNAME, PASSWORD, INSERT_DATE, VALID_DATE));
     statementBuilder.append(") VALUES (");
-    statementBuilder.append(":userId, :name, :firstname, :username, :password");
+    statementBuilder.append(":name, :firstname, :username, :password, :inserDate, :validDate");
     statementBuilder.append(")");
     sqlService.insert(statementBuilder.toString(),
-        new NVPair("userId", sqlService.getSequenceNextval()),
         new NVPair("name", name),
         new NVPair("firstname", firstname),
         new NVPair("username", username),
-        new NVPair("password", new String(BEANS.get(UserService.class).createPasswordHash(password.toCharArray()))));
+        new NVPair("password", new String(BEANS.get(UserService.class).createPasswordHash(password.toCharArray()))),
+        new NVPair("inserDate", inserDate),
+        new NVPair("validDate", validDate));
   }
 }

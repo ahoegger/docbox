@@ -51,19 +51,19 @@ public class UserTablePageData extends AbstractTablePageData {
   public static class UserTableRowData extends AbstractTableRowData {
 
     private static final long serialVersionUID = 1L;
-    public static final String userId = "userId";
+    public static final String username = "username";
     public static final String name = "name";
     public static final String firstname = "firstname";
-    private Long m_userId;
+    private String m_username;
     private String m_name;
     private String m_firstname;
 
-    public Long getUserId() {
-      return m_userId;
+    public String getUsername() {
+      return m_username;
     }
 
-    public void setUserId(Long newUserId) {
-      m_userId = newUserId;
+    public void setUsername(String newUsername) {
+      m_username = newUsername;
     }
 
     public String getName() {

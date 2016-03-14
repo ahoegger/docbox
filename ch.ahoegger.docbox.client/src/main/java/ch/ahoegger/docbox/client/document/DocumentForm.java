@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.CancelButton;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.AbstractField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.CapturedDateField;
@@ -29,6 +30,7 @@ import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.MyHtmlFi
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OriginalStorageField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PartnerField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.ValidDateField;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.OkButton;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
 import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
@@ -64,8 +66,16 @@ public class DocumentForm extends AbstractForm {
     return true;
   }
 
+  public void startPage() {
+    startInternal(new PageHandler());
+  }
+
   public void startNew() {
     startInternal(new NewHandler());
+  }
+
+  public void startEdit() {
+    startInternal(new EditHandler());
   }
 
   @FormData
@@ -122,6 +132,14 @@ public class DocumentForm extends AbstractForm {
 
   public AbstractField getAbstractTextField() {
     return getFieldByClass(AbstractField.class);
+  }
+
+  public OkButton getOkButton() {
+    return getFieldByClass(OkButton.class);
+  }
+
+  public CancelButton getCancelButton() {
+    return getFieldByClass(CancelButton.class);
   }
 
   public class MainBox extends AbstractGroupBox {
@@ -242,6 +260,32 @@ public class DocumentForm extends AbstractForm {
 
   }
 
+  public class PageHandler extends AbstractFormHandler {
+    @Override
+    protected void execLoad() {
+      if (getDisplayHint() != DISPLAY_HINT_VIEW) {
+        setDisplayHint(DISPLAY_HINT_VIEW);
+      }
+      if (getDisplayViewId() != VIEW_ID_PAGE_TABLE) {
+        setDisplayViewId(VIEW_ID_PAGE_TABLE);
+      }
+
+      getOkButton().setVisibleGranted(false);
+      getCancelButton().setVisibleGranted(false);
+
+      DocumentFormData formData = new DocumentFormData();
+      exportFormData(formData);
+      formData = BEANS.get(IDocumentService.class).load(formData);
+      importFormData(formData);
+
+      setEnabledGranted(false);
+    }
+
+    @Override
+    protected void execStore() {
+    }
+  }
+
   public class NewHandler extends AbstractFormHandler {
     @Override
     protected void execLoad() {
@@ -252,6 +296,20 @@ public class DocumentForm extends AbstractForm {
       DocumentFormData formData = new DocumentFormData();
       exportFormData(formData);
       BEANS.get(IDocumentService.class).store(formData);
+    }
+  }
+
+  public class EditHandler extends AbstractFormHandler {
+    @Override
+    protected void execLoad() {
+      DocumentFormData formData = new DocumentFormData();
+      exportFormData(formData);
+      formData = BEANS.get(IDocumentService.class).load(formData);
+      importFormData(formData);
+    }
+
+    @Override
+    protected void execStore() {
     }
   }
 
