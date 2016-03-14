@@ -7,8 +7,8 @@ import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
-import ch.ahoegger.docbox.server.security.permission.IPermissionTable;
-import ch.ahoegger.docbox.shared.security.permissions.IPermissionService;
+import ch.ahoegger.docbox.shared.security.permission.IPermissionService;
+import ch.ahoegger.docbox.shared.security.permission.IPermissionTable;
 
 /**
  * <h3>{@link PermissionService}</h3>

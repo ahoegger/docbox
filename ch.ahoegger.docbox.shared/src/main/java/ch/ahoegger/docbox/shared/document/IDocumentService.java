@@ -28,4 +28,9 @@ public interface IDocumentService {
    */
   DocumentFormData load(DocumentFormData formData);
 
+  /**
+   * @param formData
+   */
+  DocumentFormData prepareCreate(DocumentFormData formData);
+
 }

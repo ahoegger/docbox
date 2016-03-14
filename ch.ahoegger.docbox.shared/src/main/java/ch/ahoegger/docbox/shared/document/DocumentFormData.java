@@ -2,12 +2,15 @@ package ch.ahoegger.docbox.shared.document;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
 /**
@@ -25,6 +28,10 @@ public class DocumentFormData extends AbstractFormData {
 
   public CapturedDate getCapturedDate() {
     return getFieldByClass(CapturedDate.class);
+  }
+
+  public CategoriesBox getCategoriesBox() {
+    return getFieldByClass(CategoriesBox.class);
   }
 
   public Document getDocument() {
@@ -71,16 +78,28 @@ public class DocumentFormData extends AbstractFormData {
     return getPropertyByClass(DocumentPathProperty.class);
   }
 
-  public MyHtml getMyHtml() {
-    return getFieldByClass(MyHtml.class);
+  public OpenHtml getOpenHtml() {
+    return getFieldByClass(OpenHtml.class);
   }
 
   public OriginalStorage getOriginalStorage() {
     return getFieldByClass(OriginalStorage.class);
   }
 
-  public Partner getPartner() {
-    return getFieldByClass(Partner.class);
+  public Owner getOwner() {
+    return getFieldByClass(Owner.class);
+  }
+
+  public Partners getPartners() {
+    return getFieldByClass(Partners.class);
+  }
+
+  public Permissions getPermissions() {
+    return getFieldByClass(Permissions.class);
+  }
+
+  public Tag getTag() {
+    return getFieldByClass(Tag.class);
   }
 
   public ValidDate getValidDate() {
@@ -93,6 +112,11 @@ public class DocumentFormData extends AbstractFormData {
   }
 
   public static class CapturedDate extends AbstractValueFieldData<Date> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class CategoriesBox extends AbstractValueFieldData<Set<BigDecimal>> {
 
     private static final long serialVersionUID = 1L;
   }
@@ -117,7 +141,7 @@ public class DocumentFormData extends AbstractFormData {
     private static final long serialVersionUID = 1L;
   }
 
-  public static class MyHtml extends AbstractValueFieldData<String> {
+  public static class OpenHtml extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
   }
@@ -127,7 +151,130 @@ public class DocumentFormData extends AbstractFormData {
     private static final long serialVersionUID = 1L;
   }
 
-  public static class Partner extends AbstractValueFieldData<BigDecimal> {
+  public static class Owner extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class Partners extends AbstractTableFieldBeanData {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public PartnersRowData addRow() {
+      return (PartnersRowData) super.addRow();
+    }
+
+    @Override
+    public PartnersRowData addRow(int rowState) {
+      return (PartnersRowData) super.addRow(rowState);
+    }
+
+    @Override
+    public PartnersRowData createRow() {
+      return new PartnersRowData();
+    }
+
+    @Override
+    public Class<? extends AbstractTableRowData> getRowType() {
+      return PartnersRowData.class;
+    }
+
+    @Override
+    public PartnersRowData[] getRows() {
+      return (PartnersRowData[]) super.getRows();
+    }
+
+    @Override
+    public PartnersRowData rowAt(int index) {
+      return (PartnersRowData) super.rowAt(index);
+    }
+
+    public void setRows(PartnersRowData[] rows) {
+      super.setRows(rows);
+    }
+
+    public static class PartnersRowData extends AbstractTableRowData {
+
+      private static final long serialVersionUID = 1L;
+      public static final String partner = "partner";
+      private BigDecimal m_partner;
+
+      public BigDecimal getPartner() {
+        return m_partner;
+      }
+
+      public void setPartner(BigDecimal newPartner) {
+        m_partner = newPartner;
+      }
+    }
+  }
+
+  public static class Permissions extends AbstractTableFieldBeanData {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public PermissionsRowData addRow() {
+      return (PermissionsRowData) super.addRow();
+    }
+
+    @Override
+    public PermissionsRowData addRow(int rowState) {
+      return (PermissionsRowData) super.addRow(rowState);
+    }
+
+    @Override
+    public PermissionsRowData createRow() {
+      return new PermissionsRowData();
+    }
+
+    @Override
+    public Class<? extends AbstractTableRowData> getRowType() {
+      return PermissionsRowData.class;
+    }
+
+    @Override
+    public PermissionsRowData[] getRows() {
+      return (PermissionsRowData[]) super.getRows();
+    }
+
+    @Override
+    public PermissionsRowData rowAt(int index) {
+      return (PermissionsRowData) super.rowAt(index);
+    }
+
+    public void setRows(PermissionsRowData[] rows) {
+      super.setRows(rows);
+    }
+
+    public static class PermissionsRowData extends AbstractTableRowData {
+
+      private static final long serialVersionUID = 1L;
+      public static final String user = "user";
+      public static final String permission = "permission";
+      private String m_user;
+      private Integer m_permission;
+
+      public String getUser() {
+        return m_user;
+      }
+
+      public void setUser(String newUser) {
+        m_user = newUser;
+      }
+
+      public Integer getPermission() {
+        return m_permission;
+      }
+
+      public void setPermission(Integer newPermission) {
+        m_permission = newPermission;
+      }
+    }
+  }
+
+  public static class Tag extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
   }

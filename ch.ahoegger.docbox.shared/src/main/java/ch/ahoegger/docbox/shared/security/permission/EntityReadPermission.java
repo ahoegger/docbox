@@ -1,4 +1,4 @@
-package ch.ahoegger.docbox.shared.security.permissions;
+package ch.ahoegger.docbox.shared.security.permission;
 
 import java.security.BasicPermission;
 import java.security.Permission;

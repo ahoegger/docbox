@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.security.UserIdAccessControlService;
 
-import ch.ahoegger.docbox.shared.security.permissions.EntityReadPermission;
+import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
 
 /**
  * <h3>{@link AccessControlService}</h3>

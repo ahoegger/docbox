@@ -1,4 +1,4 @@
-package ch.ahoegger.docbox.shared.security.permissions;
+package ch.ahoegger.docbox.shared.security.permission;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.shared.TunnelToServer;

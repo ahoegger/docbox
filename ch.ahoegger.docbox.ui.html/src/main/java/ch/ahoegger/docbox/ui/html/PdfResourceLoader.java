@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.ui.html.res.loader.AbstractResourceLoader;
 
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
 import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
-import ch.ahoegger.docbox.shared.security.permissions.EntityReadPermission;
+import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
 
 /**
  * <h3>{@link PdfResourceLoader}</h3>

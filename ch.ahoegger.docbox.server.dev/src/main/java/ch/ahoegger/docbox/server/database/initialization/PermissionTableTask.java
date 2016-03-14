@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.database.IDocboxSqlService;
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
-import ch.ahoegger.docbox.server.security.permission.IPermissionTable;
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
+import ch.ahoegger.docbox.shared.security.permission.IPermissionTable;
 
 /**
  * <h3>{@link PermissionTableTask}</h3>
@@ -37,12 +37,14 @@ public class PermissionTableTask implements ITableTask, IPermissionTable {
 
   @Override
   public void createRows(IDocboxSqlService sqlService) {
-    createPermission(sqlService, "cuttis", IDevSequenceNumbers.SEQ_START_DOCUMENT + 1, PERMISSION_READ);
     createPermission(sqlService, "admin", IDevSequenceNumbers.SEQ_START_DOCUMENT, PERMISSION_WRITE);
+    createPermission(sqlService, "admin", IDevSequenceNumbers.SEQ_START_DOCUMENT + 1, PERMISSION_WRITE);
+    createPermission(sqlService, "admin", IDevSequenceNumbers.SEQ_START_DOCUMENT + 2, PERMISSION_WRITE);
+    createPermission(sqlService, "cuttis", IDevSequenceNumbers.SEQ_START_DOCUMENT + 1, PERMISSION_READ);
     createPermission(sqlService, "bob", IDevSequenceNumbers.SEQ_START_DOCUMENT + 1, PERMISSION_WRITE);
   }
 
-  private void createPermission(IDocboxSqlService sqlService, String userId, Long entityId, Short permission) {
+  private void createPermission(IDocboxSqlService sqlService, String userId, Long entityId, Integer permission) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(IUserTable.USERNAME, ENTITY_NR, PERMISSION));
@@ -55,9 +57,4 @@ public class PermissionTableTask implements ITableTask, IPermissionTable {
         new NVPair("permission", permission));
   }
 
-  public static void main(String[] args) {
-    System.out.println(PERMISSION_READ);
-    System.out.println(PERMISSION_WRITE);
-    System.out.println(PERMISSION_READ | PERMISSION_WRITE);
-  }
 }

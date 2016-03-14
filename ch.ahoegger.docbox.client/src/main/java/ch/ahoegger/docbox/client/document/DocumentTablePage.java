@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.client.document;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.dto.PageData;
@@ -17,6 +18,9 @@ import org.eclipse.scout.rt.client.ui.desktop.OpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
+import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
+import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -65,6 +69,24 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
   }
 
   public class Table extends AbstractTable {
+
+    @Override
+    protected int getConfiguredDropType() {
+      return IDNDSupport.TYPE_FILE_TRANSFER;
+    }
+
+    @Override
+    protected void execDrop(ITableRow row, TransferObject t) {
+      if (t instanceof ResourceListTransferObject) {
+        List<BinaryResource> resources = ((ResourceListTransferObject) t).getResources();
+        if (resources.size() > 0) {
+          DocumentForm form = new DocumentForm();
+          form.getDocumentField().setValue(CollectionUtility.firstElement(resources));
+          form.startNew();
+        }
+      }
+
+    }
 
     public AbstractColumn getAbstractColumn() {
       return getColumnSet().getColumnByClass(AbstractColumn.class);

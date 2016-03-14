@@ -1,4 +1,4 @@
-package ch.ahoegger.docbox.server.security.permission;
+package ch.ahoegger.docbox.shared.security.permission;
 
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 
@@ -16,7 +16,7 @@ public interface IPermissionTable {
   public static final String ENTITY_NR = "ENTITY_NR";
   public static final String PERMISSION = "PERMISSION";
 
-  public static final short PERMISSION_READ = 1;
-  public static final short PERMISSION_WRITE = 2;
+  public static final int PERMISSION_READ = 1;
+  public static final int PERMISSION_WRITE = 2;
 
 }

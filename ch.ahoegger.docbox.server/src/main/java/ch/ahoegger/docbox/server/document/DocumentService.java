@@ -1,5 +1,9 @@
 package ch.ahoegger.docbox.server.document;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -11,12 +15,16 @@ import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.ServerSession;
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
-import ch.ahoegger.docbox.server.security.permission.IPermissionTable;
+import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
+import ch.ahoegger.docbox.server.security.permission.UserPermission;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
+import ch.ahoegger.docbox.shared.document.DocumentFormData.Permissions.PermissionsRowData;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
-import ch.ahoegger.docbox.shared.security.permissions.EntityReadPermission;
+import ch.ahoegger.docbox.shared.document.IDocumentTable;
+import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
+import ch.ahoegger.docbox.shared.security.permission.IPermissionTable;
 
 /**
  * <h3>{@link DocumentService}</h3>
@@ -30,7 +38,7 @@ public class DocumentService implements IDocumentService, IDocumentTable {
   public DocumentTableData getTableData(DocumentSearchFormData formData) {
     StringBuilder sqlBuilder = new StringBuilder();
     sqlBuilder.append("SELECT ");
-    sqlBuilder.append(SqlFramentBuilder.columnsAliased("DOC", DOCUMENT_NR, ABSTRACT, PARTNER_NR, DOCUMENT_URL));
+    sqlBuilder.append(SqlFramentBuilder.columnsAliased("DOC", DOCUMENT_NR, ABSTRACT, DOCUMENT_URL));
     sqlBuilder.append(" FROM ").append(TABLE_NAME).append(" ").append(TABLE_ALIAS);
     sqlBuilder.append(", ").append(IPermissionTable.TABLE_NAME).append(" ").append(IPermissionTable.TABLE_ALIAS);
     sqlBuilder.append(" WHERE 1 = 1");
@@ -44,11 +52,21 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     sqlBuilder.append(" INTO ");
     sqlBuilder.append(":{td.documentId}, ");
     sqlBuilder.append(":{td.abstract}, ");
-    sqlBuilder.append(":{td.partner}, ");
     sqlBuilder.append(":{td.documentPath} ");
     DocumentTableData tableData = new DocumentTableData();
     SQL.selectInto(sqlBuilder.toString(), new NVPair("td", tableData));
     return tableData;
+  }
+
+  @Override
+  public DocumentFormData prepareCreate(DocumentFormData formData) {
+    formData.getCapturedDate().setValue(new Date());
+    for (UserPermission up : BEANS.get(DefaultPermissionService.class).getDefaultPermissions()) {
+      PermissionsRowData row = formData.getPermissions().addRow();
+      row.setUser(up.getUsername());
+      row.setPermission(up.getPermission());
+    }
+    return formData;
   }
 
   @Override
@@ -70,10 +88,16 @@ public class DocumentService implements IDocumentService, IDocumentTable {
   @RemoteServiceAccessDenied
   public DocumentFormData loadTrusted(DocumentFormData formData) {
     StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(ABSTRACT, PARTNER_NR, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE));
+    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE));
     statementBuilder.append(" FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
-    statementBuilder.append(" INTO ").append(":abstract, :partner, :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage");
+    statementBuilder.append(" INTO ").append(":abstract,  :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage");
     SQL.selectInto(statementBuilder.toString(), formData);
+
+    // partners
+    for (BigDecimal partnerId : BEANS.get(DocumentPartnerService.class).getPartnerIds(formData.getDocumentId())) {
+      formData.getPartners().addRow().setPartner(partnerId);
+    }
+
     return formData;
   }
 }
