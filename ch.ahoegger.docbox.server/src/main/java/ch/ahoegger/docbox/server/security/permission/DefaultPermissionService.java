@@ -1,7 +1,8 @@
 package ch.ahoegger.docbox.server.security.permission;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -18,14 +19,13 @@ import ch.ahoegger.docbox.shared.security.permission.IDefaultPermissionTable;
 @ApplicationScoped
 public class DefaultPermissionService implements IDefaultPermissionTable {
 
-  public Set<UserPermission> getDefaultPermissions() {
-    Set<UserPermission> result = new HashSet<UserPermission>();
+  public Map<String, Integer> getDefaultPermissions() {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(USERNAME, PERMISSION)).append(" FROM ").append(TABLE_NAME);
     Object[][] rawResult = SQL.select(statementBuilder.toString());
-    for (Object[] up : rawResult) {
-      result.add(new UserPermission(TypeCastUtility.castValue(up[0], String.class), TypeCastUtility.castValue(up[1], Integer.class)));
-    }
-    return result;
+    return Arrays.stream(rawResult).collect(Collectors.toMap(
+        row -> (String) TypeCastUtility.castValue(row[0], String.class),
+        row -> (Integer) TypeCastUtility.castValue(row[1], Integer.class),
+        (p1, p2) -> Math.max(p1, p2)));
   }
 }

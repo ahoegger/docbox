@@ -14,7 +14,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
-import org.eclipse.scout.rt.client.ui.desktop.OpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
@@ -31,13 +30,11 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
-import ch.ahoegger.docbox.client.ClientSession;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
-import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
 import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
 
 /**
@@ -48,9 +45,16 @@ import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
 @PageData(DocumentTableData.class)
 public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.Table> {
 
+  public static final String DOCUMENT_ENTITY = "DOCUMENT";
+
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("Documents");
+  }
+
+  @Override
+  protected void execInitPage() {
+    registerDataChangeListener(DOCUMENT_ENTITY);
   }
 
   @Override
@@ -187,7 +191,7 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
 
       @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-        return CollectionUtility.hashSet(TableMenuType.EmptySpace);
+        return CollectionUtility.hashSet(TableMenuType.EmptySpace, TableMenuType.SingleSelection, TableMenuType.MultiSelection);
       }
 
       @Override
@@ -221,26 +225,6 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
         form.startEdit();
       }
 
-    }
-
-    @Order(3000)
-    public class TestMenu extends AbstractMenu {
-      @Override
-      protected String getConfiguredText() {
-        return TEXTS.get("Open");
-      }
-
-      @Override
-      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-        return CollectionUtility.hashSet(TableMenuType.SingleSelection);
-      }
-
-      @Override
-      protected void execAction() {
-        BinaryResource document = BEANS.get(IDocumentStoreService.class).getDocument(getDocumentIdColumn().getSelectedValue());
-
-        ClientSession.get().getDesktop().openUri(document, OpenUriAction.NEW_WINDOW);
-      }
     }
 
   }

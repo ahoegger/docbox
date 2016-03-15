@@ -113,6 +113,11 @@ public class DocumentForm extends AbstractForm {
     return true;
   }
 
+  @Override
+  protected void execStored() {
+    getDesktop().dataChanged(DocumentTablePage.DOCUMENT_ENTITY);
+  }
+
   public void startPage() {
     startInternal(new PageHandler());
   }
@@ -642,6 +647,11 @@ public class DocumentForm extends AbstractForm {
 
           @Order(10)
           public class UserColumn extends AbstractSmartColumn<String> {
+
+            @Override
+            protected int getConfiguredSortIndex() {
+              return 0;
+            }
 
             @Override
             protected int getConfiguredWidth() {

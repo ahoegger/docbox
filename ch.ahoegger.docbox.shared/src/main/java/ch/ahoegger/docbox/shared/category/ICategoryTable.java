@@ -10,7 +10,7 @@ public interface ICategoryTable {
   public static String TABLE_NAME = "CATEGORY";
 
   // columns
-  public static String CATEGORY_NR = "DOCUMENT_NR";
+  public static String CATEGORY_NR = "CATEGORY_NR";
   public static String NAME = "NAME";
   public static int NAME_LENGTH = 1200;
   public static String DESCRIPTION = "DESCRIPTION";

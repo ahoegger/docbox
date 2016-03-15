@@ -1,7 +1,11 @@
 package ch.ahoegger.docbox.server.document;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.VetoException;
@@ -17,16 +21,15 @@ import ch.ahoegger.docbox.server.ServerSession;
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
-import ch.ahoegger.docbox.server.security.permission.UserPermission;
 import ch.ahoegger.docbox.shared.ISequenceTable;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Permissions.PermissionsRowData;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
+import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
 import ch.ahoegger.docbox.shared.document.IDocumentTable;
 import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
-import ch.ahoegger.docbox.shared.security.permission.IPermissionTable;
 
 /**
  * <h3>{@link DocumentService}</h3>
@@ -42,11 +45,11 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     sqlBuilder.append("SELECT ");
     sqlBuilder.append(SqlFramentBuilder.columnsAliased("DOC", DOCUMENT_NR, ABSTRACT, DOCUMENT_URL));
     sqlBuilder.append(" FROM ").append(TABLE_NAME).append(" ").append(TABLE_ALIAS);
-    sqlBuilder.append(", ").append(IPermissionTable.TABLE_NAME).append(" ").append(IPermissionTable.TABLE_ALIAS);
+    sqlBuilder.append(", ").append(IDocumentPermissionTable.TABLE_NAME).append(" ").append(IDocumentPermissionTable.TABLE_ALIAS);
     sqlBuilder.append(" WHERE 1 = 1");
-    sqlBuilder.append(" AND ").append(IPermissionTable.TABLE_ALIAS).append(".").append(IPermissionTable.USERNAME).append(" = '").append(ServerSession.get().getUserId()).append("'");
-    sqlBuilder.append(" AND ").append(TABLE_ALIAS).append(".").append(DOCUMENT_NR).append(" = ").append(IPermissionTable.TABLE_ALIAS).append(".").append(IPermissionTable.ENTITY_NR);
-    sqlBuilder.append(" AND ").append(IPermissionTable.TABLE_ALIAS).append(".").append(IPermissionTable.PERMISSION).append(" >= ").append(IPermissionTable.PERMISSION_READ);
+    sqlBuilder.append(" AND ").append(IDocumentPermissionTable.TABLE_ALIAS).append(".").append(IDocumentPermissionTable.USERNAME).append(" = '").append(ServerSession.get().getUserId()).append("'");
+    sqlBuilder.append(" AND ").append(TABLE_ALIAS).append(".").append(DOCUMENT_NR).append(" = ").append(IDocumentPermissionTable.TABLE_ALIAS).append(".").append(IDocumentPermissionTable.DOCUMENT_NR);
+    sqlBuilder.append(" AND ").append(IDocumentPermissionTable.TABLE_ALIAS).append(".").append(IDocumentPermissionTable.PERMISSION).append(" >= ").append(IDocumentPermissionTable.PERMISSION_READ);
 
     if (StringUtility.hasText(formData.getAbstract().getValue())) {
       sqlBuilder.append(" AND ").append(SqlFramentBuilder.whereStringContains(TABLE_ALIAS, ABSTRACT, formData.getAbstract().getValue()));
@@ -63,10 +66,14 @@ public class DocumentService implements IDocumentService, IDocumentTable {
   @Override
   public DocumentFormData prepareCreate(DocumentFormData formData) {
     formData.getCapturedDate().setValue(new Date());
-    for (UserPermission up : BEANS.get(DefaultPermissionService.class).getDefaultPermissions()) {
+    Map<String, Integer> defaultPermissions = BEANS.get(DefaultPermissionService.class).getDefaultPermissions();
+    defaultPermissions.remove(ServerSession.get().getUserId());
+    defaultPermissions.put(ServerSession.get().getUserId(), IDocumentPermissionTable.PERMISSION_OWNER);
+    for (Entry<String, Integer> permission : defaultPermissions.entrySet()) {
       PermissionsRowData row = formData.getPermissions().addRow();
-      row.setUser(up.getUsername());
-      row.setPermission(up.getPermission());
+      row.setUser(permission.getKey());
+      row.setPermission(permission.getValue());
+
     }
     return formData;
   }
@@ -89,6 +96,22 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     SQL.insert(statementBuilder.toString(), formData);
 
     // partner
+    BEANS.get(DocumentPartnerService.class).createDocumentPartners(documentId,
+        Arrays.stream(formData.getPartners().getRows())
+            .filter(r -> r.getPartner() != null)
+            .map(r -> r.getPartner()).collect(Collectors.toSet()));
+
+    // categories
+    BEANS.get(DocumentCategoryService.class).createDocumentCategories(documentId, formData.getCategoriesBox().getValue());
+
+    // permissions
+    Map<String, Integer> permissions = Arrays.stream(formData.getPermissions().getRows())
+        .filter(row -> StringUtility.hasText(row.getUser()) && row.getPermission() != null)
+        .collect(Collectors.toMap(
+            row -> row.getUser(),
+            row -> row.getPermission(),
+            (p1, p2) -> Math.max(p1, p2)));
+    BEANS.get(DocumentPermissionService.class).createDocumentPermissions(documentId, permissions);
 
   }
 
@@ -119,6 +142,15 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     // partners
     for (BigDecimal partnerId : BEANS.get(DocumentPartnerService.class).getPartnerIds(formData.getDocumentId())) {
       formData.getPartners().addRow().setPartner(partnerId);
+    }
+    // categories
+    formData.getCategoriesBox().setValue(BEANS.get(DocumentCategoryService.class).getCategoryIds(formData.getDocumentId()));
+
+    // permissions
+    for (Entry<String, Integer> permission : BEANS.get(DocumentPermissionService.class).getPermissions(formData.getDocumentId()).entrySet()) {
+      PermissionsRowData row = formData.getPermissions().addRow();
+      row.setUser(permission.getKey());
+      row.setPermission(permission.getValue());
     }
 
     return formData;

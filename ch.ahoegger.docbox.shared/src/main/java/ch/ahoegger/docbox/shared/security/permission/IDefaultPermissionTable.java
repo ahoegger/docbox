@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.shared.security.permission;
 
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
+import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 
 /**
  * <h3>{@link IDefaultPermissionTable}</h3>
@@ -12,5 +13,5 @@ public interface IDefaultPermissionTable {
   public static String TABLE_ALIAS = "DPS";
 
   public static String USERNAME = IUserTable.USERNAME;
-  public static String PERMISSION = IPermissionTable.PERMISSION;
+  public static String PERMISSION = IDocumentPermissionTable.PERMISSION;
 }

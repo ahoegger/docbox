@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
+import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 import ch.ahoegger.docbox.shared.security.permission.IDefaultPermissionTable;
-import ch.ahoegger.docbox.shared.security.permission.IPermissionTable;
 
 /**
  * <h3>{@link DefaultPermissionTableTask}</h3>
@@ -39,8 +39,8 @@ public class DefaultPermissionTableTask implements ITableTask, IDefaultPermissio
   @Override
   public void createRows(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
-    createDefaultPermissionRow(sqlService, "admin", IPermissionTable.PERMISSION_WRITE);
-    createDefaultPermissionRow(sqlService, "bob", IPermissionTable.PERMISSION_READ);
+    createDefaultPermissionRow(sqlService, "admin", IDocumentPermissionTable.PERMISSION_WRITE);
+    createDefaultPermissionRow(sqlService, "bob", IDocumentPermissionTable.PERMISSION_READ);
   }
 
   private void createDefaultPermissionRow(ISqlService sqlService, String username, int permission) {
