@@ -3,16 +3,18 @@ package ch.ahoegger.docbox.server.database;
 import org.eclipse.scout.rt.server.jdbc.derby.AbstractDerbySqlService;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
+import ch.ahoegger.docbox.shared.ISequenceTable;
+
 /**
  * <h3>{@link AbstractDocboxSqlService}</h3>
  *
  * @author aho
  */
-public class AbstractDocboxSqlService extends AbstractDerbySqlService implements IDocboxSqlService {
+public class AbstractDocboxSqlService extends AbstractDerbySqlService {
 
   @Override
-  public Long getSequenceNextval() {
-    return super.getSequenceNextval("PRIMARY_KEY_SEQ");
+  protected String getConfiguredSequenceColumnName() {
+    return ISequenceTable.LAST_VAL;
   }
 
   @Override

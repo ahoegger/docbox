@@ -4,11 +4,11 @@ import java.util.Date;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.administration.user.UserService;
-import ch.ahoegger.docbox.server.database.IDocboxSqlService;
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 
@@ -37,19 +37,20 @@ public class UserTableTask implements ITableTask, IUserTable {
   }
 
   @Override
-  public void createTable(IDocboxSqlService sqlService) {
-    LOG.info("SQL-DEV create Table: USER");
+  public void createTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV create Table: {0}", TABLE_NAME);
     sqlService.insert(getCreateStatement());
   }
 
   @Override
-  public void createRows(IDocboxSqlService sqlService) {
+  public void createRows(ISqlService sqlService) {
+    LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
     createUser(sqlService, "Cuttis", "Bolion", "cuttis", "pwd", new Date(), null);
     createUser(sqlService, "Bob", "Miller", "bob", "pwd", new Date(), null);
     createUser(sqlService, "Admin", "Manager", "admin", "manager", new Date(), null);
   }
 
-  private void createUser(IDocboxSqlService sqlService, String name, String firstname, String username, String password, Date inserDate, Date validDate) {
+  private void createUser(ISqlService sqlService, String name, String firstname, String username, String password, Date inserDate, Date validDate) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(NAME, FIRSTNAME, USERNAME, PASSWORD, INSERT_DATE, VALID_DATE));

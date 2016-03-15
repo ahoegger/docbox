@@ -1,10 +1,10 @@
 package ch.ahoegger.docbox.server.database.initialization;
 
 import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.server.database.IDocboxSqlService;
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 import ch.ahoegger.docbox.shared.security.permission.IPermissionTable;
@@ -30,13 +30,14 @@ public class PermissionTableTask implements ITableTask, IPermissionTable {
   }
 
   @Override
-  public void createTable(IDocboxSqlService sqlService) {
-    LOG.info("SQL-DEV create Table: " + TABLE_NAME);
+  public void createTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV create Table: {0}", TABLE_NAME);
     sqlService.insert(getCreateStatement());
   }
 
   @Override
-  public void createRows(IDocboxSqlService sqlService) {
+  public void createRows(ISqlService sqlService) {
+    LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
     createPermission(sqlService, "admin", IDevSequenceNumbers.SEQ_START_DOCUMENT, PERMISSION_WRITE);
     createPermission(sqlService, "admin", IDevSequenceNumbers.SEQ_START_DOCUMENT + 1, PERMISSION_WRITE);
     createPermission(sqlService, "admin", IDevSequenceNumbers.SEQ_START_DOCUMENT + 2, PERMISSION_WRITE);
@@ -44,7 +45,7 @@ public class PermissionTableTask implements ITableTask, IPermissionTable {
     createPermission(sqlService, "bob", IDevSequenceNumbers.SEQ_START_DOCUMENT + 1, PERMISSION_WRITE);
   }
 
-  private void createPermission(IDocboxSqlService sqlService, String userId, Long entityId, Integer permission) {
+  private void createPermission(ISqlService sqlService, String userId, Long entityId, Integer permission) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(IUserTable.USERNAME, ENTITY_NR, PERMISSION));

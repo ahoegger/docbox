@@ -15,8 +15,10 @@ import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.ServerSession;
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
+import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
 import ch.ahoegger.docbox.server.security.permission.UserPermission;
+import ch.ahoegger.docbox.shared.ISequenceTable;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Permissions.PermissionsRowData;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
@@ -67,6 +69,27 @@ public class DocumentService implements IDocumentService, IDocumentTable {
       row.setPermission(up.getPermission());
     }
     return formData;
+  }
+
+  @Override
+  public void create(DocumentFormData formData) {
+    // create document
+    Long documentId = SQL.getSequenceNextval(ISequenceTable.TABLE_NAME);
+    formData.setDocumentId(documentId);
+    String documentPath = BEANS.get(DocumentStoreService.class).store(formData.getDocument().getValue(), formData.getCapturedDate().getValue(), documentId);
+    formData.setDocumentPath(documentPath);
+
+    // create document
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
+    statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE));
+    statementBuilder.append(") VALUES (");
+    statementBuilder.append(":documentId, :abstract, :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage");
+    statementBuilder.append(" )");
+    SQL.insert(statementBuilder.toString(), formData);
+
+    // partner
+
   }
 
   @Override

@@ -1,11 +1,11 @@
 package ch.ahoegger.docbox.server.database.initialization;
 
 import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.administration.user.IUserRoleTable;
-import ch.ahoegger.docbox.server.database.IDocboxSqlService;
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 
@@ -29,16 +29,18 @@ public class UserRoleTableTask implements ITableTask, IUserRoleTable {
   }
 
   @Override
-  public void createTable(IDocboxSqlService sqlService) {
+  public void createTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV create Table: {0}", TABLE_NAME);
     sqlService.insert(getCreateStatement());
   }
 
   @Override
-  public void createRows(IDocboxSqlService sqlService) {
+  public void createRows(ISqlService sqlService) {
+    LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
     createUserRole(sqlService, IDevSequenceNumbers.SEQ_START_ROLE, "admin");
   }
 
-  private void createUserRole(IDocboxSqlService sqlService, Long roleId, String username) {
+  private void createUserRole(ISqlService sqlService, Long roleId, String username) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(ROLE_NR, USERNAME));

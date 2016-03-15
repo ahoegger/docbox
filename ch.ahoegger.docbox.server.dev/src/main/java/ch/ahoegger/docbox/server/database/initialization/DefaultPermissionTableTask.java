@@ -1,10 +1,10 @@
 package ch.ahoegger.docbox.server.database.initialization;
 
 import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.server.database.IDocboxSqlService;
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 import ch.ahoegger.docbox.shared.security.permission.IDefaultPermissionTable;
@@ -31,17 +31,19 @@ public class DefaultPermissionTableTask implements ITableTask, IDefaultPermissio
   }
 
   @Override
-  public void createTable(IDocboxSqlService sqlService) {
+  public void createTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV create Table: {0}", TABLE_NAME);
     sqlService.insert(getCreateStatement());
   }
 
   @Override
-  public void createRows(IDocboxSqlService sqlService) {
+  public void createRows(ISqlService sqlService) {
+    LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
     createDefaultPermissionRow(sqlService, "admin", IPermissionTable.PERMISSION_WRITE);
     createDefaultPermissionRow(sqlService, "bob", IPermissionTable.PERMISSION_READ);
   }
 
-  private void createDefaultPermissionRow(IDocboxSqlService sqlService, String username, int permission) {
+  private void createDefaultPermissionRow(ISqlService sqlService, String username, int permission) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(USERNAME, PERMISSION));

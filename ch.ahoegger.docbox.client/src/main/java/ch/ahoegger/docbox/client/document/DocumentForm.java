@@ -837,7 +837,7 @@ public class DocumentForm extends AbstractForm {
     protected void execStore() {
       DocumentFormData formData = new DocumentFormData();
       exportFormData(formData);
-      BEANS.get(IDocumentService.class).store(formData);
+      BEANS.get(IDocumentService.class).create(formData);
     }
   }
 
@@ -853,6 +853,9 @@ public class DocumentForm extends AbstractForm {
 
     @Override
     protected void execStore() {
+      DocumentFormData formData = new DocumentFormData();
+      exportFormData(formData);
+      BEANS.get(IDocumentService.class).store(formData);
     }
   }
 

@@ -1,10 +1,10 @@
 package ch.ahoegger.docbox.server.database.initialization;
 
 import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.server.database.IDocboxSqlService;
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.server.security.role.IRoleTable;
 
@@ -28,16 +28,17 @@ public class RoleTableTask implements ITableTask, IRoleTable {
   }
 
   @Override
-  public void createTable(IDocboxSqlService sqlService) {
+  public void createTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV create Table: {0}", TABLE_NAME);
     sqlService.insert(getCreateStatement());
   }
 
   @Override
-  public void createRows(IDocboxSqlService sqlService) {
+  public void createRows(ISqlService sqlService) {
     createRole(sqlService, IDevSequenceNumbers.SEQ_START_ROLE, "admin");
   }
 
-  private void createRole(IDocboxSqlService sqlService, Long roleId, String roleName) {
+  private void createRole(ISqlService sqlService, Long roleId, String roleName) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(ROLE_NR, NAME));
