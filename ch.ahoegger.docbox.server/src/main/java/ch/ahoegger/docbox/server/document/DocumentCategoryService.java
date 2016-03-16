@@ -47,4 +47,10 @@ public class DocumentCategoryService implements IDocumentCategoryTable {
       }
     }
   }
+
+  public void delete(Long categoryId) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(CATEGORY_NR).append(" = :categoryId");
+    SQL.delete(statementBuilder.toString(), new NVPair("categoryId", categoryId));
+  }
 }

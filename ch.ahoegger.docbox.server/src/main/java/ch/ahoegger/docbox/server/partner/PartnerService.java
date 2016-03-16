@@ -1,28 +1,34 @@
 package ch.ahoegger.docbox.server.partner;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
+import ch.ahoegger.docbox.server.document.DocumentPartnerService;
+import ch.ahoegger.docbox.shared.ISequenceTable;
 import ch.ahoegger.docbox.shared.document.IDocumentPartnerTable;
+import ch.ahoegger.docbox.shared.partner.IPartnerService;
 import ch.ahoegger.docbox.shared.partner.IPartnerTable;
 import ch.ahoegger.docbox.shared.partner.Partner;
+import ch.ahoegger.docbox.shared.partner.PartnerFormData;
 
 /**
  * <h3>{@link PartnerService}</h3>
  *
  * @author aho
  */
-@ApplicationScoped
-public class PartnerService implements IPartnerTable {
+public class PartnerService implements IPartnerService, IPartnerTable {
 
+  @RemoteServiceAccessDenied
   public List<Partner> getPartners(Long documentId) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, PARTNER_NR, NAME, DESCRIPTION, START_DATE, END_DATE));
@@ -40,5 +46,56 @@ public class PartnerService implements IPartnerTable {
         .withEndDate(TypeCastUtility.castValue(row[4], Date.class)))
         .collect(Collectors.toList());
 
+  }
+
+  @Override
+  public PartnerFormData prepareCreate(PartnerFormData formData) {
+    formData.getStartDate().setValue(new Date());
+    return formData;
+  }
+
+  @Override
+  public PartnerFormData create(PartnerFormData formData) {
+    formData.setPartnerId(new BigDecimal(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME)));
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("INSERT INTO ").append(TABLE_NAME);
+    statementBuilder.append(" (").append(SqlFramentBuilder.columns(PARTNER_NR, NAME, DESCRIPTION, START_DATE, END_DATE)).append(")");
+    statementBuilder.append(" VALUES (:partnerId, :name, :description, :startDate, :endDate )");
+    SQL.insert(statementBuilder.toString(), formData);
+    return formData;
+  }
+
+  @Override
+  public PartnerFormData load(PartnerFormData formData) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(SqlFramentBuilder.columns(NAME, DESCRIPTION, START_DATE, END_DATE)));
+    statementBuilder.append(" FROM ").append(TABLE_NAME);
+    statementBuilder.append(" WHERE ").append(PARTNER_NR).append(" = :partnerId");
+    statementBuilder.append(" INTO :name, :description, :startDate, :endDate");
+    SQL.selectInto(statementBuilder.toString(), formData);
+    return formData;
+  }
+
+  @Override
+  public PartnerFormData store(PartnerFormData formData) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("UPDATE ").append(TABLE_NAME).append(" SET ");
+    statementBuilder.append(NAME).append("= :name, ");
+    statementBuilder.append(DESCRIPTION).append("= :description, ");
+    statementBuilder.append(START_DATE).append("= :startDate, ");
+    statementBuilder.append(END_DATE).append("= :endDate ");
+    statementBuilder.append(" WHERE ").append(PARTNER_NR).append(" = :partnerId");
+    SQL.update(statementBuilder.toString(), formData);
+    return formData;
+  }
+
+  @Override
+  public void delete(Long partnerId) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(PARTNER_NR).append(" = :partnerId");
+    SQL.delete(statementBuilder.toString(), new NVPair("partnerId", partnerId));
+
+    // delete document category connection
+    BEANS.get(DocumentPartnerService.class).delete(partnerId);
   }
 }

@@ -48,4 +48,11 @@ public class DocumentPartnerService implements IDocumentPartnerTable {
       }
     }
   }
+
+  public void delete(Long partnerId) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(PARTNER_NR).append(" = :partnerId");
+    SQL.delete(statementBuilder.toString(), new NVPair("partnerId", partnerId));
+
+  }
 }

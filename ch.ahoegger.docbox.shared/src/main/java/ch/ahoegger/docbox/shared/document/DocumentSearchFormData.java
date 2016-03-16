@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.shared.document;
 
+import java.math.BigDecimal;
+
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -18,7 +20,16 @@ public class DocumentSearchFormData extends AbstractFormData {
     return getFieldByClass(Abstract.class);
   }
 
+  public Partner getPartner() {
+    return getFieldByClass(Partner.class);
+  }
+
   public static class Abstract extends AbstractValueFieldData<String> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class Partner extends AbstractValueFieldData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

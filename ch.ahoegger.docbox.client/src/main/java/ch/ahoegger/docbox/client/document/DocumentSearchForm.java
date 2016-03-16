@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.client.document;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
@@ -8,17 +10,21 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractSearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractResetButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractSearchButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.ResetButton;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchButton;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.AbstractField;
+import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.PartnerField;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
+import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
 
 /**
  * <h3>{@link DocumentSearchForm}</h3>
@@ -42,6 +48,10 @@ public class DocumentSearchForm extends AbstractSearchForm {
 
   public SearchButton getSearchButton() {
     return getFieldByClass(SearchButton.class);
+  }
+
+  public PartnerField getPartnerField() {
+    return getFieldByClass(PartnerField.class);
   }
 
   public ResetButton getResetButton() {
@@ -72,6 +82,20 @@ public class DocumentSearchForm extends AbstractSearchForm {
             return 400;
           }
         }
+
+        @Order(2000)
+        public class PartnerField extends AbstractSmartField<BigDecimal> {
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("Partner");
+          }
+
+          @Override
+          protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
+            return PartnerLookupCall.class;
+          }
+        }
+
       }
 
     }

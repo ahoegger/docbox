@@ -11,12 +11,15 @@ import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.ValueFieldMenuType;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
+import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
@@ -33,6 +36,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBo
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -42,6 +47,8 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
+import ch.ahoegger.docbox.client.category.CategoryForm;
+import ch.ahoegger.docbox.client.category.CategoryTablePage;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.CancelButton;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.AbstractField;
@@ -65,8 +72,10 @@ import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.ValidDat
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.OkButton;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI;
+import ch.ahoegger.docbox.client.partner.PartnerForm;
 import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
 import ch.ahoegger.docbox.shared.category.CategoryLookupCall;
+import ch.ahoegger.docbox.shared.category.ICategoryService;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Partners;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
@@ -441,6 +450,23 @@ public class DocumentForm extends AbstractForm {
               }
             }
 
+            @Order(1000)
+            public class NewPartnerMenu extends AbstractMenu {
+              @Override
+              protected String getConfiguredText() {
+                return TEXTS.get("New");
+              }
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.hashSet(ValueFieldMenuType.NotNull, ValueFieldMenuType.Null);
+              }
+
+              @Override
+              protected void execAction() {
+              }
+            }
+
           }
 
           @Order(2000)
@@ -563,6 +589,35 @@ public class DocumentForm extends AbstractForm {
               }
             }
 
+            @Order(3000)
+            public class NewPartnerMenu extends AbstractMenu {
+              @Override
+              protected String getConfiguredText() {
+                return TEXTS.get("New");
+              }
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.hashSet(TableMenuType.SingleSelection, TableMenuType.EmptySpace);
+              }
+
+              @Override
+              protected void execAction() {
+                PartnerForm form = new PartnerForm();
+                form.startNew();
+                form.addFormListener(new FormListener() {
+
+                  @Override
+                  public void formChanged(FormEvent e) {
+                    if (FormEvent.TYPE_STORE_AFTER == e.getType()) {
+                      ITableRow row = addRow(createRow(), true);
+                      getPartnerColumn().setValue(row, form.getPartnerId());
+                    }
+                  }
+                });
+              }
+            }
+
           }
 
         }
@@ -585,6 +640,108 @@ public class DocumentForm extends AbstractForm {
         protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
           return CategoryLookupCall.class;
         }
+
+        @Override
+        protected void execInitField() {
+          registerDataChangeListener(CategoryTablePage.CATEGORY_ENTITY);
+        }
+
+        @Override
+        protected void execDataChanged(Object... dataTypes) {
+          loadListBoxData();
+          super.execDataChanged(dataTypes);
+        }
+
+        @Override
+        protected void execPrepareLookup(ILookupCall<BigDecimal> call) {
+          call.setMaster(CategoryTablePage.CATEGORY_ENTITY);
+        }
+
+        public class CategoriesTable extends DefaultListBoxTable {
+
+          @Order(1000)
+          public class NewCategoryMenu extends AbstractMenu {
+            @Override
+            protected String getConfiguredText() {
+              return TEXTS.get("New");
+            }
+
+            @Override
+            protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+              return CollectionUtility.hashSet(TableMenuType.EmptySpace, TableMenuType.SingleSelection);
+            }
+
+            @Override
+            protected void execAction() {
+              CategoryForm form = new CategoryForm();
+              form.startNew();
+              form.addFormListener(new FormListener() {
+
+                @Override
+                public void formChanged(FormEvent e) {
+                  if (e.getType() == FormEvent.TYPE_STORE_AFTER) {
+
+                    ITableRow newRow = getKeyColumn().findRow(form.getCategoryId());
+                    if (newRow != null) {
+                      checkRow(newRow, true);
+                    }
+                  }
+                }
+              });
+            }
+          }
+
+          @Order(1500)
+          public class EditMenu extends AbstractMenu {
+            @Override
+            protected String getConfiguredText() {
+              return TEXTS.get("Edit");
+            }
+
+            @Override
+            protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+              return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+            }
+
+            @Override
+            protected void execAction() {
+              CategoryForm form = new CategoryForm();
+              form.setCategoryId(getKeyColumn().getSelectedValue());
+              form.startModify();
+            }
+          }
+
+          @Order(2000)
+          public class DeleteCategoryMenu extends AbstractMenu {
+            @Override
+            protected String getConfiguredText() {
+              return TEXTS.get("Delete");
+            }
+
+            @Override
+            protected double getConfiguredViewOrder() {
+              // TODO check admin
+              return super.getConfiguredViewOrder();
+            }
+
+            @Override
+            protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+              return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+            }
+
+            @Override
+            protected void execAction() {
+              if (MessageBox.YES_OPTION == MessageBoxes.createYesNo()
+                  .withHeader(TEXTS.get("Delete"))
+                  .withBody(TEXTS.get("VerificationDelete", getTextColumn().getSelectedDisplayText())).show()) {
+                BEANS.get(ICategoryService.class).delete(getKeyColumn().getSelectedValue().longValue());
+                getDesktop().dataChanged(CategoryTablePage.CATEGORY_ENTITY);
+              }
+            }
+          }
+
+        }
+
       }
 
       @Order(2000)

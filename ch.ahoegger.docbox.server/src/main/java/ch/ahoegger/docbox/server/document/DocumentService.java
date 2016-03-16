@@ -27,6 +27,7 @@ import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Permissions.PermissionsRowData;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
+import ch.ahoegger.docbox.shared.document.IDocumentPartnerTable;
 import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
 import ch.ahoegger.docbox.shared.document.IDocumentTable;
@@ -44,7 +45,7 @@ public class DocumentService implements IDocumentService, IDocumentTable {
   public DocumentTableData getTableData(DocumentSearchFormData formData) {
     StringBuilder sqlBuilder = new StringBuilder();
     sqlBuilder.append("SELECT ");
-    sqlBuilder.append(SqlFramentBuilder.columnsAliased("DOC", DOCUMENT_NR, ABSTRACT, DOCUMENT_URL));
+    sqlBuilder.append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR, ABSTRACT, DOCUMENT_URL));
     sqlBuilder.append(" FROM ").append(TABLE_NAME).append(" ").append(TABLE_ALIAS);
     sqlBuilder.append(", ").append(IDocumentPermissionTable.TABLE_NAME).append(" ").append(IDocumentPermissionTable.TABLE_ALIAS);
     sqlBuilder.append(" WHERE 1 = 1");
@@ -52,15 +53,26 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     sqlBuilder.append(" AND ").append(TABLE_ALIAS).append(".").append(DOCUMENT_NR).append(" = ").append(IDocumentPermissionTable.TABLE_ALIAS).append(".").append(IDocumentPermissionTable.DOCUMENT_NR);
     sqlBuilder.append(" AND ").append(IDocumentPermissionTable.TABLE_ALIAS).append(".").append(IDocumentPermissionTable.PERMISSION).append(" >= ").append(IDocumentPermissionTable.PERMISSION_READ);
 
+    // abstract search criteria
     if (StringUtility.hasText(formData.getAbstract().getValue())) {
       sqlBuilder.append(" AND ").append(SqlFramentBuilder.whereStringContains(TABLE_ALIAS, ABSTRACT, formData.getAbstract().getValue()));
     }
+    // partner search criteria
+    if (formData.getPartner().getValue() != null) {
+      sqlBuilder.append(" AND EXISTS ( SELECT 1 FROM ").append(IDocumentPartnerTable.TABLE_NAME).append(" AS ").append(IDocumentPartnerTable.TABLE_ALIAS);
+      sqlBuilder.append(" WHERE ").append(SqlFramentBuilder.columnsAliased(IDocumentPartnerTable.TABLE_ALIAS, IDocumentPartnerTable.PARTNER_NR)).append(" = ").append(":partner");
+      sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentPartnerTable.TABLE_ALIAS, IDocumentPartnerTable.DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR));
+      sqlBuilder.append(")");
+    }
+
     sqlBuilder.append(" INTO ");
     sqlBuilder.append(":{td.documentId}, ");
     sqlBuilder.append(":{td.abstract}, ");
     sqlBuilder.append(":{td.documentPath} ");
     DocumentTableData tableData = new DocumentTableData();
-    SQL.selectInto(sqlBuilder.toString(), new NVPair("td", tableData));
+    SQL.selectInto(sqlBuilder.toString(),
+        new NVPair("td", tableData),
+        formData);
 
     // partners
 
