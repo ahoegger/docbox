@@ -1,7 +1,5 @@
 package ch.ahoegger.docbox.shared.document;
 
-import java.math.BigDecimal;
-
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
@@ -59,7 +57,7 @@ public class DocumentTableData extends AbstractTablePageData {
     public static final String documentPath = "documentPath";
     private Long m_documentId;
     private String m_abstract;
-    private BigDecimal m_partner;
+    private String m_partner;
     private String m_documentPath;
 
     public Long getDocumentId() {
@@ -78,11 +76,11 @@ public class DocumentTableData extends AbstractTablePageData {
       m_abstract = newAbstract;
     }
 
-    public BigDecimal getPartner() {
+    public String getPartner() {
       return m_partner;
     }
 
-    public void setPartner(BigDecimal newPartner) {
+    public void setPartner(String newPartner) {
       m_partner = newPartner;
     }
 

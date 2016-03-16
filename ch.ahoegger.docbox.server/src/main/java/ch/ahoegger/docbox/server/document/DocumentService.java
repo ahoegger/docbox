@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import ch.ahoegger.docbox.server.ServerSession;
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
+import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
 import ch.ahoegger.docbox.shared.ISequenceTable;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
@@ -60,6 +61,13 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     sqlBuilder.append(":{td.documentPath} ");
     DocumentTableData tableData = new DocumentTableData();
     SQL.selectInto(sqlBuilder.toString(), new NVPair("td", tableData));
+
+    // partners
+
+    Arrays.stream(tableData.getRows()).forEach(row -> row.setPartner(BEANS.get(PartnerService.class).getPartners(row.getDocumentId())
+        .stream().map(p -> p.getName()).reduce((p1, p2) -> p1 + ", " + p2)
+        .orElse("")));
+
     return tableData;
   }
 

@@ -1,6 +1,5 @@
 package ch.ahoegger.docbox.client.document;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
@@ -12,7 +11,6 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -28,14 +26,12 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
-import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
 
 /**
  * <h3>{@link DocumentTablePage}</h3>
@@ -132,7 +128,7 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
     }
 
     @Order(30)
-    public class PartnerColumn extends AbstractSmartColumn<BigDecimal> {
+    public class PartnerColumn extends AbstractStringColumn {
       @Override
       protected String getConfiguredHeaderText() {
         return TEXTS.get("Partner");
@@ -141,11 +137,6 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
       @Override
       protected int getConfiguredWidth() {
         return 200;
-      }
-
-      @Override
-      protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
-        return PartnerLookupCall.class;
       }
     }
 

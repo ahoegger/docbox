@@ -8,6 +8,7 @@ package ch.ahoegger.docbox.shared.partner;
 public interface IPartnerTable {
 
   public static String TABLE_NAME = "PARTNER";
+  public static String TABLE_ALIAS = "P";
 
   public static String PARTNER_NR = "PARTNER_NR";
   public static String NAME = "NAME";
