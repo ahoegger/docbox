@@ -18,7 +18,7 @@ import ch.ahoegger.docbox.shared.security.permission.IPermissionService;
 /**
  * <h3>{@link DocumentPermissionService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentPermissionService implements IPermissionService, IDocumentPermissionTable {
 

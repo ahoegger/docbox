@@ -18,7 +18,7 @@ import ch.ahoegger.docbox.shared.helloworld.IHelloWorldFormService;
 /**
  * <h3>{@link HelloWorldForm}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @FormData(value = HelloWorldFormData.class, sdkCommand = FormData.SdkCommand.CREATE)
 public class HelloWorldForm extends AbstractForm {

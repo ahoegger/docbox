@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 /**
  * <h3>{@link SqlFramentBuilder}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class SqlFramentBuilder {
 

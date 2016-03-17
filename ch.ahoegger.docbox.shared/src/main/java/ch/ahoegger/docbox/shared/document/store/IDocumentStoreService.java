@@ -7,7 +7,7 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
 /**
  * <h3>{@link IFileService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @ApplicationScoped
 @TunnelToServer

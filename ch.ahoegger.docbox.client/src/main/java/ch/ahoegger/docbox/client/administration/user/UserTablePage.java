@@ -17,7 +17,7 @@ import ch.ahoegger.docbox.shared.administration.user.UserTablePageData;
 /**
  * <h3>{@link UserTablePage}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @PageData(UserTablePageData.class)
 public class UserTablePage extends AbstractPageWithTable<UserTablePage.Table> {

@@ -13,7 +13,7 @@ import ch.ahoegger.docbox.shared.partner.IPartnerTable;
 /**
  * <h3>{@link PartnerTableTask}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class PartnerTableTask implements ITableTask, IPartnerTable {
   private static final Logger LOG = LoggerFactory.getLogger(PartnerTableTask.class);

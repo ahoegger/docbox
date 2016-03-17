@@ -9,7 +9,7 @@ import ch.ahoegger.docbox.shared.Icons;
 /**
  * <h3>{@link SettingsOutline}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Order(3000)
 public class SettingsOutline extends AbstractOutline {

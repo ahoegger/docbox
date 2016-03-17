@@ -6,7 +6,7 @@ import java.security.Permission;
 /**
  * <h3>{@link DocumentReadPermission}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentReadPermission extends BasicPermission {
   private static final long serialVersionUID = 1L;

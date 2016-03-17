@@ -7,7 +7,7 @@ package ch.ahoegger.docbox.client;
  * <br>
  * Usage: <code>ResourceBase.class.getResource("relativeFolder/file.ext")</code>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public final class ResourceBase {
 	private ResourceBase() {

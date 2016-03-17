@@ -9,7 +9,7 @@ import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 /**
  * <h3>{@link UserLookupService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class UserLookupService extends AbstractSqlLookupService<String> implements IUserLookupService, IUserTable {
 

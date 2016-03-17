@@ -10,7 +10,7 @@ import ch.ahoegger.docbox.shared.administration.user.UserFormData;
 /**
  * <h3>{@link UserDetailPage}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class UserDetailPage extends AbstractPageWithNodes {
 

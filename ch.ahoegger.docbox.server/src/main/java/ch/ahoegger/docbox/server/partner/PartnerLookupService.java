@@ -11,7 +11,7 @@ import ch.ahoegger.docbox.shared.partner.IPartnerTable;
 /**
  * <h3>{@link PartnerLookupService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class PartnerLookupService extends AbstractSqlLookupService<BigDecimal> implements IParterLookupService, IPartnerTable {
 

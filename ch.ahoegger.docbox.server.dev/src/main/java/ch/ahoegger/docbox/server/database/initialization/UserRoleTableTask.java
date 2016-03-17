@@ -12,7 +12,7 @@ import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 /**
  * <h3>{@link UserRoleTableTask}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class UserRoleTableTask implements ITableTask, IUserRoleTable {
   private static final Logger LOG = LoggerFactory.getLogger(UserRoleTableTask.class);

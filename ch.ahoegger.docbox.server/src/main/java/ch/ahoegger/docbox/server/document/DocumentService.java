@@ -36,7 +36,7 @@ import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
 /**
  * <h3>{@link DocumentService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentService implements IDocumentService, IDocumentTable {
   private static final Logger LOG = LoggerFactory.getLogger(DocumentService.class);

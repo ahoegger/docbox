@@ -3,7 +3,7 @@ package ch.ahoegger.docbox.shared.category;
 /**
  * <h3>{@link ICategoryTable}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public interface ICategoryTable {
   public static String TABLE_ALIAS = "CAT";

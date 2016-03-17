@@ -1,9 +1,11 @@
 package ch.ahoegger.docbox.shared.document;
 
+import ch.ahoegger.docbox.shared.conversation.IConversationTable;
+
 /**
  * <h3>{@link IDocumentTable}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public interface IDocumentTable {
 
@@ -21,4 +23,5 @@ public interface IDocumentTable {
   public static int DOCUMENT_URL_LENGTH = 1200;
   public static String ORIGINAL_STORAGE = "ORIGINAL_STORAGE";
   public static int ORIGINAL_STORAGE_LENGTH = 1200;
+  public static String CONVERSATION_NR = IConversationTable.CONVERSATION_NR;
 }

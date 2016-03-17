@@ -3,7 +3,7 @@ package ch.ahoegger.docbox.shared;
 /**
  * <h3>{@link ISequenceTable}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public interface ISequenceTable {
 

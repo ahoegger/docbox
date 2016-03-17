@@ -11,7 +11,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentCategoryTable;
 /**
  * <h3>{@link DocumentCategoryTableTask}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentCategoryTableTask implements ITableTask, IDocumentCategoryTable {
 

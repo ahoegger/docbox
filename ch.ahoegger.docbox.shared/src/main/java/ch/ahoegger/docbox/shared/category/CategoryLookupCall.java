@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 /**
  * <h3>{@link CategoryLookupCall}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class CategoryLookupCall extends LookupCall<BigDecimal> {
 

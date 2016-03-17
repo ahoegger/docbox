@@ -11,7 +11,7 @@ import ch.ahoegger.docbox.client.administration.user.UserTablePage;
 /**
  * <h3>{@link AdministrationOutline}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class AdministrationOutline extends AbstractOutline {
   @Override

@@ -29,7 +29,7 @@ import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
 /**
  * <h3>{@link DocumentSearchForm}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @FormData(value = DocumentSearchFormData.class, sdkCommand = SdkCommand.CREATE)
 public class DocumentSearchForm extends AbstractSearchForm {

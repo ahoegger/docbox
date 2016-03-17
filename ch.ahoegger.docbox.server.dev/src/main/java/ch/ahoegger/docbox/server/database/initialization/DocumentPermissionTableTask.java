@@ -12,7 +12,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 /**
  * <h3>{@link DocumentPermissionTableTask}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentPermissionTableTask implements ITableTask, IDocumentPermissionTable {
   private static final Logger LOG = LoggerFactory.getLogger(DocumentPermissionTableTask.class);

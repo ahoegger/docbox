@@ -19,7 +19,7 @@ import ch.ahoegger.docbox.shared.administration.user.IUserService;
 /**
  * <h3>{@link UserCredentialsVerifier}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class UserCredentialsVerifier implements ICredentialVerifier {
 

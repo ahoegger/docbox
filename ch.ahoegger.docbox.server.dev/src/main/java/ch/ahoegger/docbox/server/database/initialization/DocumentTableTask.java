@@ -20,7 +20,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentTable;
 /**
  * <h3>{@link DocumentTableTask}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentTableTask implements ITableTask, IDocumentTable {
   private static final Logger LOG = LoggerFactory.getLogger(DocumentTableTask.class);
@@ -36,6 +36,7 @@ public class DocumentTableTask implements ITableTask, IDocumentTable {
     statementBuilder.append(VALID_DATE).append(" DATE, ");
     statementBuilder.append(DOCUMENT_URL).append(" VARCHAR(").append(DOCUMENT_URL_LENGTH).append("), ");
     statementBuilder.append(ORIGINAL_STORAGE).append(" VARCHAR(").append(ORIGINAL_STORAGE_LENGTH).append("), ");
+    statementBuilder.append(CONVERSATION_NR).append(" DECIMAL, ");
     statementBuilder.append("PRIMARY KEY (").append(DOCUMENT_NR).append(")");
     statementBuilder.append(" )");
     return statementBuilder.toString();
@@ -51,22 +52,22 @@ public class DocumentTableTask implements ITableTask, IDocumentTable {
   public void createRows(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
     try {
-      createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT, "A sample document", new Date(), new Date(), new Date(), "2016_03_08_124640.pdf", null);
-      createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT + 1, "Bobs document", new Date(), new Date(), new Date(), "2016_03_08_124640.pdf", null);
-      createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT + 2, "Muliple partner document", new Date(), new Date(), new Date(), "2016_03_08_124640.pdf", null);
+      createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT, "A sample document", new Date(), new Date(), new Date(), "2016_03_08_124640.pdf", null, null);
+      createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT + 1, "Bobs document", new Date(), new Date(), new Date(), "2016_03_08_124640.pdf", null, null);
+      createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT + 2, "Muliple partner document", new Date(), new Date(), new Date(), "2016_03_08_124640.pdf", null, null);
     }
     catch (IOException e) {
       LOG.error("Could not add dev documents to data store.", e);
     }
   }
 
-  public void createDocumentRow(ISqlService sqlService, long documentId, String abstractText, Date documentDate, Date capturedDate, Date validDate, String devDocumentName, String originalStorage) throws IOException {
+  public void createDocumentRow(ISqlService sqlService, long documentId, String abstractText, Date documentDate, Date capturedDate, Date validDate, String devDocumentName, String originalStorage, Long conversationId) throws IOException {
     String docPath = addDevDocument(devDocumentName, capturedDate, documentId);
     StringBuilder sqlBuilder = new StringBuilder();
     sqlBuilder.append("INSERT INTO ").append(TABLE_NAME);
-    sqlBuilder.append(" (").append(SqlFramentBuilder.columns(DOCUMENT_NR, ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE));
+    sqlBuilder.append(" (").append(SqlFramentBuilder.columns(DOCUMENT_NR, ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE, CONVERSATION_NR));
     sqlBuilder.append(") VALUES ( ");
-    sqlBuilder.append(":documentId, :abstract, :documentDate, :insertDate, :validDate, :documentUrl, :originalStorage");
+    sqlBuilder.append(":documentId, :abstract, :documentDate, :insertDate, :validDate, :documentUrl, :originalStorage, :conversationId");
     sqlBuilder.append(")");
 
     sqlService.insert(sqlBuilder.toString(),
@@ -76,7 +77,8 @@ public class DocumentTableTask implements ITableTask, IDocumentTable {
         new NVPair("insertDate", capturedDate),
         new NVPair("validDate", validDate),
         new NVPair("documentUrl", docPath),
-        new NVPair("originalStorage", originalStorage));
+        new NVPair("originalStorage", originalStorage),
+        new NVPair("conversationId", conversationId));
   }
 
   private String addDevDocument(String fileName, Date insertDate, Long documentId) throws IOException {

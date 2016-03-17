@@ -27,7 +27,7 @@ import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
 /**
  * <h3>{@link DocumentStoreService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentStoreService implements IDocumentStoreService {
   private static final Logger LOG = LoggerFactory.getLogger(DocumentStoreService.class);

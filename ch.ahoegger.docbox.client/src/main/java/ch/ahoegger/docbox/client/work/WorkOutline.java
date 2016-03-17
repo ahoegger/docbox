@@ -14,7 +14,7 @@ import ch.ahoegger.docbox.shared.Icons;
 /**
  * <h3>{@link WorkOutline}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Order(1000)
 public class WorkOutline extends AbstractOutline {

@@ -11,7 +11,7 @@ import ch.ahoegger.docbox.shared.category.ICategoryTable;
 /**
  * <h3>{@link CategoryLookupService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class CategoryLookupService extends AbstractSqlLookupService<BigDecimal> implements ICategoryLookupService, ICategoryTable {
 

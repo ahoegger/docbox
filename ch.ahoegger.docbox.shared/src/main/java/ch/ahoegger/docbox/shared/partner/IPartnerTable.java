@@ -3,7 +3,7 @@ package ch.ahoegger.docbox.shared.partner;
 /**
  * <h3>{@link IPartnerTable}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public interface IPartnerTable {
 

@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * <h3>{@link Partner}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class Partner {
 

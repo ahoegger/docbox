@@ -5,7 +5,7 @@ import ch.ahoegger.docbox.shared.category.ICategoryTable;
 /**
  * <h3>{@link IDocumentCategoryTable}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public interface IDocumentCategoryTable {
   public static String TABLE_NAME = "DOCUMENT_CATEGORY";

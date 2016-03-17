@@ -37,7 +37,7 @@ import ch.ahoegger.docbox.shared.security.role.RoleLookupCall;
 /**
  * <h3>{@link UserForm}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @FormData(value = UserFormData.class, sdkCommand = SdkCommand.CREATE)
 public class UserForm extends AbstractForm {

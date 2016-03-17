@@ -13,7 +13,7 @@ import ch.ahoegger.docbox.shared.security.permission.IDefaultPermissionTable;
 /**
  * <h3>{@link DefaultPermissionTableTask}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DefaultPermissionTableTask implements ITableTask, IDefaultPermissionTable {
 

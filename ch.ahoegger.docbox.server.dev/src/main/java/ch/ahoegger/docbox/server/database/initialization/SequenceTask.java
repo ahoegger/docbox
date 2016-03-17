@@ -11,7 +11,7 @@ import ch.ahoegger.docbox.shared.ISequenceTable;
 /**
  * <h3>{@link SequenceTask}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Order(-20)
 public class SequenceTask implements ITableTask, ISequenceTable {

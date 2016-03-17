@@ -10,7 +10,7 @@ import ch.ahoegger.docbox.shared.Icons;
 /**
  * <h3>{@link SearchOutline}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Order(2000)
 public class SearchOutline extends AbstractSearchOutline {

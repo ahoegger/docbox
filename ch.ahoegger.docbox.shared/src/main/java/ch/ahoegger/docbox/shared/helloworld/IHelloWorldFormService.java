@@ -8,7 +8,7 @@ import ch.ahoegger.docbox.shared.helloworld.HelloWorldFormData;
 /**
  * <h3>{@link IHelloWorldFormService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @TunnelToServer
 public interface IHelloWorldFormService extends IService {

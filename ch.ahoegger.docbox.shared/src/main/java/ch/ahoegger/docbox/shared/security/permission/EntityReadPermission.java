@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 /**
  * <h3>{@link EntityReadPermission}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class EntityReadPermission extends BasicPermission {
   private static final long serialVersionUID = 1L;

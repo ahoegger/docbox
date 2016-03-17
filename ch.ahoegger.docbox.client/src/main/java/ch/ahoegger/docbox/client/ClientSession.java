@@ -10,7 +10,7 @@ import ch.ahoegger.docbox.client.Desktop;
 /**
  * <h3>{@link ClientSession}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class ClientSession extends AbstractClientSession {
 

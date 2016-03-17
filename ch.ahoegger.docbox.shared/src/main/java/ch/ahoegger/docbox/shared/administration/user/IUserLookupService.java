@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 /**
  * <h3>{@link IUserLookupService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @TunnelToServer
 public interface IUserLookupService extends ILookupService<String> {

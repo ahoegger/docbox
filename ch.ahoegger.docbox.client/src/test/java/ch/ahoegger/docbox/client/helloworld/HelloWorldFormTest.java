@@ -20,7 +20,7 @@ import ch.ahoegger.docbox.shared.helloworld.IHelloWorldFormService;
  * <h3>{@link HelloWorldFormTest}</h3> Contains Tests for the
  * {@link HelloWorldForm}.
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("anonymous")

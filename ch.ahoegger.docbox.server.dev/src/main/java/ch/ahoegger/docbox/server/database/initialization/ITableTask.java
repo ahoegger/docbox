@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.server.jdbc.ISqlService;
 /**
  * <h3>{@link ITableTask}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Bean
 public interface ITableTask {

@@ -17,7 +17,7 @@ import ch.ahoegger.docbox.shared.category.ICategoryTable;
 /**
  * <h3>{@link CategoryService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class CategoryService implements ICategoryService, ICategoryTable {
 

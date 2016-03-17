@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 /**
  * <h3>{@link UserLookupCall}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class UserLookupCall extends LookupCall<String> {
 

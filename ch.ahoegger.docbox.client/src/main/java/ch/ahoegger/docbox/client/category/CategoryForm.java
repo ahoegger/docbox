@@ -29,7 +29,7 @@ import ch.ahoegger.docbox.shared.category.ICategoryTable;
 /**
  * <h3>{@link CategoryForm}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @FormData(value = CategoryFormData.class, sdkCommand = SdkCommand.CREATE)
 public class CategoryForm extends AbstractForm {

@@ -6,7 +6,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 /**
  * <h3>{@link IDefaultPermissionTable}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public interface IDefaultPermissionTable {
   public static String TABLE_NAME = "DEFAULT_PERMISSION_TABLE";

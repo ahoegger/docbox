@@ -13,7 +13,7 @@ import ch.ahoegger.docbox.shared.category.ICategoryTable;
 /**
  * <h3>{@link CategoryTableTask}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class CategoryTableTask implements ITableTask, ICategoryTable {
   private static final Logger LOG = LoggerFactory.getLogger(CategoryTableTask.class);

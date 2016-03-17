@@ -5,7 +5,7 @@ import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 /**
  * <h3>{@link DocumentReadPermission}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentReadPermission extends BasicHierarchyPermission {
   private static final long serialVersionUID = 1L;

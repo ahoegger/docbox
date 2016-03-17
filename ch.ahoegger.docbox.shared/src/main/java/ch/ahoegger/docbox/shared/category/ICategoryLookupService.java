@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 /**
  * <h3>{@link ICategoryLookupService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @TunnelToServer
 public interface ICategoryLookupService extends ILookupService<BigDecimal> {

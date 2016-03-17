@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.server.jdbc.derby.DerbySqlStyle;
 /**
  * <h3>{@link DerbySqlStyleEx}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DerbySqlStyleEx extends DerbySqlStyle {
 

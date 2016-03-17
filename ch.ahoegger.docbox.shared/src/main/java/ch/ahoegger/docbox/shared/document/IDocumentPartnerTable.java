@@ -5,7 +5,7 @@ import ch.ahoegger.docbox.shared.partner.IPartnerTable;
 /**
  * <h3>{@link IDocumentPartnerTable}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public interface IDocumentPartnerTable {
 

@@ -5,7 +5,7 @@ import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 /**
  * <h3>{@link IDocumentPermissionTable}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public interface IDocumentPermissionTable {
 

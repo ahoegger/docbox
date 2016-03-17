@@ -9,7 +9,7 @@ import net.sourceforge.tess4j.TesseractException;
 /**
  * <h3>{@link OcrService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class OcrService {
 

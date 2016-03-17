@@ -6,7 +6,7 @@ import java.security.Permission;
 /**
  * <h3>{@link EntityReadPermission}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class EntityReadPermission extends BasicPermission {
 

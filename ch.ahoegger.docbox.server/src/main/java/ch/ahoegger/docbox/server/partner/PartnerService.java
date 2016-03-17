@@ -24,7 +24,7 @@ import ch.ahoegger.docbox.shared.partner.PartnerFormData;
 /**
  * <h3>{@link PartnerService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class PartnerService implements IPartnerService, IPartnerTable {
 
@@ -98,4 +98,5 @@ public class PartnerService implements IPartnerService, IPartnerTable {
     // delete document category connection
     BEANS.get(DocumentPartnerService.class).delete(partnerId);
   }
+
 }

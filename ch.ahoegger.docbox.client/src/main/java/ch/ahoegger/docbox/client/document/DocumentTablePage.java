@@ -36,7 +36,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentService;
 /**
  * <h3>{@link DocumentTablePage}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @PageData(DocumentTableData.class)
 public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.Table> {

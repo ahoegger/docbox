@@ -24,7 +24,7 @@ import ch.ahoegger.docbox.client.work.WorkOutline;
 /**
  * <h3>{@link Desktop}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class Desktop extends AbstractDesktop {
   @Override

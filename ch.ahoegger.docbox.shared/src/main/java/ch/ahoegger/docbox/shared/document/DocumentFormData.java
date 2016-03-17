@@ -34,6 +34,10 @@ public class DocumentFormData extends AbstractFormData {
     return getFieldByClass(CategoriesBox.class);
   }
 
+  public Conversation getConversation() {
+    return getFieldByClass(Conversation.class);
+  }
+
   public Document getDocument() {
     return getFieldByClass(Document.class);
   }
@@ -86,10 +90,6 @@ public class DocumentFormData extends AbstractFormData {
     return getFieldByClass(OriginalStorage.class);
   }
 
-  public Owner getOwner() {
-    return getFieldByClass(Owner.class);
-  }
-
   public Partners getPartners() {
     return getFieldByClass(Partners.class);
   }
@@ -121,6 +121,11 @@ public class DocumentFormData extends AbstractFormData {
     private static final long serialVersionUID = 1L;
   }
 
+  public static class Conversation extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
   public static class Document extends AbstractValueFieldData<BinaryResource> {
 
     private static final long serialVersionUID = 1L;
@@ -147,11 +152,6 @@ public class DocumentFormData extends AbstractFormData {
   }
 
   public static class OriginalStorage extends AbstractValueFieldData<String> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class Owner extends AbstractValueFieldData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

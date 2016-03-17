@@ -11,7 +11,7 @@ import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI
 /**
  * <h3>{@link PdfResourceLoaderFactory}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class PdfResourceLoaderFactory implements IResourceLoaderFactory {
 

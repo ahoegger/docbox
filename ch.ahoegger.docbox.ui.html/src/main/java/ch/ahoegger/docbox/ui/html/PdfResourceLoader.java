@@ -23,7 +23,7 @@ import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
 /**
  * <h3>{@link PdfResourceLoader}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class PdfResourceLoader extends AbstractResourceLoader {
 

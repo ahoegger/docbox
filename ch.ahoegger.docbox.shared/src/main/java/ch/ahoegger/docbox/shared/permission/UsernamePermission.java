@@ -6,7 +6,7 @@ import java.security.Permission;
 /**
  * <h3>{@link UsernamePermission}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class UsernamePermission extends BasicPermission {
   private static final long serialVersionUID = 1L;

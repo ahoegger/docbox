@@ -11,7 +11,7 @@ import ch.ahoegger.docbox.server.security.role.IRoleTable;
 /**
  * <h3>{@link RoleTableTask}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class RoleTableTask implements ITableTask, IRoleTable {
   private static final Logger LOG = LoggerFactory.getLogger(RoleTableTask.class);

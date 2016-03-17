@@ -8,7 +8,7 @@ import ch.ahoegger.docbox.shared.ISequenceTable;
 /**
  * <h3>{@link AbstractDocboxSqlService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class AbstractDocboxSqlService extends AbstractDerbySqlService {
 

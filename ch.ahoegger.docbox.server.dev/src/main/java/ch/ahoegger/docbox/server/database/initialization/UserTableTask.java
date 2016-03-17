@@ -15,7 +15,7 @@ import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 /**
  * <h3>{@link UserTableTask}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class UserTableTask implements ITableTask, IUserTable {
 

@@ -6,7 +6,7 @@ import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 /**
  * <h3>{@link IUserRoleTable}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public interface IUserRoleTable {
   public static final String TABLE_NAME = "USER_ROLE";

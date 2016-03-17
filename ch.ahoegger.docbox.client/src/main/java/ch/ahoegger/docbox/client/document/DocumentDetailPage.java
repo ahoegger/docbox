@@ -12,7 +12,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentService;
 /**
  * <h3>{@link DocumentDetailPage}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentDetailPage extends AbstractPageWithNodes {
 

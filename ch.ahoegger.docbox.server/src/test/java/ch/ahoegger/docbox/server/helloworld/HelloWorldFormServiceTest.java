@@ -15,7 +15,7 @@ import ch.ahoegger.docbox.shared.helloworld.IHelloWorldFormService;
 /**
  * <h3>{@link HelloWorldFormServiceTest}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @RunWith(ServerTestRunner.class)
 @RunWithSubject(HelloWorldFormServiceTest.SUBJECT_NAME)

@@ -10,7 +10,7 @@ import ch.ahoegger.docbox.shared.security.role.IRoleLookupService;
 /**
  * <h3>{@link RoleLookupService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class RoleLookupService extends AbstractSqlLookupService<BigDecimal> implements IRoleLookupService, IRoleTable {
 

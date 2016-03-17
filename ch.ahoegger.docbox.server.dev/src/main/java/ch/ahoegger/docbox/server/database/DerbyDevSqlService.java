@@ -16,7 +16,7 @@ import ch.ahoegger.docbox.server.database.initialization.ITableTask;
 /**
  * <h3>{@link DerbyDevSqlService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Order(-20)
 @CreateImmediately

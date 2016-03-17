@@ -5,7 +5,7 @@ import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 /**
  * <h3>{@link DocumentLinkProperties}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentLinkProperties {
 

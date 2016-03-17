@@ -11,7 +11,7 @@ import org.eclipse.scout.rt.server.jdbc.SQL;
 /**
  * <h3>{@link RoleService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @ApplicationScoped
 public class UserRoleService implements IUserRoleTable {

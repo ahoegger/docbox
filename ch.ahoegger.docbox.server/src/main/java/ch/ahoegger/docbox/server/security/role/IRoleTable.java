@@ -3,7 +3,7 @@ package ch.ahoegger.docbox.server.security.role;
 /**
  * <h3>{@link IRoleTable}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public interface IRoleTable {
   public static final String TABLE_NAME = "ROLE";

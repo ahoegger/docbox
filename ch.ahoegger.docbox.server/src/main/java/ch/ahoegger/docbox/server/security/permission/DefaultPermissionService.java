@@ -14,7 +14,7 @@ import ch.ahoegger.docbox.shared.security.permission.IDefaultPermissionTable;
 /**
  * <h3>{@link DefaultPermissionService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @ApplicationScoped
 public class DefaultPermissionService implements IDefaultPermissionTable {

@@ -11,7 +11,7 @@ import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
 /**
  * <h3>{@link AccessControlService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Order(-1)
 public class AccessControlService extends UserIdAccessControlService {

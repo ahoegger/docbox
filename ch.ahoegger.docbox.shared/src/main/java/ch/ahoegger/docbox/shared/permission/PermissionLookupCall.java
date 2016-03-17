@@ -12,7 +12,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 /**
  * <h3>{@link PermissionLookupCall}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class PermissionLookupCall extends LocalLookupCall<Integer> {
 

@@ -23,7 +23,7 @@ import ch.ahoegger.docbox.shared.administration.user.UserTablePageData;
 /**
  * <h3>{@link UserService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class UserService implements IUserService, IUserTable {
   private static final byte[] SALT = "[B@484b61fc".getBytes();

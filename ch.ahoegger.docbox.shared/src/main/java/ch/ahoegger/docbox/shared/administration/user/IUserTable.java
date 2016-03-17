@@ -3,7 +3,7 @@ package ch.ahoegger.docbox.shared.administration.user;
 /**
  * <h3>{@link IUserTable}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public interface IUserTable {
 

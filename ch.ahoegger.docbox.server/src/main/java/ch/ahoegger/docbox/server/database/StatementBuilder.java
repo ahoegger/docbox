@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 /**
  * <h3>{@link StatementBuilder}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class StatementBuilder {
   private StringBuilder m_sqlBuilder = new StringBuilder();

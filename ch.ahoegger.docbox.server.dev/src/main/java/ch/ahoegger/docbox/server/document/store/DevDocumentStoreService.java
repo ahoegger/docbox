@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 /**
  * <h3>{@link DevDocumentStoreService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Replace
 public class DevDocumentStoreService extends DocumentStoreService {

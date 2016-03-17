@@ -11,7 +11,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentPartnerTable;
 /**
  * <h3>{@link DocumentPartnerTableTask}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentPartnerTableTask implements ITableTask, IDocumentPartnerTable {
 
