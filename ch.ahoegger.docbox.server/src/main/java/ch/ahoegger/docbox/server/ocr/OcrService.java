@@ -1,11 +1,5 @@
 package ch.ahoegger.docbox.server.ocr;
 
-import java.io.File;
-
-import net.sourceforge.tess4j.ITesseract;
-import net.sourceforge.tess4j.Tesseract;
-import net.sourceforge.tess4j.TesseractException;
-
 /**
  * <h3>{@link OcrService}</h3>
  *
@@ -56,18 +50,18 @@ public class OcrService {
 //    System.out.println("Text extracted successfully. Check output file.");
 //  }
 
-  public static void main(String[] args) {
-    File imageFile = new File("D:/business/buchungen/2016-02_EnrionHannoverFlug.pdf");
-    ITesseract instance = new Tesseract(); // JNA Interface Mapping
-    // ITesseract instance = new Tesseract1(); // JNA Direct Mapping
-
-    try {
-      String result = instance.doOCR(imageFile);
-      System.out.println(result);
-    }
-    catch (TesseractException e) {
-      System.err.println(e.getMessage());
-    }
-  }
+//  public static void main(String[] args) {
+//    File imageFile = new File("D:/business/buchungen/2016-02_EnrionHannoverFlug.pdf");
+//    ITesseract instance = new Tesseract(); // JNA Interface Mapping
+//    // ITesseract instance = new Tesseract1(); // JNA Direct Mapping
+//
+//    try {
+//      String result = instance.doOCR(imageFile);
+//      System.out.println(result);
+//    }
+//    catch (TesseractException e) {
+//      System.err.println(e.getMessage());
+//    }
+//  }
 
 }

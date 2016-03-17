@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.client.document;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
@@ -10,7 +11,9 @@ import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -26,9 +29,12 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI;
+import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
+import ch.ahoegger.docbox.shared.conversation.ConversationLookupCall;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
@@ -96,6 +102,22 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
       return getColumnSet().getColumnByClass(DocumentPathColumn.class);
     }
 
+    public DocumentDateColumn getDocumentDateColumn() {
+      return getColumnSet().getColumnByClass(DocumentDateColumn.class);
+    }
+
+    public CapturedDateColumn getCapturedDateColumn() {
+      return getColumnSet().getColumnByClass(CapturedDateColumn.class);
+    }
+
+    public ConversationColumn getConversationColumn() {
+      return getColumnSet().getColumnByClass(ConversationColumn.class);
+    }
+
+    public OwnerColumn getOwnerColumn() {
+      return getColumnSet().getColumnByClass(OwnerColumn.class);
+    }
+
     public PartnerColumn getPartnerColumn() {
       return getColumnSet().getColumnByClass(PartnerColumn.class);
     }
@@ -140,12 +162,70 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
       }
     }
 
-    @Order(2000)
-    public class DocumentPathColumn extends AbstractStringColumn {
+    @Order(522)
+    public class ConversationColumn extends AbstractSmartColumn<BigDecimal> {
       @Override
       protected String getConfiguredHeaderText() {
-        return TEXTS.get("Path");
+        return TEXTS.get("Conversation");
       }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 100;
+      }
+
+      @Override
+      protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
+        return ConversationLookupCall.class;
+      }
+    }
+
+    @Order(1015)
+    public class DocumentDateColumn extends AbstractDateColumn {
+      @Override
+      protected String getConfiguredHeaderText() {
+        return TEXTS.get("Date");
+      }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 100;
+      }
+    }
+
+    @Order(1507)
+    public class CapturedDateColumn extends AbstractDateColumn {
+      @Override
+      protected String getConfiguredHeaderText() {
+        return TEXTS.get("CapturedOn");
+      }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 100;
+      }
+    }
+
+    @Order(1753)
+    public class OwnerColumn extends AbstractSmartColumn<String> {
+      @Override
+      protected String getConfiguredHeaderText() {
+        return TEXTS.get("Owner");
+      }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 100;
+      }
+
+      @Override
+      protected Class<? extends ILookupCall<String>> getConfiguredLookupCall() {
+        return UserLookupCall.class;
+      }
+    }
+
+    @Order(2000)
+    public class DocumentPathColumn extends AbstractStringColumn {
 
       @Override
       protected boolean getConfiguredHtmlEnabled() {

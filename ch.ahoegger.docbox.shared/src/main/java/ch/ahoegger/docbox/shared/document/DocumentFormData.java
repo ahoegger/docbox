@@ -98,10 +98,6 @@ public class DocumentFormData extends AbstractFormData {
     return getFieldByClass(Permissions.class);
   }
 
-  public Tag getTag() {
-    return getFieldByClass(Tag.class);
-  }
-
   public ValidDate getValidDate() {
     return getFieldByClass(ValidDate.class);
   }
@@ -272,11 +268,6 @@ public class DocumentFormData extends AbstractFormData {
         m_permission = newPermission;
       }
     }
-  }
-
-  public static class Tag extends AbstractValueFieldData<String> {
-
-    private static final long serialVersionUID = 1L;
   }
 
   public static class ValidDate extends AbstractValueFieldData<Date> {

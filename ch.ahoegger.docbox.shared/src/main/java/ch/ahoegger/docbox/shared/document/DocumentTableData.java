@@ -1,5 +1,8 @@
 package ch.ahoegger.docbox.shared.document;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
@@ -54,10 +57,18 @@ public class DocumentTableData extends AbstractTablePageData {
     public static final String documentId = "documentId";
     public static final String abstract_ = "abstract";
     public static final String partner = "partner";
+    public static final String conversation = "conversation";
+    public static final String documentDate = "documentDate";
+    public static final String capturedDate = "capturedDate";
+    public static final String owner = "owner";
     public static final String documentPath = "documentPath";
     private Long m_documentId;
     private String m_abstract;
     private String m_partner;
+    private BigDecimal m_conversation;
+    private Date m_documentDate;
+    private Date m_capturedDate;
+    private String m_owner;
     private String m_documentPath;
 
     public Long getDocumentId() {
@@ -82,6 +93,38 @@ public class DocumentTableData extends AbstractTablePageData {
 
     public void setPartner(String newPartner) {
       m_partner = newPartner;
+    }
+
+    public BigDecimal getConversation() {
+      return m_conversation;
+    }
+
+    public void setConversation(BigDecimal newConversation) {
+      m_conversation = newConversation;
+    }
+
+    public Date getDocumentDate() {
+      return m_documentDate;
+    }
+
+    public void setDocumentDate(Date newDocumentDate) {
+      m_documentDate = newDocumentDate;
+    }
+
+    public Date getCapturedDate() {
+      return m_capturedDate;
+    }
+
+    public void setCapturedDate(Date newCapturedDate) {
+      m_capturedDate = newCapturedDate;
+    }
+
+    public String getOwner() {
+      return m_owner;
+    }
+
+    public void setOwner(String newOwner) {
+      m_owner = newOwner;
     }
 
     public String getDocumentPath() {

@@ -1,9 +1,6 @@
 package ch.ahoegger.docbox.client.document;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,32 +10,24 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.ValueFieldMenuType;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
-import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.AbstractFileChooserField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.HorizontalGroupBoxBodyGrid;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmartGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
-import org.eclipse.scout.rt.client.ui.form.fields.placeholder.AbstractPlaceholderField;
-import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
-import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -48,12 +37,10 @@ import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 import ch.ahoegger.docbox.client.category.CategoryForm;
 import ch.ahoegger.docbox.client.category.CategoryTablePage;
 import ch.ahoegger.docbox.client.conversation.ConversationForm;
-import ch.ahoegger.docbox.client.document.AbstractPartnerTableField.Table;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.CancelButton;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.AbstractField;
@@ -64,27 +51,20 @@ import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.Document
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.DocumentField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OpenHtmlField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OriginalStorageField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PartnerBox;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PartnerBox.PartnerSequenceBox;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PartnerBox.PartnerSequenceBox.MultipleButton;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PartnerBox.PartnerSequenceBox.PartnerField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PartnerBox.PartnersField;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PartnersField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PermissionsField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PlaceHolder01Field;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.TagField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.ValidDateField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.OkButton;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI;
-import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
+import ch.ahoegger.docbox.client.document.field.AbstractPartnerTableField;
+import ch.ahoegger.docbox.client.document.field.AbstractPartnerTableField.Table;
+import ch.ahoegger.docbox.client.document.field.AbstractPermissionTableField;
 import ch.ahoegger.docbox.shared.category.CategoryLookupCall;
 import ch.ahoegger.docbox.shared.category.ICategoryService;
 import ch.ahoegger.docbox.shared.conversation.ConversationLookupCall;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
-import ch.ahoegger.docbox.shared.document.DocumentFormData.Partners;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
-import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
-import ch.ahoegger.docbox.shared.permission.PermissionLookupCall;
 
 /**
  * <h3>{@link DocumentForm}</h3>
@@ -195,36 +175,12 @@ public class DocumentForm extends AbstractForm {
     return getFieldByClass(AbstractField.class);
   }
 
-  public TagField getTagField() {
-    return getFieldByClass(TagField.class);
-  }
-
-  public PartnerBox getPartnerBox() {
-    return getFieldByClass(PartnerBox.class);
-  }
-
   public CategoriesBox getCategoriesBox() {
     return getFieldByClass(CategoriesBox.class);
   }
 
-  public PlaceHolder01Field getPlaceHolder01Field() {
-    return getFieldByClass(PlaceHolder01Field.class);
-  }
-
-  public PartnerField getPartnerField() {
-    return getFieldByClass(PartnerField.class);
-  }
-
   public PartnersField getPartnersField() {
     return getFieldByClass(PartnersField.class);
-  }
-
-  public PartnerSequenceBox getPartnerSequenceBox() {
-    return getFieldByClass(PartnerSequenceBox.class);
-  }
-
-  public MultipleButton getMultipleButton() {
-    return getFieldByClass(MultipleButton.class);
   }
 
   public PermissionsField getPermissionsField() {
@@ -250,7 +206,7 @@ public class DocumentForm extends AbstractForm {
 
       @Override
       protected Class<? extends IGroupBoxBodyGrid> getConfiguredBodyGrid() {
-        return HorizontalGroupBoxBodyGrid.class;
+        return VerticalSmartGroupBoxBodyGrid.class;
       }
 
       @Order(10)
@@ -258,11 +214,6 @@ public class DocumentForm extends AbstractForm {
         @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("Document");
-        }
-
-        @Override
-        protected boolean getConfiguredMandatory() {
-          return true;
         }
 
         @Override
@@ -354,12 +305,92 @@ public class DocumentForm extends AbstractForm {
         }
       }
 
-      @Order(60)
+      @Order(55)
       public class ValidDateField extends AbstractDateField {
         @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("ValidUntil");
         }
+      }
+
+      @Order(60)
+      public class PartnersField extends AbstractPartnerTableField {
+
+        @Override
+        protected int getConfiguredGridH() {
+          return 2;
+        }
+
+      }
+
+      @Order(70)
+      public class ConversationField extends AbstractSmartField<BigDecimal> {
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("Conversation");
+        }
+
+        @Override
+        protected void execInitField() {
+          getPartnersField().getTable().addTableListener(new TableAdapter() {
+
+            @Override
+            public void tableChanged(TableEvent e) {
+              switch (e.getType()) {
+                case TableEvent.TYPE_ROWS_DELETED:
+                case TableEvent.TYPE_ROWS_INSERTED:
+                case TableEvent.TYPE_ROWS_UPDATED:
+                  // TODO update smart value
+                  break;
+              }
+            }
+          });
+        }
+
+        @Override
+        protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
+          return ConversationLookupCall.class;
+        }
+
+        @Override
+        protected void execPrepareLookup(ILookupCall<BigDecimal> call) {
+          Table partnerTable = getPartnersField().getTable();
+
+          call.setMaster(partnerTable.getPartnerColumn().getValues().stream().filter(v -> v != null).collect(Collectors.toList()));
+          super.execPrepareLookup(call);
+        }
+
+        @Order(1000)
+        public class NewConversationMenu extends AbstractMenu {
+          @Override
+          protected String getConfiguredText() {
+            return TEXTS.get("New");
+          }
+
+          @Override
+          protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+            return CollectionUtility.hashSet(ValueFieldMenuType.NotNull, ValueFieldMenuType.Null);
+          }
+
+          @Override
+          protected void execAction() {
+            ConversationForm form = new ConversationForm();
+            Table partnerTable = getPartnersField().getTable();
+
+            BigDecimal partnerId = partnerTable.getPartnerColumn().getValues().stream().filter(id -> id != null).findFirst().orElse(null);
+            form.getPartnerField().setValue(partnerId);
+            form.startNew();
+            form.addFormListener(new FormListener() {
+              @Override
+              public void formChanged(FormEvent e) {
+                if (FormEvent.TYPE_STORE_AFTER == e.getType()) {
+                  setValue(form.getConversationId());
+                }
+              }
+            });
+          }
+        }
+
       }
 
       @Order(80)
@@ -376,134 +407,16 @@ public class DocumentForm extends AbstractForm {
       }
 
       @Order(90)
-      public class TagField extends AbstractSmartField<String> {
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("Tag");
-        }
-
-        @Override
-        protected boolean getConfiguredEnabled() {
-          return false;
-        }
-      }
-
-      @Order(100)
-      public class PlaceHolder01Field extends AbstractPlaceholderField {
-      }
-
-      @Order(110)
-      public class PartnerBox extends AbstractGroupBox {
-
-        @Override
-        protected int getConfiguredGridW() {
-          return 1;
-        }
-
-        @Override
-        protected int getConfiguredGridColumnCount() {
-          return 1;
-        }
+      public class PermissionsField extends AbstractPermissionTableField {
 
         @Override
         protected int getConfiguredGridH() {
-          return 3;
-        }
-
-        @Order(10)
-        public class PartnerSequenceBox extends AbstractSequenceBox {
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("Partner");
-          }
-
-          @Override
-          protected boolean getConfiguredAutoCheckFromTo() {
-            return false;
-          }
-
-          @Order(10)
-          @FormData(sdkCommand = SdkCommand.IGNORE)
-          public class PartnerField extends AbstractSmartField<BigDecimal> {
-            @Override
-            protected String getConfiguredLabel() {
-              return TEXTS.get("Partner");
-            }
-
-            @Override
-            protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
-              return PartnerLookupCall.class;
-            }
-
-            @Override
-            protected void execChangedValue() {
-              Table table = getPartnersField().getTable();
-              table.deleteAllRows();
-              if (getValue() != null) {
-                ITableRow row = table.createRow();
-                table.getPartnerColumn().setValue(row, getValue());
-                table.addRow(row);
-              }
-            }
-
-            @Order(1000)
-            public class NewPartnerMenu extends AbstractMenu {
-              @Override
-              protected String getConfiguredText() {
-                return TEXTS.get("New");
-              }
-
-              @Override
-              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.hashSet(ValueFieldMenuType.NotNull, ValueFieldMenuType.Null);
-              }
-
-              @Override
-              protected void execAction() {
-              }
-            }
-
-          }
-
-          @Order(2000)
-          public class MultipleButton extends AbstractButton {
-            @Override
-            protected String getConfiguredLabel() {
-              return TEXTS.get("Multiple");
-            }
-
-            @Override
-            protected boolean getConfiguredGridUseUiWidth() {
-              return true;
-            }
-
-            @Override
-            protected void execClickAction() {
-              getPartnerSequenceBox().setVisible(false);
-              getPartnersField().setVisible(true);
-            }
-          }
-
-        }
-
-        @Order(20)
-        public class PartnersField extends AbstractPartnerTableField {
-
-          @Override
-          protected boolean getConfiguredVisible() {
-            return false;
-          }
-
-          @Override
-          protected int getConfiguredGridH() {
-            return 3;
-          }
-
+          return 2;
         }
 
       }
 
-      @Order(120)
+      @Order(110)
       public class CategoriesBox extends AbstractListBox<BigDecimal> {
         @Override
         protected String getConfiguredLabel() {
@@ -512,7 +425,7 @@ public class DocumentForm extends AbstractForm {
 
         @Override
         protected int getConfiguredGridH() {
-          return 6;
+          return 8;
         }
 
         @Override
@@ -623,268 +536,6 @@ public class DocumentForm extends AbstractForm {
 
       }
 
-      @Order(2000)
-      public class PermissionsField extends AbstractTableField<PermissionsField.Table> {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("Permissions");
-        }
-
-        @Override
-        protected int getConfiguredGridH() {
-          return 3;
-        }
-
-        public class Table extends AbstractTable {
-          public PermissionColumn getPermissionColumn() {
-            return getColumnSet().getColumnByClass(PermissionColumn.class);
-          }
-
-          public UserColumn getUserColumn() {
-            return getColumnSet().getColumnByClass(UserColumn.class);
-          }
-
-          @Override
-          protected boolean getConfiguredHeaderVisible() {
-            return false;
-          }
-
-          @Override
-          protected boolean getConfiguredAutoDiscardOnDelete() {
-            return true;
-          }
-
-          @Override
-          protected boolean getConfiguredMultiSelect() {
-            return false;
-          }
-
-          @Override
-          protected boolean getConfiguredAutoResizeColumns() {
-            return true;
-          }
-
-          @Override
-          protected void execContentChanged() {
-            try {
-              setTableChanging(true);
-              for (ITableRow row : getRows()) {
-                Cell cell = row.getCellForUpdate(getUserColumn());
-                // TODO do not allow administators to be removed!
-                //  cell.setEditable(false);
-              }
-            }
-            finally {
-              setTableChanging(false);
-            }
-
-          }
-
-          @Order(10)
-          public class UserColumn extends AbstractSmartColumn<String> {
-
-            @Override
-            protected int getConfiguredSortIndex() {
-              return 0;
-            }
-
-            @Override
-            protected int getConfiguredWidth() {
-              return 100;
-            }
-
-            @Override
-            protected Class<? extends ILookupCall<String>> getConfiguredLookupCall() {
-              return UserLookupCall.class;
-            }
-
-            @Override
-            protected boolean getConfiguredEditable() {
-              return true;
-            }
-
-            @Override
-            protected IFormField execPrepareEdit(ITableRow row) {
-              return super.execPrepareEdit(row);
-            }
-
-            @Override
-            protected IFormField prepareEditInternal(ITableRow row) {
-              return new P_UserSmarField(row);
-            }
-
-            public class P_UserSmarField extends AbstractSmartField<String> {
-              private ITableRow m_row;
-
-              public P_UserSmarField(ITableRow row) {
-                m_row = row;
-
-              }
-
-              @Override
-              protected Class<? extends ILookupCall<String>> getConfiguredLookupCall() {
-                return UserLookupCall.class;
-              }
-
-              @Override
-              protected void execFilterBrowseLookupResult(ILookupCall<String> call, List<ILookupRow<String>> result) {
-                filterDuplicateTypesLookupResult(m_row, result);
-              }
-
-              @Override
-              protected void execFilterTextLookupResult(ILookupCall<String> call, List<ILookupRow<String>> result) {
-                filterDuplicateTypesLookupResult(m_row, result);
-              }
-
-              /**
-               * @param row
-               * @param result
-               */
-              private void filterDuplicateTypesLookupResult(ITableRow row, List<ILookupRow<String>> result) {
-                Set<String> alreadyUsed = new HashSet<String>(getUserColumn().getValues());
-                alreadyUsed.remove(getUserColumn().getValue(row));
-                for (Iterator<ILookupRow<String>> iterator = result.iterator(); iterator.hasNext();) {
-                  ILookupRow<String> current = iterator.next();
-                  if (alreadyUsed.contains(current.getKey())) {
-                    iterator.remove();
-                  }
-                }
-              }
-
-            }
-
-          }
-
-          @Order(20)
-          public class PermissionColumn extends AbstractSmartColumn<Integer> {
-
-            @Override
-            protected int getConfiguredWidth() {
-              return 100;
-            }
-
-            @Override
-            protected Class<? extends ILookupCall<Integer>> getConfiguredLookupCall() {
-              return PermissionLookupCall.class;
-            }
-
-            @Override
-            protected boolean getConfiguredEditable() {
-              return true;
-            }
-          }
-
-          @Order(1000)
-          public class AddMenu extends AbstractMenu {
-            @Override
-            protected String getConfiguredText() {
-              return TEXTS.get("Add");
-            }
-
-            @Override
-            protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-              return CollectionUtility.hashSet(TableMenuType.SingleSelection, TableMenuType.EmptySpace, TableMenuType.MultiSelection);
-            }
-
-            @Override
-            protected void execAction() {
-              addRow(createRow(), true);
-            }
-          }
-
-          @Order(1010)
-          public class DeleteMenu extends AbstractMenu {
-            @Override
-            protected String getConfiguredText() {
-              return TEXTS.get("Delete");
-            }
-
-            @Override
-            protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-              return CollectionUtility.hashSet(TableMenuType.SingleSelection);
-            }
-
-            @Override
-            protected void execAction() {
-              deleteRow(getSelectedRow());
-            }
-          }
-
-        }
-
-      }
-
-      @Order(3000)
-      public class ConversationField extends AbstractSmartField<BigDecimal> {
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("Conversation");
-        }
-
-        @Override
-        protected void execInitField() {
-          getPartnersField().getTable().addTableListener(new TableAdapter() {
-
-            @Override
-            public void tableChanged(TableEvent e) {
-              switch (e.getType()) {
-                case TableEvent.TYPE_ROWS_DELETED:
-                case TableEvent.TYPE_ROWS_INSERTED:
-                case TableEvent.TYPE_ROWS_UPDATED:
-                  // TODO update smart value
-                  break;
-              }
-            }
-          });
-        }
-
-        @Override
-        protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
-          return ConversationLookupCall.class;
-        }
-
-        @Override
-        protected void execPrepareLookup(ILookupCall<BigDecimal> call) {
-          Table partnerTable = getPartnersField().getTable();
-
-          call.setMaster(partnerTable.getPartnerColumn().getValues().stream().filter(v -> v != null).collect(Collectors.toList()));
-          super.execPrepareLookup(call);
-        }
-
-        @Order(1000)
-        public class NewConversationMenu extends AbstractMenu {
-          @Override
-          protected String getConfiguredText() {
-            return TEXTS.get("New");
-          }
-
-          @Override
-          protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-            return CollectionUtility.hashSet(ValueFieldMenuType.NotNull, ValueFieldMenuType.Null);
-          }
-
-          @Override
-          protected void execAction() {
-            ConversationForm form = new ConversationForm();
-            Table partnerTable = getPartnersField().getTable();
-
-            BigDecimal partnerId = partnerTable.getPartnerColumn().getValues().stream().filter(id -> id != null).findFirst().orElse(null);
-            form.getPartnerField().setValue(partnerId);
-            form.startNew();
-            form.addFormListener(new FormListener() {
-              @Override
-              public void formChanged(FormEvent e) {
-                if (FormEvent.TYPE_STORE_AFTER == e.getType()) {
-                  setValue(form.getConversationId());
-                }
-              }
-            });
-          }
-        }
-
-      }
-
     }
 
     @Order(1000)
@@ -895,21 +546,6 @@ public class DocumentForm extends AbstractForm {
     public class CancelButton extends AbstractCancelButton {
     }
 
-  }
-
-  protected void importPartners(Partners partners) {
-    switch (partners.getRowCount()) {
-      case 1:
-        getPartnerField().setValue(partners.getRows()[0].getPartner());
-      case 0:
-        getPartnerSequenceBox().setVisible(true);
-        getPartnersField().setVisible(false);
-        break;
-      default:
-        getPartnerSequenceBox().setVisible(false);
-        getPartnersField().setVisible(true);
-        break;
-    }
   }
 
   public class PageHandler extends AbstractFormHandler {
@@ -929,7 +565,6 @@ public class DocumentForm extends AbstractForm {
       exportFormData(formData);
       formData = BEANS.get(IDocumentService.class).load(formData);
       importFormData(formData);
-      importPartners(formData.getPartners());
 
       setEnabledGranted(false);
     }
@@ -946,6 +581,7 @@ public class DocumentForm extends AbstractForm {
       formData = BEANS.get(IDocumentService.class).prepareCreate(formData);
       importFormData(formData);
       getDocumentField().setVisible(true);
+      getDocumentField().setMandatory(true);
       getOpenHtmlField().setVisible(false);
     }
 
@@ -964,7 +600,6 @@ public class DocumentForm extends AbstractForm {
       exportFormData(formData);
       formData = BEANS.get(IDocumentService.class).load(formData);
       importFormData(formData);
-      importPartners(formData.getPartners());
     }
 
     @Override

@@ -48,7 +48,7 @@ public class PartnerForm extends AbstractForm {
 
   @Override
   protected void execStored() {
-    getDesktop().dataChanged(PartnerTablePage.PARTNER_ENTITY);
+    getDesktop().dataChanged(IPartnerEntity.ENTITY_KEY);
   }
 
   public void startNew() {

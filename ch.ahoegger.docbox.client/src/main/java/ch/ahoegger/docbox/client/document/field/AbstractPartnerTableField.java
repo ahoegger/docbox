@@ -1,4 +1,4 @@
-package ch.ahoegger.docbox.client.document;
+package ch.ahoegger.docbox.client.document.field;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -35,7 +35,7 @@ import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
  *
  * @author Andreas Hoegger
  */
-public class AbstractPartnerTableField extends AbstractTableField<AbstractPartnerTableField.Table> {
+public abstract class AbstractPartnerTableField extends AbstractTableField<AbstractPartnerTableField.Table> {
 
   @Override
   protected String getConfiguredLabel() {
