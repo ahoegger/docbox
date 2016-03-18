@@ -1,5 +1,6 @@
 **/target/
 **/bin/
 **/.classpath
+**/.flattened-pom.xml
 **/*.class
 **/*.log
