@@ -34,16 +34,24 @@ public class ConversationTableTask implements ITableTask, IConversationTable {
 
   @Override
   public void createTable(ISqlService sqlService) {
-    LOG.info("SQL-DEV create Table: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create Table: {}", TABLE_NAME);
     sqlService.insert(getCreateStatement());
   }
 
   @Override
   public void createRows(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", TABLE_NAME);
     createConversationRow(sqlService, IDevSequenceNumbers.SEQ_START_CONVERSATION, "House selling", "everything related with house selling.", new Date(), null);
     createConversationRow(sqlService, IDevSequenceNumbers.SEQ_START_CONVERSATION + 1, "Ponny order", "all documents to get a ponny.", new Date(), null);
     createConversationRow(sqlService, IDevSequenceNumbers.SEQ_START_CONVERSATION + 2, "Without partner rel", "all documents to get a ponny.", new Date(), null);
+  }
+
+  @Override
+  public void dropTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DROP TABLE ").append(TABLE_NAME);
+    sqlService.insert(statementBuilder.toString());
   }
 
   public void createConversationRow(ISqlService sqlService, long conversationId, String name, String description, Date startDate, Date endDate) {

@@ -28,13 +28,21 @@ public class SequenceTask implements ITableTask, ISequenceTable {
 
   @Override
   public void createTable(ISqlService sqlService) {
-    LOG.info("SQL-DEV create Table: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create Table: {}", TABLE_NAME);
     sqlService.insert(getCreateStatement());
   }
 
   @Override
+  public void dropTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DROP TABLE ").append(TABLE_NAME);
+    sqlService.insert(statementBuilder.toString());
+  }
+
+  @Override
   public void createRows(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", TABLE_NAME);
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (").append(LAST_VAL).append(") VALUES (:lastVal)");
     sqlService.insert(statementBuilder.toString(),

@@ -6,9 +6,9 @@ import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
+import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
-import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
@@ -19,19 +19,16 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.CancelButton;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox;
+import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.ActiveField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.FirstnameField;
-import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.InsertDateField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.NameField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.PasswordField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.RoleBox;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.UsernameField;
-import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.ValidDateField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.OkButton;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 import ch.ahoegger.docbox.shared.administration.user.UserFormData;
-import ch.ahoegger.docbox.shared.document.DocumentFormData;
-import ch.ahoegger.docbox.shared.document.IDocumentService;
 import ch.ahoegger.docbox.shared.security.role.RoleLookupCall;
 
 /**
@@ -55,6 +52,11 @@ public class UserForm extends AbstractForm {
   @Override
   protected boolean getConfiguredMaximizeEnabled() {
     return true;
+  }
+
+  @Override
+  protected void execStored() {
+    getDesktop().dataChanged(IUserEntity.ENTITY_KEY);
   }
 
   public void startPage() {
@@ -85,16 +87,12 @@ public class UserForm extends AbstractForm {
     return getFieldByClass(PasswordField.class);
   }
 
-  public InsertDateField getInsertDateField() {
-    return getFieldByClass(InsertDateField.class);
-  }
-
-  public ValidDateField getValidDateField() {
-    return getFieldByClass(ValidDateField.class);
-  }
-
   public RoleBox getRoleBox() {
     return getFieldByClass(RoleBox.class);
+  }
+
+  public ActiveField getActiveField() {
+    return getFieldByClass(ActiveField.class);
   }
 
   public NameField getNameField() {
@@ -192,24 +190,11 @@ public class UserForm extends AbstractForm {
         }
       }
 
-      @Order(2000)
-      public class InsertDateField extends AbstractDateField {
+      @Order(1020)
+      public class ActiveField extends AbstractBooleanField {
         @Override
         protected String getConfiguredLabel() {
-          return TEXTS.get("CapturedOn");
-        }
-
-        @Override
-        protected boolean getConfiguredMandatory() {
-          return true;
-        }
-      }
-
-      @Order(3000)
-      public class ValidDateField extends AbstractDateField {
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("ValidUntil");
+          return TEXTS.get("Active");
         }
       }
 
@@ -272,13 +257,17 @@ public class UserForm extends AbstractForm {
   public class NewHandler extends AbstractFormHandler {
     @Override
     protected void execLoad() {
+      getUsernameField().setEnabled(true);
+      UserFormData formData = new UserFormData();
+      formData = BEANS.get(IUserService.class).prepareCreate(formData);
+      importFormData(formData);
     }
 
     @Override
     protected void execStore() {
-      DocumentFormData formData = new DocumentFormData();
-      exportFormData(formData);
-      BEANS.get(IDocumentService.class).store(formData);
+      UserFormData formData = new UserFormData();
+      formData = BEANS.get(IUserService.class).create(formData);
+      importFormData(formData);
     }
   }
 

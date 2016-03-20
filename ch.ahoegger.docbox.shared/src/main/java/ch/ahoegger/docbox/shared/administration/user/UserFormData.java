@@ -1,7 +1,6 @@
 package ch.ahoegger.docbox.shared.administration.user;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.Set;
 
 import javax.annotation.Generated;
@@ -18,12 +17,12 @@ public class UserFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public Firstname getFirstname() {
-    return getFieldByClass(Firstname.class);
+  public Active getActive() {
+    return getFieldByClass(Active.class);
   }
 
-  public InsertDate getInsertDate() {
-    return getFieldByClass(InsertDate.class);
+  public Firstname getFirstname() {
+    return getFieldByClass(Firstname.class);
   }
 
   public Name getName() {
@@ -42,16 +41,12 @@ public class UserFormData extends AbstractFormData {
     return getFieldByClass(Username.class);
   }
 
-  public ValidDate getValidDate() {
-    return getFieldByClass(ValidDate.class);
-  }
-
-  public static class Firstname extends AbstractValueFieldData<String> {
+  public static class Active extends AbstractValueFieldData<Boolean> {
 
     private static final long serialVersionUID = 1L;
   }
 
-  public static class InsertDate extends AbstractValueFieldData<Date> {
+  public static class Firstname extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
   }
@@ -72,11 +67,6 @@ public class UserFormData extends AbstractFormData {
   }
 
   public static class Username extends AbstractValueFieldData<String> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class ValidDate extends AbstractValueFieldData<Date> {
 
     private static final long serialVersionUID = 1L;
   }

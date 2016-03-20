@@ -28,4 +28,13 @@ public class UserRoleService implements IUserRoleTable {
     }
     return roleIds;
   }
+
+  /**
+   * @param username
+   */
+  public void deleteByUsername(String username) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(USERNAME).append(" = :username");
+    SQL.delete(statementBuilder.toString(), new NVPair("username", username));
+  }
 }

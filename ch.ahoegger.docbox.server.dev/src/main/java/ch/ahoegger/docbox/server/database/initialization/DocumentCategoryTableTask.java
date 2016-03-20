@@ -30,16 +30,24 @@ public class DocumentCategoryTableTask implements ITableTask, IDocumentCategoryT
 
   @Override
   public void createTable(ISqlService sqlService) {
-    LOG.info("SQL-DEV create Table: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create Table: {}", TABLE_NAME);
     sqlService.insert(getCreateStatement());
   }
 
   @Override
   public void createRows(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", TABLE_NAME);
     createDocumentCategoryRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT, IDevSequenceNumbers.SEQ_START_CATEGORY);
     createDocumentCategoryRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT + 2, IDevSequenceNumbers.SEQ_START_CATEGORY);
     createDocumentCategoryRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT + 2, IDevSequenceNumbers.SEQ_START_CATEGORY + 1);
+  }
+
+  @Override
+  public void dropTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DROP TABLE ").append(TABLE_NAME);
+    sqlService.insert(statementBuilder.toString());
   }
 
   private void createDocumentCategoryRow(ISqlService sqlService, Long documentId, Long categoryId) {

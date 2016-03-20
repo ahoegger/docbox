@@ -34,15 +34,23 @@ public class CategoryTableTask implements ITableTask, ICategoryTable {
 
   @Override
   public void createTable(ISqlService sqlService) {
-    LOG.info("SQL-DEV create Table: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create Table: {}", TABLE_NAME);
     sqlService.insert(getCreateStatement());
   }
 
   @Override
   public void createRows(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", TABLE_NAME);
     createCategoryRow(sqlService, IDevSequenceNumbers.SEQ_START_CATEGORY, "Work", "anything work related.", new Date(), null);
     createCategoryRow(sqlService, IDevSequenceNumbers.SEQ_START_CATEGORY + 1, "Household", "some window cleaning stuff.", new Date(), null);
+  }
+
+  @Override
+  public void dropTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DROP TABLE ").append(TABLE_NAME);
+    sqlService.insert(statementBuilder.toString());
   }
 
   public void createCategoryRow(ISqlService sqlService, long categoryId, String name, String description, Date startDate, Date endDate) {

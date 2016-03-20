@@ -31,18 +31,26 @@ public class DocumentPermissionTableTask implements ITableTask, IDocumentPermiss
 
   @Override
   public void createTable(ISqlService sqlService) {
-    LOG.info("SQL-DEV create Table: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create Table: {}", TABLE_NAME);
     sqlService.insert(getCreateStatement());
   }
 
   @Override
   public void createRows(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", TABLE_NAME);
     createDocumentPermissionRow(sqlService, "admin", IDevSequenceNumbers.SEQ_START_DOCUMENT, PERMISSION_WRITE);
     createDocumentPermissionRow(sqlService, "admin", IDevSequenceNumbers.SEQ_START_DOCUMENT + 1, PERMISSION_WRITE);
     createDocumentPermissionRow(sqlService, "admin", IDevSequenceNumbers.SEQ_START_DOCUMENT + 2, PERMISSION_WRITE);
     createDocumentPermissionRow(sqlService, "cuttis", IDevSequenceNumbers.SEQ_START_DOCUMENT + 1, PERMISSION_READ);
     createDocumentPermissionRow(sqlService, "bob", IDevSequenceNumbers.SEQ_START_DOCUMENT + 1, PERMISSION_WRITE);
+  }
+
+  @Override
+  public void dropTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DROP TABLE ").append(TABLE_NAME);
+    sqlService.insert(statementBuilder.toString());
   }
 
   private void createDocumentPermissionRow(ISqlService sqlService, String userId, Long documentId, Integer permission) {

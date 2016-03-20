@@ -16,4 +16,6 @@ public interface ITableTask {
   void createTable(ISqlService sqlService);
 
   void createRows(ISqlService sqlService);
+
+  void dropTable(ISqlService sqlService);
 }

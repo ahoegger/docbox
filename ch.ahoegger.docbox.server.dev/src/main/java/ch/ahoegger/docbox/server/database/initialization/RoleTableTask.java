@@ -29,7 +29,7 @@ public class RoleTableTask implements ITableTask, IRoleTable {
 
   @Override
   public void createTable(ISqlService sqlService) {
-    LOG.info("SQL-DEV create Table: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create Table: {}", TABLE_NAME);
     sqlService.insert(getCreateStatement());
   }
 
@@ -38,7 +38,15 @@ public class RoleTableTask implements ITableTask, IRoleTable {
     createRole(sqlService, IDevSequenceNumbers.SEQ_START_ROLE, "admin");
   }
 
-  private void createRole(ISqlService sqlService, Long roleId, String roleName) {
+  @Override
+  public void dropTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DROP TABLE ").append(TABLE_NAME);
+    sqlService.insert(statementBuilder.toString());
+  }
+
+  public void createRole(ISqlService sqlService, Long roleId, String roleName) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(ROLE_NR, NAME));

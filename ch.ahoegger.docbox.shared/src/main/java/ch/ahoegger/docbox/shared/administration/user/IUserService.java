@@ -30,4 +30,21 @@ public interface IUserService {
    */
   UserFormData load(UserFormData formData);
 
+  /**
+   * @param formData
+   * @return
+   */
+  UserFormData prepareCreate(UserFormData formData);
+
+  /**
+   * @param formData
+   * @return
+   */
+  UserFormData create(UserFormData formData);
+
+  /**
+   * @param string
+   */
+  void delete(String string);
+
 }

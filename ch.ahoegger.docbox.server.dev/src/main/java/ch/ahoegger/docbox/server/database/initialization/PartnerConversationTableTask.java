@@ -30,15 +30,23 @@ public class PartnerConversationTableTask implements ITableTask, IPartnerConvers
 
   @Override
   public void createTable(ISqlService sqlService) {
-    LOG.info("SQL-DEV create Table: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create Table: {}", TABLE_NAME);
     sqlService.insert(getCreateStatement());
   }
 
   @Override
   public void createRows(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", TABLE_NAME);
     createPartnerConversationRow(sqlService, IDevSequenceNumbers.SEQ_START_PARTNER, IDevSequenceNumbers.SEQ_START_CONVERSATION);
     createPartnerConversationRow(sqlService, IDevSequenceNumbers.SEQ_START_PARTNER, IDevSequenceNumbers.SEQ_START_CONVERSATION + 1);
+  }
+
+  @Override
+  public void dropTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DROP TABLE ").append(TABLE_NAME);
+    sqlService.insert(statementBuilder.toString());
   }
 
   private void createPartnerConversationRow(ISqlService sqlService, Long partnerId, Long conversationId) {

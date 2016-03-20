@@ -32,15 +32,23 @@ public class DefaultPermissionTableTask implements ITableTask, IDefaultPermissio
 
   @Override
   public void createTable(ISqlService sqlService) {
-    LOG.info("SQL-DEV create Table: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create Table: {}", TABLE_NAME);
     sqlService.insert(getCreateStatement());
   }
 
   @Override
   public void createRows(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", TABLE_NAME);
     createDefaultPermissionRow(sqlService, "admin", IDocumentPermissionTable.PERMISSION_WRITE);
     createDefaultPermissionRow(sqlService, "bob", IDocumentPermissionTable.PERMISSION_READ);
+  }
+
+  @Override
+  public void dropTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DROP TABLE ").append(TABLE_NAME);
+    sqlService.insert(statementBuilder.toString());
   }
 
   private void createDefaultPermissionRow(ISqlService sqlService, String username, int permission) {

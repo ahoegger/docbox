@@ -34,15 +34,23 @@ public class PartnerTableTask implements ITableTask, IPartnerTable {
 
   @Override
   public void createTable(ISqlService sqlService) {
-    LOG.info("SQL-DEV create Table: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create Table: {}", TABLE_NAME);
     sqlService.insert(getCreateStatement());
   }
 
   @Override
   public void createRows(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", TABLE_NAME);
     createPartnerRow(sqlService, IDevSequenceNumbers.SEQ_START_PARTNER, "Gorak Inc", "A special company", new Date(), null);
     createPartnerRow(sqlService, IDevSequenceNumbers.SEQ_START_PARTNER + 1, "Solan Org", "Some other comapny", new Date(), null);
+  }
+
+  @Override
+  public void dropTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DROP TABLE ").append(TABLE_NAME);
+    sqlService.insert(statementBuilder.toString());
   }
 
   public void createPartnerRow(ISqlService sqlService, long patnerId, String name, String description, Date startDate, Date endDate) {

@@ -18,7 +18,6 @@ public interface IUserTable {
   public static String PASSWORD = "PASSWORD";
   public static int PASSWORD_LENGTH = 480;
 
-  public static String INSERT_DATE = "INSERT_DATE";
-  public static String VALID_DATE = "VALID_DATE";
+  public static String ACTIVE = "ACTIVE";
 
 }

@@ -54,9 +54,11 @@ public class UserTablePageData extends AbstractTablePageData {
     public static final String username = "username";
     public static final String name = "name";
     public static final String firstname = "firstname";
+    public static final String active = "active";
     private String m_username;
     private String m_name;
     private String m_firstname;
+    private Boolean m_active;
 
     public String getUsername() {
       return m_username;
@@ -80,6 +82,14 @@ public class UserTablePageData extends AbstractTablePageData {
 
     public void setFirstname(String newFirstname) {
       m_firstname = newFirstname;
+    }
+
+    public Boolean getActive() {
+      return m_active;
+    }
+
+    public void setActive(Boolean newActive) {
+      m_active = newActive;
     }
   }
 }

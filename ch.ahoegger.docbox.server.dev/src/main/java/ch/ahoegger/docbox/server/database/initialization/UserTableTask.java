@@ -1,7 +1,5 @@
 package ch.ahoegger.docbox.server.database.initialization;
 
-import java.util.Date;
-
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
@@ -29,8 +27,7 @@ public class UserTableTask implements ITableTask, IUserTable {
     statementBuilder.append(NAME).append(" VARCHAR(").append(NAME_LENGTH).append(") NOT NULL, ");
     statementBuilder.append(FIRSTNAME).append(" VARCHAR(").append(FIRSTNAME_LENGTH).append(") NOT NULL, ");
     statementBuilder.append(PASSWORD).append(" VARCHAR(").append(PASSWORD_LENGTH).append(") NOT NULL, ");
-    statementBuilder.append(INSERT_DATE).append(" DATE NOT NULL, ");
-    statementBuilder.append(VALID_DATE).append(" DATE, ");
+    statementBuilder.append(ACTIVE).append(" BOOLEAN NOT NULL, ");
     statementBuilder.append("PRIMARY KEY (").append(USERNAME).append(")");
     statementBuilder.append(")");
     return statementBuilder.toString();
@@ -38,31 +35,38 @@ public class UserTableTask implements ITableTask, IUserTable {
 
   @Override
   public void createTable(ISqlService sqlService) {
-    LOG.info("SQL-DEV create Table: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create Table: {}", TABLE_NAME);
     sqlService.insert(getCreateStatement());
   }
 
   @Override
   public void createRows(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
-    createUser(sqlService, "Cuttis", "Bolion", "cuttis", "pwd", new Date(), null);
-    createUser(sqlService, "Bob", "Miller", "bob", "pwd", new Date(), null);
-    createUser(sqlService, "Admin", "Manager", "admin", "manager", new Date(), null);
+    LOG.info("SQL-DEV create rows for: {}", TABLE_NAME);
+    createUser(sqlService, "Cuttis", "Bolion", "cuttis", "pwd", true);
+    createUser(sqlService, "Bob", "Miller", "bob", "pwd", true);
+    createUser(sqlService, "Admin", "Manager", "admin", "manager", true);
   }
 
-  private void createUser(ISqlService sqlService, String name, String firstname, String username, String password, Date inserDate, Date validDate) {
+  @Override
+  public void dropTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DROP TABLE ").append(TABLE_NAME);
+    sqlService.insert(statementBuilder.toString());
+  }
+
+  public void createUser(ISqlService sqlService, String name, String firstname, String username, String password, boolean active) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(SqlFramentBuilder.columns(NAME, FIRSTNAME, USERNAME, PASSWORD, INSERT_DATE, VALID_DATE));
+    statementBuilder.append(SqlFramentBuilder.columns(NAME, FIRSTNAME, USERNAME, PASSWORD, ACTIVE));
     statementBuilder.append(") VALUES (");
-    statementBuilder.append(":name, :firstname, :username, :password, :inserDate, :validDate");
+    statementBuilder.append(":name, :firstname, :username, :password, :active");
     statementBuilder.append(")");
     sqlService.insert(statementBuilder.toString(),
         new NVPair("name", name),
         new NVPair("firstname", firstname),
         new NVPair("username", username),
         new NVPair("password", new String(BEANS.get(UserService.class).createPasswordHash(password.toCharArray()))),
-        new NVPair("inserDate", inserDate),
-        new NVPair("validDate", validDate));
+        new NVPair("active", active));
   }
 }

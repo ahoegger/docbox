@@ -50,7 +50,7 @@ public class DocumentTableTask implements ITableTask, IDocumentTable {
 
   @Override
   public void createRows(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {0}", TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", TABLE_NAME);
     try {
       createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT, "A sample document", new Date(), new Date(), new Date(), "2016_03_08_124640.pdf", null, null);
       createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT + 1, "Bobs document", new Date(), new Date(), new Date(), "2016_03_08_124640.pdf", null, null);
@@ -59,6 +59,14 @@ public class DocumentTableTask implements ITableTask, IDocumentTable {
     catch (IOException e) {
       LOG.error("Could not add dev documents to data store.", e);
     }
+  }
+
+  @Override
+  public void dropTable(ISqlService sqlService) {
+    LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DROP TABLE ").append(TABLE_NAME);
+    sqlService.insert(statementBuilder.toString());
   }
 
   public void createDocumentRow(ISqlService sqlService, long documentId, String abstractText, Date documentDate, Date capturedDate, Date validDate, String devDocumentName, String originalStorage, Long conversationId) throws IOException {
