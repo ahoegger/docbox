@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.client.document;
 
 import java.math.BigDecimal;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
@@ -14,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
@@ -22,7 +24,9 @@ import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchButto
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.AbstractField;
+import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.ConversationField;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.PartnerField;
+import ch.ahoegger.docbox.shared.conversation.ConversationLookupCall;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
 
@@ -48,6 +52,10 @@ public class DocumentSearchForm extends AbstractSearchForm {
 
   public SearchButton getSearchButton() {
     return getFieldByClass(SearchButton.class);
+  }
+
+  public ConversationField getConversationField() {
+    return getFieldByClass(ConversationField.class);
   }
 
   public PartnerField getPartnerField() {
@@ -93,6 +101,31 @@ public class DocumentSearchForm extends AbstractSearchForm {
           @Override
           protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
             return PartnerLookupCall.class;
+          }
+        }
+
+        @Order(3000)
+        public class ConversationField extends AbstractSmartField<BigDecimal> {
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("Conversation");
+          }
+
+          @Override
+          protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
+            return ConversationLookupCall.class;
+          }
+
+          @Override
+          public void setLookupCall(ILookupCall<BigDecimal> call) {
+            ((ConversationLookupCall) call).setNoMasterShowAll(true);
+            super.setLookupCall(call);
+          }
+
+          @Override
+          protected void execPrepareLookup(ILookupCall<BigDecimal> call) {
+            call.setMaster(CollectionUtility.hashSet(getPartnerField().getValue()).stream().filter(v -> v != null).collect(Collectors.toList()));
+            super.execPrepareLookup(call);
           }
         }
 

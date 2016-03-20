@@ -28,6 +28,7 @@ public class UserTableTask implements ITableTask, IUserTable {
     statementBuilder.append(FIRSTNAME).append(" VARCHAR(").append(FIRSTNAME_LENGTH).append(") NOT NULL, ");
     statementBuilder.append(PASSWORD).append(" VARCHAR(").append(PASSWORD_LENGTH).append(") NOT NULL, ");
     statementBuilder.append(ACTIVE).append(" BOOLEAN NOT NULL, ");
+    statementBuilder.append(ADMINISTRATOR).append(" BOOLEAN NOT NULL, ");
     statementBuilder.append("PRIMARY KEY (").append(USERNAME).append(")");
     statementBuilder.append(")");
     return statementBuilder.toString();
@@ -42,9 +43,9 @@ public class UserTableTask implements ITableTask, IUserTable {
   @Override
   public void createRows(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", TABLE_NAME);
-    createUser(sqlService, "Cuttis", "Bolion", "cuttis", "pwd", true);
-    createUser(sqlService, "Bob", "Miller", "bob", "pwd", true);
-    createUser(sqlService, "Admin", "Manager", "admin", "manager", true);
+    createUser(sqlService, "Cuttis", "Bolion", "cuttis", "pwd", true, false);
+    createUser(sqlService, "Bob", "Miller", "bob", "pwd", true, false);
+    createUser(sqlService, "Admin", "Manager", "admin", "manager", true, true);
   }
 
   @Override
@@ -55,18 +56,19 @@ public class UserTableTask implements ITableTask, IUserTable {
     sqlService.insert(statementBuilder.toString());
   }
 
-  public void createUser(ISqlService sqlService, String name, String firstname, String username, String password, boolean active) {
+  public void createUser(ISqlService sqlService, String name, String firstname, String username, String password, boolean active, boolean administrator) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(SqlFramentBuilder.columns(NAME, FIRSTNAME, USERNAME, PASSWORD, ACTIVE));
+    statementBuilder.append(SqlFramentBuilder.columns(NAME, FIRSTNAME, USERNAME, PASSWORD, ACTIVE, ADMINISTRATOR));
     statementBuilder.append(") VALUES (");
-    statementBuilder.append(":name, :firstname, :username, :password, :active");
+    statementBuilder.append(":name, :firstname, :username, :password, :active, :administrator");
     statementBuilder.append(")");
     sqlService.insert(statementBuilder.toString(),
         new NVPair("name", name),
         new NVPair("firstname", firstname),
         new NVPair("username", username),
         new NVPair("password", new String(BEANS.get(UserService.class).createPasswordHash(password.toCharArray()))),
-        new NVPair("active", active));
+        new NVPair("active", active),
+        new NVPair("administrator", administrator));
   }
 }

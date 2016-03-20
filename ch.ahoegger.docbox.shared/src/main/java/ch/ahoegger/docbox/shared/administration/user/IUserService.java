@@ -44,7 +44,14 @@ public interface IUserService {
 
   /**
    * @param string
+   * @return
    */
   void delete(String string);
+
+  /**
+   * @param formData
+   * @return
+   */
+  UserFormData store(UserFormData formData);
 
 }

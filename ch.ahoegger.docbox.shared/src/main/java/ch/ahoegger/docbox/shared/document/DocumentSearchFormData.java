@@ -20,11 +20,20 @@ public class DocumentSearchFormData extends AbstractFormData {
     return getFieldByClass(Abstract.class);
   }
 
+  public Conversation getConversation() {
+    return getFieldByClass(Conversation.class);
+  }
+
   public Partner getPartner() {
     return getFieldByClass(Partner.class);
   }
 
   public static class Abstract extends AbstractValueFieldData<String> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class Conversation extends AbstractValueFieldData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

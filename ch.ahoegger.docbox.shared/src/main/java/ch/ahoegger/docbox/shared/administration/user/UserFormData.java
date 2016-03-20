@@ -1,8 +1,5 @@
 package ch.ahoegger.docbox.shared.administration.user;
 
-import java.math.BigDecimal;
-import java.util.Set;
-
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -21,6 +18,14 @@ public class UserFormData extends AbstractFormData {
     return getFieldByClass(Active.class);
   }
 
+  public Administrator getAdministrator() {
+    return getFieldByClass(Administrator.class);
+  }
+
+  public ChangePassword getChangePassword() {
+    return getFieldByClass(ChangePassword.class);
+  }
+
   public Firstname getFirstname() {
     return getFieldByClass(Firstname.class);
   }
@@ -33,15 +38,21 @@ public class UserFormData extends AbstractFormData {
     return getFieldByClass(Password.class);
   }
 
-  public RoleBox getRoleBox() {
-    return getFieldByClass(RoleBox.class);
-  }
-
   public Username getUsername() {
     return getFieldByClass(Username.class);
   }
 
   public static class Active extends AbstractValueFieldData<Boolean> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class Administrator extends AbstractValueFieldData<Boolean> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class ChangePassword extends AbstractValueFieldData<Boolean> {
 
     private static final long serialVersionUID = 1L;
   }
@@ -57,11 +68,6 @@ public class UserFormData extends AbstractFormData {
   }
 
   public static class Password extends AbstractValueFieldData<String> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class RoleBox extends AbstractValueFieldData<Set<BigDecimal>> {
 
     private static final long serialVersionUID = 1L;
   }

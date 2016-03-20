@@ -8,6 +8,7 @@ package ch.ahoegger.docbox.shared.administration.user;
 public interface IUserTable {
 
   public static String TABLE_NAME = "DOCBOX_USER";
+  public static String TABLE_ALIAS = "U";
 
   public static String USERNAME = "USERNAME";
   public static int USERNAME_LENGTH = 240;
@@ -17,6 +18,7 @@ public interface IUserTable {
   public static int FIRSTNAME_LENGTH = 240;
   public static String PASSWORD = "PASSWORD";
   public static int PASSWORD_LENGTH = 480;
+  public static String ADMINISTRATOR = "ADMINISTRATOR";
 
   public static String ACTIVE = "ACTIVE";
 

@@ -23,6 +23,7 @@ import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
 import ch.ahoegger.docbox.shared.ISequenceTable;
+import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Permissions.PermissionsRowData;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
@@ -50,7 +51,7 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
     sqlBuilder.append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS);
     // join with permission
-    sqlBuilder.append("  INNER JOIN ").append(IDocumentPermissionTable.TABLE_NAME).append(" ").append(IDocumentPermissionTable.TABLE_ALIAS)
+    sqlBuilder.append("  LEFT OUTER JOIN ").append(IDocumentPermissionTable.TABLE_NAME).append(" ").append(IDocumentPermissionTable.TABLE_ALIAS)
         .append(" ON ").append(TABLE_ALIAS).append(".").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR)).append(" = ")
         .append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS, IDocumentPermissionTable.DOCUMENT_NR));
     // join with owner
@@ -60,8 +61,10 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
     sqlBuilder.append(" WHERE 1 = 1");
     // check permission
-    sqlBuilder.append(" AND ").append(IDocumentPermissionTable.TABLE_ALIAS).append(".").append(IDocumentPermissionTable.USERNAME).append(" = '").append(ServerSession.get().getUserId()).append("'");
-    sqlBuilder.append(" AND ").append(IDocumentPermissionTable.TABLE_ALIAS).append(".").append(IDocumentPermissionTable.PERMISSION).append(" >= ").append(IDocumentPermissionTable.PERMISSION_READ);
+    sqlBuilder.append(" AND (").append(IDocumentPermissionTable.TABLE_ALIAS).append(".").append(IDocumentPermissionTable.USERNAME).append(" = '").append(ServerSession.get().getUserId()).append("'");
+    sqlBuilder.append(" AND ").append(IDocumentPermissionTable.TABLE_ALIAS).append(".").append(IDocumentPermissionTable.PERMISSION).append(" >= ").append(IDocumentPermissionTable.PERMISSION_READ).append(") ");
+    sqlBuilder.append(" OR EXISTS ( SELECT 1 FROM ").append(IUserTable.TABLE_NAME).append(" WHERE ").append(IUserTable.USERNAME).append(" = '").append(ServerSession.get().getUserId()).append("'")
+        .append(" AND ").append(IUserTable.ADMINISTRATOR).append(") ");
 //
 
     // abstract search criteria

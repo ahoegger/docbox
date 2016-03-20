@@ -13,10 +13,18 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 public class ConversationLookupCall extends LookupCall<BigDecimal> {
 
   private static final long serialVersionUID = 1L;
+  private boolean m_noMasterShowAll = false;
 
   @Override
   protected Class<? extends ILookupService<BigDecimal>> getConfiguredService() {
     return IConversationLookupService.class;
   }
 
+  public void setNoMasterShowAll(boolean noMasterShowAll) {
+    m_noMasterShowAll = noMasterShowAll;
+  }
+
+  public boolean isNoMasterShowAll() {
+    return m_noMasterShowAll;
+  }
 }

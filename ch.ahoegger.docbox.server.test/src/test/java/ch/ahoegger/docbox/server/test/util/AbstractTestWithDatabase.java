@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import ch.ahoegger.docbox.server.ServerSession;
 import ch.ahoegger.docbox.server.database.initialization.ITableTask;
 import ch.ahoegger.docbox.server.database.initialization.SequenceTask;
-import ch.ahoegger.docbox.server.test.adminstration.user.UserServiceTest;
 
 /**
  * <h3>{@link AbstractTestWithDatabase}</h3>
@@ -19,9 +18,11 @@ import ch.ahoegger.docbox.server.test.adminstration.user.UserServiceTest;
  * @author aho
  */
 @RunWith(ServerTestRunner.class)
-@RunWithSubject(UserServiceTest.SUBJECT_NAME)
+@RunWithSubject(AbstractTestWithDatabase.SUBJECT_NAME)
 @RunWithServerSession(ServerSession.class)
 public abstract class AbstractTestWithDatabase {
+
+  public static final String SUBJECT_NAME = "admin";
 
   @BeforeClass
   public static void setupDb() {

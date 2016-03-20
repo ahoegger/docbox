@@ -1,7 +1,5 @@
 package ch.ahoegger.docbox.client.administration.user;
 
-import java.math.BigDecimal;
-
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -10,26 +8,24 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanFi
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.CancelButton;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.ActiveField;
+import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.AdministratorField;
+import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.ChangePasswordField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.FirstnameField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.NameField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.PasswordField;
-import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.RoleBox;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.UsernameField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.OkButton;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 import ch.ahoegger.docbox.shared.administration.user.UserFormData;
-import ch.ahoegger.docbox.shared.security.role.RoleLookupCall;
 
 /**
  * <h3>{@link UserForm}</h3>
@@ -87,12 +83,16 @@ public class UserForm extends AbstractForm {
     return getFieldByClass(PasswordField.class);
   }
 
-  public RoleBox getRoleBox() {
-    return getFieldByClass(RoleBox.class);
-  }
-
   public ActiveField getActiveField() {
     return getFieldByClass(ActiveField.class);
+  }
+
+  public ChangePasswordField getChangePasswordField() {
+    return getFieldByClass(ChangePasswordField.class);
+  }
+
+  public AdministratorField getAdministratorField() {
+    return getFieldByClass(AdministratorField.class);
   }
 
   public NameField getNameField() {
@@ -171,6 +171,23 @@ public class UserForm extends AbstractForm {
         }
       }
 
+      @Order(35)
+      public class ChangePasswordField extends AbstractBooleanField {
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("ChangePassword");
+        }
+
+        @Override
+        protected void execChangedValue() {
+          getPasswordField().setEnabled(getValue());
+          getPasswordField().setMandatory(getValue());
+          if (!getValue()) {
+            getPasswordField().setValue(null);
+          }
+        }
+      }
+
       @Order(40)
       public class PasswordField extends AbstractStringField {
 
@@ -198,21 +215,11 @@ public class UserForm extends AbstractForm {
         }
       }
 
-      @Order(4000)
-      public class RoleBox extends AbstractListBox<BigDecimal> {
+      @Order(2510)
+      public class AdministratorField extends AbstractBooleanField {
         @Override
         protected String getConfiguredLabel() {
-          return TEXTS.get("Role");
-        }
-
-        @Override
-        protected int getConfiguredGridH() {
-          return 6;
-        }
-
-        @Override
-        protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
-          return RoleLookupCall.class;
+          return TEXTS.get("Administrator");
         }
       }
 
@@ -238,6 +245,7 @@ public class UserForm extends AbstractForm {
         setDisplayViewId(VIEW_ID_PAGE_TABLE);
       }
 
+      getChangePasswordField().setVisible(false);
       getOkButton().setVisibleGranted(false);
       getCancelButton().setVisibleGranted(false);
 
@@ -258,7 +266,9 @@ public class UserForm extends AbstractForm {
     @Override
     protected void execLoad() {
       getUsernameField().setEnabled(true);
+      getChangePasswordField().setVisible(false);
       UserFormData formData = new UserFormData();
+      exportFormData(formData);
       formData = BEANS.get(IUserService.class).prepareCreate(formData);
       importFormData(formData);
     }
@@ -266,6 +276,7 @@ public class UserForm extends AbstractForm {
     @Override
     protected void execStore() {
       UserFormData formData = new UserFormData();
+      exportFormData(formData);
       formData = BEANS.get(IUserService.class).create(formData);
       importFormData(formData);
     }
@@ -274,6 +285,7 @@ public class UserForm extends AbstractForm {
   public class EditHandler extends AbstractFormHandler {
     @Override
     protected void execLoad() {
+      getChangePasswordField().setVisible(true);
       UserFormData formData = new UserFormData();
       exportFormData(formData);
       formData = BEANS.get(IUserService.class).load(formData);
@@ -282,6 +294,10 @@ public class UserForm extends AbstractForm {
 
     @Override
     protected void execStore() {
+      UserFormData formData = new UserFormData();
+      exportFormData(formData);
+      formData = BEANS.get(IUserService.class).store(formData);
+      importFormData(formData);
     }
   }
 }

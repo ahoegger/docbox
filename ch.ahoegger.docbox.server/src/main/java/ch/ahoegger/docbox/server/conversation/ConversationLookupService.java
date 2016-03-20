@@ -9,6 +9,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
+import ch.ahoegger.docbox.shared.conversation.ConversationLookupCall;
 import ch.ahoegger.docbox.shared.conversation.IConversationLookupService;
 import ch.ahoegger.docbox.shared.conversation.IConversationTable;
 import ch.ahoegger.docbox.shared.partner.IPartnerConversationTable;
@@ -39,6 +40,8 @@ public class ConversationLookupService extends AbstractSqlLookupService<BigDecim
   @Override
   protected List<ILookupRow<BigDecimal>> execLoadLookupRows(String originalSql, String preprocessedSql, ILookupCall<BigDecimal> call) {
     StringBuilder statementBuilder = new StringBuilder(preprocessedSql);
+    ConversationLookupCall conversationLookupCall = (ConversationLookupCall) call;
+
     List<BigDecimal> partnerIds = (List<BigDecimal>) call.getMaster();
     if (CollectionUtility.hasElements(partnerIds)) {
       statementBuilder.append(" OR ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, CONVERSATION_NR)).append(" IN (")
@@ -50,7 +53,9 @@ public class ConversationLookupService extends AbstractSqlLookupService<BigDecim
           .append(partnerIds.stream().map(id -> id.toPlainString()).reduce((id1, id2) -> id1 + ", " + id2).get())
           .append(") ) ");
     }
-
+    else if (conversationLookupCall.isNoMasterShowAll()) {
+      statementBuilder.append(" OR 1 = 1");
+    }
     return super.execLoadLookupRows(originalSql, statementBuilder.toString(), call);
 
   }
