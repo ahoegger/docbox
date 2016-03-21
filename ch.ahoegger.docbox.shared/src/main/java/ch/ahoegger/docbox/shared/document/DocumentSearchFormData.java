@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.shared.document;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import javax.annotation.Generated;
 
@@ -20,8 +21,24 @@ public class DocumentSearchFormData extends AbstractFormData {
     return getFieldByClass(Abstract.class);
   }
 
+  public ActiveBox getActiveBox() {
+    return getFieldByClass(ActiveBox.class);
+  }
+
   public Conversation getConversation() {
     return getFieldByClass(Conversation.class);
+  }
+
+  public DocumentDateFrom getDocumentDateFrom() {
+    return getFieldByClass(DocumentDateFrom.class);
+  }
+
+  public DocumentDateTo getDocumentDateTo() {
+    return getFieldByClass(DocumentDateTo.class);
+  }
+
+  public Owner getOwner() {
+    return getFieldByClass(Owner.class);
   }
 
   public Partner getPartner() {
@@ -33,7 +50,27 @@ public class DocumentSearchFormData extends AbstractFormData {
     private static final long serialVersionUID = 1L;
   }
 
+  public static class ActiveBox extends AbstractValueFieldData<DocumentActiveState> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
   public static class Conversation extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class DocumentDateFrom extends AbstractValueFieldData<Date> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class DocumentDateTo extends AbstractValueFieldData<Date> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class Owner extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
   }

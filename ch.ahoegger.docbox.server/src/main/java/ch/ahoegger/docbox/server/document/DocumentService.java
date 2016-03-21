@@ -53,10 +53,6 @@ public class DocumentService implements IDocumentService, IDocumentTable {
         .append(", ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_OWNER", IDocumentPermissionTable.USERNAME));
 
     sqlBuilder.append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS);
-    // join with permission
-//    sqlBuilder.append("  LEFT OUTER JOIN ").append(IDocumentPermissionTable.TABLE_NAME).append(" ").append(IDocumentPermissionTable.TABLE_ALIAS)
-//        .append(" ON ").append(TABLE_ALIAS).append(".").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR)).append(" = ")
-//        .append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS, IDocumentPermissionTable.DOCUMENT_NR));
     // join with owner
     sqlBuilder.append(" LEFT OUTER JOIN ").append(IDocumentPermissionTable.TABLE_NAME).append(" AS ").append(IDocumentPermissionTable.TABLE_ALIAS + "_OWNER")
         .append(" ON ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_OWNER", IDocumentPermissionTable.DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR))
@@ -64,7 +60,6 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
     sqlBuilder.append(" WHERE 1 = 1");
     // permission
-    // check permission
     // either admin
     sqlBuilder.append(" AND ( EXISTS ( SELECT 1 FROM ").append(IUserTable.TABLE_NAME).append(" AS ").append(IUserTable.TABLE_ALIAS)
         .append(" WHERE ").append(SqlFramentBuilder.columnsAliased(IUserTable.TABLE_ALIAS, IUserTable.USERNAME)).append(" = :username")
@@ -78,11 +73,6 @@ public class DocumentService implements IDocumentService, IDocumentTable {
         .append(")");
     sqlBuilder.append(" )");
 
-//    sqlBuilder.append(" AND (").append(IDocumentPermissionTable.TABLE_ALIAS).append(".").append(IDocumentPermissionTable.USERNAME).append(" = '").append(ServerSession.get().getUserId()).append("'");
-//    sqlBuilder.append(" AND ").append(IDocumentPermissionTable.TABLE_ALIAS).append(".").append(IDocumentPermissionTable.PERMISSION).append(" >= ").append(IDocumentPermissionTable.PERMISSION_READ).append(") ");
-//    sqlBuilder.append(" OR EXISTS ( SELECT 1 FROM ").append(IUserTable.TABLE_NAME).append(" WHERE ").append(IUserTable.USERNAME).append(" = '").append(ServerSession.get().getUserId()).append("'")
-//        .append(" AND ").append(IUserTable.ADMINISTRATOR).append(") ");
-
     // abstract search criteria
     if (StringUtility.hasText(formData.getAbstract().getValue())) {
       sqlBuilder.append(" AND ").append(SqlFramentBuilder.whereStringContains(TABLE_ALIAS, ABSTRACT, formData.getAbstract().getValue()));
@@ -94,7 +84,32 @@ public class DocumentService implements IDocumentService, IDocumentTable {
       sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentPartnerTable.TABLE_ALIAS, IDocumentPartnerTable.DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR));
       sqlBuilder.append(")");
     }
+    // document date from
+    if (formData.getDocumentDateFrom().getValue() != null) {
+      sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_DATE)).append(" >= ").append(":documentDateFrom");
+    }
+    // document date to
+    if (formData.getDocumentDateTo().getValue() != null) {
+      sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_DATE)).append(" <= ").append(":documentDateTo");
+    }
+    // active document (valid date)
+    if (formData.getActiveBox().getValue() != null) {
+      switch (formData.getActiveBox().getValue()) {
+        case Active:
+          sqlBuilder.append(" AND (").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, VALID_DATE)).append(" >= ").append(":today")
+              .append(" OR ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, VALID_DATE)).append(" IS NULL)");
+          break;
+        case Inactive:
+          sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, VALID_DATE)).append(" < ").append(":today");
+          break;
+      }
+    }
+    // owner
+    if (StringUtility.hasText(formData.getOwner().getValue())) {
+      sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_OWNER", IDocumentPermissionTable.USERNAME))
+          .append(" = :owner");
 
+    }
     sqlBuilder.append(" INTO ");
     sqlBuilder.append(":{td.documentId}, ");
     sqlBuilder.append(":{td.abstract}, ");
@@ -105,9 +120,12 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     sqlBuilder.append(":{td.owner} ");
     DocumentTableData tableData = new DocumentTableData();
     System.out.println("USERNAME: " + ServerSession.get().getUserId());
+    Calendar cal = Calendar.getInstance();
+    DateUtility.truncCalendar(cal);
     SQL.selectInto(sqlBuilder.toString(),
         new NVPair("td", tableData),
         new NVPair("username", ServerSession.get().getUserId()),
+        new NVPair("today", cal.getTime()),
         formData);
 
     // partners

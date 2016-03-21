@@ -2,12 +2,14 @@ package ch.ahoegger.docbox.server.database.initialization;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,9 +54,14 @@ public class DocumentTableTask implements ITableTask, IDocumentTable {
   public void createRows(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", TABLE_NAME);
     try {
-      createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT, "A sample document", new Date(), new Date(), new Date(), "2016_03_08_124640.pdf", null, null);
-      createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT + 1, "Bobs document", new Date(), new Date(), new Date(), "2016_03_08_124640.pdf", null, null);
-      createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT + 2, "Muliple partner document", new Date(), new Date(), new Date(), "2016_03_08_124640.pdf", null, null);
+      Calendar cal = Calendar.getInstance();
+      DateUtility.truncCalendar(cal);
+
+      createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT, "A sample document", cal.getTime(), new Date(), new Date(), "2016_03_08_124640.pdf", null, null);
+      cal.add(Calendar.YEAR, -1);
+      createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT + 1, "Bobs document", cal.getTime(), new Date(), new Date(), "2016_03_08_124640.pdf", null, null);
+      cal.add(Calendar.YEAR, -3);
+      createDocumentRow(sqlService, IDevSequenceNumbers.SEQ_START_DOCUMENT + 2, "Muliple partner document", cal.getTime(), new Date(), new Date(), "2016_03_08_124640.pdf", null, null);
     }
     catch (IOException e) {
       LOG.error("Could not add dev documents to data store.", e);
