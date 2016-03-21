@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
@@ -73,5 +74,22 @@ public class DocumentPermissionService implements IPermissionService, IDocumentP
           new NVPair("username", permission.getKey()),
           new NVPair("permission", permission.getValue()));
     }
+  }
+
+  /**
+   * @param documentId
+   * @param permissions
+   */
+  @RemoteServiceAccessDenied
+  public void updateDocumentPermissions(Long documentId, Map<String, Integer> permissions) {
+    deleteDocumentPermissions(documentId);
+    createDocumentPermissions(documentId, permissions);
+  }
+
+  @RemoteServiceAccessDenied
+  public void deleteDocumentPermissions(Long documentId) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
+    SQL.delete(statementBuilder.toString(), new NVPair("documentId", documentId));
   }
 }

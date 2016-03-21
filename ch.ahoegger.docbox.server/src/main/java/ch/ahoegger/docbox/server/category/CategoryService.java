@@ -69,6 +69,6 @@ public class CategoryService implements ICategoryService, ICategoryTable {
     SQL.delete(statementBuilder.toString(), new NVPair("categoryId", categoryId));
 
     // delete document category connection
-    BEANS.get(DocumentCategoryService.class).delete(categoryId);
+    BEANS.get(DocumentCategoryService.class).deleteByCategoryId(categoryId);
   }
 }

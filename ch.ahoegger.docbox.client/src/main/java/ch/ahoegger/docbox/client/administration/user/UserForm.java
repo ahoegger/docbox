@@ -11,6 +11,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.CancelButton;
@@ -26,6 +27,7 @@ import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.OkButton;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 import ch.ahoegger.docbox.shared.administration.user.UserFormData;
+import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
 
 /**
  * <h3>{@link UserForm}</h3>
@@ -34,6 +36,21 @@ import ch.ahoegger.docbox.shared.administration.user.UserFormData;
  */
 @FormData(value = UserFormData.class, sdkCommand = SdkCommand.CREATE)
 public class UserForm extends AbstractForm {
+  public static enum FORM_MODE {
+    NEW,
+    PAGE,
+    MODIFY
+  }
+
+  private final FORM_MODE m_formMode;
+
+  public UserForm(FORM_MODE mode) {
+    m_formMode = mode;
+  }
+
+  public FORM_MODE getFormMode() {
+    return m_formMode;
+  }
 
   @Override
   protected int getConfiguredDisplayHint() {
@@ -51,20 +68,23 @@ public class UserForm extends AbstractForm {
   }
 
   @Override
+  protected void execInitForm() {
+    switch (getFormMode()) {
+      case MODIFY:
+        setHandler(new EditHandler());
+        break;
+      case PAGE:
+        setHandler(new PageHandler());
+        break;
+      case NEW:
+        setHandler(new NewHandler());
+        break;
+    }
+  }
+
+  @Override
   protected void execStored() {
     getDesktop().dataChanged(IUserEntity.ENTITY_KEY);
-  }
-
-  public void startPage() {
-    startInternal(new PageHandler());
-  }
-
-  public void startNew() {
-    startInternal(new NewHandler());
-  }
-
-  public void startEdit() {
-    startInternal(new EditHandler());
   }
 
   public FieldBox getFieldBox() {
@@ -169,6 +189,18 @@ public class UserForm extends AbstractForm {
         protected int getConfiguredMaxLength() {
           return IUserTable.USERNAME_LENGTH;
         }
+
+        @Override
+        protected String execValidateValue(String rawValue) {
+          if (getFormMode() == FORM_MODE.NEW) {
+            UserLookupCall call = new UserLookupCall();
+            call.setKey(rawValue);
+            if (!call.getDataByKey().isEmpty()) {
+              throw new VetoException(TEXTS.get("Validate_UsernameAlreadyUsed"));
+            }
+          }
+          return super.execValidateValue(rawValue);
+        }
       }
 
       @Order(35)
@@ -251,6 +283,7 @@ public class UserForm extends AbstractForm {
 
       UserFormData formData = new UserFormData();
       exportFormData(formData);
+      System.out.println(formData.getUsername().getValue());
       formData = BEANS.get(IUserService.class).load(formData);
       importFormData(formData);
 

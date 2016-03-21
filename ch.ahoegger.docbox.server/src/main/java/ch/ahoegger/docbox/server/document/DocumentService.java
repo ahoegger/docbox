@@ -2,7 +2,7 @@ package ch.ahoegger.docbox.server.document;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -11,6 +11,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
@@ -103,7 +104,9 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
   @Override
   public DocumentFormData prepareCreate(DocumentFormData formData) {
-    formData.getCapturedDate().setValue(new Date());
+    Calendar cal = Calendar.getInstance();
+    DateUtility.truncCalendar(cal);
+    formData.getCapturedDate().setValue(cal.getTime());
     Map<String, Integer> defaultPermissions = BEANS.get(DefaultPermissionService.class).getDefaultPermissions();
     defaultPermissions.remove(ServerSession.get().getUserId());
     defaultPermissions.put(ServerSession.get().getUserId(), IDocumentPermissionTable.PERMISSION_OWNER);
@@ -117,19 +120,21 @@ public class DocumentService implements IDocumentService, IDocumentTable {
   }
 
   @Override
-  public void create(DocumentFormData formData) {
+  public DocumentFormData create(DocumentFormData formData) {
     // create document
     Long documentId = SQL.getSequenceNextval(ISequenceTable.TABLE_NAME);
     formData.setDocumentId(documentId);
     String documentPath = BEANS.get(DocumentStoreService.class).store(formData.getDocument().getValue(), formData.getCapturedDate().getValue(), documentId);
     formData.setDocumentPath(documentPath);
+    // reset binary resource only used for creation
+    formData.getDocument().setValue(null);
 
     // create document
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE));
+    statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE, CONVERSATION_NR));
     statementBuilder.append(") VALUES (");
-    statementBuilder.append(":documentId, :abstract, :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage");
+    statementBuilder.append(":documentId, :abstract, :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage, :conversation");
     statementBuilder.append(" )");
     SQL.insert(statementBuilder.toString(), formData);
 
@@ -151,11 +156,34 @@ public class DocumentService implements IDocumentService, IDocumentTable {
             (p1, p2) -> Math.max(p1, p2)));
     BEANS.get(DocumentPermissionService.class).createDocumentPermissions(documentId, permissions);
 
+    return formData;
+
   }
 
   @Override
   public void store(DocumentFormData formData) {
-    LOG.debug("Store document.");
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("UPDATE ").append(TABLE_NAME).append(" SET ")
+        .append(ABSTRACT).append("= :abstract, ")
+        .append(DOCUMENT_DATE).append("= :documentDate, ")
+        .append(VALID_DATE).append("= :validDate, ")
+        .append(DOCUMENT_URL).append("= :documentPath, ")
+        .append(ORIGINAL_STORAGE).append("= :originalStorage, ")
+        .append(CONVERSATION_NR).append("= :conversation ")
+        .append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
+    SQL.update(statementBuilder.toString(), formData);
+
+    // categories
+    BEANS.get(DocumentCategoryService.class).updateDocumentCategories(formData.getDocumentId(), formData.getCategoriesBox().getValue());
+
+    // permissions
+    Map<String, Integer> permissions = Arrays.stream(formData.getPermissions().getRows())
+        .filter(row -> StringUtility.hasText(row.getUser()) && row.getPermission() != null)
+        .collect(Collectors.toMap(
+            row -> row.getUser(),
+            row -> row.getPermission(),
+            (p1, p2) -> Math.max(p1, p2)));
+    BEANS.get(DocumentPermissionService.class).updateDocumentPermissions(formData.getDocumentId(), permissions);
   }
 
   @Override
@@ -172,9 +200,9 @@ public class DocumentService implements IDocumentService, IDocumentTable {
   @RemoteServiceAccessDenied
   public DocumentFormData loadTrusted(DocumentFormData formData) {
     StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE));
+    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE, CONVERSATION_NR));
     statementBuilder.append(" FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
-    statementBuilder.append(" INTO ").append(":abstract,  :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage");
+    statementBuilder.append(" INTO ").append(":abstract,  :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage, :conversation");
     SQL.selectInto(statementBuilder.toString(), formData);
 
     // partners

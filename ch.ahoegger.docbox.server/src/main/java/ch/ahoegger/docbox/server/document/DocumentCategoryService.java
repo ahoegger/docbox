@@ -10,6 +10,7 @@ import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.shared.document.IDocumentCategoryTable;
@@ -48,9 +49,26 @@ public class DocumentCategoryService implements IDocumentCategoryTable {
     }
   }
 
-  public void delete(Long categoryId) {
+  public void deleteByCategoryId(Long categoryId) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(CATEGORY_NR).append(" = :categoryId");
     SQL.delete(statementBuilder.toString(), new NVPair("categoryId", categoryId));
+  }
+
+  /**
+   * @param documentId
+   * @param value
+   */
+  @RemoteServiceAccessDenied
+  public void updateDocumentCategories(Long documentId, Set<BigDecimal> categoryIds) {
+    deleteByDocumentId(documentId);
+    createDocumentCategories(documentId, categoryIds);
+  }
+
+  @RemoteServiceAccessDenied
+  public void deleteByDocumentId(Long documentId) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
+    SQL.delete(statementBuilder.toString(), new NVPair("documentId", documentId));
   }
 }

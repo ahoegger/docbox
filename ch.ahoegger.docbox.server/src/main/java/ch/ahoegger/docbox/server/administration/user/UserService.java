@@ -43,8 +43,8 @@ public class UserService implements IUserService, IUserTable {
     ISqlService sqlService = BEANS.get(ISqlService.class);
 
     StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(USERNAME, NAME, FIRSTNAME, ACTIVE)).append(" FROM ").append(TABLE_NAME);
-    statementBuilder.append(" INTO ").append(":{page.username}, :{page.name}, :{page.firstname}, :{page.active}");
+    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(USERNAME, NAME, FIRSTNAME, ACTIVE, ADMINISTRATOR)).append(" FROM ").append(TABLE_NAME);
+    statementBuilder.append(" INTO ").append(":{page.username}, :{page.name}, :{page.firstname}, :{page.active}, :{page.administrator}");
 
     sqlService.selectInto(statementBuilder.toString(), new NVPair("page", pageData));
     return pageData;

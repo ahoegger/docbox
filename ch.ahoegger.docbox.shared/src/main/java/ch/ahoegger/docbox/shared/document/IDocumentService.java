@@ -35,7 +35,8 @@ public interface IDocumentService {
 
   /**
    * @param formData
+   * @return
    */
-  void create(DocumentFormData formData);
+  DocumentFormData create(DocumentFormData formData);
 
 }

@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
+import ch.ahoegger.docbox.client.administration.user.UserForm.FORM_MODE;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
 import ch.ahoegger.docbox.shared.administration.user.UserTablePageData;
 
@@ -61,6 +62,10 @@ public class UserTablePage extends AbstractPageWithTable<UserTablePage.Table> {
 
     public ActiveColumn getActiveColumn() {
       return getColumnSet().getColumnByClass(ActiveColumn.class);
+    }
+
+    public AdministratorColumn getAdministratorColumn() {
+      return getColumnSet().getColumnByClass(AdministratorColumn.class);
     }
 
     public NameColumn getNameColumn() {
@@ -116,7 +121,20 @@ public class UserTablePage extends AbstractPageWithTable<UserTablePage.Table> {
 
       @Override
       protected int getConfiguredWidth() {
-        return 60;
+        return 80;
+      }
+    }
+
+    @Order(5000)
+    public class AdministratorColumn extends AbstractBooleanColumn {
+      @Override
+      protected String getConfiguredHeaderText() {
+        return TEXTS.get("Administrator");
+      }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 100;
       }
     }
 
@@ -134,9 +152,9 @@ public class UserTablePage extends AbstractPageWithTable<UserTablePage.Table> {
 
       @Override
       protected void execAction() {
-        UserForm form = new UserForm();
+        UserForm form = new UserForm(FORM_MODE.MODIFY);
         form.getUsernameField().setValue(getUsernameColumn().getSelectedValue());
-        form.startEdit();
+        form.start();
 
       }
     }
@@ -155,8 +173,8 @@ public class UserTablePage extends AbstractPageWithTable<UserTablePage.Table> {
 
       @Override
       protected void execAction() {
-        UserForm form = new UserForm();
-        form.startNew();
+        UserForm form = new UserForm(FORM_MODE.NEW);
+        form.start();
       }
     }
 

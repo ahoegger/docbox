@@ -607,6 +607,7 @@ public class DocumentForm extends AbstractForm {
       DocumentFormData formData = new DocumentFormData();
       exportFormData(formData);
       BEANS.get(IDocumentService.class).store(formData);
+
     }
   }
 
