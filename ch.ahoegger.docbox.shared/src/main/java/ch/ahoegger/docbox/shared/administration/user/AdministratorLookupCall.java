@@ -4,16 +4,16 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
 /**
- * <h3>{@link UserLookupCall}</h3>
+ * <h3>{@link AdministratorLookupCall}</h3>
  *
- * @author Andreas Hoegger
+ * @author aho
  */
-public class UserLookupCall extends LookupCall<String> {
+public class AdministratorLookupCall extends LookupCall<String> {
 
   private static final long serialVersionUID = 1L;
 
   @Override
   protected Class<? extends ILookupService<String>> getConfiguredService() {
-    return IUserLookupService.class;
+    return IAdministratorLookupService.class;
   }
 }

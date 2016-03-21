@@ -53,7 +53,7 @@ public class DocumentPermissionTableTask implements ITableTask, IDocumentPermiss
     sqlService.insert(statementBuilder.toString());
   }
 
-  private void createDocumentPermissionRow(ISqlService sqlService, String userId, Long documentId, Integer permission) {
+  public void createDocumentPermissionRow(ISqlService sqlService, String userId, long documentId, int permission) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(IUserTable.USERNAME, DOCUMENT_NR, PERMISSION));

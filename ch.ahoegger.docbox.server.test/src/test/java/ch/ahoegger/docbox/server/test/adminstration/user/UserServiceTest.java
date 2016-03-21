@@ -63,6 +63,7 @@ public class UserServiceTest extends AbstractTestWithDatabase {
     fd1.getName().setValue("modified.name");
     fd1.getFirstname().setValue("modified.firstname");
     fd1.getActive().setValue(false);
+    fd1.getAdministrator().setValue(true);
 
     userService.store(fd1);
 
@@ -83,6 +84,7 @@ public class UserServiceTest extends AbstractTestWithDatabase {
     fd1.getUsername().setValue("modifyPwd.username");
     fd1 = userService.load(fd1);
 
+    fd1.getChangePassword().setValue(true);
     fd1.getPassword().setValue("1234abc");
     userService.store(fd1);
 

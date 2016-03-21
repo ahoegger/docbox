@@ -75,8 +75,9 @@ public class UserService implements IUserService, IUserTable {
     statementBuilder.append("UPDATE ").append(TABLE_NAME).append(" SET ")
         .append(NAME).append("= :name, ")
         .append(FIRSTNAME).append("= :firstname, ")
-        .append(ACTIVE).append("= :active ");
-    if (formData.getPassword().isValueSet()) {
+        .append(ACTIVE).append("= :active, ")
+        .append(ADMINISTRATOR).append("= :administrator ");
+    if (formData.getChangePassword().isValueSet() && formData.getChangePassword().getValue()) {
       statementBuilder.append(", ").append(PASSWORD).append("= :password");
       formData.getPassword().setValue(new String(createPasswordHash(formData.getPassword().getValue().toCharArray())));
     }

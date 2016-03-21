@@ -24,10 +24,12 @@ import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.N
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.PasswordField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.UsernameField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.OkButton;
+import ch.ahoegger.docbox.shared.administration.user.AdministratorLookupCall;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 import ch.ahoegger.docbox.shared.administration.user.UserFormData;
 import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
+import ch.ahoegger.docbox.shared.administration.user.UserValidationStatus;
 
 /**
  * <h3>{@link UserForm}</h3>
@@ -186,6 +188,11 @@ public class UserForm extends AbstractForm {
         }
 
         @Override
+        protected boolean getConfiguredFormatLower() {
+          return true;
+        }
+
+        @Override
         protected int getConfiguredMaxLength() {
           return IUserTable.USERNAME_LENGTH;
         }
@@ -253,6 +260,21 @@ public class UserForm extends AbstractForm {
         protected String getConfiguredLabel() {
           return TEXTS.get("Administrator");
         }
+
+        @Override
+        protected Boolean execValidateValue(Boolean rawValue) {
+          removeErrorStatus(UserValidationStatus.AdministratorAtLeastOne.class);
+          if (!rawValue) {
+            AdministratorLookupCall call = new AdministratorLookupCall();
+            if (call.getDataByAll().stream()
+                .filter(row -> !row.getKey().equals(getUsernameField().getValue())).count() < 1) {
+              // only one admin left
+              addErrorStatus(new UserValidationStatus.AdministratorAtLeastOne());
+            }
+          }
+          return super.execValidateValue(rawValue);
+
+        }
       }
 
     }
@@ -319,6 +341,7 @@ public class UserForm extends AbstractForm {
     @Override
     protected void execLoad() {
       getChangePasswordField().setVisible(true);
+      getPasswordField().setEnabled(false);
       UserFormData formData = new UserFormData();
       exportFormData(formData);
       formData = BEANS.get(IUserService.class).load(formData);

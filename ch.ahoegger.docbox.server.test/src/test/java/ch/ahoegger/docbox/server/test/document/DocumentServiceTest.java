@@ -41,7 +41,7 @@ public class DocumentServiceTest extends AbstractTestWithDatabase {
     cal.add(Calendar.DAY_OF_MONTH, 5);
     DateUtility.truncCalendar(cal);
     Date documentDate = cal.getTime();
-    BEANS.get(CategoryTableTask.class).createCategoryRow(sqlService, 900, "sampleCategoriy", null, documentDate, null);
+    BEANS.get(CategoryTableTask.class).createCategoryRow(sqlService, 100, "sampleCategoriy", null, documentDate, null);
 
     // partner
     BEANS.get(PartnerTableTask.class).createPartnerRow(sqlService, 120, "partner01", null, cal.getTime(), null);
@@ -53,13 +53,13 @@ public class DocumentServiceTest extends AbstractTestWithDatabase {
 
     cal = Calendar.getInstance();
     cal.set(1982, 04, 20);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 2000, "Cats Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 140, "Cats Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
     cal.set(1982, 04, 21);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 2001, "Abstract Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 141, "Abstract Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
     cal.set(1982, 04, 22);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 2002, "Dogs Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 142, "Dogs Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
     cal.set(1982, 04, 23);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 2003, "All fish are wet", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 143, "All fish are wet", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
   }
 
   @Test

@@ -147,6 +147,11 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
       protected int getConfiguredWidth() {
         return 300;
       }
+
+      @Override
+      protected int getConfiguredSortIndex() {
+        return 1;
+      }
     }
 
     @Order(30)
@@ -190,6 +195,11 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
       @Override
       protected int getConfiguredWidth() {
         return 100;
+      }
+
+      @Override
+      protected int getConfiguredSortIndex() {
+        return 0;
       }
     }
 

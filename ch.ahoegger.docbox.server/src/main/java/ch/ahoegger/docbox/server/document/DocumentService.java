@@ -45,6 +45,8 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
   @Override
   public DocumentTableData getTableData(DocumentSearchFormData formData) {
+    Object[][] rawRes = SQL.select("SELECT * FROM " + IDocumentPermissionTable.TABLE_NAME);
+
     StringBuilder sqlBuilder = new StringBuilder();
     sqlBuilder.append("SELECT ")
         .append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR, ABSTRACT, CONVERSATION_NR, DOCUMENT_DATE, INSERT_DATE, DOCUMENT_URL))
@@ -52,21 +54,34 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
     sqlBuilder.append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS);
     // join with permission
-    sqlBuilder.append("  LEFT OUTER JOIN ").append(IDocumentPermissionTable.TABLE_NAME).append(" ").append(IDocumentPermissionTable.TABLE_ALIAS)
-        .append(" ON ").append(TABLE_ALIAS).append(".").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR)).append(" = ")
-        .append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS, IDocumentPermissionTable.DOCUMENT_NR));
+//    sqlBuilder.append("  LEFT OUTER JOIN ").append(IDocumentPermissionTable.TABLE_NAME).append(" ").append(IDocumentPermissionTable.TABLE_ALIAS)
+//        .append(" ON ").append(TABLE_ALIAS).append(".").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR)).append(" = ")
+//        .append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS, IDocumentPermissionTable.DOCUMENT_NR));
     // join with owner
     sqlBuilder.append(" LEFT OUTER JOIN ").append(IDocumentPermissionTable.TABLE_NAME).append(" AS ").append(IDocumentPermissionTable.TABLE_ALIAS + "_OWNER")
         .append(" ON ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_OWNER", IDocumentPermissionTable.DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR))
         .append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_OWNER", IDocumentPermissionTable.PERMISSION)).append(" = ").append(IDocumentPermissionTable.PERMISSION_OWNER);
 
     sqlBuilder.append(" WHERE 1 = 1");
+    // permission
     // check permission
-    sqlBuilder.append(" AND (").append(IDocumentPermissionTable.TABLE_ALIAS).append(".").append(IDocumentPermissionTable.USERNAME).append(" = '").append(ServerSession.get().getUserId()).append("'");
-    sqlBuilder.append(" AND ").append(IDocumentPermissionTable.TABLE_ALIAS).append(".").append(IDocumentPermissionTable.PERMISSION).append(" >= ").append(IDocumentPermissionTable.PERMISSION_READ).append(") ");
-    sqlBuilder.append(" OR EXISTS ( SELECT 1 FROM ").append(IUserTable.TABLE_NAME).append(" WHERE ").append(IUserTable.USERNAME).append(" = '").append(ServerSession.get().getUserId()).append("'")
-        .append(" AND ").append(IUserTable.ADMINISTRATOR).append(") ");
-//
+    // either admin
+    sqlBuilder.append(" AND ( EXISTS ( SELECT 1 FROM ").append(IUserTable.TABLE_NAME).append(" AS ").append(IUserTable.TABLE_ALIAS)
+        .append(" WHERE ").append(SqlFramentBuilder.columnsAliased(IUserTable.TABLE_ALIAS, IUserTable.USERNAME)).append(" = :username")
+        .append(" AND ").append(SqlFramentBuilder.columnsAliased(IUserTable.TABLE_ALIAS, IUserTable.ADMINISTRATOR))
+        .append(")");
+    // or permission
+    sqlBuilder.append(" OR EXISTS (SELECT 1 FROM ").append(IDocumentPermissionTable.TABLE_NAME).append(" AS ").append(IDocumentPermissionTable.TABLE_ALIAS + "_1")
+        .append(" WHERE ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_1", IDocumentPermissionTable.DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR))
+        .append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_1", IDocumentPermissionTable.USERNAME)).append(" = :username")
+        .append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_1", IDocumentPermissionTable.PERMISSION)).append(" >= ").append(IDocumentPermissionTable.PERMISSION_READ)
+        .append(")");
+    sqlBuilder.append(" )");
+
+//    sqlBuilder.append(" AND (").append(IDocumentPermissionTable.TABLE_ALIAS).append(".").append(IDocumentPermissionTable.USERNAME).append(" = '").append(ServerSession.get().getUserId()).append("'");
+//    sqlBuilder.append(" AND ").append(IDocumentPermissionTable.TABLE_ALIAS).append(".").append(IDocumentPermissionTable.PERMISSION).append(" >= ").append(IDocumentPermissionTable.PERMISSION_READ).append(") ");
+//    sqlBuilder.append(" OR EXISTS ( SELECT 1 FROM ").append(IUserTable.TABLE_NAME).append(" WHERE ").append(IUserTable.USERNAME).append(" = '").append(ServerSession.get().getUserId()).append("'")
+//        .append(" AND ").append(IUserTable.ADMINISTRATOR).append(") ");
 
     // abstract search criteria
     if (StringUtility.hasText(formData.getAbstract().getValue())) {
@@ -89,8 +104,10 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     sqlBuilder.append(":{td.documentPath}, ");
     sqlBuilder.append(":{td.owner} ");
     DocumentTableData tableData = new DocumentTableData();
+    System.out.println("USERNAME: " + ServerSession.get().getUserId());
     SQL.selectInto(sqlBuilder.toString(),
         new NVPair("td", tableData),
+        new NVPair("username", ServerSession.get().getUserId()),
         formData);
 
     // partners

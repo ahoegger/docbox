@@ -4,6 +4,7 @@ import java.security.BasicPermission;
 import java.security.Permission;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 /**
  * <h3>{@link EntityReadPermission}</h3>
@@ -31,6 +32,9 @@ public class EntityReadPermission extends BasicPermission {
 
   @Override
   public boolean implies(Permission p) {
+    if (ACCESS.check(new AdministratorPermission())) {
+      return true;
+    }
     if (p.getClass() == EntityReadPermission.class) {
       Long entityId = ((EntityReadPermission) p).getEntityId();
       return BEANS.get(IPermissionService.class).hasReadAccess(getUserId(), entityId);

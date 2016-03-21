@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
@@ -26,6 +25,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
+import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 import ch.ahoegger.docbox.shared.permission.PermissionLookupCall;
 
 /**
@@ -66,6 +66,18 @@ public abstract class AbstractPermissionTableField extends AbstractTableField<Ab
     ensureEmptyRow();
   }
 
+  protected void validateOwners() {
+    if (getTable().getPermissionColumn().getValues().stream()
+        .filter(p -> p != null)
+        .filter(p -> p.intValue() == IDocumentPermissionTable.PERMISSION_OWNER)
+        .collect(Collectors.toList()).size() > 1) {
+      addErrorStatus(TEXTS.get("Validate_OneOwnerOnly"));
+    }
+    else {
+      clearErrorStatus();
+    }
+  }
+
   public class Table extends AbstractTable {
 
     public PermissionColumn getPermissionColumn() {
@@ -98,18 +110,7 @@ public abstract class AbstractPermissionTableField extends AbstractTableField<Ab
 
     @Override
     protected void execContentChanged() {
-      try {
-        setTableChanging(true);
-        for (ITableRow row : getRows()) {
-          Cell cell = row.getCellForUpdate(getUserColumn());
-          // TODO do not allow administators to be removed!
-          //  cell.setEditable(false);
-        }
-      }
-      finally {
-        setTableChanging(false);
-      }
-
+      validateOwners();
     }
 
     @Order(10)
