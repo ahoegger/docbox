@@ -45,7 +45,7 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
   @Override
   public DocumentTableData getTableData(DocumentSearchFormData formData) {
-    Object[][] rawRes = SQL.select("SELECT * FROM " + IDocumentPermissionTable.TABLE_NAME);
+    Object[][] rawRes = SQL.select("SELECT * FROM " + TABLE_NAME);
 
     StringBuilder sqlBuilder = new StringBuilder();
     sqlBuilder.append("SELECT ")

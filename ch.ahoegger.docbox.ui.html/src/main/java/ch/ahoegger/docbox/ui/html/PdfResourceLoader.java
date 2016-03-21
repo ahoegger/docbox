@@ -13,7 +13,6 @@ import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
-import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.res.loader.AbstractResourceLoader;
 
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
@@ -49,7 +48,7 @@ public class PdfResourceLoader extends AbstractResourceLoader {
         throw new VetoException("Access denied");
       }
       BinaryResource resource = BEANS.get(IDocumentStoreService.class).getDocument(documentId);
-      return new HttpCacheObject(cacheKey, true, IHttpCacheControl.MAX_AGE_4_HOURS, resource);
+      return new HttpCacheObject(cacheKey, false, 0, resource);
     }
     return null;
   }

@@ -3,7 +3,9 @@ package ch.ahoegger.docbox.server.document.store;
 import java.io.File;
 
 import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,9 +20,13 @@ public class DevDocumentStoreService extends DocumentStoreService {
 
   @Override
   protected String getConfiguredDocumentStoreLocation() {
-    File workingDir = IOUtility.createTempDirectory("docbox");
-    workingDir.deleteOnExit();
-    return workingDir.getAbsolutePath();
+    String docStoreLocation = CONFIG.getPropertyValue(DocumentStoreLocationProperty.class);
+    if (StringUtility.isNullOrEmpty(docStoreLocation)) {
+      File workingDir = IOUtility.createTempDirectory("docbox");
+      workingDir.deleteOnExit();
+      return workingDir.getAbsolutePath();
+    }
+    return super.getConfiguredDocumentStoreLocation();
   }
 
 }

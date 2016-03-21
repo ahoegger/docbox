@@ -6,8 +6,10 @@ import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
-import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 import ch.ahoegger.docbox.server.SuperUserRunContextProducer;
@@ -18,25 +20,28 @@ import ch.ahoegger.docbox.server.database.initialization.ITableTask;
  *
  * @author Andreas Hoegger
  */
-@Order(-20)
+
 @CreateImmediately
-public class DerbyDevSqlService extends AbstractDocboxSqlService {
+@Replace
+public class DerbyDevSqlService extends DerbySqlService {
 
   @PostConstruct
   protected void init() {
-    try {
-      BEANS.get(SuperUserRunContextProducer.class).produce().run(new IRunnable() {
+    if (StringUtility.isNullOrEmpty(CONFIG.getPropertyValue(DatabaseLocationProperty.class))) {
+      // init in memory db
+      try {
+        BEANS.get(SuperUserRunContextProducer.class).produce().run(new IRunnable() {
 
-        @Override
-        public void run() throws Exception {
-          initializeDatabase();
-        }
-      });
+          @Override
+          public void run() throws Exception {
+            initializeDatabase();
+          }
+        });
+      }
+      catch (RuntimeException e) {
+        BEANS.get(ExceptionHandler.class).handle(e);
+      }
     }
-    catch (RuntimeException e) {
-      BEANS.get(ExceptionHandler.class).handle(e);
-    }
-
   }
 
   private void initializeDatabase() {
@@ -53,6 +58,11 @@ public class DerbyDevSqlService extends AbstractDocboxSqlService {
 
   @Override
   protected String getConfiguredJdbcMappingName() {
-    return "jdbc:derby:memory:contacts-database;create=true";
+    if (StringUtility.isNullOrEmpty(CONFIG.getPropertyValue(DatabaseLocationProperty.class))) {
+      // in memory
+      return "jdbc:derby:memory:contacts-database;create=true";
+    }
+    return super.getConfiguredJdbcMappingName();
   }
+
 }

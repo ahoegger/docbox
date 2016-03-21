@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,11 @@ public class DocumentStoreService implements IDocumentStoreService {
   }
 
   protected String getConfiguredDocumentStoreLocation() {
-    return CONFIG.getPropertyValue(DocumentStoreLocationProperty.class);
+    String docStoreLocation = CONFIG.getPropertyValue(DocumentStoreLocationProperty.class);
+    if (StringUtility.isNullOrEmpty(docStoreLocation)) {
+      throw new ProcessingException("Document store location is not set. See property '{}'", new Object[]{DocumentStoreLocationProperty.KEY});
+    }
+    return docStoreLocation;
   }
 
   protected File getDocumentStoreDirectory() {
@@ -51,7 +56,7 @@ public class DocumentStoreService implements IDocumentStoreService {
     DocumentFormData formData = new DocumentFormData();
     formData.setDocumentId(documentId);
     formData = BEANS.get(DocumentService.class).loadTrusted(formData);
-
+    System.out.println("KKKKK: " + formData.getDocumentPath());
     BinaryResource resource = get(formData.getDocumentPath());
     return resource;
   }
@@ -94,9 +99,11 @@ public class DocumentStoreService implements IDocumentStoreService {
 
   public static class DocumentStoreLocationProperty extends AbstractStringConfigProperty {
 
+    public static final String KEY = "docbox.server.documentStoreLocation";
+
     @Override
     public String getKey() {
-      return "docbox.server.documentStoreLocation";
+      return KEY;
     }
   }
 }
