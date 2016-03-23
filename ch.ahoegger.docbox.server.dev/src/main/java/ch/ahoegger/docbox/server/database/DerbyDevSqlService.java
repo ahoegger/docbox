@@ -44,7 +44,7 @@ public class DerbyDevSqlService extends DerbySqlService {
     }
   }
 
-  private void initializeDatabase() {
+  protected void initializeDatabase() {
     List<ITableTask> tableTasks = BEANS.all(ITableTask.class);
     // create tables
     for (ITableTask task : tableTasks) {
