@@ -16,7 +16,7 @@
   <name>DocBox HTML UI WAR</name>
 
   <build>
-      <finalName>ch.ahoegger.docbox.ch.ahoegger.docbox.ui.html</finalName>
+      <finalName>docbox</finalName>
   </build>
 
   <dependencies>
