@@ -92,8 +92,7 @@ public class FtpBackupService implements IBackupService {
                   .withSubject(subject).withTransactionScope(TransactionScope.REQUIRES_NEW))
               .withName("backup job")
               .withExecutionTrigger(Jobs.newExecutionTrigger()
-//                  .withSchedule(CronScheduleBuilder.cronSchedule("0 10 2 * * ?"))));
-                  .withSchedule(CronScheduleBuilder.cronSchedule("0 0/2 * * * ?"))));
+                  .withSchedule(CronScheduleBuilder.cronSchedule("0 10 2 * * ?"))));
     }
   }
 
