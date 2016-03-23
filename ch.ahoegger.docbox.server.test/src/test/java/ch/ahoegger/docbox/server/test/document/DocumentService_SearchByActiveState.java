@@ -34,20 +34,20 @@ public class DocumentService_SearchByActiveState extends AbstractTestWithDatabas
 
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
-    cal.add(Calendar.DAY_OF_MONTH, +10);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 100, "doc 01", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    cal.add(Calendar.DAY_OF_MONTH, +1);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 5000, "doc 01", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
     cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 101, "doc 02", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 5001, "doc 02", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
     cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.add(Calendar.DAY_OF_WEEK, 1);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 102, "doc 03", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 5002, "doc 03", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
     cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.add(Calendar.DAY_OF_WEEK, -1);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 103, "doc 04", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 104, "doc 05", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 5003, "doc 04", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 5004, "doc 05", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null);
   }
 
   @Test
@@ -57,10 +57,10 @@ public class DocumentService_SearchByActiveState extends AbstractTestWithDatabas
     sd.getActiveBox().setValue(DocumentActiveState.Active);
     DocumentTableData tableData = service.getTableData(sd);
     Assert.assertEquals(4, tableData.getRowCount());
-    Assert.assertEquals(new Long(100), tableData.getRows()[0].getDocumentId());
-    Assert.assertEquals(new Long(101), tableData.getRows()[1].getDocumentId());
-    Assert.assertEquals(new Long(102), tableData.getRows()[2].getDocumentId());
-    Assert.assertEquals(new Long(104), tableData.getRows()[3].getDocumentId());
+    Assert.assertEquals(new Long(5000), tableData.getRows()[0].getDocumentId());
+    Assert.assertEquals(new Long(5001), tableData.getRows()[1].getDocumentId());
+    Assert.assertEquals(new Long(5002), tableData.getRows()[2].getDocumentId());
+    Assert.assertEquals(new Long(5004), tableData.getRows()[3].getDocumentId());
   }
 
   @Test
@@ -70,7 +70,7 @@ public class DocumentService_SearchByActiveState extends AbstractTestWithDatabas
     sd.getActiveBox().setValue(DocumentActiveState.Inactive);
     DocumentTableData tableData = service.getTableData(sd);
     Assert.assertEquals(1, tableData.getRowCount());
-    Assert.assertEquals(new Long(103), tableData.getRows()[0].getDocumentId());
+    Assert.assertEquals(new Long(5003), tableData.getRows()[0].getDocumentId());
   }
 
   @Test
@@ -80,11 +80,11 @@ public class DocumentService_SearchByActiveState extends AbstractTestWithDatabas
     sd.getActiveBox().setValue(DocumentActiveState.All);
     DocumentTableData tableData = service.getTableData(sd);
     Assert.assertEquals(5, tableData.getRowCount());
-    Assert.assertEquals(new Long(100), tableData.getRows()[0].getDocumentId());
-    Assert.assertEquals(new Long(101), tableData.getRows()[1].getDocumentId());
-    Assert.assertEquals(new Long(102), tableData.getRows()[2].getDocumentId());
-    Assert.assertEquals(new Long(103), tableData.getRows()[3].getDocumentId());
-    Assert.assertEquals(new Long(104), tableData.getRows()[4].getDocumentId());
+    Assert.assertEquals(new Long(5000), tableData.getRows()[0].getDocumentId());
+    Assert.assertEquals(new Long(5001), tableData.getRows()[1].getDocumentId());
+    Assert.assertEquals(new Long(5002), tableData.getRows()[2].getDocumentId());
+    Assert.assertEquals(new Long(5003), tableData.getRows()[3].getDocumentId());
+    Assert.assertEquals(new Long(5004), tableData.getRows()[4].getDocumentId());
   }
 
 }

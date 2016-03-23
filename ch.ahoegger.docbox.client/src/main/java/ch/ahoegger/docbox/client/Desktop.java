@@ -1,13 +1,14 @@
 package ch.ahoegger.docbox.client;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.bookmark.menu.AbstractBookmarkMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -15,11 +16,13 @@ import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 import ch.ahoegger.docbox.client.administration.AdministrationOutline;
 import ch.ahoegger.docbox.client.search.SearchOutline;
 import ch.ahoegger.docbox.client.settings.SettingsOutline;
 import ch.ahoegger.docbox.client.work.WorkOutline;
+import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 
 /**
  * <h3>{@link Desktop}</h3>
@@ -61,6 +64,28 @@ public class Desktop extends AbstractDesktop {
       return TEXTS.get("File");
     }
 
+    @Order(0)
+    public class ManualBackupMenu extends AbstractMenu {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("ManualBackup");
+      }
+
+      @Override
+      protected boolean getConfiguredVisible() {
+        return ACCESS.check(new AdministratorPermission());
+      }
+
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet();
+      }
+
+      @Override
+      protected void execAction() {
+      }
+    }
+
     @Order(1000)
     public class ExitMenu extends AbstractMenu {
 
@@ -73,13 +98,6 @@ public class Desktop extends AbstractDesktop {
       protected void execAction() {
         ClientSessionProvider.currentSession(ClientSession.class).stop();
       }
-    }
-  }
-
-  @Order(2000)
-  public class BookmarkMenu extends AbstractBookmarkMenu {
-    public BookmarkMenu() {
-      super(Desktop.this);
     }
   }
 

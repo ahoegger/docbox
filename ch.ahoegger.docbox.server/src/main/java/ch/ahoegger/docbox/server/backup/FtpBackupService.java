@@ -11,6 +11,7 @@ import java.util.Date;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractPortConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -20,10 +21,12 @@ import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.server.backup.internal.FtpBackupRunnable;
+import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
+import ch.ahoegger.docbox.shared.backup.IBackupService;
 
 /**
  * <h3>{@link FtpBackupService}</h3>
@@ -31,7 +34,7 @@ import ch.ahoegger.docbox.server.backup.internal.FtpBackupRunnable;
  * @author aho
  */
 @ApplicationScoped
-public class FtpBackupService {
+public class FtpBackupService implements IBackupService {
   private static final Logger LOG = LoggerFactory.getLogger(FtpBackupService.class);
 
   private static enum Status {
@@ -46,10 +49,12 @@ public class FtpBackupService {
   private Date m_lastModificationDate;
   private Status m_status = Status.Idle;
 
+  @Override
   public void notifyModification() {
     m_lastModificationDate = new Date();
   }
 
+  @Override
   public void backup() {
     if (m_lastBackupDate == null) {
       backupInternal();
@@ -61,15 +66,16 @@ public class FtpBackupService {
     }
   }
 
+  @RemoteServiceAccessDenied
   protected void backupInternal() throws ProcessingException {
     try {
       if (Status.Backup.equals(m_status)) {
         throw new ProcessingException(new ProcessingStatus("It is a backup running - try later...", IStatus.ERROR));
       }
       m_status = Status.Backup;
-      checkParameters();
       // create zip file
-      File zipFile = new FtpBackupRunnable().call();
+
+      File zipFile = BEANS.get(DocumentStoreService.class).createBackupFile();
       store(zipFile);
       m_lastBackupDate = new Date();
     }
@@ -83,17 +89,12 @@ public class FtpBackupService {
   }
 
   /**
-   *
-   */
-  private void checkParameters() {
-  }
-
-  /**
    * @param zipFile
    * @throws IOException
    * @throws PlatformException
    * @throws SocketException
    */
+  @RemoteServiceAccessDenied
   private void store(File zipFile) {
     FTPClient client = new FTPClient();
     client.setConnectTimeout(20000);
@@ -149,6 +150,7 @@ public class FtpBackupService {
     }
   }
 
+  @RemoteServiceAccessDenied
   protected void moveAndCreateDirectory(java.nio.file.Path remotePath, final FTPClient client) {
     remotePath.forEach(segment -> {
       try {
@@ -169,6 +171,7 @@ public class FtpBackupService {
     });
   }
 
+  @RemoteServiceAccessDenied
   public String getBackupFileName() {
     if (m_backupFileName == null) {
       String backupFileName = CONFIG.getPropertyValue(FtpBackupFilenameProperty.class);
@@ -184,10 +187,12 @@ public class FtpBackupService {
     return m_backupFileName;
   }
 
+  @RemoteServiceAccessDenied
   public Date getLastBackupDate() {
     return m_lastBackupDate;
   }
 
+  @RemoteServiceAccessDenied
   public Date getLastModificationDate() {
     return m_lastModificationDate;
   }
