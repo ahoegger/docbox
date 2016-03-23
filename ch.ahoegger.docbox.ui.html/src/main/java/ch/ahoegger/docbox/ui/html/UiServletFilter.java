@@ -19,6 +19,8 @@ import org.eclipse.scout.rt.server.commons.authentication.ServletFilterHelper;
 import org.eclipse.scout.rt.server.commons.authentication.TrivialAccessController;
 import org.eclipse.scout.rt.server.commons.authentication.TrivialAccessController.TrivialAuthConfig;
 
+import ch.ahoegger.docbox.ui.html.security.UserCredentialVerifierProxy;
+
 /**
  * <h3>{@link UiServletFilter}</h3> This is the main servlet filter used for the HTML UI.
  *
@@ -35,7 +37,7 @@ public class UiServletFilter implements Filter {
     m_trivialAccessController = BEANS.get(TrivialAccessController.class).init(new TrivialAuthConfig()
         .withExclusionFilter(filterConfig.getInitParameter("filter-exclude")).withLoginPageInstalled(true));
     m_formBasedAccessController = BEANS.get(FormBasedAccessController.class)
-        .init(new FormBasedAuthConfig().withCredentialVerifier(BEANS.get(UserCredentialsVerifier.class)));
+        .init(new FormBasedAuthConfig().withCredentialVerifier(BEANS.get(UserCredentialVerifierProxy.class)));
     m_developmentAccessController = BEANS.get(DevelopmentAccessController.class).init();
   }
 

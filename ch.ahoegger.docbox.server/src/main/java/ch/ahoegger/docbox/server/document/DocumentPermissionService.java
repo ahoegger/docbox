@@ -29,7 +29,7 @@ public class DocumentPermissionService implements IPermissionService, IDocumentP
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(PERMISSION, USERNAME, DOCUMENT_NR)).append(" FROM ").append(TABLE_NAME);
     statementBuilder.append(" WHERE 1 = 1");
-    statementBuilder.append(" AND ").append(USERNAME).append(" LIKE :userId");
+    statementBuilder.append(" AND ").append(USERNAME).append(" = :userId");
     statementBuilder.append(" AND ").append(DOCUMENT_NR).append(" = :entityId");
 //    statementBuilder.append(" INTO :permission");
 //    SQL.selectInto(statementBuilder.toString(), new NVPair("userId", userId), new NVPair("entityId", entityId), new NVPair("permission", permission));

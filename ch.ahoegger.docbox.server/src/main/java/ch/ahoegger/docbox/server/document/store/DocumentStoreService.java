@@ -5,22 +5,26 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.AccessController;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +34,7 @@ import ch.ahoegger.docbox.server.database.DerbySqlService.DatabaseLocationProper
 import ch.ahoegger.docbox.server.document.DocumentService;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
+import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
 
 /**
  * <h3>{@link DocumentStoreService}</h3>
@@ -60,7 +65,12 @@ public class DocumentStoreService implements IDocumentStoreService {
 
   @Override
   public BinaryResource getDocument(Long documentId) {
-    System.out.println("### username : " + BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject());
+    // permissioncheck
+    Subject s = Subject.getSubject(AccessController.getContext());
+    if (!ACCESS.check(new EntityReadPermission(documentId))) {
+//    if (!ACCESS.check(new EntityReadPermission(formData.getDocumentId()))) {
+      throw new VetoException("Access denied");
+    }
     DocumentFormData formData = new DocumentFormData();
     formData.setDocumentId(documentId);
     formData = BEANS.get(DocumentService.class).loadTrusted(formData);

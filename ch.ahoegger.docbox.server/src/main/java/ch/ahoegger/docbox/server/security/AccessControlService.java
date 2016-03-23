@@ -28,7 +28,7 @@ public class AccessControlService extends UserIdAccessControlService {
 
 //    permissions.add(new AllPermission());
 
-    permissions.add(new EntityReadPermission(getUserIdOfCurrentSubject()));
+    permissions.add(new EntityReadPermission());
     UserFormData userFd = new UserFormData();
     userFd.getUsername().setValue(getUserIdOfCurrentUser());
     userFd = BEANS.get(UserService.class).load(userFd);

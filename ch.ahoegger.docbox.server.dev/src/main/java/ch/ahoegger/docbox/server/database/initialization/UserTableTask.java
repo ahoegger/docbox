@@ -6,8 +6,8 @@ import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.server.administration.user.UserService;
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
+import ch.ahoegger.docbox.server.security.SecurityService;
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 
 /**
@@ -67,7 +67,7 @@ public class UserTableTask implements ITableTask, IUserTable {
         new NVPair("name", name),
         new NVPair("firstname", firstname),
         new NVPair("username", username),
-        new NVPair("password", new String(BEANS.get(UserService.class).createPasswordHash(password.toCharArray()))),
+        new NVPair("password", new String(BEANS.get(SecurityService.class).createPasswordHash(password.toCharArray()))),
         new NVPair("active", active),
         new NVPair("administrator", administrator));
   }

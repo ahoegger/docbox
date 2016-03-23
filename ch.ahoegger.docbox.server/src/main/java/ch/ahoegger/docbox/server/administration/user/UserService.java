@@ -1,24 +1,19 @@
 package ch.ahoegger.docbox.server.administration.user;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
-import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
-import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
+import ch.ahoegger.docbox.server.security.SecurityService;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 import ch.ahoegger.docbox.shared.administration.user.UserFormData;
@@ -31,8 +26,6 @@ import ch.ahoegger.docbox.shared.administration.user.UserTablePageData;
  */
 public class UserService implements IUserService, IUserTable {
   private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
-
-  private static final byte[] SALT = "[B@484b61fc".getBytes();
 
   @Override
   public UserTablePageData getUserTableData() {
@@ -79,7 +72,7 @@ public class UserService implements IUserService, IUserTable {
         .append(ADMINISTRATOR).append("= :administrator ");
     if (formData.getChangePassword().isValueSet() && formData.getChangePassword().getValue()) {
       statementBuilder.append(", ").append(PASSWORD).append("= :password");
-      formData.getPassword().setValue(new String(createPasswordHash(formData.getPassword().getValue().toCharArray())));
+      formData.getPassword().setValue(new String(BEANS.get(SecurityService.class).createPasswordHash(formData.getPassword().getValue().toCharArray())));
     }
     statementBuilder.append(" WHERE ").append(USERNAME).append(" = :username");
     SQL.update(statementBuilder.toString(), formData);
@@ -96,7 +89,7 @@ public class UserService implements IUserService, IUserTable {
 
   @Override
   public UserFormData create(UserFormData formData) {
-    formData.getPassword().setValue(new String(createPasswordHash(formData.getPassword().getValue().toCharArray())));
+    formData.getPassword().setValue(new String(BEANS.get(SecurityService.class).createPasswordHash(formData.getPassword().getValue().toCharArray())));
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME);
     statementBuilder.append(" (").append(SqlFramentBuilder.columns(USERNAME, NAME, FIRSTNAME, ACTIVE, PASSWORD, ADMINISTRATOR)).append(")");
@@ -132,36 +125,4 @@ public class UserService implements IUserService, IUserTable {
 
   }
 
-  @Override
-  public boolean authenticate(String username, final char[] passwordPlainText) {
-    String pwHash = new String(createPasswordHash(passwordPlainText));
-
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(PASSWORD).append(" FROM ").append(TABLE_NAME);
-    statementBuilder.append(" WHERE ").append(ACTIVE)
-        .append(" AND ").append(USERNAME).append(" = :username");
-    Object[][] result = SQL.select(statementBuilder.toString(), new NVPair("username", username));
-    if (result.length == 1) {
-      return result[0][0].equals(pwHash);
-    }
-    return false;
-  }
-
-  @RemoteServiceAccessDenied
-  public byte[] createPasswordHash(final char[] password) {
-    return SecurityUtility.hash(toBytes(password), SALT);
-  }
-
-  @RemoteServiceAccessDenied
-  private byte[] toBytes(final char[] password) {
-    try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-      final OutputStreamWriter writer = new OutputStreamWriter(os, StandardCharsets.UTF_16);
-      writer.write(password);
-      writer.flush();
-      return os.toByteArray();
-    }
-    catch (final IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
 }

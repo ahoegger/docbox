@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import ch.ahoegger.docbox.server.administration.user.UserService;
 import ch.ahoegger.docbox.server.database.initialization.UserTableTask;
+import ch.ahoegger.docbox.server.security.SecurityService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
@@ -78,7 +79,7 @@ public class UserServiceTest extends AbstractTestWithDatabase {
   @Test
   public void testModifyUserPassword() {
     UserService userService = BEANS.get(UserService.class);
-    Assert.assertTrue(userService.authenticate("modifyPwd.username", "modifyPwd.secret".toCharArray()));
+    Assert.assertTrue(BEANS.get(SecurityService.class).authenticate("modifyPwd.username", "modifyPwd.secret".toCharArray()));
 
     UserFormData fd1 = new UserFormData();
     fd1.getUsername().setValue("modifyPwd.username");
@@ -89,8 +90,8 @@ public class UserServiceTest extends AbstractTestWithDatabase {
     userService.store(fd1);
 
     // try to login
-    Assert.assertFalse(userService.authenticate("modifyPwd.username", "modifyPwd.secret".toCharArray()));
-    Assert.assertTrue(userService.authenticate("modifyPwd.username", "1234abc".toCharArray()));
+    Assert.assertFalse(BEANS.get(SecurityService.class).authenticate("modifyPwd.username", "modifyPwd.secret".toCharArray()));
+    Assert.assertTrue(BEANS.get(SecurityService.class).authenticate("modifyPwd.username", "1234abc".toCharArray()));
 
   }
 
@@ -113,8 +114,7 @@ public class UserServiceTest extends AbstractTestWithDatabase {
 
   @Test
   public void testLogin() {
-    UserService userService = BEANS.get(UserService.class);
-    Assert.assertTrue(userService.authenticate("semil.borak", "secret".toCharArray()));
-    Assert.assertFalse(userService.authenticate("inactive.username", "inactive.secret".toCharArray()));
+    Assert.assertTrue(BEANS.get(SecurityService.class).authenticate("semil.borak", "secret".toCharArray()));
+    Assert.assertFalse(BEANS.get(SecurityService.class).authenticate("inactive.username", "inactive.secret".toCharArray()));
   }
 }

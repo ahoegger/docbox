@@ -18,13 +18,6 @@ public interface IUserService {
   UserTablePageData getUserTableData();
 
   /**
-   * @param username
-   * @param passwordPlainText
-   * @return
-   */
-  boolean authenticate(String username, char[] passwordPlainText);
-
-  /**
    * @param formData
    * @return
    */
