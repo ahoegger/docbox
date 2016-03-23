@@ -36,10 +36,6 @@ public class ConversationFormData extends AbstractFormData {
     return getPropertyByClass(ConversationIdProperty.class);
   }
 
-  public Description getDescription() {
-    return getFieldByClass(Description.class);
-  }
-
   public EndDate getEndDate() {
     return getFieldByClass(EndDate.class);
   }
@@ -48,8 +44,8 @@ public class ConversationFormData extends AbstractFormData {
     return getFieldByClass(Name.class);
   }
 
-  public Partner getPartner() {
-    return getFieldByClass(Partner.class);
+  public Notes getNotes() {
+    return getFieldByClass(Notes.class);
   }
 
   public StartDate getStartDate() {
@@ -57,11 +53,6 @@ public class ConversationFormData extends AbstractFormData {
   }
 
   public static class ConversationIdProperty extends AbstractPropertyData<BigDecimal> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class Description extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
   }
@@ -76,7 +67,7 @@ public class ConversationFormData extends AbstractFormData {
     private static final long serialVersionUID = 1L;
   }
 
-  public static class Partner extends AbstractValueFieldData<BigDecimal> {
+  public static class Notes extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
   }

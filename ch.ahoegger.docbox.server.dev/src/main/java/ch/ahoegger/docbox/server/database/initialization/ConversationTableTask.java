@@ -24,7 +24,7 @@ public class ConversationTableTask implements ITableTask, IConversationTable {
     statementBuilder.append("CREATE TABLE ").append(TABLE_NAME).append(" (");
     statementBuilder.append(CONVERSATION_NR).append(" DECIMAL NOT NULL, ");
     statementBuilder.append(NAME).append(" VARCHAR(").append(NAME_LENGTH).append(") NOT NULL, ");
-    statementBuilder.append(DESCRIPTION).append(" VARCHAR(").append(DESCRIPTION_LENGTH).append("), ");
+    statementBuilder.append(NOTES).append(" VARCHAR(").append(NOTES_LENGTH).append("), ");
     statementBuilder.append(START_DATE).append(" DATE, ");
     statementBuilder.append(END_DATE).append(" DATE, ");
     statementBuilder.append("PRIMARY KEY (").append(CONVERSATION_NR).append(")");
@@ -57,7 +57,7 @@ public class ConversationTableTask implements ITableTask, IConversationTable {
   public void createConversationRow(ISqlService sqlService, long conversationId, String name, String description, Date startDate, Date endDate) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(SqlFramentBuilder.columns(CONVERSATION_NR, NAME, DESCRIPTION, START_DATE, END_DATE));
+    statementBuilder.append(SqlFramentBuilder.columns(CONVERSATION_NR, NAME, NOTES, START_DATE, END_DATE));
     statementBuilder.append(") VALUES (");
     statementBuilder.append(":conversationId, :name, :description, :startDate, :endDate");
     statementBuilder.append(")");

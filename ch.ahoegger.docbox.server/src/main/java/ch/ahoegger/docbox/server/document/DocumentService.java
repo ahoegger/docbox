@@ -84,6 +84,10 @@ public class DocumentService implements IDocumentService, IDocumentTable {
       sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentPartnerTable.TABLE_ALIAS, IDocumentPartnerTable.DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR));
       sqlBuilder.append(")");
     }
+    // conversation search criteria
+    if (formData.getConversation().getValue() != null) {
+      sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, CONVERSATION_NR)).append(" = ").append(":conversation");
+    }
     // document date from
     if (formData.getDocumentDateFrom().getValue() != null) {
       sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_DATE)).append(" >= ").append(":documentDateFrom");

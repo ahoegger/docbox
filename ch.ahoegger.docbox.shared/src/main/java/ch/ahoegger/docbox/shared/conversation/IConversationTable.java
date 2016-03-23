@@ -14,8 +14,8 @@ public interface IConversationTable {
   public static String NAME = "NAME";
   public static int NAME_LENGTH = 1200;
 
-  public static String DESCRIPTION = "DESCRIPTION";
-  public static int DESCRIPTION_LENGTH = 2400;
+  public static String NOTES = "NOTES";
+  public static int NOTES_LENGTH = 4800;
   public static String START_DATE = "START_DATE";
   public static String END_DATE = "END_DATE";
 }

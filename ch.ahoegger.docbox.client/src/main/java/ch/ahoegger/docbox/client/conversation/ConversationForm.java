@@ -10,25 +10,22 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
-import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.CancelButton;
-import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.FieldBox;
-import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.FieldBox.DescriptionField;
-import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.FieldBox.EndDateField;
-import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.FieldBox.NameField;
-import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.FieldBox.StartDateField;
-import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.OkButton;
-import ch.ahoegger.docbox.client.conversation.ConversationForm.MainBox.FieldBox.PartnerField;
+import ch.ahoegger.docbox.client.conversation.ConversationForm.MainBox.CancelButton;
+import ch.ahoegger.docbox.client.conversation.ConversationForm.MainBox.FieldBox;
+import ch.ahoegger.docbox.client.conversation.ConversationForm.MainBox.FieldBox.EndDateField;
+import ch.ahoegger.docbox.client.conversation.ConversationForm.MainBox.FieldBox.NameField;
+import ch.ahoegger.docbox.client.conversation.ConversationForm.MainBox.FieldBox.NotesField;
+import ch.ahoegger.docbox.client.conversation.ConversationForm.MainBox.FieldBox.StartDateField;
+import ch.ahoegger.docbox.client.conversation.ConversationForm.MainBox.OkButton;
 import ch.ahoegger.docbox.shared.category.ICategoryTable;
 import ch.ahoegger.docbox.shared.conversation.ConversationFormData;
 import ch.ahoegger.docbox.shared.conversation.IConversationService;
-import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
+import ch.ahoegger.docbox.shared.conversation.IConversationTable;
 
 /**
  * <h3>{@link ConversationForm}</h3>
@@ -73,8 +70,8 @@ public class ConversationForm extends AbstractForm {
     m_conversationId = categoryId;
   }
 
-  public DescriptionField getDescriptionField() {
-    return getFieldByClass(DescriptionField.class);
+  public NotesField getNotesField() {
+    return getFieldByClass(NotesField.class);
   }
 
   public StartDateField getStartDateField() {
@@ -83,10 +80,6 @@ public class ConversationForm extends AbstractForm {
 
   public EndDateField getEndDateField() {
     return getFieldByClass(EndDateField.class);
-  }
-
-  public PartnerField getPartnerField() {
-    return getFieldByClass(PartnerField.class);
   }
 
   public NameField getNameField() {
@@ -138,28 +131,15 @@ public class ConversationForm extends AbstractForm {
       }
 
       @Order(2000)
-      public class DescriptionField extends AbstractStringField {
+      public class NotesField extends AbstractStringField {
         @Override
         protected String getConfiguredLabel() {
-          return TEXTS.get("Description");
+          return TEXTS.get("Notes");
         }
 
         @Override
         protected int getConfiguredMaxLength() {
-          return ICategoryTable.DESCRIPTION_LENGTH;
-        }
-      }
-
-      @Order(2500)
-      public class PartnerField extends AbstractSmartField<BigDecimal> {
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("Partner");
-        }
-
-        @Override
-        protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
-          return PartnerLookupCall.class;
+          return IConversationTable.NOTES_LENGTH;
         }
       }
 

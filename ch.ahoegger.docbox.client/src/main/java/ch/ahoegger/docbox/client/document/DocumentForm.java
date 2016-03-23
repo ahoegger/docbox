@@ -375,10 +375,6 @@ public class DocumentForm extends AbstractForm {
           @Override
           protected void execAction() {
             ConversationForm form = new ConversationForm();
-            Table partnerTable = getPartnersField().getTable();
-
-            BigDecimal partnerId = partnerTable.getPartnerColumn().getValues().stream().filter(id -> id != null).findFirst().orElse(null);
-            form.getPartnerField().setValue(partnerId);
             form.startNew();
             form.addFormListener(new FormListener() {
               @Override
