@@ -10,6 +10,7 @@ import org.eclipse.scout.rt.server.jdbc.SQL;
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.server.partner.PartnerConversationService;
 import ch.ahoegger.docbox.shared.ISequenceTable;
+import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.conversation.ConversationFormData;
 import ch.ahoegger.docbox.shared.conversation.IConversationService;
 import ch.ahoegger.docbox.shared.conversation.IConversationTable;
@@ -43,6 +44,10 @@ public class ConversationService implements IConversationService, IConversationT
     if (partnerId != null) {
       BEANS.get(PartnerConversationService.class).create(partnerId, formData.getConversationId());
     }
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
     return formData;
   }
 
@@ -80,6 +85,9 @@ public class ConversationService implements IConversationService, IConversationT
     // partner conversation link
     BEANS.get(PartnerConversationService.class).update(formData.getPartner().getValue(), formData.getConversationId());
 
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
     return formData;
   }
 
@@ -88,6 +96,9 @@ public class ConversationService implements IConversationService, IConversationT
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(CONVERSATION_NR).append(" = :conversationId");
     SQL.delete(statementBuilder.toString(), new NVPair("conversationId", conversationId));
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
 
     // delete partner conversation connection
     BEANS.get(PartnerConversationService.class).delete(conversationId);

@@ -7,12 +7,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
+import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 import ch.ahoegger.docbox.shared.security.permission.IPermissionService;
 
@@ -73,7 +75,10 @@ public class DocumentPermissionService implements IPermissionService, IDocumentP
           new NVPair("documentId", documentId),
           new NVPair("username", permission.getKey()),
           new NVPair("permission", permission.getValue()));
+
     }
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
   }
 
   /**
@@ -91,5 +96,9 @@ public class DocumentPermissionService implements IPermissionService, IDocumentP
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
     SQL.delete(statementBuilder.toString(), new NVPair("documentId", documentId));
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
   }
 }

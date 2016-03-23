@@ -198,6 +198,11 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
       }
 
       @Override
+      protected boolean getConfiguredSortAscending() {
+        return false;
+      }
+
+      @Override
       protected int getConfiguredSortIndex() {
         return 0;
       }

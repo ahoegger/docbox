@@ -13,15 +13,18 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 import ch.ahoegger.docbox.client.administration.AdministrationOutline;
+import ch.ahoegger.docbox.client.administration.DbDumpForm;
 import ch.ahoegger.docbox.client.search.SearchOutline;
 import ch.ahoegger.docbox.client.settings.SettingsOutline;
 import ch.ahoegger.docbox.client.work.WorkOutline;
+import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 
 /**
@@ -83,6 +86,26 @@ public class Desktop extends AbstractDesktop {
 
       @Override
       protected void execAction() {
+        BEANS.get(IBackupService.class).backup();
+      }
+    }
+
+    @Order(500)
+    public class DbDumpMenu extends AbstractMenu {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("DBDump");
+      }
+
+      @Override
+      protected boolean getConfiguredVisible() {
+        return ACCESS.check(new AdministratorPermission());
+      }
+
+      @Override
+      protected void execAction() {
+        DbDumpForm form = new DbDumpForm();
+        form.start();
       }
     }
 

@@ -4,14 +4,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
-import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.jdbc.SQL;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,22 +27,17 @@ public class SecurityService implements IUserTable {
   private static final byte[] SALT = "[B@484b61fc".getBytes();
 
   public boolean authenticate(String username, final char[] passwordPlainText) {
-    return ServerRunContexts.copyCurrent().withTransactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<Boolean>() {
-      @Override
-      public Boolean call() throws Exception {
-        String pwHash = new String(createPasswordHash(passwordPlainText));
+    String pwHash = new String(createPasswordHash(passwordPlainText));
 
-        StringBuilder statementBuilder = new StringBuilder();
-        statementBuilder.append("SELECT ").append(PASSWORD).append(" FROM ").append(TABLE_NAME);
-        statementBuilder.append(" WHERE ").append(ACTIVE)
-            .append(" AND ").append(USERNAME).append(" = :username");
-        Object[][] result = SQL.select(statementBuilder.toString(), new NVPair("username", username));
-        if (result.length == 1) {
-          return result[0][0].equals(pwHash);
-        }
-        return false;
-      }
-    });
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("SELECT ").append(PASSWORD).append(" FROM ").append(TABLE_NAME);
+    statementBuilder.append(" WHERE ").append(ACTIVE)
+        .append(" AND ").append(USERNAME).append(" = :username");
+    Object[][] result = SQL.select(statementBuilder.toString(), new NVPair("username", username));
+    if (result.length == 1) {
+      return result[0][0].equals(pwHash);
+    }
+    return false;
 
   }
 

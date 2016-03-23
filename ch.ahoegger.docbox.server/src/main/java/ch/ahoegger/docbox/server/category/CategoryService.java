@@ -10,6 +10,7 @@ import org.eclipse.scout.rt.server.jdbc.SQL;
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.server.document.DocumentCategoryService;
 import ch.ahoegger.docbox.shared.ISequenceTable;
+import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.category.CategoryFormData;
 import ch.ahoegger.docbox.shared.category.ICategoryService;
 import ch.ahoegger.docbox.shared.category.ICategoryTable;
@@ -35,6 +36,10 @@ public class CategoryService implements ICategoryService, ICategoryTable {
     statementBuilder.append(" (").append(SqlFramentBuilder.columns(CATEGORY_NR, NAME, DESCRIPTION, START_DATE, END_DATE)).append(")");
     statementBuilder.append(" VALUES (:categoryId, :name, :description, :startDate, :endDate )");
     SQL.insert(statementBuilder.toString(), formData);
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
     return formData;
   }
 
@@ -59,6 +64,10 @@ public class CategoryService implements ICategoryService, ICategoryTable {
     statementBuilder.append(END_DATE).append("= :endDate ");
     statementBuilder.append(" WHERE ").append(CATEGORY_NR).append(" = :categoryId");
     SQL.update(statementBuilder.toString(), formData);
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
     return formData;
   }
 
@@ -67,6 +76,9 @@ public class CategoryService implements ICategoryService, ICategoryTable {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(CATEGORY_NR).append(" = :categoryId");
     SQL.delete(statementBuilder.toString(), new NVPair("categoryId", categoryId));
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
 
     // delete document category connection
     BEANS.get(DocumentCategoryService.class).deleteByCategoryId(categoryId);

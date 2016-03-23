@@ -5,37 +5,60 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.SocketException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Date;
 
+import javax.annotation.PostConstruct;
+import javax.security.auth.Subject;
+
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.CreateImmediately;
+import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPortConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
+import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
+import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
+import org.quartz.CronScheduleBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.ahoegger.docbox.server.backup.internal.ZipFile;
+import ch.ahoegger.docbox.server.database.DerbySqlService;
+import ch.ahoegger.docbox.server.database.DerbySqlService.DatabaseLocationProperty;
 import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
+import ch.ahoegger.docbox.server.document.store.DocumentStoreService.DocumentStoreLocationProperty;
+import ch.ahoegger.docbox.shared.administration.DbDumpFormData;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
+import ch.ahoegger.docbox.shared.backup.IDbDumpService;
+import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
+import ch.ahoegger.docbox.shared.security.permission.BackupPermission;
 
 /**
  * <h3>{@link FtpBackupService}</h3>
  *
  * @author aho
  */
-@ApplicationScoped
+
+@CreateImmediately
 public class FtpBackupService implements IBackupService {
   private static final Logger LOG = LoggerFactory.getLogger(FtpBackupService.class);
+  public static final String BACKUP_USER_NAME = "docadmin-backup-user";
 
   private static enum Status {
     Idle,
@@ -49,6 +72,31 @@ public class FtpBackupService implements IBackupService {
   private Date m_lastModificationDate;
   private Status m_status = Status.Idle;
 
+  @PostConstruct
+  public void setupChronJob() {
+    Subject subject = new Subject();
+    subject.getPrincipals().add(new SimplePrincipal(BACKUP_USER_NAME));
+    subject.setReadOnly();
+
+    if (CONFIG.getPropertyValue(FtpBackupEnabledProperty.class)) {
+      Jobs.schedule(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          LOG.info("Start chron backup.");
+          backup();
+        }
+      },
+          Jobs.newInput()
+              .withRunContext(ServerRunContexts.empty()
+                  .withSubject(subject).withTransactionScope(TransactionScope.REQUIRES_NEW))
+              .withName("backup job")
+              .withExecutionTrigger(Jobs.newExecutionTrigger()
+//                  .withSchedule(CronScheduleBuilder.cronSchedule("0 10 2 * * ?"))));
+                  .withSchedule(CronScheduleBuilder.cronSchedule("0 0/2 * * * ?"))));
+    }
+  }
+
   @Override
   public void notifyModification() {
     m_lastModificationDate = new Date();
@@ -56,6 +104,10 @@ public class FtpBackupService implements IBackupService {
 
   @Override
   public void backup() {
+    if (!(ACCESS.check(new AdministratorPermission())
+        || ACCESS.check(new BackupPermission()))) {
+      throw new VetoException("Access denied.");
+    }
     if (m_lastBackupDate == null) {
       backupInternal();
     }
@@ -75,7 +127,7 @@ public class FtpBackupService implements IBackupService {
       m_status = Status.Backup;
       // create zip file
 
-      File zipFile = BEANS.get(DocumentStoreService.class).createBackupFile();
+      File zipFile = createBackupFile();
       store(zipFile);
       m_lastBackupDate = new Date();
     }
@@ -85,6 +137,47 @@ public class FtpBackupService implements IBackupService {
     }
     finally {
       m_status = Status.Idle;
+    }
+  }
+
+  protected File createBackupFile() throws ProcessingException {
+    String databaseLocation = CONFIG.getPropertyValue(DatabaseLocationProperty.class);
+    if (StringUtility.isNullOrEmpty(databaseLocation)) {
+      throw new ProcessingException(new ProcessingStatus(String.format("Document store: Could not create backup file: database location is not set! [Property:'%s']", DatabaseLocationProperty.KEY), IStatus.ERROR));
+    }
+    String documentStoreLocation = CONFIG.getPropertyValue(DocumentStoreLocationProperty.class);
+    if (StringUtility.isNullOrEmpty(documentStoreLocation)) {
+      throw new ProcessingException(new ProcessingStatus(String.format("Document store: Could not create backup file: document store location is not set! [Property:'%s']", DocumentStoreLocationProperty.KEY), IStatus.ERROR));
+    }
+
+    // create zip file
+    ZipFile zipFile = null;
+    try {
+      zipFile = new ZipFile(Files.createTempFile("backup-tmp", ".zip").toFile());
+      zipFile.getArchiveFile().deleteOnExit();
+
+      // db dump
+      BEANS.get(DocumentStoreService.class).backup(zipFile);
+      BEANS.get(DerbySqlService.class).backup(zipFile);
+      IDbDumpService dbDumpService = BEANS.get(IDbDumpService.class);
+      DbDumpFormData formData = new DbDumpFormData();
+      formData = dbDumpService.load(formData);
+      zipFile.addFile("docadminDbDump.sql", formData.getDBScript().getValue().getBytes());
+
+      return zipFile.getArchiveFile();
+    }
+    catch (IOException e) {
+      throw new ProcessingException(new ProcessingStatus(String.format("Document store: Could not create backup file!"), e, 0, IStatus.ERROR));
+    }
+    finally {
+      if (zipFile != null) {
+        try {
+          zipFile.close();
+        }
+        catch (IOException e) {
+          // void
+        }
+      }
     }
   }
 
@@ -195,6 +288,20 @@ public class FtpBackupService implements IBackupService {
   @RemoteServiceAccessDenied
   public Date getLastModificationDate() {
     return m_lastModificationDate;
+  }
+
+  public static class FtpBackupEnabledProperty extends AbstractBooleanConfigProperty {
+    public static final String KEY = "docbox.ftp.backupEnabled";
+
+    @Override
+    public String getKey() {
+      return KEY;
+    }
+
+    @Override
+    protected Boolean getDefaultValue() {
+      return false;
+    }
   }
 
   public static class FtpServerUrlProperty extends AbstractStringConfigProperty {

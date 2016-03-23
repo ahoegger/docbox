@@ -14,6 +14,7 @@ import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
 import ch.ahoegger.docbox.shared.administration.user.UserFormData;
+import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 
 /**
  * <h3>{@link HelloWorldFormServiceTest}</h3>
@@ -44,6 +45,7 @@ public class UserServiceTest extends AbstractTestWithDatabase {
     fd1.getName().setValue("name");
     fd1.getFirstname().setValue("firstname");
     fd1.getAdministrator().setValue(false);
+    fd1.getDefaultPermission().setValue(IDocumentPermissionTable.PERMISSION_WRITE);
     fd1 = userService.create(fd1);
 
     UserFormData fd2 = new UserFormData();
@@ -65,6 +67,7 @@ public class UserServiceTest extends AbstractTestWithDatabase {
     fd1.getFirstname().setValue("modified.firstname");
     fd1.getActive().setValue(false);
     fd1.getAdministrator().setValue(true);
+    fd1.getDefaultPermission().setValue(IDocumentPermissionTable.PERMISSION_OWNER);
 
     userService.store(fd1);
 

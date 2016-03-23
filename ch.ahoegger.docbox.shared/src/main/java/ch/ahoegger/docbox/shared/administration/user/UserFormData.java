@@ -26,6 +26,10 @@ public class UserFormData extends AbstractFormData {
     return getFieldByClass(ChangePassword.class);
   }
 
+  public DefaultPermission getDefaultPermission() {
+    return getFieldByClass(DefaultPermission.class);
+  }
+
   public Firstname getFirstname() {
     return getFieldByClass(Firstname.class);
   }
@@ -53,6 +57,11 @@ public class UserFormData extends AbstractFormData {
   }
 
   public static class ChangePassword extends AbstractValueFieldData<Boolean> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class DefaultPermission extends AbstractValueFieldData<Integer> {
 
     private static final long serialVersionUID = 1L;
   }

@@ -4,11 +4,13 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
+import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.partner.IPartnerConversationTable;
 
 /**
@@ -24,7 +26,11 @@ public class PartnerConversationService implements IPartnerConversationTable {
       StringBuilder statementBuilder = new StringBuilder();
       statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(CONVERSATION_NR).append(" = :conversationId");
       SQL.delete(statementBuilder.toString(), new NVPair("conversationId", conversationId));
+
+      // notify backup needed
+      BEANS.get(IBackupService.class).notifyModification();
     }
+
   }
 
   /**
@@ -36,11 +42,15 @@ public class PartnerConversationService implements IPartnerConversationTable {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(PARTNER_NR, CONVERSATION_NR)).append(" ) VALUES (");
-    statementBuilder.append(":partnerId, conversationId");
+    statementBuilder.append(":partnerId, :conversationId");
     statementBuilder.append(")");
     SQL.insert(statementBuilder.toString(),
         new NVPair("partnerId", partnerId),
         new NVPair("conversationId", conversationId));
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
   }
 
   /**
@@ -60,5 +70,8 @@ public class PartnerConversationService implements IPartnerConversationTable {
           new NVPair("partnerId", partnerId),
           new NVPair("conversationId", conversationId));
     }
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
   }
 }

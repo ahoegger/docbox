@@ -5,11 +5,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
+import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.IDocumentPartnerTable;
 
 /**
@@ -45,6 +47,10 @@ public class DocumentPartnerService implements IDocumentPartnerTable {
         SQL.insert(statementBuilder.toString(),
             new NVPair("documentId", documentId),
             new NVPair("partnerId", partnerId));
+
+        // notify backup needed
+        BEANS.get(IBackupService.class).notifyModification();
+
       }
     }
   }

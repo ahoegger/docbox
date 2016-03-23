@@ -14,10 +14,14 @@ import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.server.security.SecurityService;
+import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 import ch.ahoegger.docbox.shared.administration.user.UserFormData;
 import ch.ahoegger.docbox.shared.administration.user.UserTablePageData;
+import ch.ahoegger.docbox.shared.backup.IBackupService;
+import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
+import ch.ahoegger.docbox.shared.security.permission.IDefaultPermissionTable;
 
 /**
  * <h3>{@link UserService}</h3>
@@ -48,9 +52,13 @@ public class UserService implements IUserService, IUserTable {
     BooleanHolder exists = new BooleanHolder();
 
     StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT TRUE, ").append(SqlFramentBuilder.columns(FIRSTNAME, NAME, USERNAME, ACTIVE, ADMINISTRATOR));
-    statementBuilder.append(" FROM ").append(TABLE_NAME).append(" WHERE ").append(USERNAME).append(" = :username");
-    statementBuilder.append(" INTO ").append(":exists, :firstname, :name, :username, :active, :administrator");
+    statementBuilder.append("SELECT TRUE, ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, FIRSTNAME, NAME, USERNAME, ACTIVE, ADMINISTRATOR))
+        .append(", ").append(SqlFramentBuilder.columnsAliased(IDefaultPermissionTable.TABLE_ALIAS, IDefaultPermissionTable.PERMISSION))
+        .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS)
+        .append(" LEFT OUTER JOIN ").append(IDefaultPermissionTable.TABLE_NAME).append(" AS ").append(IDefaultPermissionTable.TABLE_ALIAS)
+        .append(" ON ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, USERNAME)).append(" = ").append(SqlFramentBuilder.columnsAliased(IDefaultPermissionTable.TABLE_ALIAS, IDefaultPermissionTable.USERNAME))
+        .append(" WHERE ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, USERNAME)).append(" = :username")
+        .append(" INTO ").append(":exists, :firstname, :name, :username, :active, :administrator, :defaultPermission");
     SQL.selectInto(statementBuilder.toString(),
         new NVPair("exists", exists),
         formData);
@@ -77,6 +85,12 @@ public class UserService implements IUserService, IUserTable {
     statementBuilder.append(" WHERE ").append(USERNAME).append(" = :username");
     SQL.update(statementBuilder.toString(), formData);
     formData.getPassword().setValue(null);
+
+    BEANS.get(DefaultPermissionService.class).updateDefaultPermission(formData.getUsername().getValue(), formData.getDefaultPermission().getValue());
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
     return formData;
   }
 
@@ -84,6 +98,7 @@ public class UserService implements IUserService, IUserTable {
   public UserFormData prepareCreate(UserFormData formData) {
     formData.getActive().setValue(true);
     formData.getAdministrator().setValue(false);
+    formData.getDefaultPermission().setValue(IDocumentPermissionTable.PERMISSION_READ);
     return formData;
   }
 
@@ -96,6 +111,12 @@ public class UserService implements IUserService, IUserTable {
     statementBuilder.append(" VALUES (:username, :name, :firstname, :active, :password, :administrator)");
     SQL.insert(statementBuilder.toString(), formData);
     formData.getPassword().setValue(null);
+
+    BEANS.get(DefaultPermissionService.class).createDefaultPermission(formData.getUsername().getValue(), formData.getDefaultPermission().getValue());
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
     return formData;
   }
 
@@ -122,6 +143,11 @@ public class UserService implements IUserService, IUserTable {
     if (deletedRows != 1) {
       LOG.warn("Deleted {} rows for '{}' username.", deletedRows, username);
     }
+
+    BEANS.get(DefaultPermissionService.class).deleteByUsername(username);
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
 
   }
 

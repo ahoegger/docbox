@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -13,6 +14,7 @@ import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
+import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.IDocumentCategoryTable;
 
 /**
@@ -46,6 +48,10 @@ public class DocumentCategoryService implements IDocumentCategoryTable {
             new NVPair("documentId", documentId),
             new NVPair("categoryId", categoryId));
       }
+
+      // notify backup needed
+      BEANS.get(IBackupService.class).notifyModification();
+
     }
   }
 
@@ -53,6 +59,10 @@ public class DocumentCategoryService implements IDocumentCategoryTable {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(CATEGORY_NR).append(" = :categoryId");
     SQL.delete(statementBuilder.toString(), new NVPair("categoryId", categoryId));
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
   }
 
   /**
@@ -70,5 +80,9 @@ public class DocumentCategoryService implements IDocumentCategoryTable {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
     SQL.delete(statementBuilder.toString(), new NVPair("documentId", documentId));
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
   }
 }

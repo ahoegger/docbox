@@ -3,7 +3,6 @@ package ch.ahoegger.docbox.server.document.store;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.AccessController;
 import java.text.DateFormat;
@@ -15,11 +14,11 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
@@ -30,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.backup.internal.ZipFile;
-import ch.ahoegger.docbox.server.database.DerbySqlService.DatabaseLocationProperty;
 import ch.ahoegger.docbox.server.document.DocumentService;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
@@ -106,40 +104,10 @@ public class DocumentStoreService implements IDocumentStoreService {
     }
   }
 
-  public File createBackupFile() throws ProcessingException {
-    String databaseLocation = CONFIG.getPropertyValue(DatabaseLocationProperty.class);
-    if (StringUtility.isNullOrEmpty(databaseLocation)) {
-      throw new ProcessingException(new ProcessingStatus(String.format("Document store: Could not create backup file: database location is not set! [Property:'%s']", DatabaseLocationProperty.KEY), IStatus.ERROR));
-    }
-    String documentStoreLocation = CONFIG.getPropertyValue(DocumentStoreLocationProperty.class);
-    if (StringUtility.isNullOrEmpty(documentStoreLocation)) {
-      throw new ProcessingException(new ProcessingStatus(String.format("Document store: Could not create backup file: document store location is not set! [Property:'%s']", DocumentStoreLocationProperty.KEY), IStatus.ERROR));
-    }
-
-    // create zip file
-    ZipFile zipFile = null;
-    try {
-      zipFile = new ZipFile(Files.createTempFile("backup-tmp", ".zip").toFile());
-      zipFile.getArchiveFile().deleteOnExit();
-//      zipFile.addFile("docadminDbDump.sql", getDBDump());
+  @RemoteServiceAccessDenied
+  public void backup(ZipFile zipFile) throws PlatformException, IOException {
+    synchronized (IO_LOCK) {
       zipFile.addFile(Paths.get(CONFIG.getPropertyValue(DocumentStoreLocationProperty.class)).toFile());
-      // TODO move to SQL service with lock!
-      zipFile.addFile(Paths.get(CONFIG.getPropertyValue(DatabaseLocationProperty.class)).toFile());
-
-      return zipFile.getArchiveFile();
-    }
-    catch (IOException e) {
-      throw new ProcessingException(new ProcessingStatus(String.format("Document store: Could not create backup file!"), e, 0, IStatus.ERROR));
-    }
-    finally {
-      if (zipFile != null) {
-        try {
-          zipFile.close();
-        }
-        catch (IOException e) {
-          // void
-        }
-      }
     }
   }
 
@@ -165,4 +133,5 @@ public class DocumentStoreService implements IDocumentStoreService {
       return KEY;
     }
   }
+
 }

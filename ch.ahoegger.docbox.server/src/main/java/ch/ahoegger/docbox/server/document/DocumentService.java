@@ -25,6 +25,7 @@ import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
 import ch.ahoegger.docbox.shared.ISequenceTable;
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
+import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Permissions.PermissionsRowData;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
@@ -45,7 +46,6 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
   @Override
   public DocumentTableData getTableData(DocumentSearchFormData formData) {
-    Object[][] rawRes = SQL.select("SELECT * FROM " + TABLE_NAME);
 
     StringBuilder sqlBuilder = new StringBuilder();
     sqlBuilder.append("SELECT ")
@@ -134,6 +134,8 @@ public class DocumentService implements IDocumentService, IDocumentTable {
         .stream().map(p -> p.getName()).reduce((p1, p2) -> p1 + ", " + p2)
         .orElse("")));
 
+    Arrays.stream(tableData.getRows()).map(row -> row.getAbstract() + " - " + row.getConversation()).forEach(System.out::println);
+
     return tableData;
   }
 
@@ -191,6 +193,9 @@ public class DocumentService implements IDocumentService, IDocumentTable {
             (p1, p2) -> Math.max(p1, p2)));
     BEANS.get(DocumentPermissionService.class).createDocumentPermissions(documentId, permissions);
 
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
     return formData;
 
   }
@@ -219,12 +224,14 @@ public class DocumentService implements IDocumentService, IDocumentTable {
             row -> row.getPermission(),
             (p1, p2) -> Math.max(p1, p2)));
     BEANS.get(DocumentPermissionService.class).updateDocumentPermissions(formData.getDocumentId(), permissions);
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
   }
 
   @Override
   public DocumentFormData load(DocumentFormData formData) {
     if (!ACCESS.check(new EntityReadPermission(formData.getDocumentId()))) {
-//    if (!ACCESS.check(new EntityReadPermission(formData.getDocumentId()))) {
       throw new VetoException("Access denied");
     }
 

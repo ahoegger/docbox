@@ -130,6 +130,11 @@ public class ConversationForm extends AbstractForm {
         protected int getConfiguredMaxLength() {
           return ICategoryTable.NAME_LENGTH;
         }
+
+        @Override
+        protected boolean getConfiguredMandatory() {
+          return true;
+        }
       }
 
       @Order(2000)

@@ -8,6 +8,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanFi
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -19,6 +20,7 @@ import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.ActiveField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.AdministratorField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.ChangePasswordField;
+import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.DefaultPermissionField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.FirstnameField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.NameField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.PasswordField;
@@ -30,6 +32,7 @@ import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 import ch.ahoegger.docbox.shared.administration.user.UserFormData;
 import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
 import ch.ahoegger.docbox.shared.administration.user.UserValidationStatus;
+import ch.ahoegger.docbox.shared.permission.PermissionLookupCall;
 
 /**
  * <h3>{@link UserForm}</h3>
@@ -115,6 +118,10 @@ public class UserForm extends AbstractForm {
 
   public AdministratorField getAdministratorField() {
     return getFieldByClass(AdministratorField.class);
+  }
+
+  public DefaultPermissionField getDefaultPermissionField() {
+    return getFieldByClass(DefaultPermissionField.class);
   }
 
   public NameField getNameField() {
@@ -277,6 +284,19 @@ public class UserForm extends AbstractForm {
         }
       }
 
+      @Order(4000)
+      public class DefaultPermissionField extends AbstractSmartField<Integer> {
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("DefaultPermission");
+        }
+
+        @Override
+        protected void execInitField() {
+          setLookupCall(new PermissionLookupCall(false));
+        }
+
+      }
     }
 
     @Order(200)

@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.server.document.DocumentPartnerService;
 import ch.ahoegger.docbox.shared.ISequenceTable;
+import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.IDocumentPartnerTable;
 import ch.ahoegger.docbox.shared.partner.IPartnerService;
 import ch.ahoegger.docbox.shared.partner.IPartnerTable;
@@ -62,6 +63,10 @@ public class PartnerService implements IPartnerService, IPartnerTable {
     statementBuilder.append(" (").append(SqlFramentBuilder.columns(PARTNER_NR, NAME, DESCRIPTION, START_DATE, END_DATE)).append(")");
     statementBuilder.append(" VALUES (:partnerId, :name, :description, :startDate, :endDate )");
     SQL.insert(statementBuilder.toString(), formData);
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
     return formData;
   }
 
@@ -86,6 +91,10 @@ public class PartnerService implements IPartnerService, IPartnerTable {
     statementBuilder.append(END_DATE).append("= :endDate ");
     statementBuilder.append(" WHERE ").append(PARTNER_NR).append(" = :partnerId");
     SQL.update(statementBuilder.toString(), formData);
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
     return formData;
   }
 
@@ -94,6 +103,9 @@ public class PartnerService implements IPartnerService, IPartnerTable {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(PARTNER_NR).append(" = :partnerId");
     SQL.delete(statementBuilder.toString(), new NVPair("partnerId", partnerId));
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
 
     // delete document category connection
     BEANS.get(DocumentPartnerService.class).delete(partnerId);

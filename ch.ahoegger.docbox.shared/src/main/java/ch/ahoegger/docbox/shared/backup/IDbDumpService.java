@@ -3,23 +3,21 @@ package ch.ahoegger.docbox.shared.backup;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
+import ch.ahoegger.docbox.shared.administration.DbDumpFormData;
+
 /**
- * <h3>{@link IBackupService}</h3>
+ * <h3>{@link IDbDumpService}</h3>
  *
  * @author aho
  */
 @ApplicationScoped
 @TunnelToServer
-public interface IBackupService {
+public interface IDbDumpService {
 
   /**
-   *
+   * @param formData
+   * @return
    */
-  void backup();
-
-  /**
-   *
-   */
-  void notifyModification();
+  DbDumpFormData load(DbDumpFormData formData);
 
 }
