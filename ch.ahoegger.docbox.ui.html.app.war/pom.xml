@@ -1,28 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>ch.ahoegger.docbox</groupId>
-    <artifactId>ch.ahoegger.docbox.parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <relativePath>../ch.ahoegger.docbox.parent/pom.xml</relativePath>
-  </parent>
+	<parent>
+		<groupId>ch.ahoegger.docbox</groupId>
+		<artifactId>ch.ahoegger.docbox.parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../ch.ahoegger.docbox.parent/pom.xml</relativePath>
+	</parent>
 
-  <artifactId>ch.ahoegger.docbox.ui.html.app.war</artifactId>
-  <packaging>war</packaging>
+	<artifactId>ch.ahoegger.docbox.ui.html.app.war</artifactId>
+	<packaging>war</packaging>
 
-  <name>DocBox HTML UI WAR</name>
+	<name>DocBox HTML UI WAR</name>
 
-  <build>
-      <finalName>docbox</finalName>
-  </build>
+	<build>
+		<finalName>docbox</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>config.properties</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
 
-  <dependencies>
-    <dependency>
-      <groupId>ch.ahoegger.docbox</groupId>
-      <artifactId>ch.ahoegger.docbox.ui.html</artifactId>
-    </dependency>
-  </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>ch.ahoegger.docbox</groupId>
+			<artifactId>ch.ahoegger.docbox.ui.html</artifactId>
+		</dependency>
+	</dependencies>
 </project>
