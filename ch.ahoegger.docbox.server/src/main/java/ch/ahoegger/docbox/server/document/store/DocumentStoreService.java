@@ -12,6 +12,8 @@ import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.FileUtility;
@@ -32,6 +34,8 @@ import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
  */
 public class DocumentStoreService implements IDocumentStoreService {
   private static final Logger LOG = LoggerFactory.getLogger(DocumentStoreService.class);
+
+  public static final IExecutionSemaphore DOCUMENT_ACCESS_SEMAPHORE = Jobs.newExecutionSemaphore(1);
 
   private File m_documentStoreDirectory;
 

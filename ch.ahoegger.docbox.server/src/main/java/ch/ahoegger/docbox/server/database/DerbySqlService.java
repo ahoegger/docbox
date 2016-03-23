@@ -39,9 +39,11 @@ public class DerbySqlService extends AbstractDerbySqlService {
 
   public static class DatabaseLocationProperty extends AbstractStringConfigProperty {
 
+    public static final String KEY = "docbox.server.databaseLocation";
+
     @Override
     public String getKey() {
-      return "docbox.server.databaseLocation";
+      return KEY;
     }
   }
 }
