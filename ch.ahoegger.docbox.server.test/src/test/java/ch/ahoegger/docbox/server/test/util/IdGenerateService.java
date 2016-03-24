@@ -10,7 +10,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 @ApplicationScoped
 public class IdGenerateService {
 
-  private long m_nextId = 2900;
+  private long m_nextId = 10000;
 
   public long getNextId() {
     return m_nextId++;

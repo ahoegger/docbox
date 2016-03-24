@@ -8,7 +8,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.res.loader.AbstractResourceLoader;
@@ -35,17 +34,7 @@ public class PdfResourceLoader extends AbstractResourceLoader {
 
     String documentIdParameter = getRequest().getParameter(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class));
     if (StringUtility.hasText(documentIdParameter)) {
-
-      IAccessControlService accessControlService = BEANS.get(IAccessControlService.class);
-      accessControlService.getUserIdOfCurrentSubject();
-
-      System.out.println("###HTML " + BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject());
-      long documentId = Long.parseLong(documentIdParameter);
-//      if (!ACCESS.check(new EntityReadPermission(documentId))) {
-////      if (!ACCESS.check(new EntityReadPermission(formData.getDocumentId()))) {
-//        throw new VetoException("Access denied");
-//      }
-      BinaryResource resource = BEANS.get(IDocumentStoreService.class).getDocument(documentId);
+      BinaryResource resource = BEANS.get(IDocumentStoreService.class).getDocument(Long.parseLong(documentIdParameter));
       return new HttpCacheObject(cacheKey, false, 0, resource);
     }
     return null;

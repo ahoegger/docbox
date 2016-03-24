@@ -4,12 +4,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.security.AccessController;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
@@ -43,7 +40,7 @@ public class DocumentStoreService implements IDocumentStoreService {
   private static final Logger LOG = LoggerFactory.getLogger(DocumentStoreService.class);
 
   private File m_documentStoreDirectory;
-  private static final Object IO_LOCK = new Object();
+  protected static final Object IO_LOCK = new Object();
 
   public DocumentStoreService() {
     m_documentStoreDirectory = new File(getConfiguredDocumentStoreLocation());
@@ -64,28 +61,24 @@ public class DocumentStoreService implements IDocumentStoreService {
   @Override
   public BinaryResource getDocument(Long documentId) {
     // permissioncheck
-    Subject s = Subject.getSubject(AccessController.getContext());
     if (!ACCESS.check(new EntityReadPermission(documentId))) {
-//    if (!ACCESS.check(new EntityReadPermission(formData.getDocumentId()))) {
       throw new VetoException("Access denied");
     }
+
     DocumentFormData formData = new DocumentFormData();
     formData.setDocumentId(documentId);
     formData = BEANS.get(DocumentService.class).loadTrusted(formData);
-    System.out.println("KKKKK: " + formData.getDocumentPath());
     BinaryResource resource = get(formData.getDocumentPath());
     return resource;
   }
 
   @RemoteServiceAccessDenied
   public String store(BinaryResource resource, Date capturedDate, Long documentId) {
-
     DateFormat dfYear = new SimpleDateFormat("yyyy");
     DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
     StringBuilder pathBuilder = new StringBuilder();
     pathBuilder.append("/").append(dfYear.format(capturedDate)).append("/").append(df.format(capturedDate)).append("_").append(documentId).append(".").append(FileUtility.getFileExtension(resource.getFilename()));
     synchronized (IO_LOCK) {
-
       File file = new File(getDocumentStoreDirectory(), pathBuilder.toString());
       if (file.exists()) {
         throw new ProcessingException(new ProcessingStatus("document['" + file.getAbsolutePath() + "'] already exists serverside!", Status.ERROR));

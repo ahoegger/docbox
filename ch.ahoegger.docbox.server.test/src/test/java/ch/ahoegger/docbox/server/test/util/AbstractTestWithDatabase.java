@@ -26,6 +26,8 @@ public abstract class AbstractTestWithDatabase {
 
   @Before
   public void setupDb() throws Exception {
+    // delete document store
+    BEANS.get(TestDocumentStoreService.class).clearStore();
     ISqlService sqlService = BEANS.get(ISqlService.class);
     for (ITableTask task : BEANS.all(ITableTask.class)) {
       task.dropTable(sqlService);

@@ -1,18 +1,20 @@
 package ch.ahoegger.docbox.server.test.document;
 
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ch.ahoegger.docbox.server.database.initialization.DocumentTableTask;
 import ch.ahoegger.docbox.server.database.initialization.UserTableTask;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
+import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.shared.document.DocumentActiveState;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
@@ -25,29 +27,38 @@ import ch.ahoegger.docbox.shared.document.IDocumentService;
  */
 public class DocumentService_SearchByActiveState extends AbstractTestWithDatabase {
 
-  @BeforeClass
-  public static void createTestRows() throws IOException {
+  private static final String username01 = SUBJECT_NAME;
+
+  private static final Long documentId01 = BEANS.get(IdGenerateService.class).getNextId();
+  private static final Long documentId02 = BEANS.get(IdGenerateService.class).getNextId();
+  private static final Long documentId03 = BEANS.get(IdGenerateService.class).getNextId();
+  private static final Long documentId04 = BEANS.get(IdGenerateService.class).getNextId();
+  private static final Long documentId05 = BEANS.get(IdGenerateService.class).getNextId();
+
+  @Override
+  public void setupDb() throws Exception {
+    super.setupDb();
 
     ISqlService sqlService = BEANS.get(ISqlService.class);
 
-    BEANS.get(UserTableTask.class).createUser(sqlService, "name", "firstname", "admin", "secret", true, true);
+    BEANS.get(UserTableTask.class).createUser(sqlService, "name", "firstname", username01, "secret", true, true);
 
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.add(Calendar.DAY_OF_MONTH, +1);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 5000, "doc 01", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId01, "doc 01", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
     cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 5001, "doc 02", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId02, "doc 02", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
     cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.add(Calendar.DAY_OF_WEEK, 1);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 5002, "doc 03", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId03, "doc 03", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
     cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.add(Calendar.DAY_OF_WEEK, -1);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 5003, "doc 04", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, 5004, "doc 05", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId04, "doc 04", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId05, "doc 05", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null);
   }
 
   @Test
@@ -56,11 +67,11 @@ public class DocumentService_SearchByActiveState extends AbstractTestWithDatabas
     DocumentSearchFormData sd = new DocumentSearchFormData();
     sd.getActiveBox().setValue(DocumentActiveState.Active);
     DocumentTableData tableData = service.getTableData(sd);
-    Assert.assertEquals(4, tableData.getRowCount());
-    Assert.assertEquals(new Long(5000), tableData.getRows()[0].getDocumentId());
-    Assert.assertEquals(new Long(5001), tableData.getRows()[1].getDocumentId());
-    Assert.assertEquals(new Long(5002), tableData.getRows()[2].getDocumentId());
-    Assert.assertEquals(new Long(5004), tableData.getRows()[3].getDocumentId());
+
+    Assert.assertEquals(CollectionUtility.arrayList(documentId01, documentId02, documentId03, documentId05),
+        Arrays.stream(tableData.getRows()).map(row -> row.getDocumentId())
+            .sorted()
+            .collect(Collectors.toList()));
   }
 
   @Test
@@ -69,8 +80,11 @@ public class DocumentService_SearchByActiveState extends AbstractTestWithDatabas
     DocumentSearchFormData sd = new DocumentSearchFormData();
     sd.getActiveBox().setValue(DocumentActiveState.Inactive);
     DocumentTableData tableData = service.getTableData(sd);
-    Assert.assertEquals(1, tableData.getRowCount());
-    Assert.assertEquals(new Long(5003), tableData.getRows()[0].getDocumentId());
+
+    Assert.assertEquals(CollectionUtility.arrayList(documentId04),
+        Arrays.stream(tableData.getRows()).map(row -> row.getDocumentId())
+            .sorted()
+            .collect(Collectors.toList()));
   }
 
   @Test
@@ -79,12 +93,11 @@ public class DocumentService_SearchByActiveState extends AbstractTestWithDatabas
     DocumentSearchFormData sd = new DocumentSearchFormData();
     sd.getActiveBox().setValue(DocumentActiveState.All);
     DocumentTableData tableData = service.getTableData(sd);
-    Assert.assertEquals(5, tableData.getRowCount());
-    Assert.assertEquals(new Long(5000), tableData.getRows()[0].getDocumentId());
-    Assert.assertEquals(new Long(5001), tableData.getRows()[1].getDocumentId());
-    Assert.assertEquals(new Long(5002), tableData.getRows()[2].getDocumentId());
-    Assert.assertEquals(new Long(5003), tableData.getRows()[3].getDocumentId());
-    Assert.assertEquals(new Long(5004), tableData.getRows()[4].getDocumentId());
+
+    Assert.assertEquals(CollectionUtility.arrayList(documentId01, documentId02, documentId03, documentId04, documentId05),
+        Arrays.stream(tableData.getRows()).map(row -> row.getDocumentId())
+            .sorted()
+            .collect(Collectors.toList()));
   }
 
 }

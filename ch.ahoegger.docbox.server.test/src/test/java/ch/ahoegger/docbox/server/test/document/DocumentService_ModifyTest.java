@@ -65,7 +65,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
     m_today = cal.getTime();
     // create user
-    BEANS.get(UserTableTask.class).createUser(sqlService, "name01", "firstname01", AbstractTestWithDatabase.SUBJECT_NAME, "secret", true, true);
+    BEANS.get(UserTableTask.class).createUser(sqlService, "name01", "firstname01", userId01, "secret", true, true);
     BEANS.get(UserTableTask.class).createUser(sqlService, "name02", "firstname02", userId02, "secret", true, false);
 
     // create category
@@ -376,7 +376,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
     for (PermissionsRowData rd : fd.getPermissions().getRows()) {
       if (userId01.equals(rd.getUser())) {
-        fd.getPartners().removeRow(rd);
+        fd.getPermissions().removeRow(rd);
       }
     }
     service.store(fd);

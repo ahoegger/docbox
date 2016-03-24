@@ -7,12 +7,12 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ch.ahoegger.docbox.server.database.initialization.ConversationTableTask;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
+import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.shared.conversation.ConversationFormData;
 import ch.ahoegger.docbox.shared.conversation.IConversationService;
 
@@ -24,23 +24,29 @@ import ch.ahoegger.docbox.shared.conversation.IConversationService;
 
 public class ConversationServiceTest extends AbstractTestWithDatabase {
 
-  @BeforeClass
-  public static void createTestRows() {
+  private static final Long conversationId01 = BEANS.get(IdGenerateService.class).getNextId();
+  private static final Long conversationId02 = BEANS.get(IdGenerateService.class).getNextId();
+
+  @Override
+  public void setupDb() throws Exception {
+    super.setupDb();
+
     ISqlService sqlService = BEANS.get(ISqlService.class);
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.set(1999, 04, 29);
-    BEANS.get(ConversationTableTask.class).createConversationRow(sqlService, 2900, "sample conversation 01", "some notes", cal.getTime(), null);
+    BEANS.get(ConversationTableTask.class).createConversationRow(sqlService, conversationId01, "sample conversation 01", "some notes", cal.getTime(), null);
     cal.set(1999, 04, 30);
-    BEANS.get(ConversationTableTask.class).createConversationRow(sqlService, 2901, "sample conversation 02", "some notes", cal.getTime(), null);
+    BEANS.get(ConversationTableTask.class).createConversationRow(sqlService, conversationId02, "sample conversation 02", "some notes", cal.getTime(), null);
   }
 
   @Test
-  public void testCreateUser() {
+  public void testCreateConversation() {
     IConversationService service = BEANS.get(IConversationService.class);
 
     ConversationFormData fd1 = new ConversationFormData();
     fd1 = service.prepareCreate(fd1);
+
     fd1.getName().setValue("inserted conversation");
     fd1.getNotes().setValue("some notes");
     Calendar cal = Calendar.getInstance();
@@ -60,11 +66,11 @@ public class ConversationServiceTest extends AbstractTestWithDatabase {
   }
 
   @Test
-  public void testModifyUser() {
+  public void testModifyConversation() {
     IConversationService service = BEANS.get(IConversationService.class);
 
     ConversationFormData fd1 = new ConversationFormData();
-    fd1.setConversationId(new BigDecimal(2901));
+    fd1.setConversationId(new BigDecimal(conversationId02));
     fd1 = service.load(fd1);
 
     fd1.getName().setValue("modified.name");
@@ -79,7 +85,7 @@ public class ConversationServiceTest extends AbstractTestWithDatabase {
     fd1 = service.store(fd1);
 
     ConversationFormData fd2 = new ConversationFormData();
-    fd2.setConversationId(new BigDecimal(2901));
+    fd2.setConversationId(new BigDecimal(conversationId02));
     fd2 = service.load(fd2);
 
     DocboxAssert.assertEquals(fd1, fd2);
@@ -89,10 +95,10 @@ public class ConversationServiceTest extends AbstractTestWithDatabase {
   @Test
   public void testDelete() {
     IConversationService service = BEANS.get(IConversationService.class);
-    service.delete(2901l);
+    service.delete(conversationId02);
 
     ConversationFormData fd1 = new ConversationFormData();
-    fd1.setConversationId(new BigDecimal(2901));
+    fd1.setConversationId(new BigDecimal(conversationId02));
     fd1 = service.load(fd1);
     Assert.assertNull(fd1);
 
