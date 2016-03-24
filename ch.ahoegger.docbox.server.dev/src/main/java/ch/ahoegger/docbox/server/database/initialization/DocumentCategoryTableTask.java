@@ -50,7 +50,7 @@ public class DocumentCategoryTableTask implements ITableTask, IDocumentCategoryT
     sqlService.insert(statementBuilder.toString());
   }
 
-  private void createDocumentCategoryRow(ISqlService sqlService, Long documentId, Long categoryId) {
+  public void createDocumentCategoryRow(ISqlService sqlService, Long documentId, Long categoryId) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, CATEGORY_NR));

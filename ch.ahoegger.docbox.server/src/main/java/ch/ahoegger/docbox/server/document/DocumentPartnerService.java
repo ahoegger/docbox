@@ -9,6 +9,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
 import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
@@ -53,12 +54,37 @@ public class DocumentPartnerService implements IDocumentPartnerTable {
 
       }
     }
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
   }
 
-  public void delete(Long partnerId) {
+  /**
+   * @param documentId
+   * @param value
+   */
+  @RemoteServiceAccessDenied
+  public void updateDocumentPartner(Long documentId, Set<BigDecimal> partnerIds) {
+    deleteByDocumentId(documentId);
+    createDocumentPartners(documentId, partnerIds);
+  }
+
+  @RemoteServiceAccessDenied
+  public void deleteByDocumentId(Long documentId) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
+    SQL.delete(statementBuilder.toString(), new NVPair("documentId", documentId));
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
+  }
+
+  public void deletePartnerId(Long partnerId) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(PARTNER_NR).append(" = :partnerId");
     SQL.delete(statementBuilder.toString(), new NVPair("partnerId", partnerId));
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
 
   }
 }

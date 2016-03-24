@@ -108,7 +108,7 @@ public class PartnerService implements IPartnerService, IPartnerTable {
     BEANS.get(IBackupService.class).notifyModification();
 
     // delete document category connection
-    BEANS.get(DocumentPartnerService.class).delete(partnerId);
+    BEANS.get(DocumentPartnerService.class).deletePartnerId(partnerId);
   }
 
 }

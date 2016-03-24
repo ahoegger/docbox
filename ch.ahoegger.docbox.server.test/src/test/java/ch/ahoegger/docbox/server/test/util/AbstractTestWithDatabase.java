@@ -5,7 +5,7 @@ import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 
 import ch.ahoegger.docbox.server.ServerSession;
@@ -24,8 +24,8 @@ public abstract class AbstractTestWithDatabase {
 
   public static final String SUBJECT_NAME = "admin";
 
-  @BeforeClass
-  public static void setupDb() {
+  @Before
+  public void setupDb() throws Exception {
     ISqlService sqlService = BEANS.get(ISqlService.class);
     for (ITableTask task : BEANS.all(ITableTask.class)) {
       task.dropTable(sqlService);

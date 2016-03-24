@@ -86,4 +86,9 @@ public class DocumentServiceTest extends AbstractTestWithDatabase {
 
     DocboxAssert.assertEquals(fd1, fd2);
   }
+
+  @Test
+  public void testModify() {
+
+  }
 }

@@ -82,10 +82,6 @@ public class DocumentFormData extends AbstractFormData {
     return getPropertyByClass(DocumentPathProperty.class);
   }
 
-  public OpenHtml getOpenHtml() {
-    return getFieldByClass(OpenHtml.class);
-  }
-
   public OriginalStorage getOriginalStorage() {
     return getFieldByClass(OriginalStorage.class);
   }
@@ -138,11 +134,6 @@ public class DocumentFormData extends AbstractFormData {
   }
 
   public static class DocumentPathProperty extends AbstractPropertyData<String> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class OpenHtml extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
   }

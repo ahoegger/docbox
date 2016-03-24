@@ -1,8 +1,10 @@
 package ch.ahoegger.docbox.server.test.util;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -36,7 +38,14 @@ public class DocboxAssert extends Assert {
     assertNotNull(fd2);
     assertEquals(fd1.getClass(), fd2.getClass());
     if (fd1 instanceof AbstractValueFieldData) {
-      assertEquals("Value of '" + fd1.getClass().getName() + "' not equals.", ((AbstractValueFieldData) fd1).getValue(), ((AbstractValueFieldData) fd2).getValue());
+      Object val01 = ((AbstractValueFieldData) fd1).getValue();
+      Object val02 = ((AbstractValueFieldData) fd2).getValue();
+      if (val01 instanceof Date) {
+        assertTrue("Date of '" + fd1.getClass().getName() + "' not equals.", DateUtility.equals((Date) val01, (Date) val02));
+      }
+      else {
+        assertEquals("Value of '" + fd1.getClass().getName() + "' not equals.", val01, val02);
+      }
     }
     assertEquals(fd1.getAllProperties(), fd2.getAllProperties());
 

@@ -51,7 +51,7 @@ public class DefaultPermissionTableTask implements ITableTask, IDefaultPermissio
     sqlService.insert(statementBuilder.toString());
   }
 
-  private void createDefaultPermissionRow(ISqlService sqlService, String username, int permission) {
+  public void createDefaultPermissionRow(ISqlService sqlService, String username, int permission) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(USERNAME, PERMISSION));

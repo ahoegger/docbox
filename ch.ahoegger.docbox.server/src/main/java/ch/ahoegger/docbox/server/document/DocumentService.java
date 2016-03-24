@@ -211,11 +211,16 @@ public class DocumentService implements IDocumentService, IDocumentTable {
         .append(ABSTRACT).append("= :abstract, ")
         .append(DOCUMENT_DATE).append("= :documentDate, ")
         .append(VALID_DATE).append("= :validDate, ")
-        .append(DOCUMENT_URL).append("= :documentPath, ")
         .append(ORIGINAL_STORAGE).append("= :originalStorage, ")
         .append(CONVERSATION_NR).append("= :conversation ")
         .append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
     SQL.update(statementBuilder.toString(), formData);
+
+    // partner
+    BEANS.get(DocumentPartnerService.class).updateDocumentPartner(formData.getDocumentId(),
+        Arrays.stream(formData.getPartners().getRows()).map(row -> row.getPartner())
+            .filter(pId -> pId != null)
+            .collect(Collectors.toSet()));
 
     // categories
     BEANS.get(DocumentCategoryService.class).updateDocumentCategories(formData.getDocumentId(), formData.getCategoriesBox().getValue());

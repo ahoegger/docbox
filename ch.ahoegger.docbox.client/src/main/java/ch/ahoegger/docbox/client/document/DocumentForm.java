@@ -223,6 +223,7 @@ public class DocumentForm extends AbstractForm {
       }
 
       @Order(20)
+      @FormData(sdkCommand = SdkCommand.IGNORE)
       public class OpenHtmlField extends AbstractHtmlField {
 
         @Override
