@@ -9,9 +9,9 @@
 
   <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
     <!-- Sample for Tomcat Log Folder -->
-    <file>${catalina.base}/logs/ch.ahoegger.docbox.ch.ahoegger.docbox.html.ui.log</file>
+    <file>/var/lib/tomcat8/logs/docbox.html.ui.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${catalina.base}/logs/ch.ahoegger.docbox.ch.ahoegger.docbox.html.ui-%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>/var/lib/tomcat8/logs/docbox.html.ui-%d{yyyy-MM-dd}.log</fileNamePattern>
       <maxHistory>100</maxHistory>
     </rollingPolicy>
     <encoder>

@@ -8,7 +8,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 import ch.ahoegger.docbox.client.document.DocumentTablePage;
-import ch.ahoegger.docbox.client.helloworld.HelloWorldPage;
 import ch.ahoegger.docbox.shared.Icons;
 
 /**
@@ -22,7 +21,6 @@ public class WorkOutline extends AbstractOutline {
   @Override
   protected void execCreateChildPages(List<IPage<?>> pageList) {
     pageList.add(new DocumentTablePage());
-    pageList.add(new HelloWorldPage());
   }
 
   @Override
@@ -34,4 +32,5 @@ public class WorkOutline extends AbstractOutline {
   protected String getConfiguredIconId() {
     return Icons.Pencil;
   }
+
 }

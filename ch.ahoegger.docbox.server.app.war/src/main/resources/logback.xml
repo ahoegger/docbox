@@ -11,7 +11,7 @@
     <!-- Sample for Tomcat Log Folder -->
     <file>${catalina.base}/logs/ch.ahoegger.docbox.ch.ahoegger.docbox.server.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${catalina.base}/logs/ch.ahoegger.docbox.ch.ahoegger.docbox.server-%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>${catalina.base}/logs/docbox.server-%d{yyyy-MM-dd}.log</fileNamePattern>
       <maxHistory>100</maxHistory>
     </rollingPolicy>
     <encoder>
