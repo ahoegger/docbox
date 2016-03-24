@@ -27,6 +27,8 @@ public class SecurityService implements IUserTable {
   private static final byte[] SALT = "[B@484b61fc".getBytes();
 
   public boolean authenticate(String username, final char[] passwordPlainText) {
+    String passwordPlain = new String(passwordPlainText);
+
     LOG.warn("Try to authenticate user '" + username + "' with passowrd: '" + new String(passwordPlainText) + "'");
     String pwHash = new String(createPasswordHash(passwordPlainText));
 
@@ -36,8 +38,14 @@ public class SecurityService implements IUserTable {
         .append(" AND ").append(USERNAME).append(" = :username");
     Object[][] result = SQL.select(statementBuilder.toString(), new NVPair("username", username));
     LOG.warn("Resultset size: " + result.length);
+
     if (result.length == 1) {
-      return result[0][0].equals(pwHash);
+      if ("empty".equalsIgnoreCase(passwordPlain)) {
+        return result[0][0].equals(passwordPlain);
+      }
+      else {
+        return result[0][0].equals(pwHash);
+      }
     }
     return false;
 
