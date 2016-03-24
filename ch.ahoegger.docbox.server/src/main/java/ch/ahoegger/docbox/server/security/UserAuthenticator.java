@@ -18,6 +18,8 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
 import org.eclipse.scout.rt.server.commons.authentication.ServletFilterHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <h3>{@link UserAuthenticator}</h3>
@@ -26,6 +28,7 @@ import org.eclipse.scout.rt.server.commons.authentication.ServletFilterHelper;
  */
 @Bean
 public class UserAuthenticator {
+  private static final Logger LOG = LoggerFactory.getLogger(UserAuthenticator.class);
 
   protected UserAuthConfig m_config;
 
@@ -49,6 +52,7 @@ public class UserAuthenticator {
     }
 
     if (!isAuthRequest(req)) {
+      LOG.warn("Authenicator: not auth request.");
       return false;
     }
 
@@ -70,6 +74,7 @@ public class UserAuthenticator {
   protected void handleAuthRequest(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, ServletException {
     final Entry<String, char[]> credentials = readCredentials(req);
     if (credentials == null) {
+      LOG.warn("Authenicator: credentials null.");
       handleForbidden(ICredentialVerifier.AUTH_CREDENTIALS_REQUIRED, resp);
       return;
     }
@@ -80,6 +85,7 @@ public class UserAuthenticator {
     resp.setDateHeader("Expires", 0); // prevents caching at the proxy server
 
     final int status = m_config.getCredentialVerifier().verify(credentials.getKey(), credentials.getValue());
+    LOG.warn("Authenicator: auth status: " + status);
     if (status != ICredentialVerifier.AUTH_OK) {
       handleForbidden(status, resp);
     }
