@@ -12,9 +12,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
+import ch.ahoegger.docbox.shared.administration.user.IUserLookupService;
 import ch.ahoegger.docbox.shared.category.ICategoryLookupService;
+import ch.ahoegger.docbox.shared.conversation.IConversationLookupService;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
+import ch.ahoegger.docbox.shared.partner.IParterLookupService;
 
 /**
  * <h3>{@link DocumentFormTest}</h3> Contains Tests for the {@link DocumentForm}.
@@ -34,6 +37,13 @@ public class DocumentFormTest {
 
   @BeanMock
   private ICategoryLookupService m_mockCategoryLookupService;
+  @BeanMock
+  private IConversationLookupService m_mockConversationLookupService;
+
+  @BeanMock
+  private IParterLookupService m_mockPartnerLookupService;
+  @BeanMock
+  private IUserLookupService m_mockUserLookupService;
 
   /**
    * Return a reference {@link HelloWorldFormData} on method {@link IHelloWorldFormService#load(HelloWorldFormData)}.
