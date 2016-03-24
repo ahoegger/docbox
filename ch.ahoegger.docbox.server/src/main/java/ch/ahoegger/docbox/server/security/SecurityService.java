@@ -29,22 +29,27 @@ public class SecurityService implements IUserTable {
   public boolean authenticate(String username, final char[] passwordPlainText) {
     String passwordPlain = new String(passwordPlainText);
 
-    LOG.warn("Try to authenticate user '" + username + "' with passowrd: '" + new String(passwordPlainText) + "'");
-    String pwHash = new String(createPasswordHash(passwordPlainText));
-
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(PASSWORD).append(" FROM ").append(TABLE_NAME);
-    statementBuilder.append(" WHERE ").append(ACTIVE)
+    StringBuilder statementBuilder = new StringBuilder()
+        .append("SELECT ").append(PASSWORD).append(" FROM ").append(TABLE_NAME)
+        .append(" WHERE ").append(ACTIVE)
         .append(" AND ").append(USERNAME).append(" = :username");
+
     Object[][] result = SQL.select(statementBuilder.toString(), new NVPair("username", username));
-    LOG.warn("Resultset size: " + result.length);
 
     if (result.length == 1) {
       if ("empty".equalsIgnoreCase(passwordPlain)) {
-        return result[0][0].equals(passwordPlain);
+        LOG.warn("Authenicate user({}) with empty password. Do not use hash compare.", username);
+        final boolean authenticated = result[0][0].equals(passwordPlain);
+        LOG.warn("Authenicate user({}) with empty password. Do not use hash compare. Login successful:'{}'", username, authenticated);
+        return authenticated;
       }
       else {
-        return result[0][0].equals(pwHash);
+        String pwHash = new String(createPasswordHash(passwordPlainText));
+        final boolean authenicated = result[0][0].equals(pwHash);
+        if (LOG.isInfoEnabled()) {
+          LOG.warn("Authenicate user({}). Login successful:'{}'", username, authenicated);
+        }
+        return authenicated;
       }
     }
     return false;

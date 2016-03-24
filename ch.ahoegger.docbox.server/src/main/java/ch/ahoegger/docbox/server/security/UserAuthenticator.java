@@ -52,7 +52,7 @@ public class UserAuthenticator {
     }
 
     if (!isAuthRequest(req)) {
-      LOG.warn("Authenicator: not auth request.");
+      LOG.debug("Authenicator: not auth request.");
       return false;
     }
 
@@ -74,7 +74,6 @@ public class UserAuthenticator {
   protected void handleAuthRequest(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, ServletException {
     final Entry<String, char[]> credentials = readCredentials(req);
     if (credentials == null) {
-      LOG.warn("Authenicator: credentials null.");
       handleForbidden(ICredentialVerifier.AUTH_CREDENTIALS_REQUIRED, resp);
       return;
     }
@@ -85,7 +84,6 @@ public class UserAuthenticator {
     resp.setDateHeader("Expires", 0); // prevents caching at the proxy server
 
     final int status = m_config.getCredentialVerifier().verify(credentials.getKey(), credentials.getValue());
-    LOG.warn("Authenicator: auth status: " + status);
     if (status != ICredentialVerifier.AUTH_OK) {
       handleForbidden(status, resp);
     }

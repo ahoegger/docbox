@@ -9,12 +9,12 @@
 
   <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
     <!-- Sample for Tomcat Log Folder -->
-    <file>/var/lib/tomcat8/logs/docbox.server.log</file>
-<!--         <file>${catalina.base}/logs/ch.ahoegger.docbox.ch.ahoegger.docbox.server.log</file> -->
+<!--     <file>/var/lib/tomcat8/logs/docbox.server.log</file> -->
+        <file>${catalina.base}/logs/docbox.server.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-<!--       <fileNamePattern>${catalina.base}/logs/docbox.server-%d{yyyy-MM-dd}.log</fileNamePattern> -->
-      <fileNamePattern>/var/lib/tomcat8/logs/docbox.server-%d{yyyy-MM-dd}.log</fileNamePattern>
-      <maxHistory>50</maxHistory>
+       <fileNamePattern>${catalina.base}/logs/docbox.server-%d{yyyy-MM-dd}.log</fileNamePattern> 
+<!--       <fileNamePattern>/var/lib/tomcat8/logs/docbox.server-%d{yyyy-MM-dd}.log</fileNamePattern> -->
+      <maxHistory>20</maxHistory>
     </rollingPolicy>
     <encoder>
       <pattern>${logPattern}</pattern>
@@ -25,7 +25,7 @@
     <appender-ref ref="FILE" />
   </root>
 
-  <logger name="org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.StatementProcessor" level="WARN" />
+  <logger name="org.eclipse.scout.rt.server.jdbc.internal.exec.StatementProcessor" level="WARN" />
   <logger name="org.eclipse.scout.rt.shared.services.common.exceptionhandler.LogExceptionHandlerService" level="WARN" />
   <logger name="org.eclipse.scout.rt.platform.internal.BeanFilter" level="WARN" />
 

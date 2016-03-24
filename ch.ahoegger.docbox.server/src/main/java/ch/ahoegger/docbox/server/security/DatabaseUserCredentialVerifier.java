@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
  * @author aho
  */
 public class DatabaseUserCredentialVerifier implements ICredentialVerifier {
+  @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(DatabaseUserCredentialVerifier.class);
 
   @Override
@@ -35,9 +36,7 @@ public class DatabaseUserCredentialVerifier implements ICredentialVerifier {
 
         final String user = username.toLowerCase(NlsLocale.get());
 
-        final boolean authenticated = BEANS.get(SecurityService.class).authenticate(user, password);
-        LOG.warn("Authenicator: authenicated - " + authenticated);
-        if (authenticated) {
+        if (BEANS.get(SecurityService.class).authenticate(user, password)) {
           return AUTH_OK;
         }
         return AUTH_FORBIDDEN;
