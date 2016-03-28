@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
@@ -72,12 +73,18 @@ public class PartnerService implements IPartnerService, IPartnerTable {
 
   @Override
   public PartnerFormData load(PartnerFormData formData) {
+    BooleanHolder exists = new BooleanHolder();
     StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(SqlFramentBuilder.columns(NAME, DESCRIPTION, START_DATE, END_DATE)));
+    statementBuilder.append("SELECT TRUE, ").append(SqlFramentBuilder.columns(SqlFramentBuilder.columns(NAME, DESCRIPTION, START_DATE, END_DATE)));
     statementBuilder.append(" FROM ").append(TABLE_NAME);
     statementBuilder.append(" WHERE ").append(PARTNER_NR).append(" = :partnerId");
-    statementBuilder.append(" INTO :name, :description, :startDate, :endDate");
-    SQL.selectInto(statementBuilder.toString(), formData);
+    statementBuilder.append(" INTO :exists, :name, :description, :startDate, :endDate");
+    SQL.selectInto(statementBuilder.toString(),
+        new NVPair("exists", exists),
+        formData);
+    if (exists.getValue() == null) {
+      return null;
+    }
     return formData;
   }
 
