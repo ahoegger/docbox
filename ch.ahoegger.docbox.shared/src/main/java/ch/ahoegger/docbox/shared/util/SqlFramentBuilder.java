@@ -1,4 +1,4 @@
-package ch.ahoegger.docbox.server.database;
+package ch.ahoegger.docbox.shared.util;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

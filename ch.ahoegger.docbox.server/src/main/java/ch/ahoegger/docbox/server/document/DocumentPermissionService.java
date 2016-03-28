@@ -13,10 +13,10 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
-import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 import ch.ahoegger.docbox.shared.security.permission.IPermissionService;
+import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
  * <h3>{@link DocumentPermissionService}</h3>

@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.ServerSession;
-import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
@@ -35,6 +34,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
 import ch.ahoegger.docbox.shared.document.IDocumentTable;
 import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
+import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
  * <h3>{@link DocumentService}</h3>

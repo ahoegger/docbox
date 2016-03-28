@@ -11,9 +11,9 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 
-import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.security.permission.IDefaultPermissionTable;
+import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
  * <h3>{@link DefaultPermissionService}</h3>

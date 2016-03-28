@@ -7,13 +7,13 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 
-import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.server.document.DocumentCategoryService;
 import ch.ahoegger.docbox.shared.ISequenceTable;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.category.CategoryFormData;
 import ch.ahoegger.docbox.shared.category.ICategoryService;
 import ch.ahoegger.docbox.shared.category.ICategoryTable;
+import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
  * <h3>{@link CategoryService}</h3>

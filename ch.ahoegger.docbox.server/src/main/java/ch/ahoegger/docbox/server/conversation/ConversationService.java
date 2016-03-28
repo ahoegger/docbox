@@ -8,12 +8,12 @@ import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 
-import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.shared.ISequenceTable;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.conversation.ConversationFormData;
 import ch.ahoegger.docbox.shared.conversation.IConversationService;
 import ch.ahoegger.docbox.shared.conversation.IConversationTable;
+import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
  * <h3>{@link ConversationService}</h3>

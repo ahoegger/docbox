@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.server.jdbc.lookup.AbstractSqlLookupService;
 
-import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.shared.conversation.IConversationLookupService;
 import ch.ahoegger.docbox.shared.conversation.IConversationTable;
+import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
  * <h3>{@link ConversationLookupService}</h3>

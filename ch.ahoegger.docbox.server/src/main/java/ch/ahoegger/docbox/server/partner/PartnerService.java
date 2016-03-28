@@ -12,7 +12,6 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
-import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.server.document.DocumentPartnerService;
 import ch.ahoegger.docbox.shared.ISequenceTable;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
@@ -21,6 +20,7 @@ import ch.ahoegger.docbox.shared.partner.IPartnerService;
 import ch.ahoegger.docbox.shared.partner.IPartnerTable;
 import ch.ahoegger.docbox.shared.partner.Partner;
 import ch.ahoegger.docbox.shared.partner.PartnerFormData;
+import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
  * <h3>{@link PartnerService}</h3>

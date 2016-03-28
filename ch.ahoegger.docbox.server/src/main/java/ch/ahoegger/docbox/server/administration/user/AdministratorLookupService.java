@@ -2,9 +2,9 @@ package ch.ahoegger.docbox.server.administration.user;
 
 import org.eclipse.scout.rt.server.jdbc.lookup.AbstractSqlLookupService;
 
-import ch.ahoegger.docbox.server.database.SqlFramentBuilder;
 import ch.ahoegger.docbox.shared.administration.user.IAdministratorLookupService;
 import ch.ahoegger.docbox.shared.administration.user.IUserTable;
+import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
  * <h3>{@link AdministratorLookupService}</h3>
