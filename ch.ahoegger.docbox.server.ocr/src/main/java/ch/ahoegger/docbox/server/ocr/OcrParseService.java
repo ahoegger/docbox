@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,13 +45,25 @@ public class OcrParseService {
 
   public String parsePdf(InputStream pdfInputStream) {
     String parsedContent;
+    List<Path> tifFiles = CollectionUtility.emptyArrayList();
     try {
-      List<Path> tifs = pdfToTif(pdfInputStream);
-      parsedContent = computeText(tifs);
+      tifFiles = pdfToTif(pdfInputStream);
+      parsedContent = computeText(tifFiles);
     }
     catch (IOException e) {
       throw new ProcessingException(new ProcessingStatus("Could not read text form pdf.", e, 0, IStatus.ERROR));
     }
+    finally {
+      for (Path tifFile : tifFiles) {
+        try {
+          Files.deleteIfExists(tifFile);
+        }
+        catch (IOException e) {
+          // void
+        }
+      }
+    }
+
     return parsedContent;
   }
 
@@ -73,8 +86,8 @@ public class OcrParseService {
 
     List<Path> tiffPaths = new ArrayList<>();
     OutputStream os = null;
+    PDDocument pddoc = null;
     try {
-      PDDocument pddoc = null;
       pddoc = PDDocument.load(pdfInput);
       PDFRenderer pdfRenderer = new PDFRenderer(pddoc);
       Path workingDirectory = getWorkingDirectory();
@@ -90,6 +103,9 @@ public class OcrParseService {
     finally {
       if (os != null) {
         os.close();
+      }
+      if (pddoc != null) {
+        pddoc.close();
       }
     }
     return tiffPaths;
@@ -175,6 +191,8 @@ public class OcrParseService {
 
   public static class TessdataDirectoryProperty extends AbstractConfigProperty<Path> {
 
+    public static final String BUILD_REPLACEMENT_VAR = "${docbox.tesserarct.tessdata}";
+
     @Override
     public String getKey() {
       return "docbox.tesserarct.tessdata";
@@ -182,12 +200,17 @@ public class OcrParseService {
 
     @Override
     protected Path getDefaultValue() {
-      return Paths.get("/var/lib/tesseract/tessdata");
+      return Paths.get("C:/tesseract/tessdata");
     }
 
     @Override
     protected Path parse(String value) {
-      return Paths.get(value);
+      if (BUILD_REPLACEMENT_VAR.equals(value)) {
+        return getDefaultValue();
+      }
+      else {
+        return Paths.get(value);
+      }
     }
   }
 
