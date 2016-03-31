@@ -35,8 +35,6 @@
 		<module>../ch.ahoegger.docbox.server.app.war</module>
 		<module>../ch.ahoegger.docbox.ui.html</module>
 		<module>../ch.ahoegger.docbox.ui.html.app.war</module>
-		<module>zzz.ahoegger.docbox.ocr</module>
-		<module>ch.ahoegger.docbox.server.ocr</module>
 	</modules>
 
 	<!-- <repositories> -->
@@ -110,6 +108,7 @@
 				<version>1.0.4</version>
 			</dependency>
 		</dependencies>
+		
 
 
 	</dependencyManagement>
