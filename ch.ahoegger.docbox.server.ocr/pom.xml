@@ -8,7 +8,6 @@
 		<relativePath>../ch.ahoegger.docbox.parent/pom.xml</relativePath>
 
 	</parent>
-	<groupId>ch.ahoegger.docbox</groupId>
 	<artifactId>ch.ahoegger.docbox.server.ocr</artifactId>
 	<name>Docbox Server OCR</name>
 	<description>Ocr Support for docbox</description>
