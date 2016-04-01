@@ -1,7 +1,6 @@
 package ch.ahoegger.docbox.server.ocr;
 
 import static org.bytedeco.javacpp.lept.pixDestroy;
-import static org.bytedeco.javacpp.lept.pixRead;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,6 +24,7 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.tools.imageio.ImageIOUtil;
 import org.bytedeco.javacpp.BytePointer;
+import org.bytedeco.javacpp.lept;
 import org.bytedeco.javacpp.lept.PIX;
 import org.bytedeco.javacpp.tesseract.TessBaseAPI;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -89,6 +89,8 @@ public class OcrParseService {
       }
       else {
         tifFiles = pdfToTif(pddoc, workingDirectory);
+        pddoc.close();
+        pddoc = null;
         result.setText(computeText(tifFiles, tessdataDirectory));
         result.setOcrParsed(true);
       }
@@ -112,6 +114,7 @@ public class OcrParseService {
           Files.walkFileTree(workingDirectory, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
+              System.out.println("about to delete: " + filePath);
               Files.delete(filePath);
               return FileVisitResult.CONTINUE;
             }
@@ -121,11 +124,11 @@ public class OcrParseService {
               Files.delete(dir);
               return FileVisitResult.CONTINUE;
             }
+
           });
         }
         catch (IOException e) {
           LOG.warn("Could not delete working directory '" + workingDirectory + "'.", e);
-          // void
         }
       }
     }
@@ -139,22 +142,27 @@ public class OcrParseService {
 
   protected synchronized List<Path> pdfToTif(PDDocument pddoc, Path workingDirectory) throws IOException {
     List<Path> tiffPaths = new ArrayList<>();
-    OutputStream os = null;
-    try {
 
-      PDFRenderer pdfRenderer = new PDFRenderer(pddoc);
-      for (int i = 0; i < pddoc.getPages().getCount(); i++) {
+    PDFRenderer pdfRenderer = new PDFRenderer(pddoc);
+    for (int i = 0; i < pddoc.getPages().getCount(); i++) {
+      OutputStream os = null;
+      FileChannel channel = null;
+      try {
         Path tifPath = Files.createFile(workingDirectory.resolve("TIFF_" + i + ".tiff"));
         tiffPaths.add(tifPath);
-        FileChannel channel = FileChannel.open(tifPath, StandardOpenOption.WRITE);
+        channel = FileChannel.open(tifPath, StandardOpenOption.WRITE);
         os = Channels.newOutputStream(channel);
         // suffix in filename will be used as the file format
         ImageIOUtil.writeImage(pdfRenderer.renderImageWithDPI(i, 300, ImageType.RGB), "tiff", os, 300);
       }
-    }
-    finally {
-      if (os != null) {
-        os.close();
+      finally {
+        if (channel != null) {
+          channel.close();
+        }
+        if (os != null) {
+          os.flush();
+          os.close();
+        }
       }
     }
     return tiffPaths;
@@ -164,47 +172,43 @@ public class OcrParseService {
     TessBaseAPI api = null;
     PIX image = null;
     BytePointer outText = null;
-    try {
-      api = new TessBaseAPI();
-      if (api.Init(tessdataDirectory.toString(), CONFIG.getPropertyValue(TesseractLanguageProperty.class)) != 0) {
-        throw new ProcessingException(new ProcessingStatus("Could not initialize tesseract.", IStatus.ERROR));
+
+    StringBuilder result = new StringBuilder();
+    for (Path tifPath : tifPaths) {
+      // Open input image with leptonica library
+      // Get OCR result
+      try {
+        api = new TessBaseAPI();
+        if (api.Init(tessdataDirectory.toString(), CONFIG.getPropertyValue(TesseractLanguageProperty.class)) != 0) {
+          throw new ProcessingException(new ProcessingStatus("Could not initialize tesseract.", IStatus.ERROR));
+        }
+        image = lept.pixRead(tifPath.toString());
+        api.SetImage(image);
+        outText = api.GetUTF8Text();
+        if (outText != null) {
+          result.append(outText.getString());
+        }
+      }
+      finally {
+        if (api != null) {
+          api.Clear();
+          api.End();
+          try {
+            api.close();
+          }
+          catch (Exception e) {
+            throw new ProcessingException(new ProcessingStatus("Could not close api tesseract.", e, 0, IStatus.ERROR));
+          }
+        }
+        if (outText != null) {
+          outText.deallocate();
+        }
+        pixDestroy(image);
+
       }
 
-      StringBuilder result = new StringBuilder();
-      for (Path tifPath : tifPaths) {
-        // Open input image with leptonica library
-        image = pixRead(tifPath.toString());
-        api.SetImage(image);
-        // Get OCR result
-        outText = api.GetUTF8Text();
-        result.append(outText.getString());
-      }
-      return result.toString();
     }
-    finally {
-      // Destroy used object and release memory
-      if (outText != null) {
-        outText.deallocate();
-        try {
-          outText.close();
-        }
-        catch (Exception e) {
-          // void
-          LOG.warn("Could not close tesseract outText.", e);
-        }
-      }
-      if (api != null) {
-        api.End();
-        try {
-          api.close();
-        }
-        catch (Exception e) {
-          // void
-          LOG.warn("Could not close tesseract api.", e);
-        }
-      }
-      pixDestroy(image);
-    }
+    return result.toString();
 
   }
 

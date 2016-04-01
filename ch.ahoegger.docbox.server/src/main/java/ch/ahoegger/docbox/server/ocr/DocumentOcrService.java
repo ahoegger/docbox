@@ -37,6 +37,7 @@ public class DocumentOcrService implements IDocumentOcrService, IDocumentOcrTabl
     boolean ocrParsed = false;
     boolean notParsable = false;
     try {
+      LOG.debug("About to ocr parse file:'{}' with id '{}'", document.getFilename(), documentId);
       OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(document);
       text = parseResult.getText();
       ocrParsed = parseResult.isOcrParsed();
