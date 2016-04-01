@@ -11,13 +11,13 @@ public class StatementFactory {
     StringBuilder columnBuilder = new StringBuilder("(");
     StringBuilder valueBuilder = new StringBuilder("(");
     for (int i = 0; i < columns.size(); i++) {
-      IColumn column = columns.get(i);
+      IColumn<?> column = columns.get(i);
       if (i > 0) {
         columnBuilder.append(", ");
         valueBuilder.append(", ");
       }
       columnBuilder.append(column.getColumnName());
-      valueBuilder.append(column.formatValue(row[i]));
+      valueBuilder.append(column.formatValueRaw(row[i]));
     }
     columnBuilder.append(")");
     valueBuilder.append(")");

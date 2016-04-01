@@ -5,14 +5,14 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 /**
  *
  */
-public class StringColumn extends AbstractColumn<String> {
+public class ClobColumn extends AbstractColumn<String> {
 
   /**
    * @param columnName
    * @param value
    */
-  public StringColumn(String columnName) {
-    super(columnName, IColumn.TYPE.VARCHAR);
+  public ClobColumn(String columnName) {
+    super(columnName, IColumn.TYPE.CLOB);
   }
 
   @Override
@@ -25,7 +25,6 @@ public class StringColumn extends AbstractColumn<String> {
     if (value == null) {
       return "NULL";
     }
-    value = value.replace("'", "''");
     return "'" + value + "'";
   }
 }

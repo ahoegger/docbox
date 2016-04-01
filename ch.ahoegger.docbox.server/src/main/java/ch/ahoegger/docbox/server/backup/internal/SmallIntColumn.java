@@ -5,19 +5,18 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 /**
  *
  */
-public class DoubleColumn extends AbstractColumn<Double> {
+public class SmallIntColumn extends AbstractColumn<Integer> {
 
   /**
    * @param columnName
    * @param value
    */
-  public DoubleColumn(String columnName) {
-    super(columnName, IColumn.TYPE.DOUBLE);
+  public SmallIntColumn(String columnName) {
+    super(columnName, IColumn.TYPE.SMALLINT);
   }
 
   @Override
   public String formatValueRaw(Object o) {
-    return formatValue(TypeCastUtility.castValue(o, Double.class));
+    return formatValue(TypeCastUtility.castValue(o, Integer.class));
   }
-
 }

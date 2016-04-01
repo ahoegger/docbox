@@ -82,6 +82,24 @@ public class DocumentFormData extends AbstractFormData {
     return getPropertyByClass(DocumentPathProperty.class);
   }
 
+  /**
+   * access method for property HasOcrText.
+   */
+  public Boolean getHasOcrText() {
+    return getHasOcrTextProperty().getValue();
+  }
+
+  /**
+   * access method for property HasOcrText.
+   */
+  public void setHasOcrText(Boolean hasOcrText) {
+    getHasOcrTextProperty().setValue(hasOcrText);
+  }
+
+  public HasOcrTextProperty getHasOcrTextProperty() {
+    return getPropertyByClass(HasOcrTextProperty.class);
+  }
+
   public OriginalStorage getOriginalStorage() {
     return getFieldByClass(OriginalStorage.class);
   }
@@ -138,6 +156,11 @@ public class DocumentFormData extends AbstractFormData {
   }
 
   public static class DocumentPathProperty extends AbstractPropertyData<String> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class HasOcrTextProperty extends AbstractPropertyData<Boolean> {
 
     private static final long serialVersionUID = 1L;
   }

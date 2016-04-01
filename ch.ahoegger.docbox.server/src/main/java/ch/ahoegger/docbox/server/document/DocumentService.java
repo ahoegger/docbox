@@ -3,6 +3,7 @@ package ch.ahoegger.docbox.server.document;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -39,6 +40,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentPartnerTable;
 import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
 import ch.ahoegger.docbox.shared.document.IDocumentTable;
+import ch.ahoegger.docbox.shared.ocr.IDocumentOcrTable;
 import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
 import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
@@ -63,6 +65,10 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     sqlBuilder.append(" LEFT OUTER JOIN ").append(IDocumentPermissionTable.TABLE_NAME).append(" AS ").append(IDocumentPermissionTable.TABLE_ALIAS + "_OWNER")
         .append(" ON ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_OWNER", IDocumentPermissionTable.DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR))
         .append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_OWNER", IDocumentPermissionTable.PERMISSION)).append(" = ").append(IDocumentPermissionTable.PERMISSION_OWNER);
+
+    // join with ocr
+    sqlBuilder.append(" LEFT OUTER JOIN ").append(IDocumentOcrTable.TABLE_NAME).append(" AS ").append(IDocumentOcrTable.TABLE_ALIAS)
+        .append(" ON ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.DOCUMENT_NR));
 
     sqlBuilder.append(" WHERE 1 = 1");
     // permission
@@ -120,6 +126,19 @@ public class DocumentService implements IDocumentService, IDocumentTable {
           .append(" = :owner");
 
     }
+
+    // ocr search criteria
+    List<String> lowerCaseOcrSearchTerms = Arrays.stream(formData.getOcrSearchTable().getRows())
+        .map(r -> r.getSearchText())
+        .filter(text -> StringUtility.hasText(text))
+        .map(text -> text.toLowerCase())
+        .collect(Collectors.toList());
+    if (lowerCaseOcrSearchTerms.size() > 0) {
+      for (String ocrSearchItem : lowerCaseOcrSearchTerms) {
+        sqlBuilder.append(" AND ").append(SqlFramentBuilder.whereStringContains(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.TEXT, ocrSearchItem));
+      }
+    }
+
     sqlBuilder.append(" INTO ");
     sqlBuilder.append(":{td.documentId}, ");
     sqlBuilder.append(":{td.abstract}, ");
@@ -256,6 +275,25 @@ public class DocumentService implements IDocumentService, IDocumentTable {
             (p1, p2) -> Math.max(p1, p2)));
     BEANS.get(DocumentPermissionService.class).updateDocumentPermissions(formData.getDocumentId(), permissions);
 
+    // ocr
+
+    Jobs.schedule(new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        DocumentOcrService service = BEANS.get(DocumentOcrService.class);
+        if (formData.getParseOcr().getValue()) {
+          if (!service.exists(formData.getDocumentId())) {
+            service.create(formData.getDocumentId());
+          }
+        }
+        else {
+          service.delete(formData.getDocumentId());
+        }
+      }
+    }, Jobs.newInput()
+        .withRunContext(ServerRunContexts.empty()
+            .withTransactionScope(TransactionScope.REQUIRES_NEW)));
+
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
   }
@@ -290,6 +328,13 @@ public class DocumentService implements IDocumentService, IDocumentTable {
       PermissionsRowData row = formData.getPermissions().addRow();
       row.setUser(permission.getKey());
       row.setPermission(permission.getValue());
+    }
+    // ocr
+    if (formData.getParseOcr().getValue()) {
+      formData.setHasOcrText(BEANS.get(DocumentOcrService.class).exists(formData.getDocumentId()));
+    }
+    else {
+      formData.setHasOcrText(false);
     }
 
     return formData;

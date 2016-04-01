@@ -11,6 +11,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
 import ch.ahoegger.docbox.shared.ocr.IDocumentOcrService;
@@ -25,6 +26,10 @@ import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 @ApplicationScoped
 public class DocumentOcrService implements IDocumentOcrService, IDocumentOcrTable {
   private static final Logger LOG = LoggerFactory.getLogger(DocumentOcrService.class);
+
+  public void create(Long documentId) {
+    create(documentId, BEANS.get(DocumentStoreService.class).getDocument(documentId));
+  }
 
   @RemoteServiceAccessDenied
   public void create(Long documentId, BinaryResource document) {
@@ -71,5 +76,38 @@ public class DocumentOcrService implements IDocumentOcrService, IDocumentOcrTabl
       return null;
     }
     return formData;
+  }
+
+  /**
+   * @param documentId
+   * @return
+   */
+  public Boolean exists(Long documentId) {
+    BooleanHolder exists = new BooleanHolder();
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("SELECT TRUE ");
+    statementBuilder.append(" FROM ").append(TABLE_NAME);
+    statementBuilder.append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
+    statementBuilder.append(" INTO :exists");
+    SQL.selectInto(statementBuilder.toString(),
+        new NVPair("documentId", documentId),
+        new NVPair("exists", exists));
+    if (exists.getValue() == null) {
+      return Boolean.FALSE;
+    }
+    return Boolean.TRUE;
+  }
+
+  /**
+   * @param documentId
+   * @param value
+   */
+  public void delete(Long documentId) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
+    SQL.delete(statementBuilder.toString(), new NVPair("documentId", documentId));
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
   }
 }

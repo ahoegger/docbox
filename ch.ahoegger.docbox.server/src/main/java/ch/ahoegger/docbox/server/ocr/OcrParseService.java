@@ -72,7 +72,7 @@ public class OcrParseService {
     return parsePdf(pdfInputStream, CONFIG.getPropertyValue(TessdataDirectoryProperty.class));
   }
 
-  public OcrParseResult parsePdf(InputStream pdfInputStream, Path tessdataDirectory) {
+  public synchronized OcrParseResult parsePdf(InputStream pdfInputStream, Path tessdataDirectory) {
     Path workingDirectory = null;
     PDDocument pddoc = null;
     try {
@@ -131,13 +131,13 @@ public class OcrParseService {
     }
   }
 
-  protected String getTextOfPdf(PDDocument doc) throws IOException {
+  protected synchronized String getTextOfPdf(PDDocument doc) throws IOException {
     PDFTextStripper textStripper = new PDFTextStripper();
     String content = textStripper.getText(doc);
     return content;
   }
 
-  protected List<Path> pdfToTif(PDDocument pddoc, Path workingDirectory) throws IOException {
+  protected synchronized List<Path> pdfToTif(PDDocument pddoc, Path workingDirectory) throws IOException {
     List<Path> tiffPaths = new ArrayList<>();
     OutputStream os = null;
     try {
@@ -160,7 +160,7 @@ public class OcrParseService {
     return tiffPaths;
   }
 
-  protected String computeText(List<Path> tifPaths, Path tessdataDirectory) throws IOException {
+  protected synchronized String computeText(List<Path> tifPaths, Path tessdataDirectory) throws IOException {
     TessBaseAPI api = null;
     PIX image = null;
     BytePointer outText = null;

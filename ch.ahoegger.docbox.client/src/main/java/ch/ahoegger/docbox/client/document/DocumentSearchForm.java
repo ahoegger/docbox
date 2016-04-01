@@ -29,6 +29,8 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.ResetButton;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchButton;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox;
+import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.OcrBox;
+import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.OcrBox.OcrSearchTableField;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.AbstractField;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.ActiveBox;
@@ -38,6 +40,7 @@ import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBo
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.DocumentDateBox.DocumentDateToField;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.OwnerField;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.PartnerField;
+import ch.ahoegger.docbox.client.document.field.AbstractOcrSearchTableField;
 import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
 import ch.ahoegger.docbox.shared.conversation.ConversationLookupCall;
 import ch.ahoegger.docbox.shared.document.DocumentActiveState;
@@ -53,7 +56,7 @@ import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
 public class DocumentSearchForm extends AbstractSearchForm {
 
   public DocumentSearchForm() {
-    setHandler(new SearchHandler());
+    setHandler(new DocumentSearchForm.SearchHandler());
   }
 
   public SearchBox getSearchBox() {
@@ -92,6 +95,14 @@ public class DocumentSearchForm extends AbstractSearchForm {
     return getFieldByClass(ActiveBox.class);
   }
 
+  public OcrSearchTableField getOcrSearchTableField() {
+    return getFieldByClass(OcrSearchTableField.class);
+  }
+
+  public OcrBox getOcrBox() {
+    return getFieldByClass(OcrBox.class);
+  }
+
   public OwnerField getOwnerField() {
     return getFieldByClass(OwnerField.class);
   }
@@ -109,7 +120,7 @@ public class DocumentSearchForm extends AbstractSearchForm {
     @Order(1000)
     public class SearchTabBox extends AbstractTabBox {
 
-      @Order(1000)
+      @Order(10)
       public class SearchBox extends AbstractGroupBox {
         @Override
         protected String getConfiguredLabel() {
@@ -118,6 +129,7 @@ public class DocumentSearchForm extends AbstractSearchForm {
 
         @Order(1000)
         public class AbstractField extends AbstractStringField {
+
           @Override
           protected String getConfiguredLabel() {
             return TEXTS.get("Abstract");
@@ -250,6 +262,22 @@ public class DocumentSearchForm extends AbstractSearchForm {
 
       }
 
+      @Order(20)
+      public class OcrBox extends AbstractGroupBox {
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("Content");
+        }
+
+        @Order(1000)
+        public class OcrSearchTableField extends AbstractOcrSearchTableField {
+          @Override
+          protected int getConfiguredGridH() {
+            return 6;
+          }
+        }
+
+      }
     }
 
     @Order(200)

@@ -83,15 +83,7 @@ public class DocumentForm extends AbstractForm {
 
   private Long m_documentId;
   private String m_documentPath;
-  private boolean m_addingFields = false;
-
-  @Override
-  public boolean isShowing() {
-    if (m_addingFields) {
-      return false;
-    }
-    return super.isShowing();
-  }
+  private Boolean m_hasOcrText;
 
   @Override
   protected String getConfiguredTitle() {
@@ -148,6 +140,16 @@ public class DocumentForm extends AbstractForm {
   @FormData
   public void setDocumentPath(String documentPath) {
     m_documentPath = documentPath;
+  }
+
+  @FormData
+  public Boolean getHasOcrText() {
+    return m_hasOcrText;
+  }
+
+  @FormData
+  public void setHasOcrText(Boolean hasOcrText) {
+    m_hasOcrText = hasOcrText;
   }
 
   public FieldBox getFieldBox() {
@@ -631,6 +633,8 @@ public class DocumentForm extends AbstractForm {
       importFormData(formData);
 
       setEnabledGranted(false);
+      getShowOcrButton().setEnabled(getHasOcrText());
+      getShowOcrButton().setVisible(getHasOcrText());
     }
 
     @Override
@@ -647,6 +651,7 @@ public class DocumentForm extends AbstractForm {
       getDocumentField().setVisible(true);
       getDocumentField().setMandatory(true);
       getOpenHtmlField().setVisible(false);
+      getShowOcrButton().setVisible(false);
     }
 
     @Override
@@ -664,6 +669,7 @@ public class DocumentForm extends AbstractForm {
       exportFormData(formData);
       formData = BEANS.get(IDocumentService.class).load(formData);
       importFormData(formData);
+      getShowOcrButton().setVisible(getHasOcrText());
     }
 
     @Override

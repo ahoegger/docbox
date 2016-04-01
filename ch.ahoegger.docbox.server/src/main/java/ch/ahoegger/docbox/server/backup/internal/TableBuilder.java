@@ -55,6 +55,15 @@ public class TableBuilder {
         else if (CompareUtility.equals(IColumn.TYPE.BIGINT.toString(), columnType)) {
           columns.add(new DecimalColumn((String) columnResult[0]));
         }
+        else if (CompareUtility.equals(IColumn.TYPE.BOOLEAN.toString(), columnType)) {
+          columns.add(new BooleanColumn((String) columnResult[0]));
+        }
+        else if (CompareUtility.equals(IColumn.TYPE.CLOB.toString(), columnType)) {
+          columns.add(new ClobColumn((String) columnResult[0]));
+        }
+        else if (CompareUtility.equals(IColumn.TYPE.SMALLINT.toString(), columnType)) {
+          columns.add(new SmallIntColumn((String) columnResult[0]));
+        }
         else {
           errorStatusList.add(new Status("Column type '" + columnType + "' could not be resolved. Column '" + columnResult[0] + "' will be ignored!", IStatus.ERROR));
         }

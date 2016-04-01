@@ -1,11 +1,14 @@
 package ch.ahoegger.docbox.server.backup.internal;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 /**
  *
  */
-public class DateColumn extends AbstractColumn {
+public class DateColumn extends AbstractColumn<Date> {
 
   public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -18,7 +21,12 @@ public class DateColumn extends AbstractColumn {
   }
 
   @Override
-  public String formatValue(Object value) {
+  public String formatValueRaw(Object o) {
+    return formatValue(TypeCastUtility.castValue(o, Date.class));
+  }
+
+  @Override
+  public String formatValue(Date value) {
     if (value == null) {
       return "NULL";
     }

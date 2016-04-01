@@ -5,8 +5,10 @@ import java.util.Date;
 
 import javax.annotation.Generated;
 
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 
 /**
  * <b>NOTE:</b><br>
@@ -35,6 +37,10 @@ public class DocumentSearchFormData extends AbstractFormData {
 
   public DocumentDateTo getDocumentDateTo() {
     return getFieldByClass(DocumentDateTo.class);
+  }
+
+  public OcrSearchTable getOcrSearchTable() {
+    return getFieldByClass(OcrSearchTable.class);
   }
 
   public Owner getOwner() {
@@ -68,6 +74,60 @@ public class DocumentSearchFormData extends AbstractFormData {
   public static class DocumentDateTo extends AbstractValueFieldData<Date> {
 
     private static final long serialVersionUID = 1L;
+  }
+
+  public static class OcrSearchTable extends AbstractTableFieldBeanData {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public OcrSearchTableRowData addRow() {
+      return (OcrSearchTableRowData) super.addRow();
+    }
+
+    @Override
+    public OcrSearchTableRowData addRow(int rowState) {
+      return (OcrSearchTableRowData) super.addRow(rowState);
+    }
+
+    @Override
+    public OcrSearchTableRowData createRow() {
+      return new OcrSearchTableRowData();
+    }
+
+    @Override
+    public Class<? extends AbstractTableRowData> getRowType() {
+      return OcrSearchTableRowData.class;
+    }
+
+    @Override
+    public OcrSearchTableRowData[] getRows() {
+      return (OcrSearchTableRowData[]) super.getRows();
+    }
+
+    @Override
+    public OcrSearchTableRowData rowAt(int index) {
+      return (OcrSearchTableRowData) super.rowAt(index);
+    }
+
+    public void setRows(OcrSearchTableRowData[] rows) {
+      super.setRows(rows);
+    }
+
+    public static class OcrSearchTableRowData extends AbstractTableRowData {
+
+      private static final long serialVersionUID = 1L;
+      public static final String searchText = "searchText";
+      private String m_searchText;
+
+      public String getSearchText() {
+        return m_searchText;
+      }
+
+      public void setSearchText(String newSearchText) {
+        m_searchText = newSearchText;
+      }
+    }
   }
 
   public static class Owner extends AbstractValueFieldData<String> {

@@ -71,7 +71,7 @@ public class DbDumpForm extends AbstractForm {
 
       @Override
       protected int getConfiguredGridH() {
-        return 20;
+        return 10;
       }
 
       @Override
@@ -96,6 +96,11 @@ public class DbDumpForm extends AbstractForm {
 
       @Override
       protected boolean getConfiguredMultilineText() {
+        return true;
+      }
+
+      @Override
+      protected boolean getConfiguredWrapText() {
         return true;
       }
     }

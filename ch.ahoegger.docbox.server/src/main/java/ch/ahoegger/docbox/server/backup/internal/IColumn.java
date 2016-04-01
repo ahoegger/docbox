@@ -3,16 +3,21 @@ package ch.ahoegger.docbox.server.backup.internal;
 /**
  *
  */
-public interface IColumn {
+public interface IColumn<T> {
   public static enum TYPE {
     DECIMAL,
     DOUBLE,
     DATE,
     VARCHAR,
-    BIGINT
+    BIGINT,
+    BOOLEAN,
+    CLOB,
+    SMALLINT
   }
 
-  String formatValue(Object value);
+  String formatValueRaw(Object o);
+
+  String formatValue(T value);
 
   String getColumnName();
 

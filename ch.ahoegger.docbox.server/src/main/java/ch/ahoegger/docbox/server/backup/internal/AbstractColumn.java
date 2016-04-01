@@ -3,7 +3,7 @@ package ch.ahoegger.docbox.server.backup.internal;
 /**
  *
  */
-public class AbstractColumn implements IColumn {
+public abstract class AbstractColumn<T> implements IColumn<T> {
 
   private String m_columnName;
   private final TYPE m_type;
@@ -24,7 +24,7 @@ public class AbstractColumn implements IColumn {
   }
 
   @Override
-  public String formatValue(Object value) {
+  public String formatValue(T value) {
     if (value != null) {
       return value.toString();
     }
