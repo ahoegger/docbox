@@ -39,4 +39,9 @@ public interface IDocumentService {
    */
   DocumentFormData create(DocumentFormData formData);
 
+  /**
+   *
+   */
+  void buildOcrOfMissingDocuments();
+
 }

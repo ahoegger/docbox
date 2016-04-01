@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -338,5 +339,31 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     }
 
     return formData;
+  }
+
+  @Override
+  public void buildOcrOfMissingDocuments() {
+    Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        StringBuilder statementBuilder = new StringBuilder();
+        statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR))
+            .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS)
+            .append(" LEFT JOIN ").append(IDocumentOcrTable.TABLE_NAME).append(" AS ").append(IDocumentOcrTable.TABLE_ALIAS)
+            .append(" ON ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.DOCUMENT_NR))
+            .append(" WHERE ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.DOCUMENT_NR)).append(" IS NULL")
+            .append(" AND ").append(PARSE_OCR);
+        Object[][] rawResult = SQL.select(statementBuilder.toString());
+
+        DocumentOcrService service = BEANS.get(DocumentOcrService.class);
+        List<Long> documentIds = Arrays.stream(rawResult).map(row -> TypeCastUtility.castValue(row[0], Long.class)).collect(Collectors.toList());
+        for (Long docId : documentIds) {
+          service.create(docId);
+        }
+      }
+    }, Jobs.newInput()
+        .withRunContext(ServerRunContexts.empty()
+            .withTransactionScope(TransactionScope.REQUIRES_NEW)));
   }
 }

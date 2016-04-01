@@ -633,6 +633,7 @@ public class DocumentForm extends AbstractForm {
       importFormData(formData);
 
       setEnabledGranted(false);
+      getShowOcrButton().setEnabledGranted(true);
       getShowOcrButton().setEnabled(getHasOcrText());
       getShowOcrButton().setVisible(getHasOcrText());
     }

@@ -110,4 +110,5 @@ public class DocumentOcrService implements IDocumentOcrService, IDocumentOcrTabl
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
   }
+
 }

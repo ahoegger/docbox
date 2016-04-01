@@ -25,6 +25,7 @@ import ch.ahoegger.docbox.client.search.SearchOutline;
 import ch.ahoegger.docbox.client.settings.SettingsOutline;
 import ch.ahoegger.docbox.client.work.WorkOutline;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
+import ch.ahoegger.docbox.shared.document.IDocumentService;
 import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 
 /**
@@ -106,6 +107,24 @@ public class Desktop extends AbstractDesktop {
       protected void execAction() {
         DbDumpForm form = new DbDumpForm();
         form.start();
+      }
+    }
+
+    @Order(750)
+    public class ForceOcrScanMenu extends AbstractMenu {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("ForceOCRScan");
+      }
+
+      @Override
+      protected boolean getConfiguredVisible() {
+        return ACCESS.check(new AdministratorPermission());
+      }
+
+      @Override
+      protected void execAction() {
+        BEANS.get(IDocumentService.class).buildOcrOfMissingDocuments();
       }
     }
 

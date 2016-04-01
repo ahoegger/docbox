@@ -32,7 +32,7 @@ public class DocumentDetailPage extends AbstractPageWithNodes {
     DocumentFormData formData = new DocumentFormData();
     formData.setDocumentId(getDocumentId());
 
-    BEANS.get(IDocumentService.class).load(formData);
+    formData = BEANS.get(IDocumentService.class).load(formData);
     String title = formData.getAbstract().getValue();
     if (StringUtility.isNullOrEmpty(title)) {
       title = TEXTS.get("Document");
