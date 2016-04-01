@@ -49,19 +49,19 @@ public class DocumentService_SearchByOwner extends AbstractTestWithDatabase {
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.add(Calendar.DAY_OF_MONTH, -110);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId01, "doc 01", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId01, "doc 01", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false);
     cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId02, "doc 02", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId02, "doc 02", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false);
     cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.add(Calendar.DAY_OF_WEEK, -1);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId03, "doc 03", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId03, "doc 03", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false);
     cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.add(Calendar.DAY_OF_WEEK, -20);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId04, "doc 04", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId05, "doc 05", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId04, "doc 04", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId05, "doc 05", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false);
 
     // permissions
     BEANS.get(DocumentPermissionTableTask.class).createDocumentPermissionRow(sqlService, username01, documentId01, IDocumentPermissionTable.PERMISSION_OWNER);

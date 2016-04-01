@@ -17,6 +17,8 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
+import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
@@ -26,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmartGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
+import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
@@ -49,8 +52,11 @@ import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.Categori
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.ConversationField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.DocumentDateField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.DocumentField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OpenHtmlField;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.LinksBox;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.LinksBox.OpenHtmlField;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.LinksBox.ShowOcrButton;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OriginalStorageField;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.ParseOcrField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PartnersField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PermissionsField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.ValidDateField;
@@ -60,6 +66,7 @@ import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI
 import ch.ahoegger.docbox.client.document.field.AbstractPartnerTableField;
 import ch.ahoegger.docbox.client.document.field.AbstractPartnerTableField.Table;
 import ch.ahoegger.docbox.client.document.field.AbstractPermissionTableField;
+import ch.ahoegger.docbox.client.document.ocr.DocumentOcrForm;
 import ch.ahoegger.docbox.shared.category.CategoryLookupCall;
 import ch.ahoegger.docbox.shared.category.ICategoryService;
 import ch.ahoegger.docbox.shared.conversation.ConversationLookupCall;
@@ -191,6 +198,18 @@ public class DocumentForm extends AbstractForm {
     return getFieldByClass(ConversationField.class);
   }
 
+  public ParseOcrField getParseOcrField() {
+    return getFieldByClass(ParseOcrField.class);
+  }
+
+  public LinksBox getLinksBox() {
+    return getFieldByClass(LinksBox.class);
+  }
+
+  public ShowOcrButton getShowOcrButton() {
+    return getFieldByClass(ShowOcrButton.class);
+  }
+
   public OkButton getOkButton() {
     return getFieldByClass(OkButton.class);
   }
@@ -223,17 +242,57 @@ public class DocumentForm extends AbstractForm {
       }
 
       @Order(20)
-      @FormData(sdkCommand = SdkCommand.IGNORE)
-      public class OpenHtmlField extends AbstractHtmlField {
+      public class LinksBox extends AbstractSequenceBox {
+        @Override
+        protected boolean getConfiguredLabelVisible() {
+          return false;
+        }
 
         @Override
-        protected void execInitField() {
-          StringBuilder linkBuilder = new StringBuilder();
-          linkBuilder.append(CONFIG.getPropertyValue(DocumentLinkURI.class));
-          linkBuilder.append("?").append(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class)).append("=").append(getDocumentId());
-          String encodedHtml = HTML.link(linkBuilder.toString(), TEXTS.get("Open")).addAttribute("target", "_blank").toEncodedHtml();
-          setValue(encodedHtml);
+        protected boolean getConfiguredAutoCheckFromTo() {
+          return false;
         }
+
+        @Order(10)
+        @FormData(sdkCommand = SdkCommand.IGNORE)
+        public class OpenHtmlField extends AbstractHtmlField {
+
+          @Override
+          protected void execInitField() {
+            StringBuilder linkBuilder = new StringBuilder();
+            linkBuilder.append(CONFIG.getPropertyValue(DocumentLinkURI.class));
+            linkBuilder.append("?").append(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class)).append("=").append(getDocumentId());
+            String encodedHtml = HTML.link(linkBuilder.toString(), TEXTS.get("Open")).addAttribute("target", "_blank").toEncodedHtml();
+            setValue(encodedHtml);
+          }
+        }
+
+        @Order(2000)
+        public class ShowOcrButton extends AbstractButton {
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("ShowParsedContent");
+          }
+
+          @Override
+          protected int getConfiguredDisplayStyle() {
+            return DISPLAY_STYLE_LINK;
+          }
+
+          @Override
+          protected boolean getConfiguredVisible() {
+            // TODO
+            return true;
+          }
+
+          @Override
+          protected void execClickAction() {
+            DocumentOcrForm form = new DocumentOcrForm();
+            form.setDocumentId(getDocumentId());
+            form.start();
+          }
+        }
+
       }
 
       @Order(30)
@@ -390,6 +449,14 @@ public class DocumentForm extends AbstractForm {
 
       }
 
+      @Order(75)
+      public class ParseOcrField extends AbstractBooleanField {
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("ParseContent");
+        }
+      }
+
       @Order(80)
       public class OriginalStorageField extends AbstractStringField {
         @Override
@@ -422,7 +489,7 @@ public class DocumentForm extends AbstractForm {
 
         @Override
         protected int getConfiguredGridH() {
-          return 8;
+          return 9;
         }
 
         @Override

@@ -42,13 +42,13 @@ public class DocumentService_SearchByAbstractTest extends AbstractTestWithDataba
 
     Calendar cal = Calendar.getInstance();
     cal.set(1982, 04, 20);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId01, "Cats Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId01, "Cats Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false);
     cal.set(1982, 04, 21);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId02, "Abstract Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId02, "Abstract Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false);
     cal.set(1982, 04, 22);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId03, "Dogs Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId03, "Dogs Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false);
     cal.set(1982, 04, 23);
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId04, "All fish are wet", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId04, "All fish are wet", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false);
   }
 
   @Test

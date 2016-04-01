@@ -10,9 +10,14 @@ import java.util.stream.Collectors;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.slf4j.Logger;
@@ -20,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.ServerSession;
 import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
+import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
 import ch.ahoegger.docbox.shared.ISequenceTable;
@@ -148,6 +154,7 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     formData.getCapturedDate().setValue(cal.getTime());
+    formData.getParseOcr().setValue(true);
     Map<String, Integer> defaultPermissions = BEANS.get(DefaultPermissionService.class).getDefaultPermissions();
     defaultPermissions.remove(ServerSession.get().getUserId());
     defaultPermissions.put(ServerSession.get().getUserId(), IDocumentPermissionTable.PERMISSION_OWNER);
@@ -161,11 +168,12 @@ public class DocumentService implements IDocumentService, IDocumentTable {
   }
 
   @Override
-  public DocumentFormData create(DocumentFormData formData) {
+  public DocumentFormData create(final DocumentFormData formData) {
     // create document
     Long documentId = SQL.getSequenceNextval(ISequenceTable.TABLE_NAME);
     formData.setDocumentId(documentId);
-    String documentPath = BEANS.get(DocumentStoreService.class).store(formData.getDocument().getValue(), formData.getCapturedDate().getValue(), documentId);
+    final BinaryResource binaryResource = formData.getDocument().getValue();
+    String documentPath = BEANS.get(DocumentStoreService.class).store(binaryResource, formData.getCapturedDate().getValue(), documentId);
     formData.setDocumentPath(documentPath);
     // reset binary resource only used for creation
     formData.getDocument().setValue(null);
@@ -173,9 +181,9 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     // create document
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE, CONVERSATION_NR));
+    statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE, CONVERSATION_NR, PARSE_OCR));
     statementBuilder.append(") VALUES (");
-    statementBuilder.append(":documentId, :abstract, :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage, :conversation");
+    statementBuilder.append(":documentId, :abstract, :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage, :conversation, :parseOcr");
     statementBuilder.append(" )");
     SQL.insert(statementBuilder.toString(), formData);
 
@@ -197,6 +205,19 @@ public class DocumentService implements IDocumentService, IDocumentTable {
             (p1, p2) -> Math.max(p1, p2)));
     BEANS.get(DocumentPermissionService.class).createDocumentPermissions(documentId, permissions);
 
+    // ocr
+    if (formData.getParseOcr().getValue()) {
+      Jobs.schedule(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          BEANS.get(DocumentOcrService.class).create(formData.getDocumentId(), binaryResource);
+        }
+      }, Jobs.newInput()
+          .withRunContext(ServerRunContexts.empty()
+              .withTransactionScope(TransactionScope.REQUIRES_NEW)));
+    }
+
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
 
@@ -212,7 +233,8 @@ public class DocumentService implements IDocumentService, IDocumentTable {
         .append(DOCUMENT_DATE).append("= :documentDate, ")
         .append(VALID_DATE).append("= :validDate, ")
         .append(ORIGINAL_STORAGE).append("= :originalStorage, ")
-        .append(CONVERSATION_NR).append("= :conversation ")
+        .append(CONVERSATION_NR).append("= :conversation, ")
+        .append(PARSE_OCR).append("= :parseOcr ")
         .append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
     SQL.update(statementBuilder.toString(), formData);
 
@@ -251,9 +273,9 @@ public class DocumentService implements IDocumentService, IDocumentTable {
   @RemoteServiceAccessDenied
   public DocumentFormData loadTrusted(DocumentFormData formData) {
     StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE, CONVERSATION_NR));
+    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE, CONVERSATION_NR, PARSE_OCR));
     statementBuilder.append(" FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
-    statementBuilder.append(" INTO ").append(":abstract,  :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage, :conversation");
+    statementBuilder.append(" INTO ").append(":abstract,  :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage, :conversation, :parseOcr");
     SQL.selectInto(statementBuilder.toString(), formData);
 
     // partners

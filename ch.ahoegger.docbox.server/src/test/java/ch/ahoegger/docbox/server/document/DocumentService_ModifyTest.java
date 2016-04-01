@@ -83,7 +83,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     // create document
     Date docData = cal.getTime();
     Date insertDate = m_today;
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId, "doc 01", docData, insertDate, null, "2016_03_08_124640.pdf", "origStorage", conversationId01);
+    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId, "doc 01", docData, insertDate, null, "2016_03_08_124640.pdf", "origStorage", conversationId01, false);
     // links
     BEANS.get(DocumentPartnerTableTask.class).createDocumentPartnerRow(sqlService, documentId, partnerId01);
     BEANS.get(DocumentCategoryTableTask.class).createDocumentCategoryRow(sqlService, documentId, categoryId01);

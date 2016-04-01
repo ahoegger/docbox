@@ -24,4 +24,5 @@ public interface IDocumentTable {
   public static String ORIGINAL_STORAGE = "ORIGINAL_STORAGE";
   public static int ORIGINAL_STORAGE_LENGTH = 1200;
   public static String CONVERSATION_NR = IConversationTable.CONVERSATION_NR;
+  public static String PARSE_OCR = "PARSE_OCR";
 }

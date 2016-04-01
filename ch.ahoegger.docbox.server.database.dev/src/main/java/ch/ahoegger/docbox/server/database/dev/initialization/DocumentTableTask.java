@@ -31,6 +31,7 @@ public class DocumentTableTask implements ITableTask, IDocumentTable {
     statementBuilder.append(DOCUMENT_URL).append(" VARCHAR(").append(DOCUMENT_URL_LENGTH).append("), ");
     statementBuilder.append(ORIGINAL_STORAGE).append(" VARCHAR(").append(ORIGINAL_STORAGE_LENGTH).append("), ");
     statementBuilder.append(CONVERSATION_NR).append(" DECIMAL, ");
+    statementBuilder.append(PARSE_OCR).append(" BOOLEAN NOT NULL, ");
     statementBuilder.append("PRIMARY KEY (").append(DOCUMENT_NR).append(")");
     statementBuilder.append(" )");
     return statementBuilder.toString();
@@ -59,16 +60,16 @@ public class DocumentTableTask implements ITableTask, IDocumentTable {
   }
 
   public void createDocumentRow(ISqlService sqlService, long documentId, String abstractText, Date documentDate,
-      Date capturedDate, Date validDate, String docPath, String originalStorage, Long conversationId)
+      Date capturedDate, Date validDate, String docPath, String originalStorage, Long conversationId, boolean parseOcr)
       throws IOException {
 
     StringBuilder sqlBuilder = new StringBuilder();
     sqlBuilder.append("INSERT INTO ").append(TABLE_NAME);
     sqlBuilder.append(" (").append(SqlFramentBuilder.columns(DOCUMENT_NR, ABSTRACT, DOCUMENT_DATE, INSERT_DATE,
-        VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE, CONVERSATION_NR));
+        VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE, CONVERSATION_NR, PARSE_OCR));
     sqlBuilder.append(") VALUES ( ");
     sqlBuilder.append(
-        ":documentId, :abstract, :documentDate, :insertDate, :validDate, :documentUrl, :originalStorage, :conversationId");
+        ":documentId, :abstract, :documentDate, :insertDate, :validDate, :documentUrl, :originalStorage, :conversationId, :parseOcr");
     sqlBuilder.append(")");
 
     sqlService.insert(sqlBuilder.toString(),
@@ -79,7 +80,8 @@ public class DocumentTableTask implements ITableTask, IDocumentTable {
         new NVPair("validDate", validDate),
         new NVPair("documentUrl", docPath),
         new NVPair("originalStorage", originalStorage),
-        new NVPair("conversationId", conversationId));
+        new NVPair("conversationId", conversationId),
+        new NVPair("parseOcr", parseOcr));
   }
 
 }

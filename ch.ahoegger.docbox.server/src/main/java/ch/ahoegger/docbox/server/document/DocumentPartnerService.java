@@ -54,8 +54,6 @@ public class DocumentPartnerService implements IDocumentPartnerTable {
 
       }
     }
-    // notify backup needed
-    BEANS.get(IBackupService.class).notifyModification();
   }
 
   /**

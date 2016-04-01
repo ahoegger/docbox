@@ -179,7 +179,7 @@ public class DevDerbySqlService extends DerbySqlService {
         System.currentTimeMillis());
     String docPath = BEANS.get(DocumentStoreService.class).store(br, insertDate, documentId);
 
-    documentTableTask.createDocumentRow(sqlService, documentId, abstractText, documentDate, insertDate, validDate, docPath, originalStorage, conversationId);
+    documentTableTask.createDocumentRow(sqlService, documentId, abstractText, documentDate, insertDate, validDate, docPath, originalStorage, conversationId, true);
   }
 
   protected void insertDocumentCategory(ISqlService sqlService) {

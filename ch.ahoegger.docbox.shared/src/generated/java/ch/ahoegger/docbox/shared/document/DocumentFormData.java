@@ -86,6 +86,10 @@ public class DocumentFormData extends AbstractFormData {
     return getFieldByClass(OriginalStorage.class);
   }
 
+  public ParseOcr getParseOcr() {
+    return getFieldByClass(ParseOcr.class);
+  }
+
   public Partners getPartners() {
     return getFieldByClass(Partners.class);
   }
@@ -139,6 +143,11 @@ public class DocumentFormData extends AbstractFormData {
   }
 
   public static class OriginalStorage extends AbstractValueFieldData<String> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class ParseOcr extends AbstractValueFieldData<Boolean> {
 
     private static final long serialVersionUID = 1L;
   }
