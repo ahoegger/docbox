@@ -49,7 +49,7 @@ public class OcrParseServiceTest {
       OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is, tessdataDirectory);
       Assert.assertTrue(parseResult.isOcrParsed());
       String text = parseResult.getText();
-      LOG.debug("parsed text: {}", text);
+      LOG.info("parsed text: {}", text);
       System.out.println(text);
 
       Assert.assertFalse("Working direcotry is propperly removed.", Files.exists(parseResult.getWorkingDirectory()));
