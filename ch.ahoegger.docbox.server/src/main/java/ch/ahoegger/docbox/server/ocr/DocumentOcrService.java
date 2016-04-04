@@ -2,16 +2,13 @@ package ch.ahoegger.docbox.server.ocr;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
-import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
 import ch.ahoegger.docbox.shared.ocr.IDocumentOcrService;
@@ -27,25 +24,13 @@ import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 public class DocumentOcrService implements IDocumentOcrService, IDocumentOcrTable {
   private static final Logger LOG = LoggerFactory.getLogger(DocumentOcrService.class);
 
-  public void create(Long documentId) {
-    create(documentId, BEANS.get(DocumentStoreService.class).getDocument(documentId));
-  }
-
   @RemoteServiceAccessDenied
-  public void create(Long documentId, BinaryResource document) {
+  public void create(Long documentId, OcrParseResult parseResult) {
     String text = null;
     boolean ocrParsed = false;
     boolean notParsable = false;
-    try {
-      LOG.debug("About to ocr parse file:'{}' with id '{}'", document.getFilename(), documentId);
-      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(document);
-      text = parseResult.getText();
-      ocrParsed = parseResult.isOcrParsed();
-    }
-    catch (ProcessingException e) {
-      LOG.error(e.getMessage(), e);
-      notParsable = true;
-    }
+    text = parseResult.getText();
+    ocrParsed = parseResult.isOcrParsed();
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, TEXT, OCR_SCANNED, PARSE_FAILED));

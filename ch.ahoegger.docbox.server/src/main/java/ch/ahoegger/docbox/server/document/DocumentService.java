@@ -1,12 +1,15 @@
 package ch.ahoegger.docbox.server.document;
 
 import java.math.BigDecimal;
+import java.security.AccessController;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
+import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.VetoException;
@@ -19,7 +22,6 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.jdbc.SQL;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.slf4j.Logger;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import ch.ahoegger.docbox.server.ServerSession;
 import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
+import ch.ahoegger.docbox.server.ocr.ParseDocumentJob;
 import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
 import ch.ahoegger.docbox.shared.ISequenceTable;
@@ -227,15 +230,8 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
     // ocr
     if (formData.getParseOcr().getValue()) {
-      Jobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          BEANS.get(DocumentOcrService.class).create(formData.getDocumentId(), binaryResource);
-        }
-      }, Jobs.newInput()
-          .withRunContext(ServerRunContexts.empty()
-              .withTransactionScope(TransactionScope.REQUIRES_NEW)));
+      ParseDocumentJob job = new ParseDocumentJob(formData.getDocumentId());
+      job.schedule();
     }
 
     // notify backup needed
@@ -277,23 +273,14 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     BEANS.get(DocumentPermissionService.class).updateDocumentPermissions(formData.getDocumentId(), permissions);
 
     // ocr
-
-    Jobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        DocumentOcrService service = BEANS.get(DocumentOcrService.class);
-        if (formData.getParseOcr().getValue()) {
-          if (!service.exists(formData.getDocumentId())) {
-            service.create(formData.getDocumentId());
-          }
-        }
-        else {
-          service.delete(formData.getDocumentId());
-        }
-      }
-    }, Jobs.newInput()
-        .withRunContext(ServerRunContexts.empty()
-            .withTransactionScope(TransactionScope.REQUIRES_NEW)));
+    if (formData.getParseOcr().getValue()) {
+      ParseDocumentJob job = new ParseDocumentJob(formData.getDocumentId());
+      job.schedule();
+    }
+    else {
+      DocumentOcrService service = BEANS.get(DocumentOcrService.class);
+      service.delete(formData.getDocumentId());
+    }
 
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
@@ -343,27 +330,34 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
   @Override
   public void buildOcrOfMissingDocuments() {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR))
+        .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS)
+        .append(" LEFT JOIN ").append(IDocumentOcrTable.TABLE_NAME).append(" AS ").append(IDocumentOcrTable.TABLE_ALIAS)
+        .append(" ON ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.DOCUMENT_NR))
+        .append(" WHERE ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.DOCUMENT_NR)).append(" IS NULL")
+        .append(" AND ").append(PARSE_OCR);
+    Object[][] rawResult = SQL.select(statementBuilder.toString());
+
+    final List<Long> documentIds = Arrays.stream(rawResult).map(row -> TypeCastUtility.castValue(row[0], Long.class)).collect(Collectors.toList());
+
     Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        StringBuilder statementBuilder = new StringBuilder();
-        statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR))
-            .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS)
-            .append(" LEFT JOIN ").append(IDocumentOcrTable.TABLE_NAME).append(" AS ").append(IDocumentOcrTable.TABLE_ALIAS)
-            .append(" ON ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.DOCUMENT_NR))
-            .append(" WHERE ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.DOCUMENT_NR)).append(" IS NULL")
-            .append(" AND ").append(PARSE_OCR);
-        Object[][] rawResult = SQL.select(statementBuilder.toString());
 
-        DocumentOcrService service = BEANS.get(DocumentOcrService.class);
-        List<Long> documentIds = Arrays.stream(rawResult).map(row -> TypeCastUtility.castValue(row[0], Long.class)).collect(Collectors.toList());
         for (Long docId : documentIds) {
-          service.create(docId);
+          try {
+            LOG.debug("build ocr for {}.", docId);
+            new ParseDocumentJob(docId).schedule().awaitDone();
+          }
+          catch (Exception e) {
+            LOG.error(String.format("Cold not parse document with id '%s'.", docId), e);
+          }
         }
       }
-    }, Jobs.newInput()
-        .withRunContext(ServerRunContexts.empty()
-            .withTransactionScope(TransactionScope.REQUIRES_NEW)));
+    }, Jobs.newInput().withRunContext(
+        ServerRunContexts.empty()
+            .withSubject(Subject.getSubject(AccessController.getContext()))));
   }
 }

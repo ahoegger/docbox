@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,11 @@ public class OcrParseService {
   private static final Logger LOG = LoggerFactory.getLogger(OcrParseService.class);
 
   public OcrParseResult parsePdf(BinaryResource pdfResource) {
+    LOG.debug("About to parse file {} .", pdfResource.getFilename());
+    if (!"pdf".equalsIgnoreCase(FileUtility.getFileExtension(pdfResource.getFilename()))) {
+      LOG.warn("File {} is not a parsable file. Parsable files are [*.pdf].", pdfResource.getFilename());
+      return null;
+    }
     // try to get content
     ByteArrayInputStream in = null;
     try {
@@ -114,7 +120,6 @@ public class OcrParseService {
           Files.walkFileTree(workingDirectory, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
-              System.out.println("about to delete: " + filePath);
               Files.delete(filePath);
               return FileVisitResult.CONTINUE;
             }
