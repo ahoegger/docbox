@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
@@ -38,6 +39,7 @@ import ch.ahoegger.docbox.shared.conversation.ConversationLookupCall;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
+import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 
 /**
  * <h3>{@link DocumentTablePage}</h3>
@@ -311,6 +313,65 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
         form.startEdit();
       }
 
+    }
+
+    @Order(2500)
+    public class AdministrationMenu extends AbstractMenu {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("Administration");
+      }
+
+      @Override
+      protected boolean getConfiguredVisible() {
+        return ACCESS.check(new AdministratorPermission());
+      }
+
+      @Order(3000)
+      public class EnsureDocumentsParsedMenu extends AbstractMenu {
+        @Override
+        protected String getConfiguredText() {
+          return TEXTS.get("EnsureDocumentsParsed");
+        }
+
+        @Override
+        protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+          return CollectionUtility.hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+        }
+
+        @Override
+        protected boolean getConfiguredEnabled() {
+          return ACCESS.check(new AdministratorPermission());
+        }
+
+        @Override
+        protected void execAction() {
+          BEANS.get(IDocumentService.class).buildOcrOfMissingDocuments(getTable().getDocumentIdColumn().getSelectedValues());
+        }
+      }
+
+      @Order(4000)
+      public class DeleteParsedContentMenu extends AbstractMenu {
+        @Override
+        protected String getConfiguredText() {
+          return TEXTS.get("DeleteParsedContent");
+        }
+
+        @Override
+        protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+          return CollectionUtility.hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+        }
+
+        @Override
+        protected boolean getConfiguredEnabled() {
+          return ACCESS.check(new AdministratorPermission());
+        }
+
+        @Override
+        protected void execAction() {
+          BEANS.get(IDocumentService.class).deletePasedConent(getTable().getDocumentIdColumn().getSelectedValues());
+        }
+      }
     }
 
   }

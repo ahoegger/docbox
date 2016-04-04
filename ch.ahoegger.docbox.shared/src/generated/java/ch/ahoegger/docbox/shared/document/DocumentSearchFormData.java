@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.annotation.Generated;
 
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -47,6 +48,10 @@ public class DocumentSearchFormData extends AbstractFormData {
     return getFieldByClass(Owner.class);
   }
 
+  public ParsedContentBox getParsedContentBox() {
+    return getFieldByClass(ParsedContentBox.class);
+  }
+
   public Partner getPartner() {
     return getFieldByClass(Partner.class);
   }
@@ -56,7 +61,7 @@ public class DocumentSearchFormData extends AbstractFormData {
     private static final long serialVersionUID = 1L;
   }
 
-  public static class ActiveBox extends AbstractValueFieldData<DocumentActiveState> {
+  public static class ActiveBox extends AbstractValueFieldData<TriState> {
 
     private static final long serialVersionUID = 1L;
   }
@@ -131,6 +136,11 @@ public class DocumentSearchFormData extends AbstractFormData {
   }
 
   public static class Owner extends AbstractValueFieldData<String> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class ParsedContentBox extends AbstractValueFieldData<TriState> {
 
     private static final long serialVersionUID = 1L;
   }

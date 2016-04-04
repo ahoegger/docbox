@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.shared.document;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
@@ -43,5 +45,15 @@ public interface IDocumentService {
    *
    */
   void buildOcrOfMissingDocuments();
+
+  /**
+   * @param selectedValues
+   */
+  void buildOcrOfMissingDocuments(List<Long> documentIds);
+
+  /**
+   * @param selectedValues
+   */
+  void deletePasedConent(List<Long> documentIds);
 
 }

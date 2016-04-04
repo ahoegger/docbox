@@ -45,6 +45,11 @@ public abstract class AbstractOcrSearchTableField extends AbstractTableField<Abs
     ensureEmptyRow();
   }
 
+  public void resetField() {
+    getTable().discardAllRows();
+    ensureEmptyRow();
+  }
+
   private void ensureEmptyRow() {
     getTable().deleteRows(getTable().getRows().stream().filter(row -> StringUtility.isNullOrEmpty(getTable().getSearchTextColumn().getValue(row))).collect(Collectors.toList()));
     ITableRow row = getTable().createRow();

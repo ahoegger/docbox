@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
@@ -15,7 +16,6 @@ import ch.ahoegger.docbox.server.database.dev.initialization.DocumentTableTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.UserTableTask;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
-import ch.ahoegger.docbox.shared.document.DocumentActiveState;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
@@ -65,7 +65,7 @@ public class DocumentService_SearchByActiveState extends AbstractTestWithDatabas
   public void testFindActive() {
     IDocumentService service = BEANS.get(IDocumentService.class);
     DocumentSearchFormData sd = new DocumentSearchFormData();
-    sd.getActiveBox().setValue(DocumentActiveState.Active);
+    sd.getActiveBox().setValue(TriState.TRUE);
     DocumentTableData tableData = service.getTableData(sd);
 
     Assert.assertEquals(CollectionUtility.arrayList(documentId01, documentId02, documentId03, documentId05),
@@ -78,7 +78,7 @@ public class DocumentService_SearchByActiveState extends AbstractTestWithDatabas
   public void testFindInactive() {
     IDocumentService service = BEANS.get(IDocumentService.class);
     DocumentSearchFormData sd = new DocumentSearchFormData();
-    sd.getActiveBox().setValue(DocumentActiveState.Inactive);
+    sd.getActiveBox().setValue(TriState.FALSE);
     DocumentTableData tableData = service.getTableData(sd);
 
     Assert.assertEquals(CollectionUtility.arrayList(documentId04),
@@ -91,7 +91,7 @@ public class DocumentService_SearchByActiveState extends AbstractTestWithDatabas
   public void testFindAll() {
     IDocumentService service = BEANS.get(IDocumentService.class);
     DocumentSearchFormData sd = new DocumentSearchFormData();
-    sd.getActiveBox().setValue(DocumentActiveState.All);
+    sd.getActiveBox().setValue(TriState.UNDEFINED);
     DocumentTableData tableData = service.getTableData(sd);
 
     Assert.assertEquals(CollectionUtility.arrayList(documentId01, documentId02, documentId03, documentId04, documentId05),

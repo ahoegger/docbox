@@ -45,6 +45,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
 import ch.ahoegger.docbox.shared.document.IDocumentTable;
 import ch.ahoegger.docbox.shared.ocr.IDocumentOcrTable;
+import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
 import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
@@ -115,11 +116,11 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     // active document (valid date)
     if (formData.getActiveBox().getValue() != null) {
       switch (formData.getActiveBox().getValue()) {
-        case Active:
+        case TRUE:
           sqlBuilder.append(" AND (").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, VALID_DATE)).append(" >= ").append(":today")
               .append(" OR ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, VALID_DATE)).append(" IS NULL)");
           break;
-        case Inactive:
+        case FALSE:
           sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, VALID_DATE)).append(" < ").append(":today");
           break;
       }
@@ -140,6 +141,17 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     if (lowerCaseOcrSearchTerms.size() > 0) {
       for (String ocrSearchItem : lowerCaseOcrSearchTerms) {
         sqlBuilder.append(" AND ").append(SqlFramentBuilder.whereStringContains(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.TEXT, ocrSearchItem));
+      }
+    }
+    // active document (valid date)
+    if (formData.getParsedContentBox().getValue() != null) {
+      switch (formData.getParsedContentBox().getValue()) {
+        case TRUE:
+          sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.TEXT)).append(" IS NOT NULL ");
+          break;
+        case FALSE:
+          sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.TEXT)).append(" IS NULL ");
+          break;
       }
     }
 
@@ -341,8 +353,16 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
     final List<Long> documentIds = Arrays.stream(rawResult).map(row -> TypeCastUtility.castValue(row[0], Long.class)).collect(Collectors.toList());
 
-    Jobs.schedule(new IRunnable() {
+    buildOcrOfMissingDocuments(documentIds);
+  }
 
+  @Override
+  public void buildOcrOfMissingDocuments(List<Long> documentIds) {
+    if (!ACCESS.check(new AdministratorPermission())) {
+      throw new VetoException("Access denied");
+    }
+
+    Jobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
 
@@ -359,5 +379,17 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     }, Jobs.newInput().withRunContext(
         ServerRunContexts.empty()
             .withSubject(Subject.getSubject(AccessController.getContext()))));
+  }
+
+  @Override
+  public void deletePasedConent(List<Long> documentIds) {
+    if (!ACCESS.check(new AdministratorPermission())) {
+      throw new VetoException("Access denied");
+    }
+    for (Long id : documentIds) {
+      DocumentOcrService service = BEANS.get(DocumentOcrService.class);
+      service.delete(id);
+    }
+
   }
 }

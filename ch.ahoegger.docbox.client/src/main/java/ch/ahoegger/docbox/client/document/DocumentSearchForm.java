@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -31,6 +32,7 @@ import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchButto
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.OcrBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.OcrBox.OcrSearchTableField;
+import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.OcrBox.ParsedContentBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.AbstractField;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.ActiveBox;
@@ -43,7 +45,6 @@ import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBo
 import ch.ahoegger.docbox.client.document.field.AbstractOcrSearchTableField;
 import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
 import ch.ahoegger.docbox.shared.conversation.ConversationLookupCall;
-import ch.ahoegger.docbox.shared.document.DocumentActiveState;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
 
@@ -97,6 +98,10 @@ public class DocumentSearchForm extends AbstractSearchForm {
 
   public OcrSearchTableField getOcrSearchTableField() {
     return getFieldByClass(OcrSearchTableField.class);
+  }
+
+  public ParsedContentBox getParsedContentBox() {
+    return getFieldByClass(ParsedContentBox.class);
   }
 
   public OcrBox getOcrBox() {
@@ -204,13 +209,13 @@ public class DocumentSearchForm extends AbstractSearchForm {
         }
 
         @Order(5000)
-        public class ActiveBox extends AbstractRadioButtonGroup<DocumentActiveState> {
+        public class ActiveBox extends AbstractRadioButtonGroup<TriState> {
 
           @Order(1000)
-          public class ActiveOnlyButton extends AbstractRadioButton<DocumentActiveState> {
+          public class ActiveOnlyButton extends AbstractRadioButton<TriState> {
             @Override
-            protected DocumentActiveState getConfiguredRadioValue() {
-              return DocumentActiveState.Active;
+            protected TriState getConfiguredRadioValue() {
+              return TriState.TRUE;
             }
 
             @Override
@@ -220,10 +225,10 @@ public class DocumentSearchForm extends AbstractSearchForm {
           }
 
           @Order(2000)
-          public class InactiveButton extends AbstractRadioButton<DocumentActiveState> {
+          public class InactiveButton extends AbstractRadioButton<TriState> {
             @Override
-            protected DocumentActiveState getConfiguredRadioValue() {
-              return DocumentActiveState.Inactive;
+            protected TriState getConfiguredRadioValue() {
+              return TriState.FALSE;
             }
 
             @Override
@@ -233,10 +238,10 @@ public class DocumentSearchForm extends AbstractSearchForm {
           }
 
           @Order(3000)
-          public class ActiveAndInactiveButton extends AbstractRadioButton<DocumentActiveState> {
+          public class ActiveAndInactiveButton extends AbstractRadioButton<TriState> {
             @Override
-            protected DocumentActiveState getConfiguredRadioValue() {
-              return DocumentActiveState.All;
+            protected TriState getConfiguredRadioValue() {
+              return TriState.UNDEFINED;
             }
 
             @Override
@@ -277,6 +282,50 @@ public class DocumentSearchForm extends AbstractSearchForm {
           }
         }
 
+        @Order(2000)
+        public class ParsedContentBox extends AbstractRadioButtonGroup<TriState> {
+
+          @Order(1000)
+          public class AllButton extends AbstractRadioButton<TriState> {
+            @Override
+            protected String getConfiguredLabel() {
+              return TEXTS.get("All");
+            }
+
+            @Override
+            protected TriState getConfiguredRadioValue() {
+              return TriState.UNDEFINED;
+            }
+          }
+
+          @Order(2000)
+          public class WithConentButton extends AbstractRadioButton<TriState> {
+            @Override
+            protected String getConfiguredLabel() {
+              return TEXTS.get("WithContent");
+            }
+
+            @Override
+            protected TriState getConfiguredRadioValue() {
+              return TriState.TRUE;
+            }
+          }
+
+          @Order(3000)
+          public class WithoutContentButton extends AbstractRadioButton<TriState> {
+            @Override
+            protected String getConfiguredLabel() {
+              return TEXTS.get("WithoutContent");
+            }
+
+            @Override
+            protected TriState getConfiguredRadioValue() {
+              return TriState.FALSE;
+            }
+          }
+
+        }
+
       }
     }
 
@@ -313,7 +362,9 @@ public class DocumentSearchForm extends AbstractSearchForm {
       DateUtility.truncCalendar(cal);
       cal.add(Calendar.YEAR, -2);
       getDocumentDateFromField().setValue(cal.getTime());
-      getActiveBox().setValue(DocumentActiveState.Active);
+      getActiveBox().setValue(TriState.TRUE);
+      getParsedContentBox().setValue(TriState.UNDEFINED);
+      getOcrSearchTableField().resetField();
     }
 
     @Override
