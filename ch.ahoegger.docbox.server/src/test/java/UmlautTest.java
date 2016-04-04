@@ -14,6 +14,7 @@ public class UmlautTest {
 
   @Test
   public void test() {
+    LOG.warn("CHARSET: " + Charset.defaultCharset());
     String a = "öäöü";
 
     String s = new String(a.getBytes());//, Charset.forName("UTF-8"));
