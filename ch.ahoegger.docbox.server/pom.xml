@@ -15,32 +15,32 @@
 
 	<name>DocBox Server</name>
 	<build>
-	<pluginManagement>
-	<plugins>
-	 <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${master_plugin_surefire_version}</version>
-          <configuration>
-            <failIfNoTests>false</failIfNoTests>
-            <testFailureIgnore>true</testFailureIgnore>
-            <skipTests>false</skipTests>
-            <forkCount>1</forkCount>
-            <reuseForks>false</reuseForks>
-            <forkedProcessTimeoutInSeconds>100</forkedProcessTimeoutInSeconds>
-            <useManifestOnlyJar>false</useManifestOnlyJar>
-          </configuration>
-        </plugin>
-        </plugins>
-	</pluginManagement>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<argLine>-Dfile.encoding=UTF-8</argLine>
-				</configuration>
-			</plugin>
-		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>${master_plugin_surefire_version}</version>
+					<configuration>
+						<failIfNoTests>false</failIfNoTests>
+						<testFailureIgnore>true</testFailureIgnore>
+						<skipTests>false</skipTests>
+						<forkCount>1</forkCount>
+						<reuseForks>false</reuseForks>
+						<forkedProcessTimeoutInSeconds>100</forkedProcessTimeoutInSeconds>
+						<useManifestOnlyJar>false</useManifestOnlyJar>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<!-- <plugins> -->
+		<!-- <plugin> -->
+		<!-- <groupId>org.apache.maven.plugins</groupId> -->
+		<!-- <artifactId>maven-surefire-plugin</artifactId> -->
+		<!-- <configuration> -->
+		<!-- <argLine>-Dfile.encoding=UTF-8</argLine> -->
+		<!-- </configuration> -->
+		<!-- </plugin> -->
+		<!-- </plugins> -->
 	</build>
 	<dependencies>
 		<dependency>
