@@ -107,7 +107,7 @@ public class DocumentForm extends AbstractForm {
 
   @Override
   protected void execStored() {
-    getDesktop().dataChanged(DocumentTablePage.DOCUMENT_ENTITY);
+    getDesktop().dataChanged(IDocumentEntity.ENTITY_KEY);
   }
 
   public void startPage() {

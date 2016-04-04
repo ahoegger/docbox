@@ -11,6 +11,8 @@ import org.eclipse.scout.rt.server.jdbc.SQL;
 import ch.ahoegger.docbox.shared.ISequenceTable;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.conversation.ConversationFormData;
+import ch.ahoegger.docbox.shared.conversation.ConversationSearchFormData;
+import ch.ahoegger.docbox.shared.conversation.ConversationTableData;
 import ch.ahoegger.docbox.shared.conversation.IConversationService;
 import ch.ahoegger.docbox.shared.conversation.IConversationTable;
 import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
@@ -21,6 +23,26 @@ import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
  * @author Andreas Hoegger
  */
 public class ConversationService implements IConversationService, IConversationTable {
+
+  @Override
+  public ConversationTableData getTableData(ConversationSearchFormData formData) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, CONVERSATION_NR, NAME, START_DATE, END_DATE))
+        .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS).append(" ")
+        .append(SqlFramentBuilder.WHERE_DEFAULT);
+
+    statementBuilder.append(" INTO ")
+        .append(":{td.conversationId}, ")
+        .append(":{td.name}, ")
+        .append(":{td.startDate}, ")
+        .append(":{td.endDate} ");
+
+    ConversationTableData tableData = new ConversationTableData();
+    SQL.selectInto(statementBuilder.toString(),
+        new NVPair("td", tableData),
+        formData);
+    return tableData;
+  }
 
   @Override
   public ConversationFormData prepareCreate(ConversationFormData formData) {

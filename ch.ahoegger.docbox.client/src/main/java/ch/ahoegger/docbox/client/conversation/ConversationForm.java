@@ -66,8 +66,8 @@ public class ConversationForm extends AbstractForm {
   }
 
   @FormData
-  public void setConversationId(BigDecimal categoryId) {
-    m_conversationId = categoryId;
+  public void setConversationId(BigDecimal conversationId) {
+    m_conversationId = conversationId;
   }
 
   public NotesField getNotesField() {

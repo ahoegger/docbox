@@ -49,8 +49,6 @@ import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 @PageData(DocumentTableData.class)
 public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.Table> {
 
-  public static final String DOCUMENT_ENTITY = "DOCUMENT";
-
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("Documents");
@@ -58,7 +56,7 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
 
   @Override
   protected void execInitPage() {
-    registerDataChangeListener(DOCUMENT_ENTITY);
+    registerDataChangeListener(IDocumentEntity.ENTITY_KEY);
   }
 
   @Override

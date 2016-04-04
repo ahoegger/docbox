@@ -14,6 +14,11 @@ public interface IConversationService {
 
   /**
    * @param formData
+   */
+  ConversationTableData getTableData(ConversationSearchFormData formData);
+
+  /**
+   * @param formData
    * @return
    */
   ConversationFormData prepareCreate(ConversationFormData formData);

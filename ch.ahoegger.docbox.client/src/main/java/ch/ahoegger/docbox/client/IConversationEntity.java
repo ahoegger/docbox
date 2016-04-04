@@ -1,7 +1,7 @@
 package ch.ahoegger.docbox.client;
 
 /**
- * <h3>{@link ResourceBase}</h3> This class is the base for resources contained
+ * <h3>{@link IConversationEntity}</h3> This class is the base for resources contained
  * in this module.<br>
  * Do not move it to another package, the package is part of the resource name.
  * <br>
@@ -9,7 +9,7 @@ package ch.ahoegger.docbox.client;
  *
  * @author Andreas Hoegger
  */
-public final class ResourceBase {
-	private ResourceBase() {
+public final class IConversationEntity {
+	private IConversationEntity() {
 	}
 }

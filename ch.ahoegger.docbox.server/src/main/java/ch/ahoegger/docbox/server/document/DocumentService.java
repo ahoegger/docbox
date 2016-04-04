@@ -164,7 +164,6 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     sqlBuilder.append(":{td.documentPath}, ");
     sqlBuilder.append(":{td.owner} ");
     DocumentTableData tableData = new DocumentTableData();
-    System.out.println("USERNAME: " + ServerSession.get().getUserId());
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     SQL.selectInto(sqlBuilder.toString(),

@@ -7,6 +7,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TEXTS;
 
+import ch.ahoegger.docbox.client.conversation.ConversationTablePage;
 import ch.ahoegger.docbox.client.document.DocumentTablePage;
 import ch.ahoegger.docbox.shared.Icons;
 
@@ -21,6 +22,13 @@ public class WorkOutline extends AbstractOutline {
   @Override
   protected void execCreateChildPages(List<IPage<?>> pageList) {
     pageList.add(new DocumentTablePage());
+    pageList.add(new ConversationTablePage());
+  }
+
+  @Override
+  protected void execInitTree() {
+    super.execInitTree();
+    selectFirstNode();
   }
 
   @Override
