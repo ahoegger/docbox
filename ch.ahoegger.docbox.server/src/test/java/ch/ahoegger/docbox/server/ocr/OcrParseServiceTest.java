@@ -13,6 +13,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.ocr.OcrParseService.TessdataDirectoryProperty;
 import ch.ahoegger.docbox.server.test.util.OS;
@@ -24,6 +26,7 @@ import ch.ahoegger.docbox.server.test.util.OS;
  */
 @RunWith(PlatformTestRunner.class)
 public class OcrParseServiceTest {
+  private static final Logger LOG = LoggerFactory.getLogger(OcrParseServiceTest.class);
 
   private static Path tessdataDirectory;
 
@@ -46,6 +49,9 @@ public class OcrParseServiceTest {
       OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is, tessdataDirectory);
       Assert.assertTrue(parseResult.isOcrParsed());
       String text = parseResult.getText();
+      LOG.debug("parsed text: {}", text);
+      System.out.println(text);
+
       Assert.assertFalse("Working direcotry is propperly removed.", Files.exists(parseResult.getWorkingDirectory()));
       Assert.assertTrue(text.contains("einfacher Demo-Text"));
       Assert.assertTrue(text.contains("Industrie"));
