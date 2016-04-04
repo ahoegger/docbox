@@ -20,21 +20,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<systemPropertyVariables>
-						<property>
-							<name>user.language</name>
-							<value>en</value>
-						</property>
-						<property>
-							<name>user.region</name>
-							<value>CH</value>
-						</property>
-						<property>
-							<name>file.encoding</name>
-							<value>UTF-8</value>
-						</property>
-					</systemPropertyVariables>
-					<forkMode>never</forkMode>
+
+					<argLine>-Dfile.encoding=UTF-8</argLine>
 				</configuration>
 			</plugin>
 		</plugins>
