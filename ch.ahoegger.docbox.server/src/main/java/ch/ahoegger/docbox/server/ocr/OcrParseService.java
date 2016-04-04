@@ -51,7 +51,7 @@ public class OcrParseService {
   private static final Logger LOG = LoggerFactory.getLogger(OcrParseService.class);
 
   public OcrParseResult parsePdf(BinaryResource pdfResource) {
-    LOG.debug("About to parse file {} .", pdfResource.getFilename());
+    LOG.info("About to parse file {} .", pdfResource.getFilename());
     if (!"pdf".equalsIgnoreCase(FileUtility.getFileExtension(pdfResource.getFilename()))) {
       LOG.warn("File {} is not a parsable file. Parsable files are [*.pdf].", pdfResource.getFilename());
       return null;

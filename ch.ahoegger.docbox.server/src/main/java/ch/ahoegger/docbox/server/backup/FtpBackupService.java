@@ -196,7 +196,7 @@ public class FtpBackupService implements IBackupService {
 
       if (!StringUtility.isNullOrEmpty(CONFIG.getPropertyValue(FtpUsernameProperty.class))) {
         if (client.login(CONFIG.getPropertyValue(FtpUsernameProperty.class), CONFIG.getPropertyValue(FtpPasswordProperty.class))) {
-          LOG.debug("FTP connection to '" + CONFIG.getPropertyValue(FtpServerUrlProperty.class) + "' login successful.");
+          LOG.info("FTP connection to '" + CONFIG.getPropertyValue(FtpServerUrlProperty.class) + "' login successful.");
         }
         else {
           LOG.error("FTP connection to '" + CONFIG.getPropertyValue(FtpServerUrlProperty.class) + "' login failed.");
@@ -205,7 +205,7 @@ public class FtpBackupService implements IBackupService {
       }
 
       moveAndCreateDirectory(Paths.get(CONFIG.getPropertyValue(FtpRemoteBackupPathProperty.class)), client);
-      LOG.debug("moved to working directory '" + CONFIG.getPropertyValue(FtpRemoteBackupPathProperty.class) + "'");
+      LOG.info("moved to working directory '" + CONFIG.getPropertyValue(FtpRemoteBackupPathProperty.class) + "'");
       String backupFileName = getBackupFileName();
       client.rename(backupFileName, String.format("%s.bak", backupFileName));
 

@@ -348,7 +348,7 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
         for (Long docId : documentIds) {
           try {
-            LOG.debug("build ocr for {}.", docId);
+            LOG.info("build ocr for {}.", docId);
             new ParseDocumentJob(docId).schedule().awaitDone();
           }
           catch (Exception e) {
