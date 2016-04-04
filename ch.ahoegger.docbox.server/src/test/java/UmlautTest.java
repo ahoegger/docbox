@@ -14,6 +14,10 @@ public class UmlautTest {
 
   @Test
   public void test() {
+//    for (Entry<Object, Object> e : System.getProperties().entrySet()) {
+//      System.out.println(e.getKey() + " - " + e.getValue());
+//    }
+    LOG.warn("SYS PROP: " + System.getProperty("file.encoding"));
     LOG.warn("CHARSET: " + Charset.defaultCharset());
     String a = "öäöü";
 
