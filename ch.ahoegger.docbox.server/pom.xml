@@ -14,7 +14,17 @@
 	<artifactId>ch.ahoegger.docbox.server</artifactId>
 
 	<name>DocBox Server</name>
-
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<forkMode>never</forkMode>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 	<dependencies>
 		<dependency>
 			<artifactId>org.eclipse.scout.rt.server</artifactId>
