@@ -191,7 +191,7 @@ public class OcrParseService {
         api.SetImage(image);
         outText = api.GetUTF8Text();
         if (outText != null) {
-          result.append(outText.getString("UTF_8"));
+          result.append(outText.getString("UTF8"));
 //          result.append(outText.getString());
         }
       }
