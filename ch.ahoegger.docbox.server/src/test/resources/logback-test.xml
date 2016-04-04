@@ -12,6 +12,7 @@
       <levelMin>TRACE</levelMin>
       <levelMax>INFO</levelMax>
     </filter>
+    <target>System.out</target>
     <encoder>
       <pattern>${logPattern}</pattern>
     </encoder>
