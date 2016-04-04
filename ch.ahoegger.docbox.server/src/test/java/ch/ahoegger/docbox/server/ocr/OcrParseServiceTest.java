@@ -68,42 +68,42 @@ public class OcrParseServiceTest {
     }
   }
 
-//  @Test
-//  public void testPdfReadable() throws Exception {
-//    URL resource = Test.class.getClassLoader().getResource("devDocuments/withTextInfo.pdf");
-//    InputStream is = null;
-//    try {
-//      is = resource.openStream();
-//      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is, tessdataDirectory);
-//      Assert.assertFalse(parseResult.isOcrParsed());
-//      String text = parseResult.getText();
-//      Assert.assertFalse("Working direcotry is propperly removed.", Files.exists(parseResult.getWorkingDirectory()));
-//      Assert.assertTrue(text.contains("Maecenas sodales molestie volutpat. Curabitur diam libero, tincidunt vel enim non, varius lacinia"));
-//    }
-//    finally {
-//      if (is != null) {
-//        is.close();
-//      }
-//    }
-//  }
+  @Test
+  public void testPdfReadable() throws Exception {
+    URL resource = Test.class.getClassLoader().getResource("devDocuments/withTextInfo.pdf");
+    InputStream is = null;
+    try {
+      is = resource.openStream();
+      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is, tessdataDirectory);
+      Assert.assertFalse(parseResult.isOcrParsed());
+      String text = parseResult.getText();
+      Assert.assertFalse("Working direcotry is propperly removed.", Files.exists(parseResult.getWorkingDirectory()));
+      Assert.assertTrue(text.contains("Maecenas sodales molestie volutpat. Curabitur diam libero, tincidunt vel enim non, varius lacinia"));
+    }
+    finally {
+      if (is != null) {
+        is.close();
+      }
+    }
+  }
 
-//  @Test
-//  public void testMultiPageOcr() throws Exception {
-//    URL resource = Test.class.getClassLoader().getResource("devDocuments/multipPateWithoutTextInfo.pdf");
-//    InputStream is = null;
-//    try {
-//      is = resource.openStream();
-//      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is, tessdataDirectory);
-//      Assert.assertTrue(parseResult.isOcrParsed());
-//      String text = parseResult.getText();
-//      Assert.assertTrue(text.contains(" Sections 2(a) and 2(b) above"));
-//      Assert.assertTrue(text.contains("ACCEPTANCE OF THIS AGREEMENT"));
-//      Assert.assertFalse("Working direcotry is propperly removed.", Files.exists(parseResult.getWorkingDirectory()));
-//    }
-//    finally {
-//      if (is != null) {
-//        is.close();
-//      }
-//    }
-//  }
+  @Test
+  public void testMultiPageOcr() throws Exception {
+    URL resource = Test.class.getClassLoader().getResource("devDocuments/multipPateWithoutTextInfo.pdf");
+    InputStream is = null;
+    try {
+      is = resource.openStream();
+      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is, tessdataDirectory);
+      Assert.assertTrue(parseResult.isOcrParsed());
+      String text = parseResult.getText();
+      Assert.assertTrue(text.contains(" Sections 2(a) and 2(b) above"));
+      Assert.assertTrue(text.contains("ACCEPTANCE OF THIS AGREEMENT"));
+      Assert.assertFalse("Working direcotry is propperly removed.", Files.exists(parseResult.getWorkingDirectory()));
+    }
+    finally {
+      if (is != null) {
+        is.close();
+      }
+    }
+  }
 }

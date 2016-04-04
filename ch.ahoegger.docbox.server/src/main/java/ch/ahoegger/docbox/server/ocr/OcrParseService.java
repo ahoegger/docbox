@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class OcrParseService {
   private static final Logger LOG = LoggerFactory.getLogger(OcrParseService.class);
+  private static final Object LOCK = new Object();
 
   public OcrParseResult parsePdf(BinaryResource pdfResource) {
     LOG.info("About to parse file {} .", pdfResource.getFilename());
@@ -79,73 +80,79 @@ public class OcrParseService {
   }
 
   public OcrParseResult parsePdf(InputStream pdfInputStream, Path tessdataDirectory) {
-    Path workingDirectory = null;
-    PDDocument pddoc = null;
-    try {
-      OcrParseResult result = new OcrParseResult();
-      workingDirectory = Files.createTempDirectory("ocrWorkingDir").toAbsolutePath();
-      result.setWorkingDirectory(workingDirectory);
-      List<Path> tifFiles = CollectionUtility.emptyArrayList();
-      pddoc = PDDocument.load(pdfInputStream);
-      // try to get text straight
-      String content = getTextOfPdf(pddoc);
-      if (StringUtility.hasText(content)) {
-        result.setText(content);
-        result.setOcrParsed(false);
-      }
-      else {
-        tifFiles = pdfToTif(pddoc, workingDirectory);
-        pddoc.close();
-        pddoc = null;
-        result.setText(computeText(tifFiles, tessdataDirectory));
-        result.setOcrParsed(true);
-      }
-      return result;
-    }
-    catch (IOException e) {
-      throw new ProcessingException(new ProcessingStatus("Could not read text form pdf.", e, 0, IStatus.ERROR));
-    }
-    finally {
-      if (pddoc != null) {
-        try {
+    synchronized (LOCK) {
+
+      Path workingDirectory = null;
+      PDDocument pddoc = null;
+      try {
+        OcrParseResult result = new OcrParseResult();
+        workingDirectory = Files.createTempDirectory("ocrWorkingDir").toAbsolutePath();
+        result.setWorkingDirectory(workingDirectory);
+        List<Path> tifFiles = CollectionUtility.emptyArrayList();
+        pddoc = PDDocument.load(pdfInputStream);
+        // try to get text straight
+        String content = getTextOfPdf(pddoc);
+        if (StringUtility.hasText(content)) {
+          result.setText(content);
+          result.setOcrParsed(false);
+        }
+        else {
+          tifFiles = pdfToTif(pddoc, workingDirectory);
           pddoc.close();
+          pddoc = null;
+          result.setText(computeText(tifFiles, tessdataDirectory));
+          result.setOcrParsed(true);
         }
-        catch (IOException e) {
-          LOG.warn("Could not close pdd document.", e);
-        }
+        return result;
       }
-      // delete working dir
-      if (workingDirectory != null) {
-        try {
-          Files.walkFileTree(workingDirectory, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
-              Files.delete(filePath);
-              return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-              Files.delete(dir);
-              return FileVisitResult.CONTINUE;
-            }
-
-          });
+      catch (IOException e) {
+        throw new ProcessingException(new ProcessingStatus("Could not read text form pdf.", e, 0, IStatus.ERROR));
+      }
+      finally {
+        if (pddoc != null) {
+          try {
+            pddoc.close();
+          }
+          catch (IOException e) {
+            LOG.warn("Could not close pdd document.", e);
+          }
         }
-        catch (IOException e) {
-          LOG.warn("Could not delete working directory '" + workingDirectory + "'.", e);
+        // delete working dir
+        if (workingDirectory != null) {
+          try {
+            Files.walkFileTree(workingDirectory, new SimpleFileVisitor<Path>() {
+              @Override
+              public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
+                Files.delete(filePath);
+                return FileVisitResult.CONTINUE;
+              }
+
+              @Override
+              public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+              }
+
+            });
+          }
+          catch (IOException e) {
+            LOG.warn("Could not delete working directory '" + workingDirectory + "'.", e);
+          }
         }
       }
     }
   }
 
   protected String getTextOfPdf(PDDocument doc) throws IOException {
-    PDFTextStripper textStripper = new PDFTextStripper();
-    String content = textStripper.getText(doc);
-    return content;
+    synchronized (LOCK) {
+      PDFTextStripper textStripper = new PDFTextStripper();
+      String content = textStripper.getText(doc);
+      return content;
+    }
   }
 
-  protected synchronized List<Path> pdfToTif(PDDocument pddoc, Path workingDirectory) throws IOException {
+  protected List<Path> pdfToTif(PDDocument pddoc, Path workingDirectory) throws IOException {
+
     List<Path> tiffPaths = new ArrayList<>();
 
     PDFRenderer pdfRenderer = new PDFRenderer(pddoc);
@@ -174,46 +181,49 @@ public class OcrParseService {
   }
 
   protected String computeText(List<Path> tifPaths, Path tessdataDirectory) throws IOException {
-    TessBaseAPI api = null;
-    PIX image = null;
-    BytePointer outText = null;
+    synchronized (LOCK) {
 
-    StringBuilder result = new StringBuilder();
-    for (Path tifPath : tifPaths) {
-      // Open input image with leptonica library
-      // Get OCR result
-      try {
-        api = new TessBaseAPI();
-        if (api.Init(tessdataDirectory.toString(), CONFIG.getPropertyValue(TesseractLanguageProperty.class)) != 0) {
-          throw new ProcessingException(new ProcessingStatus("Could not initialize tesseract.", IStatus.ERROR));
-        }
-        image = lept.pixRead(tifPath.toString());
-        api.SetImage(image);
-        outText = api.GetUTF8Text();
-        if (outText != null) {
-          result.append(outText.getString());
-        }
-      }
-      finally {
-        if (api != null) {
-          api.Clear();
-          api.End();
-          try {
-            api.close();
+      TessBaseAPI api = null;
+      PIX image = null;
+      BytePointer outText = null;
+
+      StringBuilder result = new StringBuilder();
+      for (Path tifPath : tifPaths) {
+        // Open input image with leptonica library
+        // Get OCR result
+        try {
+          api = new TessBaseAPI();
+          if (api.Init(tessdataDirectory.toString(), CONFIG.getPropertyValue(TesseractLanguageProperty.class)) != 0) {
+            throw new ProcessingException(new ProcessingStatus("Could not initialize tesseract.", IStatus.ERROR));
           }
-          catch (Exception e) {
-            throw new ProcessingException(new ProcessingStatus("Could not close api tesseract.", e, 0, IStatus.ERROR));
+          image = lept.pixRead(tifPath.toString());
+          api.SetImage(image);
+          outText = api.GetUTF8Text();
+          if (outText != null) {
+            result.append(outText.getString());
           }
         }
-        if (outText != null) {
-          outText.deallocate();
+        finally {
+          if (api != null) {
+            api.Clear();
+            api.End();
+            try {
+              api.close();
+            }
+            catch (Exception e) {
+              throw new ProcessingException(new ProcessingStatus("Could not close api tesseract.", e, 0, IStatus.ERROR));
+            }
+          }
+          if (outText != null) {
+            outText.deallocate();
+          }
+          pixDestroy(image);
+
         }
-        pixDestroy(image);
 
       }
-
+      return result.toString();
     }
-    return result.toString();
 
   }
 
