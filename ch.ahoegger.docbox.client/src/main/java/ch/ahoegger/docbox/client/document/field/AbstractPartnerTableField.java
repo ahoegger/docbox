@@ -131,6 +131,11 @@ public abstract class AbstractPartnerTableField extends AbstractTableField<Abstr
         }
 
         @Override
+        protected boolean getConfiguredActiveFilterEnabled() {
+          return true;
+        }
+
+        @Override
         protected void execFilterBrowseLookupResult(ILookupCall<BigDecimal> call, List<ILookupRow<BigDecimal>> result) {
           filterDuplicateTypesLookupResult(m_row, result);
         }

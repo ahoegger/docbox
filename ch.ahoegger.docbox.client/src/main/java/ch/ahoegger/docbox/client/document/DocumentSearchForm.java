@@ -72,10 +72,6 @@ public class DocumentSearchForm extends AbstractSearchForm {
     return getFieldByClass(AbstractField.class);
   }
 
-  public SearchButton getSearchButton() {
-    return getFieldByClass(SearchButton.class);
-  }
-
   public ConversationField getConversationField() {
     return getFieldByClass(ConversationField.class);
   }
@@ -114,6 +110,10 @@ public class DocumentSearchForm extends AbstractSearchForm {
 
   public PartnerField getPartnerField() {
     return getFieldByClass(PartnerField.class);
+  }
+
+  public SearchButton getSearchButton() {
+    return getFieldByClass(SearchButton.class);
   }
 
   public ResetButton getResetButton() {
@@ -157,6 +157,11 @@ public class DocumentSearchForm extends AbstractSearchForm {
           protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
             return PartnerLookupCall.class;
           }
+
+          @Override
+          protected boolean getConfiguredActiveFilterEnabled() {
+            return true;
+          }
         }
 
         @Order(3000)
@@ -167,13 +172,13 @@ public class DocumentSearchForm extends AbstractSearchForm {
           }
 
           @Override
-          protected boolean getConfiguredActiveFilterEnabled() {
-            return true;
+          protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
+            return ConversationLookupCall.class;
           }
 
           @Override
-          protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
-            return ConversationLookupCall.class;
+          protected boolean getConfiguredActiveFilterEnabled() {
+            return true;
           }
 
           @Override
