@@ -28,7 +28,8 @@ public class WorkOutline extends AbstractOutline {
   @Override
   protected void execInitTree() {
     super.execInitTree();
-    selectFirstNode();
+//    ClientSession.get().getDesktop().activateFirstPage();
+//    selectFirstNode();
   }
 
   @Override

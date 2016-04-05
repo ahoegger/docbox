@@ -167,6 +167,11 @@ public class DocumentSearchForm extends AbstractSearchForm {
           }
 
           @Override
+          protected boolean getConfiguredActiveFilterEnabled() {
+            return true;
+          }
+
+          @Override
           protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
             return ConversationLookupCall.class;
           }
