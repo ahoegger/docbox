@@ -480,6 +480,7 @@ public class DocumentSearchForm extends AbstractSearchForm {
       getDocumentDateFromField().setValue(cal.getTime());
       getActiveBox().setValue(TriState.TRUE);
       getParsedContentBox().setValue(TriState.UNDEFINED);
+      getCagegoriesActiveBox().setValue(TriState.TRUE);
       getOcrSearchTableField().resetField();
     }
 
