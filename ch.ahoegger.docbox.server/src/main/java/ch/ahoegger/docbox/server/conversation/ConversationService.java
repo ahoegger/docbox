@@ -6,6 +6,7 @@ import java.util.Date;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 
 import ch.ahoegger.docbox.shared.ISequenceTable;
@@ -30,6 +31,23 @@ public class ConversationService implements IConversationService, IConversationT
     statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, CONVERSATION_NR, NAME, START_DATE, END_DATE))
         .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS).append(" ")
         .append(SqlFramentBuilder.WHERE_DEFAULT);
+
+    // search criteria name
+    if (StringUtility.hasText(formData.getName().getValue())) {
+      statementBuilder.append(" AND ").append(SqlFramentBuilder.whereStringContains(NAME, formData.getName().getValue()));
+    }
+    // seach criteria active
+    if (formData.getActiveBox().getValue() != null) {
+      switch (formData.getActiveBox().getValue()) {
+        case TRUE:
+          statementBuilder.append(" AND (").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, END_DATE)).append(" >= ").append("CURRENT_DATE")
+              .append(" OR ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, END_DATE)).append(" IS NULL)");
+          break;
+        case FALSE:
+          statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, END_DATE)).append(" < ").append("CURRENT_DATE");
+          break;
+      }
+    }
 
     statementBuilder.append(" INTO ")
         .append(":{td.conversationId}, ")

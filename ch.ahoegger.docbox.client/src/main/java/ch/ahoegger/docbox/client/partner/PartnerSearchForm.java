@@ -1,4 +1,4 @@
-package ch.ahoegger.docbox.client.conversation;
+package ch.ahoegger.docbox.client.partner;
 
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
@@ -13,22 +13,22 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.TEXTS;
 
-import ch.ahoegger.docbox.client.conversation.ConversationSearchForm.MainBox.SearchTabBox;
-import ch.ahoegger.docbox.client.conversation.ConversationSearchForm.MainBox.SearchTabBox.SearchBox;
-import ch.ahoegger.docbox.client.conversation.ConversationSearchForm.MainBox.SearchTabBox.SearchBox.ActiveBox;
-import ch.ahoegger.docbox.client.conversation.ConversationSearchForm.MainBox.SearchTabBox.SearchBox.NameField;
-import ch.ahoegger.docbox.shared.conversation.ConversationSearchFormData;
-import ch.ahoegger.docbox.shared.conversation.IConversationTable;
+import ch.ahoegger.docbox.client.partner.PartnerSearchForm.MainBox.SearchTabBox;
+import ch.ahoegger.docbox.client.partner.PartnerSearchForm.MainBox.SearchTabBox.SearchBox;
+import ch.ahoegger.docbox.client.partner.PartnerSearchForm.MainBox.SearchTabBox.SearchBox.ActiveBox;
+import ch.ahoegger.docbox.client.partner.PartnerSearchForm.MainBox.SearchTabBox.SearchBox.NameField;
+import ch.ahoegger.docbox.shared.partner.IPartnerTable;
+import ch.ahoegger.docbox.shared.partner.PartnerSearchFormData;
 
 /**
- * <h3>{@link ConversationSearchForm}</h3>
+ * <h3>{@link PartnerSearchForm}</h3>
  *
  * @author aho
  */
-@FormData(value = ConversationSearchFormData.class, sdkCommand = SdkCommand.CREATE)
-public class ConversationSearchForm extends AbstractSearchForm {
+@FormData(value = PartnerSearchFormData.class, sdkCommand = SdkCommand.CREATE)
+public class PartnerSearchForm extends AbstractSearchForm {
 
-  public ConversationSearchForm() {
+  public PartnerSearchForm() {
     setHandler(new SearchHandler());
   }
 
@@ -69,7 +69,7 @@ public class ConversationSearchForm extends AbstractSearchForm {
 
           @Override
           protected int getConfiguredMaxLength() {
-            return IConversationTable.NAME_LENGTH;
+            return IPartnerTable.NAME_LENGTH;
           }
         }
 
@@ -129,5 +129,4 @@ public class ConversationSearchForm extends AbstractSearchForm {
     protected void execStore() {
     }
   }
-
 }

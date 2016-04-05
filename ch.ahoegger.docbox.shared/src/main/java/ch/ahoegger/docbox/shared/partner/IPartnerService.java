@@ -16,6 +16,12 @@ public interface IPartnerService {
    * @param formData
    * @return
    */
+  PartnerTableData getTableData(PartnerSearchFormData formData);
+
+  /**
+   * @param formData
+   * @return
+   */
   PartnerFormData prepareCreate(PartnerFormData formData);
 
   /**
