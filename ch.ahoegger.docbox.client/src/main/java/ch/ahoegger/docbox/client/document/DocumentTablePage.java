@@ -49,6 +49,9 @@ import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 @PageData(DocumentTableData.class)
 public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.Table> {
 
+  private BigDecimal m_conversationId;
+  private BigDecimal m_partnerId;
+
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("Documents");
@@ -70,8 +73,38 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
   }
 
   @Override
+  protected ISearchForm createSearchForm() {
+    DocumentSearchForm searchForm = (DocumentSearchForm) super.createSearchForm();
+    if (getConversationId() != null) {
+      searchForm.getConversationField().setValue(getConversationId());
+      searchForm.getConversationField().setEnabled(false);
+    }
+    if (getPartnerId() != null) {
+      searchForm.getPartnerField().setValue(getPartnerId());
+      searchForm.getPartnerField().setEnabled(false);
+    }
+    return searchForm;
+  }
+
+  @Override
   protected IPage<?> execCreateChildPage(ITableRow row) {
     return new DocumentDetailPage(getTable().getDocumentIdColumn().getValue(row));
+  }
+
+  public void setConversationId(BigDecimal value) {
+    m_conversationId = value;
+  }
+
+  public BigDecimal getConversationId() {
+    return m_conversationId;
+  }
+
+  public BigDecimal getPartnerId() {
+    return m_partnerId;
+  }
+
+  public void setPartnerId(BigDecimal partnerId) {
+    m_partnerId = partnerId;
   }
 
   public class Table extends AbstractTable {
@@ -373,4 +406,5 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
     }
 
   }
+
 }

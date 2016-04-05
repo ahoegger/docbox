@@ -2,6 +2,7 @@ package ch.ahoegger.docbox.shared.document;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -26,6 +27,10 @@ public class DocumentSearchFormData extends AbstractFormData {
 
   public ActiveBox getActiveBox() {
     return getFieldByClass(ActiveBox.class);
+  }
+
+  public CategoriesBox getCategoriesBox() {
+    return getFieldByClass(CategoriesBox.class);
   }
 
   public Conversation getConversation() {
@@ -62,6 +67,11 @@ public class DocumentSearchFormData extends AbstractFormData {
   }
 
   public static class ActiveBox extends AbstractValueFieldData<TriState> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class CategoriesBox extends AbstractValueFieldData<Set<BigDecimal>> {
 
     private static final long serialVersionUID = 1L;
   }

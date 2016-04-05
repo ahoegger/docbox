@@ -40,6 +40,7 @@ import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Permissions.PermissionsRowData;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
+import ch.ahoegger.docbox.shared.document.IDocumentCategoryTable;
 import ch.ahoegger.docbox.shared.document.IDocumentPartnerTable;
 import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
@@ -131,8 +132,22 @@ public class DocumentService implements IDocumentService, IDocumentTable {
           .append(" = :owner");
 
     }
+// search criteria cagegories
+    if (formData.getCategoriesBox().getValue() != null) {
+      sqlBuilder.append(" AND ( SELECT COUNT(1) FROM ").append(IDocumentCategoryTable.TABLE_NAME).append(" AS ").append(IDocumentCategoryTable.TABLE_ALIAS)
+          .append(" WHERE ").append(SqlFramentBuilder.columnsAliased(IDocumentCategoryTable.TABLE_ALIAS, IDocumentCategoryTable.DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR))
+          .append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentCategoryTable.TABLE_ALIAS, IDocumentCategoryTable.CATEGORY_NR)).append(" IN (")
+          .append(
+              formData.getCategoriesBox().getValue()
+                  .stream()
+                  .filter(key -> key != null)
+                  .map(key -> key.toString())
+                  .collect(Collectors.joining(", ")))
+          .append("))")
+          .append(" = ").append(formData.getCategoriesBox().getValue().size());
+    }
 
-    // ocr search criteria
+    // search criteria ocr text
     List<String> lowerCaseOcrSearchTerms = Arrays.stream(formData.getOcrSearchTable().getRows())
         .map(r -> r.getSearchText())
         .filter(text -> StringUtility.hasText(text))

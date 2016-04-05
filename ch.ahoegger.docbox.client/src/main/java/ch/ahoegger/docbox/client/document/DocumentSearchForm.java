@@ -36,12 +36,16 @@ import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBo
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.AbstractField;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.ActiveBox;
+import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.CagegoriesGroupBox;
+import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.CagegoriesGroupBox.CagegoriesActiveBox;
+import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.CagegoriesGroupBox.CategoriesBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.ConversationField;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.DocumentDateBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.DocumentDateBox.DocumentDateFromField;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.DocumentDateBox.DocumentDateToField;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.OwnerField;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.PartnerField;
+import ch.ahoegger.docbox.client.document.field.AbstractCategoriesListBox;
 import ch.ahoegger.docbox.client.document.field.AbstractOcrSearchTableField;
 import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
 import ch.ahoegger.docbox.shared.conversation.ConversationLookupCall;
@@ -98,6 +102,18 @@ public class DocumentSearchForm extends AbstractSearchForm {
 
   public ParsedContentBox getParsedContentBox() {
     return getFieldByClass(ParsedContentBox.class);
+  }
+
+  public CategoriesBox getCategoriesBox() {
+    return getFieldByClass(CategoriesBox.class);
+  }
+
+  public CagegoriesGroupBox getCagegoriesGroupBox() {
+    return getFieldByClass(CagegoriesGroupBox.class);
+  }
+
+  public CagegoriesActiveBox getCagegoriesActiveBox() {
+    return getFieldByClass(CagegoriesActiveBox.class);
   }
 
   public OcrBox getOcrBox() {
@@ -273,6 +289,96 @@ public class DocumentSearchForm extends AbstractSearchForm {
           protected Class<? extends ILookupCall<String>> getConfiguredLookupCall() {
             return UserLookupCall.class;
           }
+        }
+
+        @Order(6500)
+        public class CagegoriesGroupBox extends AbstractGroupBox {
+
+          @Override
+          protected int getConfiguredGridW() {
+            return 1;
+          }
+
+          @Override
+          protected int getConfiguredGridH() {
+            return 6;
+          }
+
+          @Override
+          protected int getConfiguredGridColumnCount() {
+            return 1;
+          }
+
+          @Order(10)
+          public class CategoriesBox extends AbstractCategoriesListBox {
+
+            @Override
+            protected int getConfiguredGridH() {
+              return 5;
+            }
+
+          }
+
+          @Order(20)
+          @FormData(sdkCommand = SdkCommand.IGNORE)
+          public class CagegoriesActiveBox extends AbstractRadioButtonGroup<TriState> {
+
+            @Override
+            protected int getConfiguredGridH() {
+              return 1;
+            }
+
+            @Override
+            protected double getConfiguredGridWeightY() {
+              return 0;
+            }
+
+            @Override
+            protected void execChangedValue() {
+              getCategoriesBox().setFilterActiveRowsValue(getValue());
+            }
+
+            @Order(10)
+            public class ActiveButton extends AbstractRadioButton<TriState> {
+              @Override
+              protected TriState getConfiguredRadioValue() {
+                return TriState.TRUE;
+              }
+
+              @Override
+              protected String getConfiguredLabel() {
+                return TEXTS.get("Active");
+              }
+            }
+
+            @Order(20)
+            public class InactiveButton extends AbstractRadioButton<TriState> {
+              @Override
+              protected TriState getConfiguredRadioValue() {
+                return TriState.FALSE;
+              }
+
+              @Override
+              protected String getConfiguredLabel() {
+                return TEXTS.get("Inactive");
+              }
+            }
+
+            @Order(30)
+            public class AllButton extends AbstractRadioButton<TriState> {
+              @Override
+              protected TriState getConfiguredRadioValue() {
+                return TriState.UNDEFINED;
+              }
+
+              @Override
+              protected String getConfiguredLabel() {
+                return TEXTS.get("All");
+              }
+            }
+
+          }
+
         }
 
       }
