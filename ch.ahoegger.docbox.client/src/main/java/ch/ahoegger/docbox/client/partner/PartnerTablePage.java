@@ -50,6 +50,7 @@ public class PartnerTablePage extends AbstractPageWithTable<PartnerTablePage.Tab
   @Override
   protected IPage<?> execCreateChildPage(ITableRow row) {
     DocumentTablePage documentTablePage = new DocumentTablePage();
+
     documentTablePage.setPartnerId(getTable().getPartnerIdColumn().getValue(row));
 
     return documentTablePage;
@@ -96,6 +97,11 @@ public class PartnerTablePage extends AbstractPageWithTable<PartnerTablePage.Tab
       @Override
       protected int getConfiguredWidth() {
         return 200;
+      }
+
+      @Override
+      protected int getConfiguredSortIndex() {
+        return 0;
       }
     }
 

@@ -99,6 +99,11 @@ public class ConversationTablePage extends AbstractPageWithTable<ConversationTab
       protected int getConfiguredWidth() {
         return 200;
       }
+
+      @Override
+      protected int getConfiguredSortIndex() {
+        return 0;
+      }
     }
 
     @Order(30)

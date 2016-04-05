@@ -76,12 +76,10 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
   protected ISearchForm createSearchForm() {
     DocumentSearchForm searchForm = (DocumentSearchForm) super.createSearchForm();
     if (getConversationId() != null) {
-      searchForm.getConversationField().setValue(getConversationId());
-      searchForm.getConversationField().setEnabled(false);
+      searchForm.setHandler(new DocumentSearchForm.ConversationDocumentSearchHandler(searchForm, getConversationId()));
     }
     if (getPartnerId() != null) {
-      searchForm.getPartnerField().setValue(getPartnerId());
-      searchForm.getPartnerField().setEnabled(false);
+      searchForm.setHandler(new DocumentSearchForm.PartnerDocumentSearchHandler(searchForm, getPartnerId()));
     }
     return searchForm;
   }

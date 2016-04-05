@@ -1,7 +1,9 @@
 package ch.ahoegger.docbox.client.document;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.client.dto.FormData;
@@ -23,7 +25,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
@@ -61,7 +62,7 @@ import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
 public class DocumentSearchForm extends AbstractSearchForm {
 
   public DocumentSearchForm() {
-    setHandler(new DocumentSearchForm.SearchHandler());
+    setHandler(new DocumentSearchForm.SearchHandler(this));
   }
 
   public SearchBox getSearchBox() {
@@ -471,17 +472,79 @@ public class DocumentSearchForm extends AbstractSearchForm {
 
   }
 
-  public class SearchHandler extends AbstractFormHandler {
+  public static abstract class AbstractDocumentSearchHandler extends AbstractFormHandler {
+    public AbstractDocumentSearchHandler(DocumentSearchForm form) {
+      setFormInternal(form);
+    }
+
     @Override
     protected void execLoad() {
-      Calendar cal = Calendar.getInstance();
-      DateUtility.truncCalendar(cal);
-      cal.add(Calendar.YEAR, -2);
-      getDocumentDateFromField().setValue(cal.getTime());
-      getActiveBox().setValue(TriState.TRUE);
-      getParsedContentBox().setValue(TriState.UNDEFINED);
-      getCagegoriesActiveBox().setValue(TriState.TRUE);
-      getOcrSearchTableField().resetField();
+      getForm().getActiveBox().setValue(TriState.TRUE);
+      getForm().getParsedContentBox().setValue(TriState.UNDEFINED);
+      getForm().getCagegoriesActiveBox().setValue(TriState.TRUE);
+      getForm().getOcrSearchTableField().resetField();
+    }
+
+    @Override
+    public DocumentSearchForm getForm() {
+      return (DocumentSearchForm) super.getForm();
+    }
+  }
+
+  public static class SearchHandler extends AbstractDocumentSearchHandler {
+    /**
+     * @param form
+     */
+    public SearchHandler(DocumentSearchForm form) {
+      super(form);
+    }
+
+    @Override
+    protected void execLoad() {
+      super.execLoad();
+      getForm().getDocumentDateFromField().setValue(Date.from(LocalDate.now().minusYears(2).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+    }
+
+    @Override
+    protected void execStore() {
+    }
+  }
+
+  public static class PartnerDocumentSearchHandler extends AbstractDocumentSearchHandler {
+
+    private BigDecimal m_partnerId;
+
+    public PartnerDocumentSearchHandler(DocumentSearchForm form, BigDecimal partnerId) {
+      super(form);
+      m_partnerId = partnerId;
+    }
+
+    @Override
+    protected void execLoad() {
+      super.execLoad();
+      getForm().getPartnerField().setValue(m_partnerId);
+      getForm().getPartnerField().setEnabled(false);
+    }
+
+    @Override
+    protected void execStore() {
+    }
+  }
+
+  public static class ConversationDocumentSearchHandler extends AbstractDocumentSearchHandler {
+
+    private BigDecimal m_conversationId;
+
+    public ConversationDocumentSearchHandler(DocumentSearchForm form, BigDecimal conversationId) {
+      super(form);
+      m_conversationId = conversationId;
+    }
+
+    @Override
+    protected void execLoad() {
+      super.execLoad();
+      getForm().getConversationField().setValue(m_conversationId);
+      getForm().getConversationField().setEnabled(false);
     }
 
     @Override
