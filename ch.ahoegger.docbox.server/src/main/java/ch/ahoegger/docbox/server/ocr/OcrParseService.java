@@ -2,6 +2,7 @@ package ch.ahoegger.docbox.server.ocr;
 
 import static org.bytedeco.javacpp.lept.pixDestroy;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,16 +53,18 @@ public class OcrParseService {
   private static final Object LOCK = new Object();
 
   public OcrParseResult parsePdf(BinaryResource pdfResource) {
-    LOG.info("About to parse file {} .", pdfResource.getFilename());
+    LOG.info("About to parse file {} .", pdfResource);
     if (!"pdf".equalsIgnoreCase(FileUtility.getFileExtension(pdfResource.getFilename()))) {
-      LOG.warn("File {} is not a parsable file. Parsable files are [*.pdf].", pdfResource.getFilename());
+      LOG.warn("File {} is not a parsable file. Parsable files are [*.pdf].", pdfResource);
       return null;
     }
     // try to get content
     ByteArrayInputStream in = null;
     try {
       in = new ByteArrayInputStream(pdfResource.getContent());
-      return parsePdf(in);
+      OcrParseResult result = parsePdf(in);
+      LOG.info("Parsed file {} .", pdfResource);
+      return result;
     }
     finally {
       if (in != null) {
@@ -165,7 +168,9 @@ public class OcrParseService {
         channel = FileChannel.open(tifPath, StandardOpenOption.WRITE);
         os = Channels.newOutputStream(channel);
         // suffix in filename will be used as the file format
-        ImageIOUtil.writeImage(pdfRenderer.renderImageWithDPI(i, 300, ImageType.RGB), "tiff", os, 300);
+        BufferedImage img = pdfRenderer.renderImageWithDPI(i, 300, ImageType.RGB);
+        ImageIOUtil.writeImage(img, "tiff", os, 300);
+
       }
       finally {
         if (channel != null) {

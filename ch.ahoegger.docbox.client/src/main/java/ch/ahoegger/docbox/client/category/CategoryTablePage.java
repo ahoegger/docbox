@@ -97,7 +97,7 @@ public class CategoryTablePage extends AbstractPageWithTable<CategoryTablePage.T
 
       @Override
       protected int getConfiguredWidth() {
-        return 200;
+        return 300;
       }
 
       @Override

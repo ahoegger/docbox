@@ -201,7 +201,7 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
 
       @Override
       protected int getConfiguredWidth() {
-        return 300;
+        return 400;
       }
 
       @Override
@@ -219,7 +219,7 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
 
       @Override
       protected int getConfiguredWidth() {
-        return 200;
+        return 250;
       }
     }
 
@@ -232,7 +232,7 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
 
       @Override
       protected int getConfiguredWidth() {
-        return 100;
+        return 250;
       }
 
       @Override
@@ -286,7 +286,7 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
 
       @Override
       protected int getConfiguredWidth() {
-        return 100;
+        return 160;
       }
 
       @Override

@@ -356,6 +356,15 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
   @Override
   public void buildOcrOfMissingDocuments() {
+
+    buildOcrOfMissingDocuments(null);
+  }
+
+  @Override
+  public void buildOcrOfMissingDocuments(List<Long> documentIdsRaw) {
+    if (!ACCESS.check(new AdministratorPermission())) {
+      throw new VetoException("Access denied");
+    }
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR))
         .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS)
@@ -363,18 +372,14 @@ public class DocumentService implements IDocumentService, IDocumentTable {
         .append(" ON ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.DOCUMENT_NR))
         .append(" WHERE ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.DOCUMENT_NR)).append(" IS NULL")
         .append(" AND ").append(PARSE_OCR);
+    if (documentIdsRaw != null) {
+      statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR)).append(" IN (")
+          .append(documentIdsRaw.stream().map(id -> id.toString()).collect(Collectors.joining(", ")))
+          .append(")");
+    }
     Object[][] rawResult = SQL.select(statementBuilder.toString());
 
     final List<Long> documentIds = Arrays.stream(rawResult).map(row -> TypeCastUtility.castValue(row[0], Long.class)).collect(Collectors.toList());
-
-    buildOcrOfMissingDocuments(documentIds);
-  }
-
-  @Override
-  public void buildOcrOfMissingDocuments(List<Long> documentIds) {
-    if (!ACCESS.check(new AdministratorPermission())) {
-      throw new VetoException("Access denied");
-    }
 
     Jobs.schedule(new IRunnable() {
       @Override

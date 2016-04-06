@@ -96,7 +96,7 @@ public class PartnerTablePage extends AbstractPageWithTable<PartnerTablePage.Tab
 
       @Override
       protected int getConfiguredWidth() {
-        return 200;
+        return 300;
       }
 
       @Override
