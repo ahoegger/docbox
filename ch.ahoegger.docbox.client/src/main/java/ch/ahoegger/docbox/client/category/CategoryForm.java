@@ -48,7 +48,7 @@ public class CategoryForm extends AbstractForm {
 
   @Override
   protected void execStored() {
-    getDesktop().dataChanged(CategoryTablePage.CATEGORY_ENTITY);
+    getDesktop().dataChanged(ICategoryEntity.ENTITY_KEY);
   }
 
   public void startNew() {

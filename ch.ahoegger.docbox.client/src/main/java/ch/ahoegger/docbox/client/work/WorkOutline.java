@@ -7,6 +7,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TEXTS;
 
+import ch.ahoegger.docbox.client.category.CategoryTablePage;
 import ch.ahoegger.docbox.client.conversation.ConversationTablePage;
 import ch.ahoegger.docbox.client.document.DocumentTablePage;
 import ch.ahoegger.docbox.client.partner.PartnerTablePage;
@@ -25,6 +26,7 @@ public class WorkOutline extends AbstractOutline {
     pageList.add(new DocumentTablePage());
     pageList.add(new ConversationTablePage());
     pageList.add(new PartnerTablePage());
+    pageList.add(new CategoryTablePage());
   }
 
   @Override

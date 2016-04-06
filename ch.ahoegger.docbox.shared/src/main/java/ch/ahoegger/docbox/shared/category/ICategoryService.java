@@ -16,6 +16,12 @@ public interface ICategoryService {
    * @param formData
    * @return
    */
+  CategoryTableData getTableData(CategorySearchFormData formData);
+
+  /**
+   * @param formData
+   * @return
+   */
   CategoryFormData prepareCreate(CategoryFormData formData);
 
   /**

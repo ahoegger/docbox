@@ -5,12 +5,15 @@ import java.util.Date;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 
 import ch.ahoegger.docbox.server.document.DocumentCategoryService;
 import ch.ahoegger.docbox.shared.ISequenceTable;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.category.CategoryFormData;
+import ch.ahoegger.docbox.shared.category.CategorySearchFormData;
+import ch.ahoegger.docbox.shared.category.CategoryTableData;
 import ch.ahoegger.docbox.shared.category.ICategoryService;
 import ch.ahoegger.docbox.shared.category.ICategoryTable;
 import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
@@ -21,6 +24,43 @@ import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
  * @author Andreas Hoegger
  */
 public class CategoryService implements ICategoryService, ICategoryTable {
+
+  @Override
+  public CategoryTableData getTableData(CategorySearchFormData formData) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, CATEGORY_NR, NAME, START_DATE, END_DATE))
+        .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS).append(" ")
+        .append(SqlFramentBuilder.WHERE_DEFAULT);
+
+    // search criteria name
+    if (StringUtility.hasText(formData.getName().getValue())) {
+      statementBuilder.append(" AND ").append(SqlFramentBuilder.whereStringContains(NAME, formData.getName().getValue()));
+    }
+    // seach criteria active
+    if (formData.getActiveBox().getValue() != null) {
+      switch (formData.getActiveBox().getValue()) {
+        case TRUE:
+          statementBuilder.append(" AND (").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, END_DATE)).append(" >= ").append("CURRENT_DATE")
+              .append(" OR ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, END_DATE)).append(" IS NULL)");
+          break;
+        case FALSE:
+          statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, END_DATE)).append(" < ").append("CURRENT_DATE");
+          break;
+      }
+    }
+
+    statementBuilder.append(" INTO ")
+        .append(":{td.categoryId}, ")
+        .append(":{td.name}, ")
+        .append(":{td.startDate}, ")
+        .append(":{td.endDate} ");
+
+    CategoryTableData tableData = new CategoryTableData();
+    SQL.selectInto(statementBuilder.toString(),
+        new NVPair("td", tableData),
+        formData);
+    return tableData;
+  }
 
   @Override
   public CategoryFormData prepareCreate(CategoryFormData formData) {

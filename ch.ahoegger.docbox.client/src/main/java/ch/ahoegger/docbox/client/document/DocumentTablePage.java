@@ -51,6 +51,7 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
 
   private BigDecimal m_conversationId;
   private BigDecimal m_partnerId;
+  private BigDecimal m_categoryId;
 
   @Override
   protected String getConfiguredTitle() {
@@ -78,9 +79,13 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
     if (getConversationId() != null) {
       searchForm.setHandler(new DocumentSearchForm.ConversationDocumentSearchHandler(searchForm, getConversationId()));
     }
-    if (getPartnerId() != null) {
+    else if (getPartnerId() != null) {
       searchForm.setHandler(new DocumentSearchForm.PartnerDocumentSearchHandler(searchForm, getPartnerId()));
     }
+    else if (getCategoryId() != null) {
+      searchForm.setHandler(new DocumentSearchForm.CategoryDocumentSearchHandler(searchForm, getCategoryId()));
+    }
+
     return searchForm;
   }
 
@@ -103,6 +108,17 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
 
   public void setPartnerId(BigDecimal partnerId) {
     m_partnerId = partnerId;
+  }
+
+  /**
+   * @param value
+   */
+  public void setCategoryId(BigDecimal categoryId) {
+    m_categoryId = categoryId;
+  }
+
+  public BigDecimal getCategoryId() {
+    return m_categoryId;
   }
 
   public class Table extends AbstractTable {

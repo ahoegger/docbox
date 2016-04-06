@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.client.document.field;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -21,7 +22,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 import ch.ahoegger.docbox.client.category.CategoryForm;
-import ch.ahoegger.docbox.client.category.CategoryTablePage;
+import ch.ahoegger.docbox.client.category.ICategoryEntity;
 import ch.ahoegger.docbox.shared.category.CategoryLookupCall;
 import ch.ahoegger.docbox.shared.category.ICategoryService;
 
@@ -43,18 +44,19 @@ public abstract class AbstractCategoriesListBox extends AbstractListBox<BigDecim
 
   @Override
   protected void execInitField() {
-    registerDataChangeListener(CategoryTablePage.CATEGORY_ENTITY);
+    registerDataChangeListener(ICategoryEntity.ENTITY_KEY);
   }
 
   @Override
   protected void execDataChanged(Object... dataTypes) {
-    loadListBoxData();
-    super.execDataChanged(dataTypes);
+    if (Arrays.stream(dataTypes).filter(o -> o == ICategoryEntity.ENTITY_KEY).count() > 0) {
+      loadListBoxData();
+    }
   }
 
   @Override
   protected void execPrepareLookup(ILookupCall<BigDecimal> call) {
-    call.setMaster(CategoryTablePage.CATEGORY_ENTITY);
+    call.setMaster(ICategoryEntity.ENTITY_KEY);
   }
 
   protected IDesktop getDesktop() {
@@ -62,6 +64,11 @@ public abstract class AbstractCategoriesListBox extends AbstractListBox<BigDecim
   }
 
   public class CategoriesTable extends DefaultListBoxTable {
+
+    @Override
+    protected boolean getConfiguredAutoDiscardOnDelete() {
+      return false;
+    }
 
     @Order(1000)
     public class NewCategoryMenu extends AbstractMenu {
@@ -140,7 +147,7 @@ public abstract class AbstractCategoriesListBox extends AbstractListBox<BigDecim
             .withBody(TEXTS.get("VerificationDelete", getTextColumn().getSelectedDisplayText())).show()) {
           BEANS.get(ICategoryService.class).delete(getKeyColumn().getSelectedValue().longValue());
 
-          getDesktop().dataChanged(CategoryTablePage.CATEGORY_ENTITY);
+          getDesktop().dataChanged(ICategoryEntity.ENTITY_KEY);
         }
       }
     }

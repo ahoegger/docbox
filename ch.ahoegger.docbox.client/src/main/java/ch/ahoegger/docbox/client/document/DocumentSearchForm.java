@@ -552,4 +552,25 @@ public class DocumentSearchForm extends AbstractSearchForm {
     }
   }
 
+  public static class CategoryDocumentSearchHandler extends AbstractDocumentSearchHandler {
+
+    private BigDecimal m_categoryId;
+
+    public CategoryDocumentSearchHandler(DocumentSearchForm form, BigDecimal categoryid) {
+      super(form);
+      m_categoryId = categoryid;
+    }
+
+    @Override
+    protected void execLoad() {
+      super.execLoad();
+      getForm().getCategoriesBox().setValue(CollectionUtility.hashSet(m_categoryId));
+      getForm().getCategoriesBox().setEnabled(false);
+    }
+
+    @Override
+    protected void execStore() {
+    }
+  }
+
 }

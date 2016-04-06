@@ -49,6 +49,7 @@ public class Desktop extends AbstractDesktop {
   protected void execGuiAttached() {
     super.execGuiAttached();
     selectFirstVisibleOutline();
+    activateFirstPage();
   }
 
   protected void selectFirstVisibleOutline() {
