@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.html.HTML;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -104,14 +105,6 @@ public class DocumentForm extends AbstractForm {
 
   public void startPage() {
     startInternal(new PageHandler());
-  }
-
-  public void startNew() {
-    startInternal(new NewHandler());
-  }
-
-  public void startEdit() {
-    startInternal(new EditHandler());
   }
 
   @FormData
@@ -523,43 +516,123 @@ public class DocumentForm extends AbstractForm {
     }
   }
 
-  public class NewHandler extends AbstractFormHandler {
+  public static abstract class AbstractDocumentFormHandler extends AbstractFormHandler {
+    public AbstractDocumentFormHandler(DocumentForm form) {
+      setFormInternal(form);
+    }
+
+    @Override
+    protected void execLoad() {
+
+    }
+
+    @Override
+    public DocumentForm getForm() {
+      return (DocumentForm) super.getForm();
+    }
+  }
+
+  public static class DocumentFormNewHandler extends AbstractDocumentFormHandler {
+    private BigDecimal m_partnerId;
+    private BigDecimal m_conversationId;
+    private BinaryResource m_documentResource;
+
+    /**
+     * @param form
+     */
+    public DocumentFormNewHandler(DocumentForm form) {
+      super(form);
+    }
+
+    public void setPartnerId(BigDecimal partnerId) {
+      m_partnerId = partnerId;
+    }
+
+    public BigDecimal getPartnerId() {
+      return m_partnerId;
+    }
+
+    public void setConversationId(BigDecimal conversationId) {
+      m_conversationId = conversationId;
+    }
+
+    public BigDecimal getConversationId() {
+      return m_conversationId;
+    }
+
+    /**
+     * @param firstElement
+     */
+    public void setDocumentResource(BinaryResource documentResource) {
+      m_documentResource = documentResource;
+    }
+
+    public BinaryResource getDocumentResource() {
+      return m_documentResource;
+    }
+
     @Override
     protected void execLoad() {
       DocumentFormData formData = new DocumentFormData();
       formData = BEANS.get(IDocumentService.class).prepareCreate(formData);
-      importFormData(formData);
-      getDocumentField().setVisible(true);
-      getDocumentField().setMandatory(true);
-      getOpenHtmlField().setVisible(false);
-      getShowOcrButton().setVisible(false);
+      getForm().importFormData(formData);
+      getForm().getDocumentField().setVisible(true);
+      getForm().getDocumentField().setMandatory(true);
+      getForm().getOpenHtmlField().setVisible(false);
+      getForm().getShowOcrButton().setVisible(false);
+      if (getPartnerId() != null) {
+        getForm().getPartnersField().setValue(CollectionUtility.hashSet(getPartnerId()));
+      }
+      if (getConversationId() != null) {
+        getForm().getConversationField().setValue(getConversationId());
+      }
+      if (getDocumentResource() != null) {
+        getForm().getDocumentField().setValue(getDocumentResource());
+      }
+      super.execLoad();
     }
 
     @Override
     protected void execStore() {
       DocumentFormData formData = new DocumentFormData();
-      exportFormData(formData);
+      getForm().exportFormData(formData);
       BEANS.get(IDocumentService.class).create(formData);
     }
+
   }
 
-  public class EditHandler extends AbstractFormHandler {
+  public static class DocumentFormEditHandler extends AbstractDocumentFormHandler {
+    private final Long m_documentId;
+
+    /**
+     * @param form
+     */
+    public DocumentFormEditHandler(DocumentForm form, Long documentId) {
+      super(form);
+      m_documentId = documentId;
+    }
+
+    public Long getDocumentId() {
+      return m_documentId;
+    }
+
     @Override
     protected void execLoad() {
       DocumentFormData formData = new DocumentFormData();
-      exportFormData(formData);
+      formData.setDocumentId(getDocumentId());
       formData = BEANS.get(IDocumentService.class).load(formData);
-      importFormData(formData);
-      getShowOcrButton().setVisible(getHasOcrText());
+      getForm().importFormData(formData);
+      getForm().getShowOcrButton().setVisible(getForm().getHasOcrText());
+
     }
 
     @Override
     protected void execStore() {
       DocumentFormData formData = new DocumentFormData();
-      exportFormData(formData);
+      getForm().exportFormData(formData);
       BEANS.get(IDocumentService.class).store(formData);
-
     }
+
   }
 
 }

@@ -74,6 +74,11 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
   }
 
   @Override
+  public DocumentSearchForm getSearchFormInternal() {
+    return (DocumentSearchForm) super.getSearchFormInternal();
+  }
+
+  @Override
   protected ISearchForm createSearchForm() {
     DocumentSearchForm searchForm = (DocumentSearchForm) super.createSearchForm();
     if (getConversationId() != null) {
@@ -134,8 +139,12 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
         List<BinaryResource> resources = ((ResourceListTransferObject) t).getResources();
         if (resources.size() > 0) {
           DocumentForm form = new DocumentForm();
-          form.getDocumentField().setValue(CollectionUtility.firstElement(resources));
-          form.startNew();
+          DocumentForm.DocumentFormNewHandler handler = new DocumentForm.DocumentFormNewHandler(form);
+          handler.setPartnerId(getSearchFormInternal().getPartnerField().getValue());
+          handler.setConversationId(getSearchFormInternal().getConversationField().getValue());
+          handler.setDocumentResource(CollectionUtility.firstElement(resources));
+          form.setHandler(handler);
+          form.start();
         }
       }
 
@@ -330,11 +339,12 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
       @Override
       protected void execAction() {
         DocumentForm form = new DocumentForm();
-        form.startNew();
-        form.waitFor();
-        if (form.isFormStored()) {
-          reloadPage();
-        }
+        DocumentForm.DocumentFormNewHandler handler = new DocumentForm.DocumentFormNewHandler(form);
+        handler.setPartnerId(getSearchFormInternal().getPartnerField().getValue());
+        handler.setConversationId(getSearchFormInternal().getConversationField().getValue());
+        form.setHandler(handler);
+
+        form.start();
       }
     }
 
@@ -352,10 +362,11 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
 
       @Override
       protected void execAction() {
-
         DocumentForm form = new DocumentForm();
-        form.setDocumentId(getDocumentIdColumn().getSelectedValue());
-        form.startEdit();
+        DocumentForm.DocumentFormEditHandler handler = new DocumentForm.DocumentFormEditHandler(form, getDocumentIdColumn().getSelectedValue());
+        form.setHandler(handler);
+
+        form.start();
       }
 
     }

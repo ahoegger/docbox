@@ -75,7 +75,7 @@ public class DocumentFormTest {
   @Ignore
   public void testMessageCorrectlyImported() {
     DocumentForm frm = new DocumentForm();
-    frm.startEdit();
+//    frm.startEdit();
 
     Assert.assertEquals(MESSAGE_VALUE, frm.getAbstractTextField().getValue());
   }

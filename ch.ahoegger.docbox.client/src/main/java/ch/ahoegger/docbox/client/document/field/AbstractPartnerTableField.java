@@ -42,6 +42,15 @@ public abstract class AbstractPartnerTableField extends AbstractTableField<Abstr
     return TEXTS.get("Partners");
   }
 
+  public void setValue(Set<BigDecimal> partnerIds) {
+    getTable().discardAllRows();
+    for (BigDecimal pId : partnerIds) {
+      ITableRow row = getTable().addRow(getTable().createRow(), true);
+      getTable().getPartnerColumn().setValue(row, pId);
+    }
+    ensureEmptyRow();
+  }
+
   @Override
   protected void execInitField() {
     getTable().addTableListener(new TableAdapter() {
