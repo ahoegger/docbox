@@ -1,9 +1,7 @@
 package ch.ahoegger.docbox.server.conversation;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -19,6 +17,7 @@ import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.shared.conversation.ConversationSearchFormData;
 import ch.ahoegger.docbox.shared.conversation.ConversationTableData;
 import ch.ahoegger.docbox.shared.conversation.IConversationService;
+import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
  * <h3>{@link ConversationService_SearchByActiveState}</h3>
@@ -40,21 +39,22 @@ public class ConversationService_SearchByActiveState extends AbstractTestWithDat
     LocalDate today = LocalDate.now();
 
     BEANS.get(ConversationTableTask.class).createConversationRow(sqlService, conversationId01, "sample conversation 01", "some notes",
-        Date.from(today.minusDays(20).atStartOfDay(ZoneId.systemDefault()).toInstant()), null);
+        LocalDateUtility.toDate(today.minusDays(20)), null);
 
     // till yesterday
     BEANS.get(ConversationTableTask.class).createConversationRow(sqlService, conversationId02, "sample conversation 02", "some notes",
-        Date.from(today.minusDays(10).atStartOfDay(ZoneId.systemDefault()).toInstant()), Date.from(today.minusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        LocalDateUtility.toDate(today.minusDays(10)),
+        LocalDateUtility.toDate(today.minusDays(1)));
 
     // till today
     BEANS.get(ConversationTableTask.class).createConversationRow(sqlService, conversationId03, "sample conversation 03", "some notes",
-        Date.from(today.minusDays(10).atStartOfDay(ZoneId.systemDefault()).toInstant()),
-        Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        LocalDateUtility.toDate(today.minusDays(10)),
+        LocalDateUtility.toDate(today));
 
     // till tomorrow
     BEANS.get(ConversationTableTask.class).createConversationRow(sqlService, conversationId04, "sample conversation 04", "some notes",
-        Date.from(today.minusDays(10).atStartOfDay(ZoneId.systemDefault()).toInstant()),
-        Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        LocalDateUtility.toDate(today.minusDays(10)),
+        LocalDateUtility.toDate(today.plusDays(1)));
   }
 
   @Test

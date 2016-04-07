@@ -2,7 +2,7 @@ package ch.ahoegger.docbox.server.app.dev;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Calendar;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -17,7 +17,6 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +36,7 @@ import ch.ahoegger.docbox.server.database.dev.initialization.SequenceTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.UserTableTask;
 import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.server.security.SecurityService;
+import ch.ahoegger.docbox.shared.ISequenceTable;
 import ch.ahoegger.docbox.shared.category.ICategoryTable;
 import ch.ahoegger.docbox.shared.conversation.IConversationTable;
 import ch.ahoegger.docbox.shared.document.IDocumentCategoryTable;
@@ -45,6 +45,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 import ch.ahoegger.docbox.shared.document.IDocumentTable;
 import ch.ahoegger.docbox.shared.partner.IPartnerTable;
 import ch.ahoegger.docbox.shared.security.permission.IDefaultPermissionTable;
+import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
  * <h3>{@link DevDerbySqlService}</h3>
@@ -56,11 +57,24 @@ import ch.ahoegger.docbox.shared.security.permission.IDefaultPermissionTable;
 public class DevDerbySqlService extends DerbySqlService {
   private static final Logger LOG = LoggerFactory.getLogger(CategoryTableTask.class);
 
-  public static final Long SEQ_START_ROLE = 200l;
-  public static final Long SEQ_START_PARTNER = 300l;
-  public static final Long SEQ_START_DOCUMENT = 400l;
-  public static final Long SEQ_START_CATEGORY = 500l;
-  public static final Long SEQ_START_CONVERSATION = 600l;
+  private Long documentId01;
+  private Long documentId02;
+  private Long documentId03;
+
+  private Long categoryId01;
+  private Long categoryId02;
+  private Long categoryId03;
+
+  private Long conversationId01;
+  private Long conversationId02;
+  private Long conversationId03;
+
+  private Long partnerId01;
+  private Long partnerId02;
+
+  private static final LocalDate TODAY = LocalDate.now();
+
+  private static String SYSTEM_USER = System.getProperty("user.name").toLowerCase();
 
   @PostConstruct
   public void setupDb() {
@@ -91,6 +105,7 @@ public class DevDerbySqlService extends DerbySqlService {
   }
 
   protected void initializeDatabase() {
+
     List<ITableTask> tableTasks = BEANS.all(ITableTask.class);
     // create tables
     for (ITableTask task : tableTasks) {
@@ -110,11 +125,13 @@ public class DevDerbySqlService extends DerbySqlService {
   }
 
   protected void insertSequenceInitialValue(ISqlService sqlService) {
-    BEANS.get(SequenceTask.class).insertInitialValue(sqlService, 1000);
+    BEANS.get(SequenceTask.class).insertInitialValue(sqlService, 0);
+
   }
 
   protected void createUsers(ISqlService sqlService) {
     UserTableTask userTableTask = BEANS.get(UserTableTask.class);
+    userTableTask.insertUser(sqlService, String.format("Dev.user[%s]", SYSTEM_USER), "development", SYSTEM_USER, new String(BEANS.get(SecurityService.class).createPasswordHash("".toCharArray())), true, true);
     userTableTask.insertUser(sqlService, "Cuttis", "Bolion", "cuttis", new String(BEANS.get(SecurityService.class).createPasswordHash("pwd".toCharArray())), true, false);
     userTableTask.insertUser(sqlService, "Bob", "Miller", "bob", new String(BEANS.get(SecurityService.class).createPasswordHash("pwd".toCharArray())), true, false);
     userTableTask.insertUser(sqlService, "Admin", "Manager", "admin", new String(BEANS.get(SecurityService.class).createPasswordHash("manager".toCharArray())), true, true);
@@ -122,17 +139,31 @@ public class DevDerbySqlService extends DerbySqlService {
 
   protected void insertCategories(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", ICategoryTable.TABLE_NAME);
+
+    // ids
+    categoryId01 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+    categoryId02 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+    categoryId03 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+
     CategoryTableTask categoryTableTask = BEANS.get(CategoryTableTask.class);
-    categoryTableTask.createCategoryRow(sqlService, SEQ_START_CATEGORY, "Work", "anything work related.", new Date(), null);
-    categoryTableTask.createCategoryRow(sqlService, SEQ_START_CATEGORY + 1, "Household", "some window cleaning stuff.", new Date(), null);
+    categoryTableTask.createCategoryRow(sqlService, categoryId01, "Work", "anything work related.", LocalDateUtility.today(), null);
+    categoryTableTask.createCategoryRow(sqlService, categoryId02, "Household", "some window cleaning stuff.", LocalDateUtility.today(), null);
+    categoryTableTask.createCategoryRow(sqlService, categoryId03, "Past category", "inactive category.",
+        LocalDateUtility.toDate(TODAY.minusDays(150)),
+        LocalDateUtility.toDate(TODAY.minusDays(10)));
   }
 
   protected void insertConversations(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", IConversationTable.TABLE_NAME);
+    // ids
+    conversationId01 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+    conversationId02 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+    conversationId03 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+
     ConversationTableTask conversationTableTask = BEANS.get(ConversationTableTask.class);
-    conversationTableTask.createConversationRow(sqlService, SEQ_START_CONVERSATION, "House selling", "everything related with house selling.", new Date(), null);
-    conversationTableTask.createConversationRow(sqlService, SEQ_START_CONVERSATION + 1, "Ponny order", "all documents to get a ponny.", new Date(), null);
-    conversationTableTask.createConversationRow(sqlService, SEQ_START_CONVERSATION + 2, "Without partner rel", "all documents to get a ponny.", new Date(), null);
+    conversationTableTask.createConversationRow(sqlService, conversationId01, "House selling", "everything related with house selling.", LocalDateUtility.today(), null);
+    conversationTableTask.createConversationRow(sqlService, conversationId02, "Ponny order", "all documents to get a ponny.", LocalDateUtility.today(), null);
+    conversationTableTask.createConversationRow(sqlService, conversationId03, "Without partner rel", "all documents to get a ponny.", LocalDateUtility.today(), null);
   }
 
   protected void insertDefaultPermissions(ISqlService sqlService) {
@@ -144,9 +175,13 @@ public class DevDerbySqlService extends DerbySqlService {
 
   protected void insertPartners(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", IPartnerTable.TABLE_NAME);
+    // ids
+    partnerId01 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+    partnerId02 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+
     PartnerTableTask partnerTableTask = BEANS.get(PartnerTableTask.class);
-    partnerTableTask.createPartnerRow(sqlService, SEQ_START_PARTNER, "Gorak Inc", "A special company", new Date(), null);
-    partnerTableTask.createPartnerRow(sqlService, SEQ_START_PARTNER + 1, "Solan Org", "Some other comapny", new Date(), null);
+    partnerTableTask.createPartnerRow(sqlService, partnerId01, "Gorak Inc", "A special company", LocalDateUtility.today(), null);
+    partnerTableTask.createPartnerRow(sqlService, partnerId02, "Solan Org", "Some other comapny", LocalDateUtility.today(), null);
   }
 
   protected void insertDocuments(ISqlService sqlService) {
@@ -154,14 +189,25 @@ public class DevDerbySqlService extends DerbySqlService {
 
     DocumentTableTask documentTableTask = BEANS.get(DocumentTableTask.class);
     try {
-      Calendar cal = Calendar.getInstance();
-      DateUtility.truncCalendar(cal);
+      documentId01 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+      insertDocument(sqlService, documentTableTask, documentId01, "A sample document",
+          LocalDateUtility.today(),
+          LocalDateUtility.today(),
+          LocalDateUtility.today(),
+          "2016_03_08_124640.pdf", null, null);
 
-      insertDocument(sqlService, documentTableTask, SEQ_START_DOCUMENT, "A sample document", cal.getTime(), new Date(), new Date(), "2016_03_08_124640.pdf", null, null);
-      cal.add(Calendar.YEAR, -1);
-      insertDocument(sqlService, documentTableTask, SEQ_START_DOCUMENT + 1, "Bobs document", cal.getTime(), new Date(), new Date(), "2016_03_08_124640.pdf", null, null);
-      cal.add(Calendar.YEAR, -3);
-      insertDocument(sqlService, documentTableTask, SEQ_START_DOCUMENT + 2, "Multiple partner document", cal.getTime(), new Date(), new Date(), "2016_03_08_124640.pdf", null, null);
+      documentId02 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+      insertDocument(sqlService, documentTableTask, documentId02, "Bobs document",
+          LocalDateUtility.toDate(TODAY.minusYears(1)),
+          LocalDateUtility.today(),
+          null,
+          "2016_03_08_124640.pdf", null, null);
+      documentId03 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+      insertDocument(sqlService, documentTableTask, documentId03, "Multiple partner document",
+          LocalDateUtility.toDate(TODAY.minusYears(3)),
+          LocalDateUtility.today(),
+          null,
+          "2016_03_08_124640.pdf", null, null);
     }
     catch (IOException e) {
       LOG.error("Could not add dev documents to data store.", e);
@@ -185,26 +231,28 @@ public class DevDerbySqlService extends DerbySqlService {
   protected void insertDocumentCategory(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", IDocumentCategoryTable.TABLE_NAME);
     DocumentCategoryTableTask documentCategoryTableTask = BEANS.get(DocumentCategoryTableTask.class);
-    documentCategoryTableTask.createDocumentCategoryRow(sqlService, SEQ_START_DOCUMENT, SEQ_START_CATEGORY);
-    documentCategoryTableTask.createDocumentCategoryRow(sqlService, SEQ_START_DOCUMENT + 2, SEQ_START_CATEGORY);
-    documentCategoryTableTask.createDocumentCategoryRow(sqlService, SEQ_START_DOCUMENT + 2, SEQ_START_CATEGORY + 1);
+    documentCategoryTableTask.createDocumentCategoryRow(sqlService, documentId01, categoryId01);
+    documentCategoryTableTask.createDocumentCategoryRow(sqlService, documentId02, categoryId02);
+    documentCategoryTableTask.createDocumentCategoryRow(sqlService, documentId02, categoryId03);
+    documentCategoryTableTask.createDocumentCategoryRow(sqlService, documentId03, categoryId01);
+    documentCategoryTableTask.createDocumentCategoryRow(sqlService, documentId03, categoryId02);
   }
 
   protected void insertDocumentPartner(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", IDocumentPartnerTable.TABLE_NAME);
     DocumentPartnerTableTask documentPartnerTableTask = BEANS.get(DocumentPartnerTableTask.class);
-    documentPartnerTableTask.createDocumentPartnerRow(sqlService, SEQ_START_DOCUMENT, SEQ_START_PARTNER);
-    documentPartnerTableTask.createDocumentPartnerRow(sqlService, SEQ_START_DOCUMENT + 2, SEQ_START_PARTNER);
-    documentPartnerTableTask.createDocumentPartnerRow(sqlService, SEQ_START_DOCUMENT + 2, SEQ_START_PARTNER + 1);
+    documentPartnerTableTask.createDocumentPartnerRow(sqlService, documentId01, partnerId01);
+    documentPartnerTableTask.createDocumentPartnerRow(sqlService, documentId03, partnerId01);
+    documentPartnerTableTask.createDocumentPartnerRow(sqlService, documentId03, partnerId02);
   }
 
   protected void insertDocumentPermission(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", IDocumentPermissionTable.TABLE_NAME);
     DocumentPermissionTableTask documentPermissionTableTask = BEANS.get(DocumentPermissionTableTask.class);
-    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "admin", SEQ_START_DOCUMENT, IDocumentPermissionTable.PERMISSION_WRITE);
-    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "admin", SEQ_START_DOCUMENT + 1, IDocumentPermissionTable.PERMISSION_WRITE);
-    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "admin", SEQ_START_DOCUMENT + 2, IDocumentPermissionTable.PERMISSION_WRITE);
-    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "cuttis", SEQ_START_DOCUMENT + 1, IDocumentPermissionTable.PERMISSION_READ);
-    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "bob", SEQ_START_DOCUMENT + 1, IDocumentPermissionTable.PERMISSION_WRITE);
+    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "admin", documentId01, IDocumentPermissionTable.PERMISSION_WRITE);
+    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "admin", documentId02, IDocumentPermissionTable.PERMISSION_WRITE);
+    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "admin", documentId03, IDocumentPermissionTable.PERMISSION_WRITE);
+    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "cuttis", documentId02, IDocumentPermissionTable.PERMISSION_READ);
+    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "bob", documentId02, IDocumentPermissionTable.PERMISSION_WRITE);
   }
 }

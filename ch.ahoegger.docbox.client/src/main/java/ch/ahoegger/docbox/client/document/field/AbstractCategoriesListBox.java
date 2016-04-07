@@ -55,6 +55,26 @@ public abstract class AbstractCategoriesListBox extends AbstractListBox<BigDecim
   }
 
   @Override
+  protected boolean getConfiguredFilterActiveRows() {
+    return false;
+  }
+//  @Override
+//  protected void execChangedValue() {
+//
+//    super.execChangedValue();
+//    // reflection call
+//    try {
+//      Method method = AbstractListBox.class.getDeclaredMethod("updateActiveRowsFilter");
+//      method.setAccessible(true);
+//      method.invoke(this);
+//    }
+//    catch (Exception e) {
+//      // TODO Auto-generated catch block
+//      e.printStackTrace();
+//    }
+//  }
+
+  @Override
   protected void execPrepareLookup(ILookupCall<BigDecimal> call) {
     call.setMaster(ICategoryEntity.ENTITY_KEY);
   }

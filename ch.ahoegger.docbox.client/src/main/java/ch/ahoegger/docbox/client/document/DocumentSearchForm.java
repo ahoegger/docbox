@@ -2,8 +2,6 @@ package ch.ahoegger.docbox.client.document;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.client.dto.FormData;
@@ -52,6 +50,7 @@ import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
 import ch.ahoegger.docbox.shared.conversation.ConversationLookupCall;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
+import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
  * <h3>{@link DocumentSearchForm}</h3>
@@ -502,7 +501,7 @@ public class DocumentSearchForm extends AbstractSearchForm {
     @Override
     protected void execLoad() {
       super.execLoad();
-      getForm().getDocumentDateFromField().setValue(Date.from(LocalDate.now().minusYears(2).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+      getForm().getDocumentDateFromField().setValue(LocalDateUtility.toDate(LocalDate.now().minusYears(2)));
     }
 
     @Override

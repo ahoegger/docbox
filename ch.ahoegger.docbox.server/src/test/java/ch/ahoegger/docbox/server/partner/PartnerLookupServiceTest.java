@@ -1,8 +1,6 @@
 package ch.ahoegger.docbox.server.partner;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -16,6 +14,7 @@ import ch.ahoegger.docbox.server.database.dev.initialization.PartnerTableTask;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
+import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
  * <h3>{@link PartnerLookupServiceTest}</h3>
@@ -37,21 +36,23 @@ public class PartnerLookupServiceTest extends AbstractTestWithDatabase {
     LocalDate today = LocalDate.now();
 
     BEANS.get(PartnerTableTask.class).createPartnerRow(sqlService, partnerId01, "partner01", "some notes",
-        Date.from(today.minusDays(20).atStartOfDay(ZoneId.systemDefault()).toInstant()), null);
+        LocalDateUtility.toDate(today.minusDays(20)),
+        null);
 
     // till yesterday
     BEANS.get(PartnerTableTask.class).createPartnerRow(sqlService, partnerId02, "partner02", "some notes",
-        Date.from(today.minusDays(10).atStartOfDay(ZoneId.systemDefault()).toInstant()), Date.from(today.minusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        LocalDateUtility.toDate(today.minusDays(10)),
+        LocalDateUtility.toDate(today.minusDays(1)));
 
     // till today
     BEANS.get(PartnerTableTask.class).createPartnerRow(sqlService, partnerId03, "partner03", "some notes",
-        Date.from(today.minusDays(10).atStartOfDay(ZoneId.systemDefault()).toInstant()),
-        Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        LocalDateUtility.toDate(today.minusDays(10)),
+        LocalDateUtility.toDate(today));
 
     // till tomorrow
     BEANS.get(PartnerTableTask.class).createPartnerRow(sqlService, partnerId04, "partner04", "some notes",
-        Date.from(today.minusDays(10).atStartOfDay(ZoneId.systemDefault()).toInstant()),
-        Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        LocalDateUtility.toDate(today.minusDays(10)),
+        LocalDateUtility.toDate(today.plusDays(1)));
 
   }
 

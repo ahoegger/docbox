@@ -1,9 +1,7 @@
 package ch.ahoegger.docbox.server.document;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -30,6 +28,7 @@ import ch.ahoegger.docbox.server.test.util.TestDocumentStoreService;
 import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
 import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
 import ch.ahoegger.docbox.shared.ocr.IDocumentOcrService;
+import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
  * <h3>{@link DocumentService_ParseMissingDocumentsTest}</h3>
@@ -85,23 +84,23 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
     LocalDate today = LocalDate.now();
 
     BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId01, "Cats Document",
-        Date.from(today.minusDays(20).atStartOfDay(ZoneId.systemDefault()).toInstant()),
-        Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+        LocalDateUtility.toDate(today.minusDays(20)),
+        LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, true);
 
     BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId02, "Abstract Document",
-        Date.from(today.minusDays(20).atStartOfDay(ZoneId.systemDefault()).toInstant()),
-        Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+        LocalDateUtility.toDate(today.minusDays(20)),
+        LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, true);
 
     BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId03, "Dogs Document",
-        Date.from(today.minusDays(20).atStartOfDay(ZoneId.systemDefault()).toInstant()),
-        Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+        LocalDateUtility.toDate(today.minusDays(20)),
+        LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, true);
 
     BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId04, "All fish are wet",
-        Date.from(today.minusDays(20).atStartOfDay(ZoneId.systemDefault()).toInstant()),
-        Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+        LocalDateUtility.toDate(today.minusDays(20)),
+        LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, false);
 
     BEANS.get(DocumentOcrTableTask.class).createDocumentOcrRow(sqlService, documentId01, "parsed01", true, false);

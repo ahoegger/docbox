@@ -1,9 +1,7 @@
 package ch.ahoegger.docbox.server.conversation;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -18,6 +16,7 @@ import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.shared.conversation.ConversationSearchFormData;
 import ch.ahoegger.docbox.shared.conversation.ConversationTableData;
 import ch.ahoegger.docbox.shared.conversation.IConversationService;
+import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
  * <h3>{@link ConversationService_SearchByName}</h3>
@@ -39,22 +38,22 @@ public class ConversationService_SearchByName extends AbstractTestWithDatabase {
     LocalDate today = LocalDate.now();
 
     BEANS.get(ConversationTableTask.class).createConversationRow(sqlService, conversationId01, "dook haagen", "some notes",
-        Date.from(today.minusDays(20).atStartOfDay(ZoneId.systemDefault()).toInstant()),
+        LocalDateUtility.toDate(today.minusDays(20)),
         null);
 
     // till yesterday
     BEANS.get(ConversationTableTask.class).createConversationRow(sqlService, conversationId02, "smill donat", "some notes",
-        Date.from(today.minusDays(10).atStartOfDay(ZoneId.systemDefault()).toInstant()),
+        LocalDateUtility.toDate(today.minusDays(10)),
         null);
 
     // till today
     BEANS.get(ConversationTableTask.class).createConversationRow(sqlService, conversationId03, "bluk onack", "some notes",
-        Date.from(today.minusDays(10).atStartOfDay(ZoneId.systemDefault()).toInstant()),
+        LocalDateUtility.toDate(today.minusDays(10)),
         null);
 
     // till tomorrow
     BEANS.get(ConversationTableTask.class).createConversationRow(sqlService, conversationId04, "7 sense of moon", "some notes",
-        Date.from(today.minusDays(10).atStartOfDay(ZoneId.systemDefault()).toInstant()),
+        LocalDateUtility.toDate(today.minusDays(10)),
         null);
   }
 
