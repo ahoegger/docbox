@@ -2,8 +2,6 @@ package ch.ahoegger.docbox.server.ocr;
 
 import java.nio.file.Path;
 
-import org.eclipse.scout.rt.platform.util.StringUtility;
-
 /**
  * <h3>{@link OcrParseResult}</h3>
  *
@@ -14,28 +12,27 @@ public class OcrParseResult {
   private Path m_workingDirectory;
   private boolean m_ocrParsed;
 
-  public void setText(String text) {
+  public OcrParseResult withText(String text) {
     m_text = text;
+    return this;
   }
 
   public String getText() {
     return m_text;
   }
 
-  public boolean hasText() {
-    return StringUtility.hasText(getText());
-  }
-
-  public void setOcrParsed(boolean ocrParsed) {
+  public OcrParseResult withOcrParsed(boolean ocrParsed) {
     m_ocrParsed = ocrParsed;
+    return this;
   }
 
   public boolean isOcrParsed() {
     return m_ocrParsed;
   }
 
-  public void setWorkingDirectory(Path workingDirectory) {
+  public OcrParseResult withWorkingDirectory(Path workingDirectory) {
     m_workingDirectory = workingDirectory;
+    return this;
   }
 
   public Path getWorkingDirectory() {

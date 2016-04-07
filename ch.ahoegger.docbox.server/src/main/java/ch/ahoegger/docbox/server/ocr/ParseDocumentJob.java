@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
-import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
+import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
 
 /**
  * <h3>{@link ParseDocumentJob}</h3>
@@ -52,7 +52,7 @@ public class ParseDocumentJob {
     return Jobs.schedule(new Callable<BinaryResource>() {
       @Override
       public BinaryResource call() throws Exception {
-        return BEANS.get(DocumentStoreService.class).getDocument(documentId);
+        return BEANS.get(IDocumentStoreService.class).getDocument(documentId);
       }
     }, Jobs.newInput().withRunContext(
         ServerRunContexts.empty()

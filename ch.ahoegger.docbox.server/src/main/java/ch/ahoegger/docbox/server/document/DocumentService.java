@@ -14,6 +14,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -362,6 +363,10 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
   @Override
   public void buildOcrOfMissingDocuments(List<Long> documentIdsRaw) {
+    buildOcrOfMissingDocumentsInternal(documentIdsRaw);
+  }
+
+  protected IFuture<Void> buildOcrOfMissingDocumentsInternal(List<Long> documentIdsRaw) {
     if (!ACCESS.check(new AdministratorPermission())) {
       throw new VetoException("Access denied");
     }
@@ -381,7 +386,7 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
     final List<Long> documentIds = Arrays.stream(rawResult).map(row -> TypeCastUtility.castValue(row[0], Long.class)).collect(Collectors.toList());
 
-    Jobs.schedule(new IRunnable() {
+    return Jobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
 

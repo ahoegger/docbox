@@ -90,21 +90,19 @@ public class OcrParseService {
       try {
         OcrParseResult result = new OcrParseResult();
         workingDirectory = Files.createTempDirectory("ocrWorkingDir").toAbsolutePath();
-        result.setWorkingDirectory(workingDirectory);
+        result.withWorkingDirectory(workingDirectory);
         List<Path> tifFiles = CollectionUtility.emptyArrayList();
         pddoc = PDDocument.load(pdfInputStream);
         // try to get text straight
         String content = getTextOfPdf(pddoc);
         if (StringUtility.hasText(content)) {
-          result.setText(content);
-          result.setOcrParsed(false);
+          result.withText(content).withOcrParsed(false);
         }
         else {
           tifFiles = pdfToTif(pddoc, workingDirectory);
           pddoc.close();
           pddoc = null;
-          result.setText(computeText(tifFiles, tessdataDirectory));
-          result.setOcrParsed(true);
+          result.withText(computeText(tifFiles, tessdataDirectory)).withOcrParsed(true);
         }
         return result;
       }
