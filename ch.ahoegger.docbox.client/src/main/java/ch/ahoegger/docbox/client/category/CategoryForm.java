@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.client.category;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
@@ -25,6 +26,7 @@ import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.OkButton;
 import ch.ahoegger.docbox.shared.category.CategoryFormData;
 import ch.ahoegger.docbox.shared.category.ICategoryService;
 import ch.ahoegger.docbox.shared.category.ICategoryTable;
+import ch.ahoegger.docbox.shared.validation.DateValidation;
 
 /**
  * <h3>{@link CategoryForm}</h3>
@@ -148,6 +150,12 @@ public class CategoryForm extends AbstractForm {
         protected String getConfiguredLabel() {
           return TEXTS.get("from");
         }
+
+        @Override
+        protected Date execValidateValue(Date rawValue) {
+          DateValidation.validateFromTo(rawValue, getEndDateField().getValue());
+          return rawValue;
+        }
       }
 
       @Order(4000)
@@ -155,6 +163,12 @@ public class CategoryForm extends AbstractForm {
         @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("to");
+        }
+
+        @Override
+        protected Date execValidateValue(Date rawValue) {
+          DateValidation.validateFromTo(getStartDateField().getValue(), rawValue);
+          return rawValue;
         }
       }
 

@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.client.partner;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
@@ -15,16 +16,17 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TEXTS;
 
-import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.CancelButton;
-import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.FieldBox;
-import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.FieldBox.DescriptionField;
-import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.FieldBox.EndDateField;
-import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.FieldBox.NameField;
-import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.FieldBox.StartDateField;
-import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.OkButton;
-import ch.ahoegger.docbox.shared.category.ICategoryTable;
+import ch.ahoegger.docbox.client.partner.PartnerForm.MainBox.CancelButton;
+import ch.ahoegger.docbox.client.partner.PartnerForm.MainBox.FieldBox;
+import ch.ahoegger.docbox.client.partner.PartnerForm.MainBox.FieldBox.DescriptionField;
+import ch.ahoegger.docbox.client.partner.PartnerForm.MainBox.FieldBox.EndDateField;
+import ch.ahoegger.docbox.client.partner.PartnerForm.MainBox.FieldBox.NameField;
+import ch.ahoegger.docbox.client.partner.PartnerForm.MainBox.FieldBox.StartDateField;
+import ch.ahoegger.docbox.client.partner.PartnerForm.MainBox.OkButton;
 import ch.ahoegger.docbox.shared.partner.IPartnerService;
+import ch.ahoegger.docbox.shared.partner.IPartnerTable;
 import ch.ahoegger.docbox.shared.partner.PartnerFormData;
+import ch.ahoegger.docbox.shared.validation.DateValidation;
 
 /**
  * <h3>{@link PartnerForm}</h3>
@@ -120,7 +122,7 @@ public class PartnerForm extends AbstractForm {
 
         @Override
         protected int getConfiguredMaxLength() {
-          return ICategoryTable.NAME_LENGTH;
+          return IPartnerTable.NAME_LENGTH;
         }
 
         @Override
@@ -138,7 +140,7 @@ public class PartnerForm extends AbstractForm {
 
         @Override
         protected int getConfiguredMaxLength() {
-          return ICategoryTable.DESCRIPTION_LENGTH;
+          return IPartnerTable.DESCRIPTION_LENGTH;
         }
       }
 
@@ -148,6 +150,12 @@ public class PartnerForm extends AbstractForm {
         protected String getConfiguredLabel() {
           return TEXTS.get("from");
         }
+
+        @Override
+        protected Date execValidateValue(Date rawValue) {
+          DateValidation.validateFromTo(rawValue, getEndDateField().getValue());
+          return rawValue;
+        }
       }
 
       @Order(4000)
@@ -155,6 +163,12 @@ public class PartnerForm extends AbstractForm {
         @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("to");
+        }
+
+        @Override
+        protected Date execValidateValue(Date rawValue) {
+          DateValidation.validateFromTo(getStartDateField().getValue(), rawValue);
+          return rawValue;
         }
       }
 

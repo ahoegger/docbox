@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.client.conversation;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
@@ -26,6 +27,7 @@ import ch.ahoegger.docbox.shared.category.ICategoryTable;
 import ch.ahoegger.docbox.shared.conversation.ConversationFormData;
 import ch.ahoegger.docbox.shared.conversation.IConversationService;
 import ch.ahoegger.docbox.shared.conversation.IConversationTable;
+import ch.ahoegger.docbox.shared.validation.DateValidation;
 
 /**
  * <h3>{@link ConversationForm}</h3>
@@ -149,6 +151,13 @@ public class ConversationForm extends AbstractForm {
         protected String getConfiguredLabel() {
           return TEXTS.get("from");
         }
+
+        @Override
+        protected Date execValidateValue(Date rawValue) {
+          DateValidation.validateFromTo(rawValue, getEndDateField().getValue());
+          return rawValue;
+        }
+
       }
 
       @Order(4000)
@@ -156,6 +165,12 @@ public class ConversationForm extends AbstractForm {
         @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("to");
+        }
+
+        @Override
+        protected Date execValidateValue(Date rawValue) {
+          DateValidation.validateFromTo(getStartDateField().getValue(), rawValue);
+          return rawValue;
         }
       }
 

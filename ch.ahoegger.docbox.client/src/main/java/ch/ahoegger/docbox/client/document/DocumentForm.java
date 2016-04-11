@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.client.document;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,6 +66,7 @@ import ch.ahoegger.docbox.client.document.ocr.DocumentOcrForm;
 import ch.ahoegger.docbox.shared.conversation.ConversationLookupCall;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
+import ch.ahoegger.docbox.shared.validation.DateValidation;
 
 /**
  * <h3>{@link DocumentForm}</h3>
@@ -352,6 +354,12 @@ public class DocumentForm extends AbstractForm {
         @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("ValidUntil");
+        }
+
+        @Override
+        protected Date execValidateValue(Date rawValue) {
+          DateValidation.validateFromTo(getDocumentDateField().getValue(), rawValue);
+          return rawValue;
         }
       }
 
