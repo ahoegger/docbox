@@ -57,8 +57,8 @@ public class DocumentDetailPage extends AbstractPageWithNodes {
 
   @Override
   protected void startDetailForm() {
-    getDetailForm().setDocumentId(getDocumentId());
-    getDetailForm().startPage();
+    getDetailForm().setHandler(new DocumentForm.DocumentFormPageHandler(getDetailForm(), getDocumentId()));
+    getDetailForm().start();
   }
 
   @Override

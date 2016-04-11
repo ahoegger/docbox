@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -301,8 +302,10 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
     // ocr
     if (formData.getParseOcr().getValue()) {
-      ParseDocumentJob job = new ParseDocumentJob(formData.getDocumentId());
-      job.schedule();
+      if (!BEANS.get(DocumentOcrService.class).exists(formData.getDocumentId())) {
+        ParseDocumentJob job = new ParseDocumentJob(formData.getDocumentId());
+        job.schedule();
+      }
     }
     else {
       DocumentOcrService service = BEANS.get(DocumentOcrService.class);
@@ -345,7 +348,7 @@ public class DocumentService implements IDocumentService, IDocumentTable {
       row.setPermission(permission.getValue());
     }
     // ocr
-    if (formData.getParseOcr().getValue()) {
+    if (BooleanUtility.nvl(formData.getParseOcr().getValue(), false)) {
       formData.setHasOcrText(BEANS.get(DocumentOcrService.class).exists(formData.getDocumentId()));
     }
     else {

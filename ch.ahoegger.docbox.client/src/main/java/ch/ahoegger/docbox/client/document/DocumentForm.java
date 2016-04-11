@@ -103,10 +103,6 @@ public class DocumentForm extends AbstractForm {
     getDesktop().dataChanged(IDocumentEntity.ENTITY_KEY);
   }
 
-  public void startPage() {
-    startInternal(new PageHandler());
-  }
-
   @FormData
   public void setDocumentId(Long documentId) {
     m_documentId = documentId;
@@ -244,11 +240,10 @@ public class DocumentForm extends AbstractForm {
         @FormData(sdkCommand = SdkCommand.IGNORE)
         public class OpenHtmlField extends AbstractHtmlField {
 
-          @Override
-          protected void execInitField() {
+          public void setDocumentId(Long documentId) {
             StringBuilder linkBuilder = new StringBuilder();
             linkBuilder.append(CONFIG.getPropertyValue(DocumentLinkURI.class));
-            linkBuilder.append("?").append(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class)).append("=").append(getDocumentId());
+            linkBuilder.append("?").append(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class)).append("=").append(documentId);
             String encodedHtml = HTML.link(linkBuilder.toString(), TEXTS.get("Open")).addAttribute("target", "_blank").toEncodedHtml();
             setValue(encodedHtml);
           }
@@ -487,35 +482,6 @@ public class DocumentForm extends AbstractForm {
 
   }
 
-  public class PageHandler extends AbstractFormHandler {
-    @Override
-    protected void execLoad() {
-      if (getDisplayHint() != DISPLAY_HINT_VIEW) {
-        setDisplayHint(DISPLAY_HINT_VIEW);
-      }
-      if (getDisplayViewId() != VIEW_ID_PAGE_TABLE) {
-        setDisplayViewId(VIEW_ID_PAGE_TABLE);
-      }
-
-      getOkButton().setVisibleGranted(false);
-      getCancelButton().setVisibleGranted(false);
-
-      DocumentFormData formData = new DocumentFormData();
-      exportFormData(formData);
-      formData = BEANS.get(IDocumentService.class).load(formData);
-      importFormData(formData);
-
-      setEnabledGranted(false);
-      getShowOcrButton().setEnabledGranted(true);
-      getShowOcrButton().setEnabled(getHasOcrText());
-      getShowOcrButton().setVisible(getHasOcrText());
-    }
-
-    @Override
-    protected void execStore() {
-    }
-  }
-
   public static abstract class AbstractDocumentFormHandler extends AbstractFormHandler {
     public AbstractDocumentFormHandler(DocumentForm form) {
       setFormInternal(form);
@@ -622,6 +588,8 @@ public class DocumentForm extends AbstractForm {
       formData.setDocumentId(getDocumentId());
       formData = BEANS.get(IDocumentService.class).load(formData);
       getForm().importFormData(formData);
+      getForm().setTitle(formData.getAbstract().getValue());
+      getForm().getOpenHtmlField().setDocumentId(formData.getDocumentId());
       getForm().getShowOcrButton().setVisible(getForm().getHasOcrText());
 
     }
@@ -633,6 +601,50 @@ public class DocumentForm extends AbstractForm {
       BEANS.get(IDocumentService.class).store(formData);
     }
 
+  }
+
+  public static class DocumentFormPageHandler extends AbstractDocumentFormHandler {
+    private final Long m_documentId;
+
+    public DocumentFormPageHandler(DocumentForm form, Long documentId) {
+      super(form);
+      m_documentId = documentId;
+    }
+
+    public Long getDocumentId() {
+      return m_documentId;
+    }
+
+    @Override
+    protected void execLoad() {
+      if (getForm().getDisplayHint() != DISPLAY_HINT_VIEW) {
+        getForm().setDisplayHint(DISPLAY_HINT_VIEW);
+      }
+      if (getForm().getDisplayViewId() != VIEW_ID_PAGE_TABLE) {
+        getForm().setDisplayViewId(VIEW_ID_PAGE_TABLE);
+      }
+
+      getForm().getOkButton().setVisibleGranted(false);
+      getForm().getCancelButton().setVisibleGranted(false);
+
+      DocumentFormData formData = new DocumentFormData();
+      formData.setDocumentId(getDocumentId());
+      formData = BEANS.get(IDocumentService.class).load(formData);
+      getForm().importFormData(formData);
+
+      getForm().setTitle(formData.getAbstract().getValue());
+
+      getForm().getOpenHtmlField().setDocumentId(formData.getDocumentId());
+
+      getForm().setEnabledGranted(false);
+      getForm().getShowOcrButton().setEnabledGranted(true);
+      getForm().getShowOcrButton().setEnabled(getForm().getHasOcrText());
+      getForm().getShowOcrButton().setVisible(getForm().getHasOcrText());
+    }
+
+    @Override
+    protected void execStore() {
+    }
   }
 
 }
