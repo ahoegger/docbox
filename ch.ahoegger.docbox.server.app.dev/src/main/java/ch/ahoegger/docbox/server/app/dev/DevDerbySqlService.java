@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -60,6 +61,7 @@ public class DevDerbySqlService extends DerbySqlService {
   private Long documentId01;
   private Long documentId02;
   private Long documentId03;
+  private Long documentId04;
 
   private Long categoryId01;
   private Long categoryId02;
@@ -208,6 +210,14 @@ public class DevDerbySqlService extends DerbySqlService {
           LocalDateUtility.today(),
           null,
           "2016_03_08_124640.pdf", null, null);
+
+      documentId04 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+      insertDocument(sqlService, documentTableTask, documentId04, "Txt document",
+          LocalDateUtility.today(),
+          LocalDateUtility.today(),
+          null,
+          "sampleTextFile.txt", null, null);
+
     }
     catch (IOException e) {
       LOG.error("Could not add dev documents to data store.", e);
@@ -221,7 +231,7 @@ public class DevDerbySqlService extends DerbySqlService {
     // create db record
     // add document
     URL resource = DevDerbySqlService.class.getClassLoader().getResource("devDocuments/" + fileName);
-    BinaryResource br = new BinaryResource(fileName, "pdf", IOUtility.getContent(resource.openStream()),
+    BinaryResource br = new BinaryResource(fileName, FileUtility.getContentTypeForExtension(FileUtility.getFileExtension(fileName)), IOUtility.getContent(resource.openStream()),
         System.currentTimeMillis());
     String docPath = BEANS.get(DocumentStoreService.class).store(br, insertDate, documentId);
 
