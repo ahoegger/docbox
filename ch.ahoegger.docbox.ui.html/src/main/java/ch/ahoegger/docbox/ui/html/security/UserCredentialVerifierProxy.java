@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -34,6 +35,7 @@ public class UserCredentialVerifierProxy implements ICredentialVerifier {
   @PostConstruct
   protected void postConstruct() {
     m_remoteAuthUrl = getRemoteAuthUrl();
+    HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
   }
 
   public UserCredentialVerifierProxy withExternalPasswordVerifier(final ICredentialVerifier externalPasswordVerifier) {
