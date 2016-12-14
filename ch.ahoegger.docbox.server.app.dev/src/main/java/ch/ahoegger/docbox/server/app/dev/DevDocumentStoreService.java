@@ -18,6 +18,7 @@ import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
  */
 @Replace
 public class DevDocumentStoreService extends DocumentStoreService {
+  @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(DevDocumentStoreService.class);
 
   @Override

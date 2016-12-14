@@ -8,8 +8,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.res.loader.AbstractResourceLoader;
 
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
@@ -22,22 +20,38 @@ import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
  */
 public class PdfResourceLoader extends AbstractResourceLoader {
 
+  private HttpServletRequest m_request;
+
   /**
    * @param req
    */
   public PdfResourceLoader(HttpServletRequest req) {
-    super(req);
+    m_request = req;
   }
 
   @Override
-  public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
-
+  public BinaryResource loadResource(String pathInfo) throws IOException {
     String documentIdParameter = getRequest().getParameter(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class));
     if (StringUtility.hasText(documentIdParameter)) {
       BinaryResource resource = BEANS.get(IDocumentStoreService.class).getDocument(Long.parseLong(documentIdParameter));
-      return new HttpCacheObject(cacheKey, false, 0, resource);
+      return resource;
     }
     return null;
+  }
+
+//  @Override
+//  public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
+//
+//    String documentIdParameter = getRequest().getParameter(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class));
+//    if (StringUtility.hasText(documentIdParameter)) {
+//      BinaryResource resource = BEANS.get(IDocumentStoreService.class).getDocument(Long.parseLong(documentIdParameter));
+//      return new HttpCacheObject(cacheKey, resource);
+//    }
+//    return null;
+//  }
+
+  protected HttpServletRequest getRequest() {
+    return m_request;
   }
 
 }

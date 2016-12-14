@@ -11,6 +11,7 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
 @ApplicationScoped
 @TunnelToServer
 public interface IBackupService {
+  public static final String BACKUP_USER_NAME = "docadmin-backup-user";
 
   /**
    *

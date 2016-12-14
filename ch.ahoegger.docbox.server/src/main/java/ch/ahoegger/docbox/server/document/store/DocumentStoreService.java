@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
@@ -37,6 +38,7 @@ import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
  * @author Andreas Hoegger
  */
 public class DocumentStoreService implements IDocumentStoreService {
+  @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(DocumentStoreService.class);
 
   private File m_documentStoreDirectory;
@@ -87,7 +89,7 @@ public class DocumentStoreService implements IDocumentStoreService {
         try {
           file.getParentFile().mkdirs();
           file.createNewFile();
-          IOUtility.writeContent(new FileOutputStream(file), resource.getContent());
+          IOUtility.writeBytes(new FileOutputStream(file), resource.getContent());
           return pathBuilder.toString();
         }
         catch (IOException e) {
@@ -109,7 +111,7 @@ public class DocumentStoreService implements IDocumentStoreService {
     synchronized (IO_LOCK) {
       File f = new File(getDocumentStoreDirectory(), path);
       if (f.exists() && f.canRead()) {
-        return new BinaryResource(f.getName(), FileUtility.getContentType(f), null, IOUtility.getContent(f), f.lastModified());
+        return BinaryResources.create().withFilename(f.getName()).withContentType(FileUtility.getContentType(f)).withContent(IOUtility.getContent(f)).withLastModified(f.lastModified()).withCachingAllowed(false).build();
       }
       else {
         throw new ProcessingException(new ProcessingStatus("document '" + f.getAbsolutePath() + "' does not exist serverside!", Status.ERROR));

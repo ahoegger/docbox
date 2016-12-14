@@ -22,6 +22,7 @@ import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
  */
 @ApplicationScoped
 public class DocumentOcrService implements IDocumentOcrService, IDocumentOcrTable {
+  @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(DocumentOcrService.class);
 
   @RemoteServiceAccessDenied

@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContextProducer;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 
 import ch.ahoegger.docbox.server.ConfigProperties.SuperUserSubjectProperty;
 
@@ -71,11 +71,11 @@ public class SuperUserRunContextProducer extends ServerRunContextProducer {
   public ServerRunContext produce() {
     final ServerRunContext superUserRunContext = ServerRunContexts.empty()
         .withRunMonitor(BEANS.get(RunMonitor.class))
-        .withUserAgent(UserAgent.createDefault())
+        .withUserAgent(UserAgents.createDefault())
         .withSubject(m_subject.get());
 
     return superUserRunContext
-        .withSession(m_session.setIfAbsent(new Callable<IServerSession>() {
+        .withSession(m_session.setIfAbsentAndGet(new Callable<IServerSession>() {
 
           @Override
           public IServerSession call() throws Exception {

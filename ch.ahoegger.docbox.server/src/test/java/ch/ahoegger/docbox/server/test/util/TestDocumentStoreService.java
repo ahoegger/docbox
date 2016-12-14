@@ -9,8 +9,8 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import org.eclipse.scout.rt.platform.Replace;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +23,7 @@ import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
  */
 @Replace
 public class TestDocumentStoreService extends DocumentStoreService {
+  @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(TestDocumentStoreService.class);
 
   @Override
@@ -38,7 +39,7 @@ public class TestDocumentStoreService extends DocumentStoreService {
       Files.walkFileTree(documentStorePath, new SimpleFileVisitor<Path>() {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          if (CompareUtility.notEquals(file, documentStorePath)) {
+          if (ObjectUtility.notEquals(file, documentStorePath)) {
             Files.delete(file);
           }
           return FileVisitResult.CONTINUE;
@@ -48,7 +49,7 @@ public class TestDocumentStoreService extends DocumentStoreService {
         public FileVisitResult postVisitDirectory(Path dir, IOException e)
             throws IOException {
           if (e == null) {
-            if (CompareUtility.notEquals(dir, documentStorePath)) {
+            if (ObjectUtility.notEquals(dir, documentStorePath)) {
               Files.delete(dir);
             }
             return FileVisitResult.CONTINUE;

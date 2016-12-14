@@ -45,7 +45,7 @@ public class UserDetailPage extends AbstractPageWithNodes {
 
   @Override
   protected IForm createDetailForm() {
-    return ClientRunContexts.copyCurrent().withOutline(getOutline()).withForm(null).call(new Callable<IForm>() {
+    return ClientRunContexts.copyCurrent().withOutline(getOutline(), true).withForm(null).call(new Callable<IForm>() {
       @Override
       public IForm call() throws Exception {
         UserForm userForm = new UserForm(FORM_MODE.PAGE);

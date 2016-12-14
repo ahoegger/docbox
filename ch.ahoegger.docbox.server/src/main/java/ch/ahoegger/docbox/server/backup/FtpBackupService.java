@@ -27,11 +27,11 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.quartz.CronScheduleBuilder;
@@ -58,7 +58,6 @@ import ch.ahoegger.docbox.shared.security.permission.BackupPermission;
 @CreateImmediately
 public class FtpBackupService implements IBackupService {
   private static final Logger LOG = LoggerFactory.getLogger(FtpBackupService.class);
-  public static final String BACKUP_USER_NAME = "docadmin-backup-user";
 
   private static enum Status {
     Idle,

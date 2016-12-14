@@ -246,7 +246,7 @@ public class DocumentForm extends AbstractForm {
             StringBuilder linkBuilder = new StringBuilder();
             linkBuilder.append(CONFIG.getPropertyValue(DocumentLinkURI.class));
             linkBuilder.append("?").append(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class)).append("=").append(documentId);
-            String encodedHtml = HTML.link(linkBuilder.toString(), TEXTS.get("Open")).addAttribute("target", "_blank").toEncodedHtml();
+            String encodedHtml = HTML.link(linkBuilder.toString(), TEXTS.get("Open")).addAttribute("target", "_blank").toHtml();
             setValue(encodedHtml);
           }
         }

@@ -7,7 +7,7 @@ import org.apache.derby.catalog.TypeDescriptor;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 
 /**
@@ -40,28 +40,28 @@ public class TableBuilder {
       if (columnDescriptor != null) {
         String columnType = columnDescriptor.getTypeName();
         columnType = columnType.replaceAll("\\([0-9]*\\)$", "");
-        if (CompareUtility.equals(IColumn.TYPE.VARCHAR.toString(), columnType)) {
+        if (ObjectUtility.equals(IColumn.TYPE.VARCHAR.toString(), columnType)) {
           columns.add(new StringColumn((String) columnResult[0]));
         }
-        else if (CompareUtility.equals(IColumn.TYPE.DECIMAL.toString(), columnType)) {
+        else if (ObjectUtility.equals(IColumn.TYPE.DECIMAL.toString(), columnType)) {
           columns.add(new DecimalColumn((String) columnResult[0]));
         }
-        else if (CompareUtility.equals(IColumn.TYPE.DOUBLE.toString(), columnType)) {
+        else if (ObjectUtility.equals(IColumn.TYPE.DOUBLE.toString(), columnType)) {
           columns.add(new DoubleColumn((String) columnResult[0]));
         }
-        else if (CompareUtility.equals(IColumn.TYPE.DATE.toString(), columnType)) {
+        else if (ObjectUtility.equals(IColumn.TYPE.DATE.toString(), columnType)) {
           columns.add(new DateColumn((String) columnResult[0]));
         }
-        else if (CompareUtility.equals(IColumn.TYPE.BIGINT.toString(), columnType)) {
+        else if (ObjectUtility.equals(IColumn.TYPE.BIGINT.toString(), columnType)) {
           columns.add(new DecimalColumn((String) columnResult[0]));
         }
-        else if (CompareUtility.equals(IColumn.TYPE.BOOLEAN.toString(), columnType)) {
+        else if (ObjectUtility.equals(IColumn.TYPE.BOOLEAN.toString(), columnType)) {
           columns.add(new BooleanColumn((String) columnResult[0]));
         }
-        else if (CompareUtility.equals(IColumn.TYPE.CLOB.toString(), columnType)) {
+        else if (ObjectUtility.equals(IColumn.TYPE.CLOB.toString(), columnType)) {
           columns.add(new ClobColumn((String) columnResult[0]));
         }
-        else if (CompareUtility.equals(IColumn.TYPE.SMALLINT.toString(), columnType)) {
+        else if (ObjectUtility.equals(IColumn.TYPE.SMALLINT.toString(), columnType)) {
           columns.add(new SmallIntColumn((String) columnResult[0]));
         }
         else {

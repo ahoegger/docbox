@@ -6,8 +6,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 import ch.ahoegger.docbox.server.SuperUserRunContextProducer;
 import ch.ahoegger.docbox.server.database.DerbySqlService;

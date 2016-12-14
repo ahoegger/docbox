@@ -308,7 +308,7 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
         StringBuilder linkBuilder = new StringBuilder();
         linkBuilder.append(CONFIG.getPropertyValue(DocumentLinkURI.class));
         linkBuilder.append("?").append(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class)).append("=").append(getDocumentIdColumn().getValue(row));
-        String encodedHtml = HTML.link(linkBuilder.toString(), TEXTS.get("Open")).addAttribute("target", "_blank").toEncodedHtml();
+        String encodedHtml = HTML.link(linkBuilder.toString(), TEXTS.get("Open")).addAttribute("target", "_blank").toHtml();
         cell.setHtmlEnabled(true);
         cell.setText(encodedHtml);
       }
