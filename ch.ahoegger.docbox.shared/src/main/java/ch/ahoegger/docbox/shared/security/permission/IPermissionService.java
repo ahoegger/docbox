@@ -1,6 +1,6 @@
 package ch.ahoegger.docbox.shared.security.permission;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
 /**
@@ -9,8 +9,7 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
  * @author Andreas Hoegger
  */
 @TunnelToServer
-@ApplicationScoped
-public interface IPermissionService {
+public interface IPermissionService extends IService {
 
   boolean hasReadAccess(String userId, Long entityId);
 

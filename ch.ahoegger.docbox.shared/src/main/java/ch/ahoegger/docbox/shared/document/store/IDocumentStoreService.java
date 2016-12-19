@@ -1,7 +1,7 @@
 package ch.ahoegger.docbox.shared.document.store;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
 /**
@@ -9,9 +9,8 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
  *
  * @author Andreas Hoegger
  */
-@ApplicationScoped
 @TunnelToServer
-public interface IDocumentStoreService {
+public interface IDocumentStoreService extends IService {
 
   /**
    * @param path

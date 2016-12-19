@@ -11,7 +11,7 @@ import ch.ahoegger.docbox.server.database.dev.initialization.ITableTask;
 /**
  * <h3>{@link DumpDbStatementsTest}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @RunWith(PlatformTestRunner.class)
 @RunWithSubject("admin")

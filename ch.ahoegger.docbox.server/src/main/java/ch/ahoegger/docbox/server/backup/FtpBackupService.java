@@ -52,7 +52,7 @@ import ch.ahoegger.docbox.shared.security.permission.BackupPermission;
 /**
  * <h3>{@link FtpBackupService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 
 @CreateImmediately

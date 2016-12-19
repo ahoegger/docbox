@@ -31,7 +31,7 @@ import ch.ahoegger.docbox.shared.permission.PermissionLookupCall;
 /**
  * <h3>{@link AbstractPermissionTableField}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public abstract class AbstractPermissionTableField extends AbstractTableField<AbstractPermissionTableField.Table> {
 

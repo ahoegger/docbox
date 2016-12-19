@@ -23,7 +23,7 @@ import ch.ahoegger.docbox.shared.partner.PartnerTableData;
 /**
  * <h3>{@link PartnerService_SearchByActiveState}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class PartnerService_SearchByActiveState extends AbstractTestWithDatabase {
 

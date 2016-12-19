@@ -22,7 +22,7 @@ import ch.ahoegger.docbox.server.test.util.OS;
 /**
  * <h3>{@link OcrParseServiceTest}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @RunWith(PlatformTestRunner.class)
 public class OcrParseServiceTest {

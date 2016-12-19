@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.app.dev;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Date;
@@ -32,8 +33,11 @@ import ch.ahoegger.docbox.server.database.dev.initialization.DocumentCategoryTab
 import ch.ahoegger.docbox.server.database.dev.initialization.DocumentPartnerTableTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.DocumentPermissionTableTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.DocumentTableTask;
+import ch.ahoegger.docbox.server.database.dev.initialization.EmployeeTableTask;
+import ch.ahoegger.docbox.server.database.dev.initialization.EntityTableTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.ITableTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.PartnerTableTask;
+import ch.ahoegger.docbox.server.database.dev.initialization.PostingGroupTableTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.SequenceTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.UserTableTask;
 import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
@@ -45,6 +49,10 @@ import ch.ahoegger.docbox.shared.document.IDocumentCategoryTable;
 import ch.ahoegger.docbox.shared.document.IDocumentPartnerTable;
 import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 import ch.ahoegger.docbox.shared.document.IDocumentTable;
+import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupTable;
+import ch.ahoegger.docbox.shared.hr.employee.IEmployeeTable;
+import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType;
+import ch.ahoegger.docbox.shared.hr.entity.IEntityTable;
 import ch.ahoegger.docbox.shared.partner.IPartnerTable;
 import ch.ahoegger.docbox.shared.security.permission.IDefaultPermissionTable;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
@@ -52,7 +60,7 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 /**
  * <h3>{@link DevDerbySqlService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @CreateImmediately
 @Replace
@@ -74,6 +82,18 @@ public class DevDerbySqlService extends DerbySqlService {
 
   private Long partnerId01;
   private Long partnerId02;
+  private Long partnerId03_employee;
+
+  private Long entityId01;
+  private Long entityId02;
+
+  private Long postingGroupId01;
+
+  private Long entityId03;
+
+  private Long entityId04;
+
+  private Long postingGroupId02;
 
   private static final LocalDate TODAY = LocalDate.now();
 
@@ -125,6 +145,10 @@ public class DevDerbySqlService extends DerbySqlService {
     insertDocumentCategory(this);
     insertDocumentPartner(this);
     insertDocumentPermission(this);
+    // hr
+    insertEmployers(this);
+    insertPostingGroups(this);
+    insertEntities(this);
   }
 
   protected void insertSequenceInitialValue(ISqlService sqlService) {
@@ -181,10 +205,12 @@ public class DevDerbySqlService extends DerbySqlService {
     // ids
     partnerId01 = getSequenceNextval(ISequenceTable.TABLE_NAME);
     partnerId02 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+    partnerId03_employee = getSequenceNextval(ISequenceTable.TABLE_NAME);
 
     PartnerTableTask partnerTableTask = BEANS.get(PartnerTableTask.class);
     partnerTableTask.createPartnerRow(sqlService, partnerId01, "Gorak Inc", "A special company", LocalDateUtility.today(), null);
     partnerTableTask.createPartnerRow(sqlService, partnerId02, "Solan Org", "Some other comapny", LocalDateUtility.today(), null);
+    partnerTableTask.createPartnerRow(sqlService, partnerId03_employee, "Hans Muster", "An employee", LocalDateUtility.today(), null);
   }
 
   protected void insertDocuments(ISqlService sqlService) {
@@ -268,4 +294,44 @@ public class DevDerbySqlService extends DerbySqlService {
     documentPermissionTableTask.createDocumentPermissionRow(sqlService, "cuttis", documentId02, IDocumentPermissionTable.PERMISSION_READ);
     documentPermissionTableTask.createDocumentPermissionRow(sqlService, "bob", documentId02, IDocumentPermissionTable.PERMISSION_WRITE);
   }
+
+  protected void insertEmployers(ISqlService sqlService) {
+    LOG.info("SQL-DEV create rows for: {}", IEmployeeTable.TABLE_NAME);
+
+    EmployeeTableTask employerTableTask = BEANS.get(EmployeeTableTask.class);
+    employerTableTask.createEmployerRow(sqlService, partnerId03_employee, "Hans", "Muster", "Mountainview 01", "CA-90501 Santa Barbara", "12.2568.2154.69", "PC 50-101-89-7", 26.50);
+  }
+
+  protected void insertPostingGroups(ISqlService sqlService) {
+    LOG.info("SQL-DEV create rows for: {}", IPostingGroupTable.TABLE_NAME);
+
+    postingGroupId01 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+    postingGroupId02 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+
+    PostingGroupTableTask postingGroupTableTask = BEANS.get(PostingGroupTableTask.class);
+    postingGroupTableTask.createRow(sqlService, postingGroupId01, partnerId03_employee, documentId02, "September 2016", LocalDateUtility.toDate(LocalDate.of(2016, 10, 02)), BigDecimal.valueOf(256.5),
+        BigDecimal.valueOf(230.50), BigDecimal.valueOf(-10.55),
+        BigDecimal.valueOf(-5.55),
+        BigDecimal.valueOf(9.87));
+    postingGroupTableTask.createRow(sqlService, postingGroupId02, partnerId03_employee, documentId02, "Oktober 2016", LocalDateUtility.toDate(LocalDate.of(2016, 11, 02)), BigDecimal.valueOf(256.5),
+        BigDecimal.valueOf(230.50), BigDecimal.valueOf(-10.55),
+        BigDecimal.valueOf(-5.55),
+        BigDecimal.valueOf(9.87));
+  }
+
+  protected void insertEntities(ISqlService sqlService) {
+    LOG.info("SQL-DEV create rows for: {}", IEntityTable.TABLE_NAME);
+
+    entityId01 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+    entityId02 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+    entityId03 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+    entityId04 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+
+    EntityTableTask entityTableTask = BEANS.get(EntityTableTask.class);
+    entityTableTask.createEntityRow(sqlService, entityId01, partnerId03_employee, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 9, 04)), BigDecimal.valueOf(3.5), null, "Sept work 1", null);
+    entityTableTask.createEntityRow(sqlService, entityId02, partnerId03_employee, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 9, 11)), BigDecimal.valueOf(4.25), null, "Sept work 2", null);
+    entityTableTask.createEntityRow(sqlService, entityId03, partnerId03_employee, null, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(10)), BigDecimal.valueOf(5.5), null, "First work", null);
+    entityTableTask.createEntityRow(sqlService, entityId04, partnerId03_employee, null, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(1)), BigDecimal.valueOf(2.25), null, "Second work", null);
+  }
+
 }

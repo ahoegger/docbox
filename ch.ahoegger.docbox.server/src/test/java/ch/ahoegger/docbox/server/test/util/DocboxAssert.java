@@ -1,6 +1,5 @@
 package ch.ahoegger.docbox.server.test.util;
 
-
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,6 +12,25 @@ import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.junit.Assert;
 
 public class DocboxAssert extends Assert {
+
+  public static void resetFormData(AbstractFormData fd, Class<? extends AbstractFormFieldData> clazz) {
+    for (AbstractFormFieldData ffd : fd.getFields()) {
+      resetFormData(ffd, clazz, ffd.getClass().equals(clazz));
+
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static void resetFormData(AbstractFormFieldData ffd, Class<? extends AbstractFormFieldData> clazz, boolean reset) {
+    if (ffd instanceof AbstractValueFieldData && reset) {
+      ((AbstractValueFieldData) ffd).setValue(null);
+    }
+    for (AbstractFormFieldData ffdSub : ffd.getFields()) {
+
+      resetFormData(ffdSub, clazz, reset ? reset : ffdSub.getClass().equals(clazz));
+
+    }
+  }
 
   public static void assertEquals(AbstractFormData formData01, AbstractFormData formData02) {
     Map<Integer, Map<String, AbstractFormFieldData>> allFields01 = formData01.getAllFieldsRec();

@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 /**
  * <h3>{@link DatabaseUserCredentialVerifier}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DatabaseUserCredentialVerifier implements ICredentialVerifier {
   @SuppressWarnings("unused")

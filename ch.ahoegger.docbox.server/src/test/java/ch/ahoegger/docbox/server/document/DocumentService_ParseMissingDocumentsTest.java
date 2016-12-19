@@ -33,7 +33,7 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 /**
  * <h3>{@link DocumentService_ParseMissingDocumentsTest}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithDatabase {
   private static final String username01 = SUBJECT_NAME;

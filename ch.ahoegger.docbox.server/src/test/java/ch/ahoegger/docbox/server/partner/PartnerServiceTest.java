@@ -47,15 +47,15 @@ public class PartnerServiceTest extends AbstractTestWithDatabase {
     PartnerFormData fd1 = new PartnerFormData();
     fd1 = service.prepareCreate(fd1);
 
-    fd1.getName().setValue("inserted conversation");
-    fd1.getDescription().setValue("some notes");
+    fd1.getPartnerBox().getName().setValue("inserted conversation");
+    fd1.getPartnerBox().getDescription().setValue("some notes");
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.set(2014, 03, 22);
 
-    fd1.getStartDate().setValue(cal.getTime());
+    fd1.getPartnerBox().getStartDate().setValue(cal.getTime());
     cal.set(2099, 03, 22);
-    fd1.getEndDate().setValue(cal.getTime());
+    fd1.getPartnerBox().getEndDate().setValue(cal.getTime());
     fd1 = service.create(fd1);
 
     PartnerFormData fd2 = new PartnerFormData();
@@ -73,14 +73,14 @@ public class PartnerServiceTest extends AbstractTestWithDatabase {
     fd1.setPartnerId(new BigDecimal(partnerId02));
     fd1 = service.load(fd1);
 
-    fd1.getName().setValue("modified.name");
-    fd1.getDescription().setValue("modified.notes");
+    fd1.getPartnerBox().getName().setValue("modified.name");
+    fd1.getPartnerBox().getDescription().setValue("modified.notes");
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.set(2014, 03, 28);
-    fd1.getStartDate().setValue(cal.getTime());
+    fd1.getPartnerBox().getStartDate().setValue(cal.getTime());
     cal.set(2088, 12, 28);
-    fd1.getEndDate().setValue(cal.getTime());
+    fd1.getPartnerBox().getEndDate().setValue(cal.getTime());
 
     fd1 = service.store(fd1);
 

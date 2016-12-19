@@ -24,7 +24,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentService;
 /**
  * <h3>{@link DocumentService_SearchByOwner}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentService_SearchByOwner extends AbstractTestWithDatabase {
 

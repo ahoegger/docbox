@@ -15,7 +15,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
@@ -32,6 +31,7 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
+import ch.ahoegger.docbox.client.AbstractDocboxPageWithTable;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI;
 import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
@@ -47,7 +47,7 @@ import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
  * @author Andreas Hoegger
  */
 @PageData(DocumentTableData.class)
-public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.Table> {
+public class DocumentTablePage extends AbstractDocboxPageWithTable<DocumentTablePage.Table> {
 
   private BigDecimal m_conversationId;
   private BigDecimal m_partnerId;
@@ -61,6 +61,11 @@ public class DocumentTablePage extends AbstractPageWithTable<DocumentTablePage.T
   @Override
   protected void execInitPage() {
     registerDataChangeListener(IDocumentEntity.ENTITY_KEY);
+  }
+
+  @Override
+  protected void execDisposePage() {
+    super.execDisposePage();
   }
 
   @Override

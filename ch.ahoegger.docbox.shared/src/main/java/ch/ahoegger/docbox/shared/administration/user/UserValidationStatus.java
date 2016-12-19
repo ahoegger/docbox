@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
 /**
  * <h3>{@link UserValidationStatus}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public final class UserValidationStatus {
 

@@ -18,7 +18,7 @@ import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 /**
  * <h3>{@link DocumentOcrService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @ApplicationScoped
 public class DocumentOcrService implements IDocumentOcrService, IDocumentOcrTable {

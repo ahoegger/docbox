@@ -1,0 +1,106 @@
+package ch.ahoegger.docbox.client.hr.entity;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Set;
+
+import org.eclipse.scout.rt.client.dto.Data;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+
+import ch.ahoegger.docbox.client.AbstractDocboxPageWithTable;
+import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table;
+import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
+import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
+import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
+
+@Data(EntityTablePageData.class)
+public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
+
+  private BigDecimal m_partnerId;
+  private BigDecimal m_postingGroupId;
+
+  public EntityTablePage(BigDecimal partnerId) {
+    m_partnerId = partnerId;
+  }
+
+  @Override
+  protected String getConfiguredTitle() {
+    return TEXTS.get("Entity");
+  }
+
+  @Override
+  protected Class<? extends ISearchForm> getConfiguredSearchForm() {
+    return EntitySearchForm.class;
+  }
+
+  @Override
+  public EntitySearchForm getSearchFormInternal() {
+    return (EntitySearchForm) super.getSearchFormInternal();
+  }
+
+  @Override
+  protected void execInitPage() {
+    registerDataChangeListener(IWorkItemEntity.WORK_ITEM_KEY);
+  }
+
+  @Override
+  protected void execInitSearchForm() {
+    getSearchFormInternal().getPartnerIdField().setValue(m_partnerId);
+    getSearchFormInternal().setPostingGroupId(getPostingGroupId());
+  }
+
+  @Override
+  protected void execLoadData(SearchFilter filter) {
+    importPageData(BEANS.get(IEntityService.class).getEntityTableData((EntitySearchFormData) filter.getFormData()));
+  }
+
+  public void setPartnerId(BigDecimal partnerId) {
+    m_partnerId = partnerId;
+  }
+
+  public BigDecimal getPartnerId() {
+    return m_partnerId;
+  }
+
+  public void setPostingGroupId(BigDecimal postingGroupId) {
+    m_postingGroupId = postingGroupId;
+  }
+
+  public BigDecimal getPostingGroupId() {
+    return m_postingGroupId;
+  }
+
+  public class Table extends AbstractEntityTable {
+
+    @Order(1000)
+    public class PaySlipMenu extends AbstractMenu {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("CreatePayslip");
+      }
+
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+      }
+
+      @Override
+      protected void execAction() {
+        List<BigDecimal> selectedValues = getEnityIdColumn().getSelectedValues();
+        PayslipForm form = new PayslipForm();
+        form.setEntityIds(selectedValues);
+        form.start();
+
+      }
+    }
+
+  }
+}

@@ -5,7 +5,7 @@ import java.security.BasicPermission;
 /**
  * <h3>{@link AdministratorPermission}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class AdministratorPermission extends BasicPermission {
   private static final long serialVersionUID = 1L;

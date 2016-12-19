@@ -19,7 +19,7 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 /**
  * <h3>{@link ConversationLookupServiceTest}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class ConversationLookupServiceTest extends AbstractTestWithDatabase {
 

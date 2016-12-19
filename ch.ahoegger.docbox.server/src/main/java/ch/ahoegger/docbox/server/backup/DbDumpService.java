@@ -19,7 +19,7 @@ import ch.ahoegger.docbox.shared.security.permission.BackupPermission;
 /**
  * <h3>{@link DbDumpService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DbDumpService implements IDbDumpService {
 
@@ -32,7 +32,6 @@ public class DbDumpService implements IDbDumpService {
     ISqlService sqlService = BEANS.get(ISqlService.class);
     StringBuilder sqlScriptBuilder = new StringBuilder();
     Object[][] result = sqlService.select("SELECT TABLENAME FROM SYS.SYSTABLES where tabletype = 'T'", new Object[0]);
-//    Arrays.stream(result).map(row -> )
 
     for (int i = 0; i < result.length; i++) {
       Object[] row = result[i];

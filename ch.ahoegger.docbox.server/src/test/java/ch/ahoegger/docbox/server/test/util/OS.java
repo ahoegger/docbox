@@ -3,7 +3,7 @@ package ch.ahoegger.docbox.server.test.util;
 /**
  * <h3>{@link OS}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class OS {
 

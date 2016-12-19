@@ -29,7 +29,7 @@ import ch.ahoegger.docbox.shared.category.ICategoryService;
 /**
  * <h3>{@link AbstractCategoriesListBox}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public abstract class AbstractCategoriesListBox extends AbstractListBox<BigDecimal> {
   @Override

@@ -37,7 +37,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentService;
 /**
  * <h3>{@link DocumentService_ModifyTest}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 

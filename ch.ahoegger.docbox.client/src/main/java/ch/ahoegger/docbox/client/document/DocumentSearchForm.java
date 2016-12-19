@@ -46,10 +46,10 @@ import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBo
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.PartnerField;
 import ch.ahoegger.docbox.client.document.field.AbstractCategoriesListBox;
 import ch.ahoegger.docbox.client.document.field.AbstractOcrSearchTableField;
+import ch.ahoegger.docbox.client.partner.AbstractPartnerSmartField;
 import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
 import ch.ahoegger.docbox.shared.conversation.ConversationLookupCall;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
-import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
@@ -163,21 +163,8 @@ public class DocumentSearchForm extends AbstractSearchForm {
         }
 
         @Order(2000)
-        public class PartnerField extends AbstractSmartField<BigDecimal> {
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("Partner");
-          }
+        public class PartnerField extends AbstractPartnerSmartField {
 
-          @Override
-          protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
-            return PartnerLookupCall.class;
-          }
-
-          @Override
-          protected boolean getConfiguredActiveFilterEnabled() {
-            return true;
-          }
         }
 
         @Order(3000)

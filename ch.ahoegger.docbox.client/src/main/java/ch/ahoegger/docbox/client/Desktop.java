@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 import ch.ahoegger.docbox.client.administration.AdministrationOutline;
 import ch.ahoegger.docbox.client.administration.DbDumpForm;
+import ch.ahoegger.docbox.client.hr.HumanResourceOutline;
 import ch.ahoegger.docbox.client.search.SearchOutline;
 import ch.ahoegger.docbox.client.settings.SettingsOutline;
 import ch.ahoegger.docbox.client.work.WorkOutline;
@@ -41,7 +42,7 @@ public class Desktop extends AbstractDesktop {
 
   @Override
   protected List<Class<? extends IOutline>> getConfiguredOutlines() {
-    return CollectionUtility.<Class<? extends IOutline>> arrayList(WorkOutline.class, AdministrationOutline.class, SearchOutline.class,
+    return CollectionUtility.<Class<? extends IOutline>> arrayList(WorkOutline.class, HumanResourceOutline.class, AdministrationOutline.class, SearchOutline.class,
         SettingsOutline.class);
   }
 
@@ -204,6 +205,23 @@ public class Desktop extends AbstractDesktop {
     }
   }
 
+  @Order(1200)
+  public class HumanResourceOutlineViewButton extends AbstractOutlineViewButton {
+
+    public HumanResourceOutlineViewButton() {
+      this(HumanResourceOutline.class);
+    }
+
+    protected HumanResourceOutlineViewButton(Class<? extends HumanResourceOutline> outlineClass) {
+      super(Desktop.this, outlineClass);
+    }
+
+    @Override
+    protected String getConfiguredKeyStroke() {
+      return IKeyStroke.F3;
+    }
+  }
+
   @Order(1500)
   public class AdministrationOutlineViewButton extends AbstractOutlineViewButton {
 
@@ -217,7 +235,7 @@ public class Desktop extends AbstractDesktop {
 
     @Override
     protected String getConfiguredKeyStroke() {
-      return IKeyStroke.F3;
+      return IKeyStroke.F4;
     }
   }
 
@@ -237,10 +255,6 @@ public class Desktop extends AbstractDesktop {
       return DisplayStyle.TAB;
     }
 
-    @Override
-    protected String getConfiguredKeyStroke() {
-      return IKeyStroke.F3;
-    }
   }
 
   @Order(3000)

@@ -1,6 +1,6 @@
 package ch.ahoegger.docbox.shared.administration.user;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
 /**
@@ -8,9 +8,8 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
  *
  * @author Andreas Hoegger
  */
-@ApplicationScoped
 @TunnelToServer
-public interface IUserService {
+public interface IUserService extends IService {
 
   /**
    * @return

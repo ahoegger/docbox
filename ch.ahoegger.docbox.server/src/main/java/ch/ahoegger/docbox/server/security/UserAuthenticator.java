@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * <h3>{@link UserAuthenticator}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Bean
 public class UserAuthenticator {

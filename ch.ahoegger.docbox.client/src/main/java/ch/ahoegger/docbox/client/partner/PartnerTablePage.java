@@ -28,7 +28,7 @@ import ch.ahoegger.docbox.shared.partner.PartnerTableData;
 /**
  * <h3>{@link PartnerTablePage}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @PageData(PartnerTableData.class)
 public class PartnerTablePage extends AbstractPageWithTable<PartnerTablePage.Table> {

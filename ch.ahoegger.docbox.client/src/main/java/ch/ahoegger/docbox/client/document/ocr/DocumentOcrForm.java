@@ -24,7 +24,7 @@ import ch.ahoegger.docbox.shared.ocr.IDocumentOcrService;
 /**
  * <h3>{@link DocumentOcrForm}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @FormData(value = DocumentOcrFormData.class, sdkCommand = SdkCommand.CREATE)
 public class DocumentOcrForm extends AbstractForm {
@@ -37,6 +37,11 @@ public class DocumentOcrForm extends AbstractForm {
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("DocumentContent");
+  }
+
+  @Override
+  protected boolean getConfiguredAskIfNeedSave() {
+    return false;
   }
 
   @Override

@@ -1,12 +1,10 @@
 package ch.ahoegger.docbox.shared.partner;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
-import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
 /**
@@ -18,16 +16,8 @@ public class PartnerFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public Description getDescription() {
-    return getFieldByClass(Description.class);
-  }
-
-  public EndDate getEndDate() {
-    return getFieldByClass(EndDate.class);
-  }
-
-  public Name getName() {
-    return getFieldByClass(Name.class);
+  public PartnerBox getPartnerBox() {
+    return getFieldByClass(PartnerBox.class);
   }
 
   /**
@@ -48,31 +38,12 @@ public class PartnerFormData extends AbstractFormData {
     return getPropertyByClass(PartnerIdProperty.class);
   }
 
-  public StartDate getStartDate() {
-    return getFieldByClass(StartDate.class);
-  }
-
-  public static class Description extends AbstractValueFieldData<String> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class EndDate extends AbstractValueFieldData<Date> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class Name extends AbstractValueFieldData<String> {
+  public static class PartnerBox extends AbstractPartnerBoxData {
 
     private static final long serialVersionUID = 1L;
   }
 
   public static class PartnerIdProperty extends AbstractPropertyData<BigDecimal> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class StartDate extends AbstractValueFieldData<Date> {
 
     private static final long serialVersionUID = 1L;
   }

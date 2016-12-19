@@ -21,7 +21,7 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 /**
  * <h3>{@link PartnerService_SearchByName}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class PartnerService_SearchByName extends AbstractTestWithDatabase {
 

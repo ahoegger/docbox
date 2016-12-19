@@ -12,6 +12,7 @@ import org.eclipse.scout.rt.shared.services.common.security.AbstractAccessContro
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
 import ch.ahoegger.docbox.shared.administration.user.UserFormData;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
+import ch.ahoegger.docbox.shared.hr.entity.CreatePayslipPermission;
 
 /**
  * <h3>{@link AccessControlService}</h3>
@@ -31,6 +32,7 @@ public class AccessControlService extends AbstractAccessControlService<String> {
     Permissions permissions = new Permissions();
     permissions.add(new RemoteServiceAccessPermission("*.shared.*", "*"));
 
+    permissions.add(new CreatePayslipPermission());
     // TODO [aho]: Fill access control service
 
 //    permissions.add(new AllPermission());

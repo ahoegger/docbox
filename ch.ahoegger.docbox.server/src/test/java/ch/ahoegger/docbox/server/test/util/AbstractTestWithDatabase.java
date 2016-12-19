@@ -19,7 +19,7 @@ import ch.ahoegger.docbox.server.security.SecurityService;
 /**
  * <h3>{@link AbstractTestWithDatabase}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @RunWith(ServerTestRunner.class)
 @RunWithSubject(AbstractTestWithDatabase.SUBJECT_NAME)

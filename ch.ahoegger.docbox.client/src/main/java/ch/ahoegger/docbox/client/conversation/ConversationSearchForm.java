@@ -29,7 +29,7 @@ import ch.ahoegger.docbox.shared.conversation.IConversationTable;
 /**
  * <h3>{@link ConversationSearchForm}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @FormData(value = ConversationSearchFormData.class, sdkCommand = SdkCommand.CREATE)
 public class ConversationSearchForm extends AbstractSearchForm {

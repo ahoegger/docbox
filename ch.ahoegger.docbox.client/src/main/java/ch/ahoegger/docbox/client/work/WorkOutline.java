@@ -22,21 +22,6 @@ import ch.ahoegger.docbox.shared.Icons;
 public class WorkOutline extends AbstractOutline {
 
   @Override
-  protected void execCreateChildPages(List<IPage<?>> pageList) {
-    pageList.add(new DocumentTablePage());
-    pageList.add(new ConversationTablePage());
-    pageList.add(new PartnerTablePage());
-    pageList.add(new CategoryTablePage());
-  }
-
-  @Override
-  protected void execInitTree() {
-    super.execInitTree();
-//    ClientSession.get().getDesktop().activateFirstPage();
-//    selectFirstNode();
-  }
-
-  @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("Work");
   }
@@ -44,6 +29,14 @@ public class WorkOutline extends AbstractOutline {
   @Override
   protected String getConfiguredIconId() {
     return Icons.Pencil;
+  }
+
+  @Override
+  protected void execCreateChildPages(List<IPage<?>> pageList) {
+    pageList.add(new DocumentTablePage());
+    pageList.add(new ConversationTablePage());
+    pageList.add(new PartnerTablePage());
+    pageList.add(new CategoryTablePage());
   }
 
 }

@@ -28,7 +28,7 @@ import ch.ahoegger.docbox.shared.conversation.IConversationService;
 /**
  * <h3>{@link ConversationTablePage}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @PageData(ConversationTableData.class)
 public class ConversationTablePage extends AbstractPageWithTable<ConversationTablePage.Table> {

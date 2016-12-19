@@ -26,7 +26,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentService;
 /**
  * <h3>{@link DocumentServiceTest}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentServiceTest extends AbstractTestWithDatabase {
   private static final String username01 = SUBJECT_NAME;

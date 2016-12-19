@@ -5,7 +5,7 @@ import java.nio.file.Path;
 /**
  * <h3>{@link OcrParseResult}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class OcrParseResult {
   private String m_text;

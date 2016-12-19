@@ -12,7 +12,7 @@ import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI
 /**
  * <h3>{@link DocboxResourceLoaders}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Replace
 public class DocboxResourceLoaders extends ResourceLoaders {

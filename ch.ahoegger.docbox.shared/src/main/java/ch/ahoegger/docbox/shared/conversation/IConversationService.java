@@ -1,6 +1,6 @@
 package ch.ahoegger.docbox.shared.conversation;
 
-import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
 /**
@@ -8,9 +8,8 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
  *
  * @author Andreas Hoegger
  */
-@Bean
 @TunnelToServer
-public interface IConversationService {
+public interface IConversationService extends IService {
 
   /**
    * @param formData

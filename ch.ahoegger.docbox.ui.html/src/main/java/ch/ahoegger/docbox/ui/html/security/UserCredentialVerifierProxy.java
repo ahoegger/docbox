@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.shared.SharedConfigProperties.BackendUrlProperty;
 /**
  * <h3>{@link UserCredentialVerifierProxy}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class UserCredentialVerifierProxy implements ICredentialVerifier {
 

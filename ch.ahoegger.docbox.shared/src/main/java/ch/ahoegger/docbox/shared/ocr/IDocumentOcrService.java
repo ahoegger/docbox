@@ -1,6 +1,6 @@
 package ch.ahoegger.docbox.shared.ocr;
 
-import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
 import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
@@ -8,11 +8,10 @@ import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
 /**
  * <h3>{@link IDocumentOcrService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
-@Bean
 @TunnelToServer
-public interface IDocumentOcrService {
+public interface IDocumentOcrService extends IService {
 
   /**
    * @param formData

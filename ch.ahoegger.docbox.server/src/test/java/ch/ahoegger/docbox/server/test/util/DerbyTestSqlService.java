@@ -16,7 +16,7 @@ import ch.ahoegger.docbox.server.database.dev.initialization.ITableTask;
 /**
  * <h3>{@link DerbyTestSqlService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @CreateImmediately
 @Replace

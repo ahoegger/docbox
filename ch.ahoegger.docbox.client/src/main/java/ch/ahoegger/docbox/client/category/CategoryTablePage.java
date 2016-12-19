@@ -28,7 +28,7 @@ import ch.ahoegger.docbox.shared.category.ICategoryService;
 /**
  * <h3>{@link CategoryTablePage}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @PageData(CategoryTableData.class)
 public class CategoryTablePage extends AbstractPageWithTable<CategoryTablePage.Table> {

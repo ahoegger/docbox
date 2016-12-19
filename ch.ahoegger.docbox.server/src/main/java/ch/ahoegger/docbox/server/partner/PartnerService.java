@@ -24,6 +24,7 @@ import ch.ahoegger.docbox.shared.partner.Partner;
 import ch.ahoegger.docbox.shared.partner.PartnerFormData;
 import ch.ahoegger.docbox.shared.partner.PartnerSearchFormData;
 import ch.ahoegger.docbox.shared.partner.PartnerTableData;
+import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
@@ -92,7 +93,7 @@ public class PartnerService implements IPartnerService, IPartnerTable {
 
   @Override
   public PartnerFormData prepareCreate(PartnerFormData formData) {
-    formData.getStartDate().setValue(new Date());
+    formData.getPartnerBox().getStartDate().setValue(LocalDateUtility.today());
     return formData;
   }
 
@@ -103,7 +104,7 @@ public class PartnerService implements IPartnerService, IPartnerTable {
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME);
     statementBuilder.append(" (").append(SqlFramentBuilder.columns(PARTNER_NR, NAME, DESCRIPTION, START_DATE, END_DATE)).append(")");
     statementBuilder.append(" VALUES (:partnerId, :name, :description, :startDate, :endDate )");
-    SQL.insert(statementBuilder.toString(), formData);
+    SQL.insert(statementBuilder.toString(), formData, formData.getPartnerBox());
 
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
@@ -121,7 +122,7 @@ public class PartnerService implements IPartnerService, IPartnerTable {
     statementBuilder.append(" INTO :exists, :name, :description, :startDate, :endDate");
     SQL.selectInto(statementBuilder.toString(),
         new NVPair("exists", exists),
-        formData);
+        formData, formData.getPartnerBox());
     if (exists.getValue() == null) {
       return null;
     }
@@ -137,7 +138,7 @@ public class PartnerService implements IPartnerService, IPartnerTable {
     statementBuilder.append(START_DATE).append("= :startDate, ");
     statementBuilder.append(END_DATE).append("= :endDate ");
     statementBuilder.append(" WHERE ").append(PARTNER_NR).append(" = :partnerId");
-    SQL.update(statementBuilder.toString(), formData);
+    SQL.update(statementBuilder.toString(), formData, formData.getPartnerBox());
 
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();

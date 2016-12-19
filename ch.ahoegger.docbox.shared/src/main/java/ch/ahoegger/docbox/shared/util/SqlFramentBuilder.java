@@ -1,7 +1,10 @@
 package ch.ahoegger.docbox.shared.util;
 
+import java.text.NumberFormat;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 
 /**
  * <h3>{@link SqlFramentBuilder}</h3>
@@ -30,6 +33,24 @@ public class SqlFramentBuilder {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("UPPER(").append(column).append(") LIKE UPPER('");
     statementBuilder.append("%").append(text).append("%')");
+    return statementBuilder.toString();
+  }
+
+  public static String where(String tableAlias, String column, Number number) {
+    return where(tableAlias + "." + column, number);
+  }
+
+  public static String where(String column, Number number) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append(column);
+    if (number == null) {
+      statementBuilder.append(" IS NULL");
+    }
+    else {
+      NumberFormat.getInstance().setGroupingUsed(false);
+      statementBuilder.append(" = ").append(NumberUtility.format(number));
+
+    }
     return statementBuilder.toString();
   }
 }

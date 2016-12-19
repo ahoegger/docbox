@@ -10,7 +10,7 @@ import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 /**
  * <h3>{@link DevAccessControlService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Replace
 public class DevAccessControlService extends AccessControlService {

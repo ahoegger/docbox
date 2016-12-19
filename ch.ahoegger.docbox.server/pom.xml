@@ -51,6 +51,10 @@
 			<groupId>ch.ahoegger.docbox</groupId>
 			<artifactId>ch.ahoegger.docbox.shared</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>ch.ahoegger.docbox</groupId>
+			<artifactId>ch.ahoegger.docbox.jasper</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>javax.servlet</groupId>

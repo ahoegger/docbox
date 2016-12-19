@@ -22,7 +22,7 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 /**
  * <h3>{@link ConversationService_SearchByActiveState}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class ConversationService_SearchByActiveState extends AbstractTestWithDatabase {
 

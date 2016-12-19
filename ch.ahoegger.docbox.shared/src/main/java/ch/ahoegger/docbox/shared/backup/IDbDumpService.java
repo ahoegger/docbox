@@ -8,7 +8,7 @@ import ch.ahoegger.docbox.shared.administration.DbDumpFormData;
 /**
  * <h3>{@link IDbDumpService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @ApplicationScoped
 @TunnelToServer
