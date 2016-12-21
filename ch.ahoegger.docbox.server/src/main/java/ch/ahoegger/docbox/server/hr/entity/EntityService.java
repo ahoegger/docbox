@@ -1,18 +1,27 @@
 package ch.ahoegger.docbox.server.hr.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 
+import ch.ahoegger.docbox.shared.ISequenceTable;
+import ch.ahoegger.docbox.shared.backup.IBackupService;
+import ch.ahoegger.docbox.shared.hr.billing.PostingGroupCodeType.UnbilledCode;
+import ch.ahoegger.docbox.shared.hr.entity.EntityFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData.EntityTableRowData;
 import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
 import ch.ahoegger.docbox.shared.hr.entity.IEntityTable;
+import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 public class EntityService implements IEntityService, IEntityTable {
@@ -78,5 +87,51 @@ public class EntityService implements IEntityService, IEntityTable {
     SQL.selectInto(statementBuilder.toString(),
         binds.toArray());
     return tableData;
+  }
+
+  @Override
+  public EntityFormData prepareCreate(EntityFormData formData) {
+    LocalDate today = LocalDate.now();
+    formData.getEntityDate().setValue(LocalDateUtility.toDate(today));
+    formData.setPostingGroupId(UnbilledCode.ID);
+    return formData;
+  }
+
+  @Override
+  public EntityFormData create(EntityFormData formData) {
+    formData.setEntityId(new BigDecimal(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME)));
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("INSERT INTO ").append(TABLE_NAME);
+    statementBuilder.append(" (").append(SqlFramentBuilder.columns(ENTITY_NR, PARTNER_NR, POSTING_GROUP_NR, ENTITY_TYPE, HOURS, AMOUNT, ENTITY_DATE, DESCRIPTION)).append(")");
+    statementBuilder.append(" VALUES (:entityId, :partnerId,:postingGroupId, :entityType, :workHours, :expenseAmount, :entityDate, :text)");
+    SQL.insert(statementBuilder.toString(), formData);
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
+    return formData;
+  }
+
+  @Override
+  public EntityFormData load(EntityFormData formData) {
+    // TODO [aho] add business logic here.
+    return formData;
+  }
+
+  @Override
+  public EntityFormData store(EntityFormData formData) {
+    // TODO [aho] add business logic here.
+    return formData;
+  }
+
+  public void updateGroupId(Set<BigDecimal> entityIds, BigDecimal groupId) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("UPDATE ").append(TABLE_NAME).append(" SET ")
+        .append(POSTING_GROUP_NR).append("= :groupId ")
+        .append(" WHERE ").append(SqlFramentBuilder.whereIn(ENTITY_NR, entityIds));
+    SQL.update(statementBuilder.toString(), new NVPair("groupId", groupId));
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
   }
 }

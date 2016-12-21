@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.server.database.dev.initialization;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.slf4j.Logger;
@@ -52,7 +54,7 @@ public class DocumentPermissionTableTask implements ITableTask, IDocumentPermiss
     sqlService.insert(statementBuilder.toString());
   }
 
-  public void createDocumentPermissionRow(ISqlService sqlService, String userId, long documentId, int permission) {
+  public void createDocumentPermissionRow(ISqlService sqlService, String userId, BigDecimal documentId, int permission) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(IUserTable.USERNAME, DOCUMENT_NR, PERMISSION));

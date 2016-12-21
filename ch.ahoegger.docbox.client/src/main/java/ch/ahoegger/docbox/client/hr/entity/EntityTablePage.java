@@ -1,7 +1,6 @@
 package ch.ahoegger.docbox.client.hr.entity;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.dto.Data;
@@ -19,6 +18,7 @@ import ch.ahoegger.docbox.client.AbstractDocboxPageWithTable;
 import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table;
 import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
+import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.WorkCode;
 import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
 
 @Data(EntityTablePageData.class)
@@ -81,24 +81,23 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
   public class Table extends AbstractEntityTable {
 
     @Order(1000)
-    public class PaySlipMenu extends AbstractMenu {
+    public class NewMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return TEXTS.get("CreatePayslip");
+        return TEXTS.get("NewWork");
       }
 
       @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-        return CollectionUtility.hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+        return CollectionUtility.hashSet(TableMenuType.SingleSelection, TableMenuType.EmptySpace);
       }
 
       @Override
       protected void execAction() {
-        List<BigDecimal> selectedValues = getEnityIdColumn().getSelectedValues();
-        PayslipForm form = new PayslipForm();
-        form.setEntityIds(selectedValues);
-        form.start();
-
+        EntityForm form = new EntityForm();
+        form.setEntityType(WorkCode.ID);
+        form.setPartnerId(getPartnerId());
+        form.startNew();
       }
     }
 

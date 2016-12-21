@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.shared.security.permission;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
@@ -11,7 +13,7 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
 @TunnelToServer
 public interface IPermissionService extends IService {
 
-  boolean hasReadAccess(String userId, Long entityId);
+  boolean hasReadAccess(String userId, BigDecimal entityId);
 
-  boolean hasWriteAccess(Long entityId);
+  boolean hasWriteAccess(BigDecimal entityId);
 }

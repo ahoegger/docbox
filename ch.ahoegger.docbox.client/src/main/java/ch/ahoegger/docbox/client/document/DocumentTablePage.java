@@ -11,8 +11,8 @@ import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -188,7 +188,7 @@ public class DocumentTablePage extends AbstractDocboxPageWithTable<DocumentTable
     }
 
     @Order(10)
-    public class DocumentIdColumn extends AbstractLongColumn {
+    public class DocumentIdColumn extends AbstractBigDecimalColumn {
 
       @Override
       protected boolean getConfiguredDisplayable() {

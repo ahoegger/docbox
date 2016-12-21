@@ -6,6 +6,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -34,6 +35,10 @@ public abstract class AbstractEntityTable extends AbstractTable {
 
   public EntityTypeColumn getEntityTypeColumn() {
     return getColumnSet().getColumnByClass(EntityTypeColumn.class);
+  }
+
+  public TextColumn getTextColumn() {
+    return getColumnSet().getColumnByClass(TextColumn.class);
   }
 
   public PartnerIdColumn getPartnerIdColumn() {
@@ -78,20 +83,25 @@ public abstract class AbstractEntityTable extends AbstractTable {
     }
 
     @Override
+    protected boolean getConfiguredSortAscending() {
+      return false;
+    }
+
+    @Override
     protected int getConfiguredWidth() {
       return 120;
     }
   }
 
   @Order(2500)
-  public class EntityTypeColumn extends AbstractSmartColumn<Long> {
+  public class EntityTypeColumn extends AbstractSmartColumn<BigDecimal> {
     @Override
     protected String getConfiguredHeaderText() {
       return TEXTS.get("EntityType");
     }
 
     @Override
-    protected Class<? extends ICodeType<?, Long>> getConfiguredCodeType() {
+    protected Class<? extends ICodeType<?, BigDecimal>> getConfiguredCodeType() {
       return EntityTypeCodeType.class;
     }
 
@@ -145,6 +155,19 @@ public abstract class AbstractEntityTable extends AbstractTable {
     @Override
     protected BigDecimal getConfiguredMaxValue() {
       return IEntityTable.AMOUNT_MIN;
+    }
+  }
+
+  @Order(3750)
+  public class TextColumn extends AbstractStringColumn {
+    @Override
+    protected String getConfiguredHeaderText() {
+      return TEXTS.get("Text");
+    }
+
+    @Override
+    protected int getConfiguredWidth() {
+      return IEntityTable.DESCRIPTION_LENGTH;
     }
   }
 

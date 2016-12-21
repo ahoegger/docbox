@@ -49,14 +49,14 @@ public class DocumentFormData extends AbstractFormData {
   /**
    * access method for property DocumentId.
    */
-  public Long getDocumentId() {
+  public BigDecimal getDocumentId() {
     return getDocumentIdProperty().getValue();
   }
 
   /**
    * access method for property DocumentId.
    */
-  public void setDocumentId(Long documentId) {
+  public void setDocumentId(BigDecimal documentId) {
     getDocumentIdProperty().setValue(documentId);
   }
 
@@ -150,7 +150,7 @@ public class DocumentFormData extends AbstractFormData {
     private static final long serialVersionUID = 1L;
   }
 
-  public static class DocumentIdProperty extends AbstractPropertyData<Long> {
+  public static class DocumentIdProperty extends AbstractPropertyData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

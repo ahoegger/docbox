@@ -65,6 +65,7 @@ public class PostingGroupTableData extends AbstractTablePageData {
     public static final String sourceTax = "sourceTax";
     public static final String socialSecurityTax = "socialSecurityTax";
     public static final String vacationExtra = "vacationExtra";
+    public static final String documentLink = "documentLink";
     private BigDecimal m_sortGroup;
     private BigDecimal m_id;
     private BigDecimal m_partnerId;
@@ -76,6 +77,7 @@ public class PostingGroupTableData extends AbstractTablePageData {
     private BigDecimal m_sourceTax;
     private BigDecimal m_socialSecurityTax;
     private BigDecimal m_vacationExtra;
+    private String m_documentLink;
 
     public BigDecimal getSortGroup() {
       return m_sortGroup;
@@ -163,6 +165,14 @@ public class PostingGroupTableData extends AbstractTablePageData {
 
     public void setVacationExtra(BigDecimal newVacationExtra) {
       m_vacationExtra = newVacationExtra;
+    }
+
+    public String getDocumentLink() {
+      return m_documentLink;
+    }
+
+    public void setDocumentLink(String newDocumentLink) {
+      m_documentLink = newDocumentLink;
     }
   }
 }

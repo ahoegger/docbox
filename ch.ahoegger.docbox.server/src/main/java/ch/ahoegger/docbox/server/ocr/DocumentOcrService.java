@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.server.ocr;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.BooleanHolder;
@@ -26,7 +28,7 @@ public class DocumentOcrService implements IDocumentOcrService, IDocumentOcrTabl
   private static final Logger LOG = LoggerFactory.getLogger(DocumentOcrService.class);
 
   @RemoteServiceAccessDenied
-  public void create(Long documentId, OcrParseResult parseResult) {
+  public void create(BigDecimal documentId, OcrParseResult parseResult) {
     String text = null;
     boolean ocrParsed = false;
     boolean notParsable = false;
@@ -69,7 +71,7 @@ public class DocumentOcrService implements IDocumentOcrService, IDocumentOcrTabl
    * @param documentId
    * @return
    */
-  public Boolean exists(Long documentId) {
+  public Boolean exists(BigDecimal documentId) {
     BooleanHolder exists = new BooleanHolder();
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("SELECT TRUE ");
@@ -89,7 +91,7 @@ public class DocumentOcrService implements IDocumentOcrService, IDocumentOcrTabl
    * @param documentId
    * @param value
    */
-  public void delete(Long documentId) {
+  public void delete(BigDecimal documentId) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
     SQL.delete(statementBuilder.toString(), new NVPair("documentId", documentId));

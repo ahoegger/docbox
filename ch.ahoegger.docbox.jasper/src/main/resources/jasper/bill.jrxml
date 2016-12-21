@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bill" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Error" uuid="77103a51-91bc-4ef3-b556-6f7d49381b00">
 	<property name="ireport.zoom" value="1.771561000000001"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="612"/>
+	<property name="ireport.y" value="576"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["D:/private/softwareDev/docbox/jasperReports/"]]></defaultValueExpression>
 	</parameter>
@@ -20,33 +20,41 @@
 	<field name="addressLine3" class="java.lang.String">
 		<fieldDescription><![CDATA[addressLine3]]></fieldDescription>
 	</field>
-	<field name="title" class="java.lang.String"/>
-	<field name="date" class="java.lang.String">
-		<fieldDescription><![CDATA[date]]></fieldDescription>
-	</field>
-	<field name="entities" class="java.util.Collection">
-		<fieldDescription><![CDATA[entities]]></fieldDescription>
-	</field>
-	<field name="socialInsuracneAbsolute" class="java.lang.String">
-		<fieldDescription><![CDATA[socialInsuracneAbsolute]]></fieldDescription>
-	</field>
-	<field name="socialInsuracnePercentage" class="java.lang.String">
-		<fieldDescription><![CDATA[socialInsuracnePercentage]]></fieldDescription>
-	</field>
-	<field name="vacationExtraAbsolute" class="java.lang.String">
-		<fieldDescription><![CDATA[vacationExtraAbsolute]]></fieldDescription>
+	<field name="hourWage" class="java.lang.String">
+		<fieldDescription><![CDATA[hourWage]]></fieldDescription>
 	</field>
 	<field name="vacationExtraPercentage" class="java.lang.String">
 		<fieldDescription><![CDATA[vacationExtraPercentage]]></fieldDescription>
 	</field>
-	<field name="hourWage" class="java.lang.String">
-		<fieldDescription><![CDATA[hourWage]]></fieldDescription>
+	<field name="sourceTaxProcentage" class="java.lang.String">
+		<fieldDescription><![CDATA[sourceTaxProcentage]]></fieldDescription>
+	</field>
+	<field name="date" class="java.lang.String">
+		<fieldDescription><![CDATA[date]]></fieldDescription>
 	</field>
 	<field name="nettoWage" class="java.lang.String">
 		<fieldDescription><![CDATA[nettoWage]]></fieldDescription>
 	</field>
-	<field name="nettoWageRounded" class="java.lang.String">
-		<fieldDescription><![CDATA[nettoWageRounded]]></fieldDescription>
+	<field name="title" class="java.lang.String">
+		<fieldDescription><![CDATA[title]]></fieldDescription>
+	</field>
+	<field name="socialInsuracneAbsolute" class="java.lang.String">
+		<fieldDescription><![CDATA[socialInsuracneAbsolute]]></fieldDescription>
+	</field>
+	<field name="iban" class="java.lang.String">
+		<fieldDescription><![CDATA[iban]]></fieldDescription>
+	</field>
+	<field name="workItems" class="java.util.Collection">
+		<fieldDescription><![CDATA[workItems]]></fieldDescription>
+	</field>
+	<field name="vacationExtraAbsolute" class="java.lang.String">
+		<fieldDescription><![CDATA[vacationExtraAbsolute]]></fieldDescription>
+	</field>
+	<field name="socialInsuracnePercentage" class="java.lang.String">
+		<fieldDescription><![CDATA[socialInsuracnePercentage]]></fieldDescription>
+	</field>
+	<field name="sourceTaxAbsolute" class="java.lang.String">
+		<fieldDescription><![CDATA[sourceTaxAbsolute]]></fieldDescription>
 	</field>
 	<field name="bruttoWage" class="java.lang.String">
 		<fieldDescription><![CDATA[bruttoWage]]></fieldDescription>
@@ -54,18 +62,12 @@
 	<field name="hoursInPeriod" class="java.lang.String">
 		<fieldDescription><![CDATA[hoursInPeriod]]></fieldDescription>
 	</field>
-	<field name="sourceTaxAbsolute" class="java.lang.String">
-		<fieldDescription><![CDATA[sourceTaxAbsolute]]></fieldDescription>
+	<field name="nettoWageRounded" class="java.lang.String">
+		<fieldDescription><![CDATA[nettoWageRounded]]></fieldDescription>
 	</field>
-	<field name="sourceTaxProcentage" class="java.lang.String">
-		<fieldDescription><![CDATA[sourceTaxProcentage]]></fieldDescription>
+	<field name="expenses" class="java.util.Collection">
+		<fieldDescription><![CDATA[expenses]]></fieldDescription>
 	</field>
-	<field name="iban" class="java.lang.String">
-		<fieldDescription><![CDATA[iban]]></fieldDescription>
-	</field>
-	<variable name="entities_1" class="java.lang.Integer" calculation="Count">
-		<variableExpression><![CDATA[$F{entities}]]></variableExpression>
-	</variable>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -352,7 +354,7 @@
 		<band height="160" splitType="Stretch">
 			<subreport>
 				<reportElement x="36" y="42" width="483" height="100" uuid="87694581-1232-4976-8e44-8c70e7b79252"/>
-				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{entities})]]></dataSourceExpression>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{workItems})]]></dataSourceExpression>
                 <subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{subreportParameter}]]></subreportExpression>
 			</subreport>
 			<staticText>

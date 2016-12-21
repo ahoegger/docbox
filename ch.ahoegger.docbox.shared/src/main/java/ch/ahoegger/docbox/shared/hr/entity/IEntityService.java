@@ -16,4 +16,28 @@ public interface IEntityService extends IService {
    * @return
    */
   EntityTablePageData getEntityTableData(EntitySearchFormData filter);
+
+  /**
+   * @param formData
+   * @return
+   */
+  EntityFormData prepareCreate(EntityFormData formData);
+
+  /**
+   * @param formData
+   * @return
+   */
+  EntityFormData create(EntityFormData formData);
+
+  /**
+   * @param formData
+   * @return
+   */
+  EntityFormData load(EntityFormData formData);
+
+  /**
+   * @param formData
+   * @return
+   */
+  EntityFormData store(EntityFormData formData);
 }

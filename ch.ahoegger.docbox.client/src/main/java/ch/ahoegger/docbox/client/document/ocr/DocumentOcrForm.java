@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.client.document.ocr;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -28,7 +30,7 @@ import ch.ahoegger.docbox.shared.ocr.IDocumentOcrService;
  */
 @FormData(value = DocumentOcrFormData.class, sdkCommand = SdkCommand.CREATE)
 public class DocumentOcrForm extends AbstractForm {
-  private Long m_documentId;
+  private BigDecimal m_documentId;
 
   public DocumentOcrForm() {
     setHandler(new FormHandler());
@@ -50,12 +52,12 @@ public class DocumentOcrForm extends AbstractForm {
   }
 
   @FormData
-  public void setDocumentId(Long documentId) {
+  public void setDocumentId(BigDecimal documentId) {
     m_documentId = documentId;
   }
 
   @FormData
-  public Long getDocumentId() {
+  public BigDecimal getDocumentId() {
     return m_documentId;
   }
 

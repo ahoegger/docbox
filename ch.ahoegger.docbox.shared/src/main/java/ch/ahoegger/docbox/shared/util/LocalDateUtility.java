@@ -21,4 +21,8 @@ public class LocalDateUtility {
   public static Date today() {
     return toDate(LocalDate.now());
   }
+
+  public static LocalDate toLocalDate(Date date) {
+    return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+  }
 }

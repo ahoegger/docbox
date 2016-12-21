@@ -25,7 +25,7 @@ import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 @ApplicationScoped
 public class DocumentCategoryService implements IDocumentCategoryTable {
 
-  public Set<BigDecimal> getCategoryIds(Long documentId) {
+  public Set<BigDecimal> getCategoryIds(BigDecimal documentId) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("SELECT ").append(CATEGORY_NR).append(" FROM ").append(TABLE_NAME);
     statementBuilder.append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
@@ -35,7 +35,7 @@ public class DocumentCategoryService implements IDocumentCategoryTable {
     return Arrays.stream(rawResult).map(row -> TypeCastUtility.castValue(row[0], BigDecimal.class)).collect(Collectors.toSet());
   }
 
-  public void createDocumentCategories(Long documentId, Set<BigDecimal> categoryIds) {
+  public void createDocumentCategories(BigDecimal documentId, Set<BigDecimal> categoryIds) {
     if (CollectionUtility.hasElements(categoryIds)) {
       for (BigDecimal categoryId : categoryIds) {
         StringBuilder statementBuilder = new StringBuilder();
@@ -70,13 +70,13 @@ public class DocumentCategoryService implements IDocumentCategoryTable {
    * @param value
    */
   @RemoteServiceAccessDenied
-  public void updateDocumentCategories(Long documentId, Set<BigDecimal> categoryIds) {
+  public void updateDocumentCategories(BigDecimal documentId, Set<BigDecimal> categoryIds) {
     deleteByDocumentId(documentId);
     createDocumentCategories(documentId, categoryIds);
   }
 
   @RemoteServiceAccessDenied
-  public void deleteByDocumentId(Long documentId) {
+  public void deleteByDocumentId(BigDecimal documentId) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
     SQL.delete(statementBuilder.toString(), new NVPair("documentId", documentId));

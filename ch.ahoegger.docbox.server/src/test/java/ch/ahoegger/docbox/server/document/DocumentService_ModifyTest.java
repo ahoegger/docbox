@@ -44,7 +44,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
   private final String userId01 = SUBJECT_NAME;
   private final String userId02 = "username02";
 
-  private final Long documentId = BEANS.get(IdGenerateService.class).getNextId();
+  private final BigDecimal documentId = BigDecimal.valueOf(BEANS.get(IdGenerateService.class).getNextId());
   private final Long categoryId01 = BEANS.get(IdGenerateService.class).getNextId();
   private final Long categoryId02 = BEANS.get(IdGenerateService.class).getNextId();
   private final Long conversationId01 = BEANS.get(IdGenerateService.class).getNextId();
@@ -426,7 +426,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
   }
 
-  private DocumentFormData loadDocument(IDocumentService service, long docId) {
+  private DocumentFormData loadDocument(IDocumentService service, BigDecimal docId) {
     DocumentFormData fd = new DocumentFormData();
     fd.setDocumentId(docId);
     fd = service.load(fd);

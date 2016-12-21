@@ -25,14 +25,11 @@ import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.AbstractFileC
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmartGroupBoxBodyGrid;
-import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -56,8 +53,6 @@ import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.Partners
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PermissionsField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.ValidDateField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.OkButton;
-import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
-import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI;
 import ch.ahoegger.docbox.client.document.field.AbstractCategoriesListBox;
 import ch.ahoegger.docbox.client.document.field.AbstractPartnerTableField;
 import ch.ahoegger.docbox.client.document.field.AbstractPartnerTableField.Table;
@@ -76,7 +71,7 @@ import ch.ahoegger.docbox.shared.validation.DateValidation;
 @FormData(value = DocumentFormData.class, sdkCommand = SdkCommand.CREATE)
 public class DocumentForm extends AbstractForm {
 
-  private Long m_documentId;
+  private BigDecimal m_documentId;
   private String m_documentPath;
   private Boolean m_hasOcrText;
 
@@ -106,12 +101,12 @@ public class DocumentForm extends AbstractForm {
   }
 
   @FormData
-  public void setDocumentId(Long documentId) {
+  public void setDocumentId(BigDecimal documentId) {
     m_documentId = documentId;
   }
 
   @FormData
-  public Long getDocumentId() {
+  public BigDecimal getDocumentId() {
     return m_documentId;
   }
 
@@ -239,16 +234,8 @@ public class DocumentForm extends AbstractForm {
         }
 
         @Order(10)
-        @FormData(sdkCommand = SdkCommand.IGNORE)
-        public class OpenHtmlField extends AbstractHtmlField {
+        public class OpenHtmlField extends AbstractDocumentLinkField {
 
-          public void setDocumentId(Long documentId) {
-            StringBuilder linkBuilder = new StringBuilder();
-            linkBuilder.append(CONFIG.getPropertyValue(DocumentLinkURI.class));
-            linkBuilder.append("?").append(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class)).append("=").append(documentId);
-            String encodedHtml = HTML.link(linkBuilder.toString(), TEXTS.get("Open")).addAttribute("target", "_blank").toHtml();
-            setValue(encodedHtml);
-          }
         }
 
         @Order(2000)
@@ -576,17 +563,17 @@ public class DocumentForm extends AbstractForm {
   }
 
   public static class DocumentFormEditHandler extends AbstractDocumentFormHandler {
-    private final Long m_documentId;
+    private final BigDecimal m_documentId;
 
     /**
      * @param form
      */
-    public DocumentFormEditHandler(DocumentForm form, Long documentId) {
+    public DocumentFormEditHandler(DocumentForm form, BigDecimal documentId) {
       super(form);
       m_documentId = documentId;
     }
 
-    public Long getDocumentId() {
+    public BigDecimal getDocumentId() {
       return m_documentId;
     }
 
@@ -612,14 +599,14 @@ public class DocumentForm extends AbstractForm {
   }
 
   public static class DocumentFormPageHandler extends AbstractDocumentFormHandler {
-    private final Long m_documentId;
+    private final BigDecimal m_documentId;
 
-    public DocumentFormPageHandler(DocumentForm form, Long documentId) {
+    public DocumentFormPageHandler(DocumentForm form, BigDecimal documentId) {
       super(form);
       m_documentId = documentId;
     }
 
-    public Long getDocumentId() {
+    public BigDecimal getDocumentId() {
       return m_documentId;
     }
 

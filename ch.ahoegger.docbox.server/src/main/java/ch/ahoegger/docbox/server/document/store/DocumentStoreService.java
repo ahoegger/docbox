@@ -3,6 +3,7 @@ package ch.ahoegger.docbox.server.document.store;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -61,7 +62,7 @@ public class DocumentStoreService implements IDocumentStoreService {
   }
 
   @Override
-  public BinaryResource getDocument(Long documentId) {
+  public BinaryResource getDocument(BigDecimal documentId) {
     // permissioncheck
     if (!ACCESS.check(new EntityReadPermission(documentId))) {
       throw new VetoException("Access denied");
@@ -75,7 +76,7 @@ public class DocumentStoreService implements IDocumentStoreService {
   }
 
   @RemoteServiceAccessDenied
-  public String store(BinaryResource resource, Date capturedDate, Long documentId) {
+  public String store(BinaryResource resource, Date capturedDate, BigDecimal documentId) {
     DateFormat dfYear = new SimpleDateFormat("yyyy");
     DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
     StringBuilder pathBuilder = new StringBuilder();

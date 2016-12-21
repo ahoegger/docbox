@@ -17,4 +17,21 @@ public interface IPostingGroupService extends IService {
    */
   PostingGroupTableData getTableData(PostingGroupSearchFormData formData);
 
+  /**
+   * @param formData
+   * @return
+   */
+  PostingGroupFormData prepareCreate(PostingGroupFormData formData);
+
+  /**
+   * @param formData
+   */
+  PostingGroupFormData create(PostingGroupFormData formData);
+
+  /**
+   * @param formData
+   * @return
+   */
+  PostingCalculationBoxData calculateWage(PostingGroupFormData formData);
+
 }

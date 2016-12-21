@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.server.document;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,10 +39,10 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithDatabase {
   private static final String username01 = SUBJECT_NAME;
 
-  private static final Long documentId01 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long documentId02 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long documentId03 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long documentId04 = BEANS.get(IdGenerateService.class).getNextId();
+  private static final BigDecimal documentId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal documentId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal documentId03 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal documentId04 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   private static List<IBean<?>> s_mockBeans = new ArrayList<IBean<?>>();
 
@@ -61,7 +62,7 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
         new BeanMetaData(IDocumentStoreService.class)
             .withOrder(-10).withInitialInstance(new TestDocumentStoreService() {
               @Override
-              public BinaryResource getDocument(Long documentId) {
+              public BinaryResource getDocument(BigDecimal documentId) {
                 return new BinaryResource("dummy", "dummy".getBytes());
               }
             })));
@@ -131,7 +132,7 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
 
   }
 
-  private void assertOcrData(Long documentId, boolean exist) {
+  private void assertOcrData(BigDecimal documentId, boolean exist) {
     DocumentOcrFormData fd1 = new DocumentOcrFormData();
     fd1.setDocumentId(documentId);
     DocumentOcrFormData fd2 = BEANS.get(IDocumentOcrService.class).load(fd1);

@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.server.document;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +27,7 @@ import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 public class DocumentPermissionService implements IPermissionService, IDocumentPermissionTable {
 
   @Override
-  public boolean hasReadAccess(String userId, Long entityId) {
+  public boolean hasReadAccess(String userId, BigDecimal entityId) {
     List<Integer> permission = new ArrayList<Integer>();
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(PERMISSION, USERNAME, DOCUMENT_NR)).append(" FROM ").append(TABLE_NAME);
@@ -46,11 +47,11 @@ public class DocumentPermissionService implements IPermissionService, IDocumentP
   }
 
   @Override
-  public boolean hasWriteAccess(Long entityId) {
+  public boolean hasWriteAccess(BigDecimal entityId) {
     return false;
   }
 
-  public Map<String, Integer> getPermissions(Long documentId) {
+  public Map<String, Integer> getPermissions(BigDecimal documentId) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(USERNAME, PERMISSION)).append(" FROM ").append(TABLE_NAME);
     statementBuilder.append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
@@ -63,7 +64,7 @@ public class DocumentPermissionService implements IPermissionService, IDocumentP
         (p1, p2) -> Math.max(p1, p2)));
   }
 
-  public void createDocumentPermissions(Long documentId, Map<String, Integer> permissions) {
+  public void createDocumentPermissions(BigDecimal documentId, Map<String, Integer> permissions) {
     for (Entry<String, Integer> permission : permissions.entrySet()) {
       StringBuilder statementBuilder = new StringBuilder();
       statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
@@ -86,13 +87,13 @@ public class DocumentPermissionService implements IPermissionService, IDocumentP
    * @param permissions
    */
   @RemoteServiceAccessDenied
-  public void updateDocumentPermissions(Long documentId, Map<String, Integer> permissions) {
+  public void updateDocumentPermissions(BigDecimal documentId, Map<String, Integer> permissions) {
     deleteDocumentPermissions(documentId);
     createDocumentPermissions(documentId, permissions);
   }
 
   @RemoteServiceAccessDenied
-  public void deleteDocumentPermissions(Long documentId) {
+  public void deleteDocumentPermissions(BigDecimal documentId) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
     SQL.delete(statementBuilder.toString(), new NVPair("documentId", documentId));

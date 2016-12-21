@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.server.ocr;
 
+import java.math.BigDecimal;
 import java.security.AccessController;
 import java.util.concurrent.Callable;
 
@@ -23,13 +24,13 @@ import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
  */
 public class ParseDocumentJob {
 
-  private Long m_documentId;
+  private BigDecimal m_documentId;
 
-  public ParseDocumentJob(Long documentId) {
+  public ParseDocumentJob(BigDecimal documentId) {
     m_documentId = documentId;
   }
 
-  public Long getDocumentId() {
+  public BigDecimal getDocumentId() {
     return m_documentId;
   }
 
@@ -48,7 +49,7 @@ public class ParseDocumentJob {
     }, Jobs.newInput().withRunContext(RunContexts.empty().withSubject(Subject.getSubject(AccessController.getContext()))));
   }
 
-  protected IFuture<BinaryResource> getBinaryResource(final Long documentId) {
+  protected IFuture<BinaryResource> getBinaryResource(final BigDecimal documentId) {
     return Jobs.schedule(new Callable<BinaryResource>() {
       @Override
       public BinaryResource call() throws Exception {
@@ -61,7 +62,7 @@ public class ParseDocumentJob {
 
   }
 
-  protected IFuture<Void> persist(Long documentId, OcrParseResult result) {
+  protected IFuture<Void> persist(BigDecimal documentId, OcrParseResult result) {
     return Jobs.schedule(new IRunnable() {
 
       @Override

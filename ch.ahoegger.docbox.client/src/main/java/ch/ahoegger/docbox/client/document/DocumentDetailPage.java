@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.client.document;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -16,14 +18,14 @@ import ch.ahoegger.docbox.shared.document.IDocumentService;
  */
 public class DocumentDetailPage extends AbstractPageWithNodes {
 
-  private long m_documentId;
+  private BigDecimal m_documentId;
 
-  public DocumentDetailPage(long documentId) {
+  public DocumentDetailPage(BigDecimal documentId) {
     m_documentId = documentId;
 
   }
 
-  public long getDocumentId() {
+  public BigDecimal getDocumentId() {
     return m_documentId;
   }
 

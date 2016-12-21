@@ -62,7 +62,7 @@ public class DocumentTableData extends AbstractTablePageData {
     public static final String capturedDate = "capturedDate";
     public static final String owner = "owner";
     public static final String documentPath = "documentPath";
-    private Long m_documentId;
+    private BigDecimal m_documentId;
     private String m_abstract;
     private String m_partner;
     private BigDecimal m_conversation;
@@ -71,11 +71,11 @@ public class DocumentTableData extends AbstractTablePageData {
     private String m_owner;
     private String m_documentPath;
 
-    public Long getDocumentId() {
+    public BigDecimal getDocumentId() {
       return m_documentId;
     }
 
-    public void setDocumentId(Long newDocumentId) {
+    public void setDocumentId(BigDecimal newDocumentId) {
       m_documentId = newDocumentId;
     }
 

@@ -7,17 +7,19 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import org.ch.ahoegger.docbox.jasper.bean.Account;
-import org.ch.ahoegger.docbox.jasper.bean.EntityBean;
+import org.ch.ahoegger.docbox.jasper.bean.ReportExpenseItem;
+import org.ch.ahoegger.docbox.jasper.bean.ReportMonthPayslip;
+import org.ch.ahoegger.docbox.jasper.bean.ReportWorkItem;
+import org.ch.ahoegger.docbox.jasper.bean.WageCalculation;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 import net.sf.jasperreports.engine.JRException;
@@ -34,7 +36,6 @@ public class WageReportService {
   private Locale DE_CH = new Locale("de", "CH");
   private DateTimeFormatter m_dateFormatter;
   private NumberFormat m_formatFloat2FractionDigits;
-  private NumberFormat m_simpleNumberFormt;
 
   @PostConstruct
   protected void initFormatters() {
@@ -44,32 +45,50 @@ public class WageReportService {
     m_formatFloat2FractionDigits.setMaximumFractionDigits(2);
     m_formatFloat2FractionDigits.setMinimumFractionDigits(2);
 
-    m_simpleNumberFormt = NumberFormat.getInstance(DE_CH);
   }
 
-  public byte[] createReport(String title, String addressLine1, String addressLine2, String addressLine3, LocalDate date, List<Entity> entities, BigDecimal hourWage, String iban) {
-    Account account = new Account();
+  public byte[] createMonthlyReport(String title, String addressLine1, String addressLine2, String addressLine3, LocalDate date, String iban, BigDecimal hourWage, WageCalculation wageCalculation) {
+    ReportMonthPayslip account = new ReportMonthPayslip();
     account.setTitle(title);
     account.setAddressLine1(addressLine1);
     account.setAddressLine2(addressLine2);
     account.setAddressLine3(addressLine3);
     account.setDate(date.format(m_dateFormatter));
-    List<EntityBean> entityBeans = entities.stream().sorted((e1, e2) -> e1.getDate().compareTo(e2.getDate()))
-        .map(e -> {
-          EntityBean eb = new EntityBean();
-          eb.setDate(e.getDate().format(m_dateFormatter));
-          eb.setHours(m_formatFloat2FractionDigits.format(e.getHoursWorked()));
-          return eb;
+    account.setWorkItems(wageCalculation.getWorkItems()
+        .stream()
+        .map(in -> {
+          ReportWorkItem out = new ReportWorkItem();
+          out.setDate(in.getDate().format(m_dateFormatter));
+          out.setHours(m_formatFloat2FractionDigits.format(in.getHours()));
+          out.setText(in.getText());
+          return out;
+        })
+        .collect(Collectors.toList()));
 
-        }).collect(Collectors.toList());
-    account.setEntities(entityBeans);
+    account.setExpenses(wageCalculation.getExpenses()
+        .stream()
+        .map(in -> {
+          ReportExpenseItem out = new ReportExpenseItem();
+          out.setDate(in.getDate().format(m_dateFormatter));
+          out.setAmount(m_formatFloat2FractionDigits.format(in.getAmount()));
+          out.setText(in.getText());
+          return out;
+        })
+        .collect(Collectors.toList()));
+
     account.setIban(iban);
-
-    BigDecimal hoursInPeriod = entities.stream().map(e -> e.getHoursWorked())
-        .reduce((h1, h2) -> h1.add(h2)).get();
-    account = calculateWage(account, hoursInPeriod, hourWage);
-
-//    entities.stream().map(e -> e.getHoursWorked()).redu
+    // calculations
+    account.setBruttoWage(m_formatFloat2FractionDigits.format(wageCalculation.getBruttoWage()));
+    account.setHoursInPeriod(m_formatFloat2FractionDigits.format(wageCalculation.getHoursTotal()));
+    account.setHourWage(m_formatFloat2FractionDigits.format(hourWage));
+    account.setNettoWage(m_formatFloat2FractionDigits.format(wageCalculation.getNettoWage()));
+    account.setNettoWageRounded(m_formatFloat2FractionDigits.format(financeRound(wageCalculation.getNettoWage(), BigDecimal.valueOf(0.05), RoundingMode.UP)));
+    account.setSocialInsuracneAbsolute(m_formatFloat2FractionDigits.format(wageCalculation.getSocialSecuityTax()));
+    account.setSocialInsuracnePercentage(m_formatFloat2FractionDigits.format(wageCalculation.getSocialSecuityTaxRelative().multiply(BigDecimal.valueOf(100.0))));
+    account.setSourceTaxAbsolute(m_formatFloat2FractionDigits.format(wageCalculation.getSourceTax()));
+    account.setSourceTaxProcentage(m_formatFloat2FractionDigits.format(wageCalculation.getSourceTaxRelative().multiply(BigDecimal.valueOf(100.0))));
+    account.setVacationExtraAbsolute(m_formatFloat2FractionDigits.format(wageCalculation.getVacationExtra()));
+    account.setVacationExtraPercentage(m_formatFloat2FractionDigits.format(wageCalculation.getVacationExtraRelative().multiply(BigDecimal.valueOf(100.0))));
 
     InputStream billStream = getClass().getResourceAsStream("/jasper/bill.jrxml");
     InputStream billSubreportStream = getClass().getResourceAsStream("/jasper/bill_subreport1.jrxml");
@@ -85,51 +104,8 @@ public class WageReportService {
       return JasperExportManager.exportReportToPdf(print);
     }
     catch (JRException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      return null;
+      throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
     }
-
-//    JasperReport jasperSubReport = JasperCompileManager.compileReport(subReportSource);
-//
-//    Map<String, Object> parameters = new HashMap()<String, Object>;
-//    parameters.put("subreportParameter", jasperSubReport);
-//
-//    JasperFillManager.fillReportToFile(jasperMasterReport, parameters, connection);
-//
-//    // Generate jasper print
-//    JasperPrint jprint = (JasperPrint) JasperFillManager.fillReport(jasperFileName, hm, conn);
-//
-//    // Export pdf file
-//    JasperExportManager.exportReportToPdfFile(jprint, pdfFileName);
-  }
-
-  private Account calculateWage(Account account, BigDecimal hoursInPeriod, BigDecimal hourlyWage) {
-    account.setHoursInPeriod(m_formatFloat2FractionDigits.format(
-        hoursInPeriod));
-    account.setHourWage(m_formatFloat2FractionDigits.format(hourlyWage));
-    BigDecimal bruttoWage = hoursInPeriod.multiply(hourlyWage);
-    BigDecimal nettoWage = new BigDecimal(bruttoWage.doubleValue());
-    account.setBruttoWage(m_formatFloat2FractionDigits.format(bruttoWage));
-    BigDecimal socialSecurityPercentage = CONFIG.getPropertyValue(PayslipProperties.SocialInsurancePercentageProperty.class);
-    account.setSocialInsuracnePercentage(m_simpleNumberFormt.format(socialSecurityPercentage));
-    BigDecimal socialSecurityAbs = socialSecurityPercentage.divide(BigDecimal.valueOf(-100.0)).multiply(bruttoWage);
-    nettoWage = nettoWage.add(socialSecurityAbs);
-    account.setSocialInsuracneAbsolute(m_formatFloat2FractionDigits.format(socialSecurityAbs));
-    BigDecimal sourceTaxPercentage = CONFIG.getPropertyValue(PayslipProperties.SourceTaxPercentageProperty.class);
-    account.setSourceTaxProcentage(m_simpleNumberFormt.format(sourceTaxPercentage));
-    BigDecimal sourceTaxAbs = sourceTaxPercentage.divide(BigDecimal.valueOf(-100.0)).multiply(bruttoWage);
-    nettoWage = nettoWage.add(sourceTaxAbs);
-    account.setSourceTaxAbsolute(m_formatFloat2FractionDigits.format(sourceTaxAbs));
-
-    BigDecimal vacationExtraPercentage = CONFIG.getPropertyValue(PayslipProperties.VacationExtraPercentageProperty.class);
-    account.setVacationExtraPercentage(m_simpleNumberFormt.format(vacationExtraPercentage));
-    BigDecimal vacationExtraAbs = vacationExtraPercentage.divide(BigDecimal.valueOf(100.0)).multiply(bruttoWage);
-    nettoWage = nettoWage.add(vacationExtraAbs);
-    account.setVacationExtraAbsolute(m_formatFloat2FractionDigits.format(vacationExtraAbs));
-    account.setNettoWage(m_formatFloat2FractionDigits.format(nettoWage));
-    account.setNettoWageRounded(m_formatFloat2FractionDigits.format(financeRound(nettoWage, BigDecimal.valueOf(0.05), RoundingMode.UP)));
-    return account;
 
   }
 

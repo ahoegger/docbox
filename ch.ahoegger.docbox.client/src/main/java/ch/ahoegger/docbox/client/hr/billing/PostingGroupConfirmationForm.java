@@ -1,4 +1,6 @@
-package ch.ahoegger.docbox.client.hr.entity;
+package ch.ahoegger.docbox.client.hr.billing;
+
+import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
@@ -11,23 +13,23 @@ import org.eclipse.scout.rt.shared.TEXTS;
 
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI;
-import ch.ahoegger.docbox.client.hr.entity.PayslipConfirmationForm.MainBox.CloseButton;
+import ch.ahoegger.docbox.client.hr.billing.PostingGroupConfirmationForm.MainBox.CloseButton;
 
 /**
- * <h3>{@link PayslipConfirmationForm}</h3>
+ * <h3>{@link PostingGroupConfirmationForm}</h3>
  *
  * @author Andreas Hoegger
  */
-public class PayslipConfirmationForm extends AbstractForm {
+public class PostingGroupConfirmationForm extends AbstractForm {
 
-  private Long m_documentId;
+  private BigDecimal m_documentId;
 
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("PayslipCreated");
   }
 
-  public void setDocumentId(Long documentId) {
+  public void setDocumentId(BigDecimal documentId) {
     m_documentId = documentId;
   }
 
@@ -35,7 +37,7 @@ public class PayslipConfirmationForm extends AbstractForm {
     return getFieldByClass(CloseButton.class);
   }
 
-  public Long getDocumentId() {
+  public BigDecimal getDocumentId() {
     return m_documentId;
   }
 

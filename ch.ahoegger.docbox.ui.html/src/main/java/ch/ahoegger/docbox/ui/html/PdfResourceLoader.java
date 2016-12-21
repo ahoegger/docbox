@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.ui.html;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,7 +34,7 @@ public class PdfResourceLoader extends AbstractResourceLoader {
   public BinaryResource loadResource(String pathInfo) throws IOException {
     String documentIdParameter = getRequest().getParameter(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class));
     if (StringUtility.hasText(documentIdParameter)) {
-      BinaryResource resource = BEANS.get(IDocumentStoreService.class).getDocument(Long.parseLong(documentIdParameter));
+      BinaryResource resource = BEANS.get(IDocumentStoreService.class).getDocument(new BigDecimal(documentIdParameter));
       return resource;
     }
     return null;

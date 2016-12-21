@@ -28,6 +28,10 @@ public interface IPostingGroupTable {
 
   public static String STATEMENT_DATE = "STATEMENT_DATE";
 
+  public static String WORKING_HOURS = "WORKING_HOURS";
+  public static BigDecimal WORKING_HOURS_MIN = BigDecimal.valueOf(0d);
+  public static BigDecimal WORKING_HOURS_MAX = BigDecimal.valueOf(2000d);
+
   public static String BRUTTO_WAGE = "BRUTTO_WAGE";
   public static BigDecimal BRUTTO_WAGE_MIN = BigDecimal.valueOf(0d);
   public static BigDecimal BRUTTO_WAGE_MAX = BigDecimal.valueOf(20000d);

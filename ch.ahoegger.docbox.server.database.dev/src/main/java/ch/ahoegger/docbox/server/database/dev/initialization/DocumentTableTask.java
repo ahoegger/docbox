@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.database.dev.initialization;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import org.eclipse.scout.rt.platform.holders.NVPair;
@@ -59,7 +60,7 @@ public class DocumentTableTask implements ITableTask, IDocumentTable {
     sqlService.insert(statementBuilder.toString());
   }
 
-  public void createDocumentRow(ISqlService sqlService, long documentId, String abstractText, Date documentDate,
+  public void createDocumentRow(ISqlService sqlService, BigDecimal documentId, String abstractText, Date documentDate,
       Date capturedDate, Date validDate, String docPath, String originalStorage, Long conversationId, boolean parseOcr)
       throws IOException {
 

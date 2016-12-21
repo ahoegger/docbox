@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.shared.document;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.service.IService;
@@ -48,11 +49,11 @@ public interface IDocumentService extends IService {
   /**
    * @param selectedValues
    */
-  void buildOcrOfMissingDocuments(List<Long> documentIds);
+  void buildOcrOfMissingDocuments(List<BigDecimal> documentIds);
 
   /**
    * @param selectedValues
    */
-  void deletePasedConent(List<Long> documentIds);
+  void deletePasedConent(List<BigDecimal> documentIds);
 
 }

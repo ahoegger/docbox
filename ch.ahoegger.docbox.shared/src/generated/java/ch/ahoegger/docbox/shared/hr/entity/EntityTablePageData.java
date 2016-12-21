@@ -60,13 +60,15 @@ public class EntityTablePageData extends AbstractTablePageData {
     public static final String entityType = "entityType";
     public static final String hours = "hours";
     public static final String amount = "amount";
+    public static final String text = "text";
     public static final String billed = "billed";
     private BigDecimal m_enityId;
     private BigDecimal m_partnerId;
     private Date m_date;
-    private Long m_entityType;
+    private BigDecimal m_entityType;
     private BigDecimal m_hours;
     private BigDecimal m_amount;
+    private String m_text;
     private Date m_billed;
 
     public BigDecimal getEnityId() {
@@ -93,11 +95,11 @@ public class EntityTablePageData extends AbstractTablePageData {
       m_date = newDate;
     }
 
-    public Long getEntityType() {
+    public BigDecimal getEntityType() {
       return m_entityType;
     }
 
-    public void setEntityType(Long newEntityType) {
+    public void setEntityType(BigDecimal newEntityType) {
       m_entityType = newEntityType;
     }
 
@@ -115,6 +117,14 @@ public class EntityTablePageData extends AbstractTablePageData {
 
     public void setAmount(BigDecimal newAmount) {
       m_amount = newAmount;
+    }
+
+    public String getText() {
+      return m_text;
+    }
+
+    public void setText(String newText) {
+      m_text = newText;
     }
 
     public Date getBilled() {

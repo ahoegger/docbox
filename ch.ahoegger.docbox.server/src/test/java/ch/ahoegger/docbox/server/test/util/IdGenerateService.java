@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.server.test.util;
 
+import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
@@ -15,6 +16,10 @@ public class IdGenerateService {
 
   public long getNextId() {
     return m_nextId++;
+  }
+
+  public BigDecimal getNextIdBigDecimal() {
+    return BigDecimal.valueOf(getNextId());
   }
 
 }

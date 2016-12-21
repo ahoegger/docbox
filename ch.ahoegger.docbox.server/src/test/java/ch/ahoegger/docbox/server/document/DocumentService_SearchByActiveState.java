@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.server.document;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.stream.Collectors;
@@ -29,11 +30,11 @@ public class DocumentService_SearchByActiveState extends AbstractTestWithDatabas
 
   private static final String username01 = SUBJECT_NAME;
 
-  private static final Long documentId01 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long documentId02 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long documentId03 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long documentId04 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long documentId05 = BEANS.get(IdGenerateService.class).getNextId();
+  private static final BigDecimal documentId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal documentId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal documentId03 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal documentId04 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal documentId05 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
   public void setupDb() throws Exception {

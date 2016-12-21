@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.server.database.dev.initialization;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.slf4j.Logger;
@@ -50,7 +52,7 @@ public class DocumentPartnerTableTask implements ITableTask, IDocumentPartnerTab
     sqlService.insert(statementBuilder.toString());
   }
 
-  public void createDocumentPartnerRow(ISqlService sqlService, Long documentId, Long partnerId) {
+  public void createDocumentPartnerRow(ISqlService sqlService, BigDecimal documentId, Long partnerId) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, PARTNER_NR));

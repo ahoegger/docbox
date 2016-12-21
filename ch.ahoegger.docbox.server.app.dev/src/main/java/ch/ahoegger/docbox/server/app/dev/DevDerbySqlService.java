@@ -50,6 +50,7 @@ import ch.ahoegger.docbox.shared.document.IDocumentPartnerTable;
 import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 import ch.ahoegger.docbox.shared.document.IDocumentTable;
 import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupTable;
+import ch.ahoegger.docbox.shared.hr.billing.PostingGroupCodeType.UnbilledCode;
 import ch.ahoegger.docbox.shared.hr.employee.IEmployeeTable;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType;
 import ch.ahoegger.docbox.shared.hr.entity.IEntityTable;
@@ -67,10 +68,10 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 public class DevDerbySqlService extends DerbySqlService {
   private static final Logger LOG = LoggerFactory.getLogger(CategoryTableTask.class);
 
-  private Long documentId01;
-  private Long documentId02;
-  private Long documentId03;
-  private Long documentId04;
+  private BigDecimal documentId01;
+  private BigDecimal documentId02;
+  private BigDecimal documentId03;
+  private BigDecimal documentId04;
 
   private Long categoryId01;
   private Long categoryId02;
@@ -87,13 +88,11 @@ public class DevDerbySqlService extends DerbySqlService {
   private Long entityId01;
   private Long entityId02;
 
-  private Long postingGroupId01;
+  private BigDecimal postingGroupId01;
+  private BigDecimal postingGroupId02;
 
   private Long entityId03;
-
   private Long entityId04;
-
-  private Long postingGroupId02;
 
   private static final LocalDate TODAY = LocalDate.now();
 
@@ -218,27 +217,27 @@ public class DevDerbySqlService extends DerbySqlService {
 
     DocumentTableTask documentTableTask = BEANS.get(DocumentTableTask.class);
     try {
-      documentId01 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+      documentId01 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
       insertDocument(sqlService, documentTableTask, documentId01, "A sample document",
           LocalDateUtility.today(),
           LocalDateUtility.today(),
           LocalDateUtility.today(),
           "2016_03_08_124640.pdf", null, null);
 
-      documentId02 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+      documentId02 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
       insertDocument(sqlService, documentTableTask, documentId02, "Bobs document",
           LocalDateUtility.toDate(TODAY.minusYears(1)),
           LocalDateUtility.today(),
           null,
           "2016_03_08_124640.pdf", null, null);
-      documentId03 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+      documentId03 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
       insertDocument(sqlService, documentTableTask, documentId03, "Multiple partner document",
           LocalDateUtility.toDate(TODAY.minusYears(3)),
           LocalDateUtility.today(),
           null,
           "2016_03_08_124640.pdf", null, null);
 
-      documentId04 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+      documentId04 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
       insertDocument(sqlService, documentTableTask, documentId04, "Txt document",
           LocalDateUtility.today(),
           LocalDateUtility.today(),
@@ -251,7 +250,7 @@ public class DevDerbySqlService extends DerbySqlService {
     }
   }
 
-  protected void insertDocument(ISqlService sqlService, DocumentTableTask documentTableTask, long documentId, String abstractText, Date documentDate,
+  protected void insertDocument(ISqlService sqlService, DocumentTableTask documentTableTask, BigDecimal documentId, String abstractText, Date documentDate,
       Date insertDate, Date validDate, String fileName, String originalStorage, Long conversationId)
       throws IOException {
 
@@ -305,15 +304,15 @@ public class DevDerbySqlService extends DerbySqlService {
   protected void insertPostingGroups(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", IPostingGroupTable.TABLE_NAME);
 
-    postingGroupId01 = getSequenceNextval(ISequenceTable.TABLE_NAME);
-    postingGroupId02 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+    postingGroupId01 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
+    postingGroupId02 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
 
     PostingGroupTableTask postingGroupTableTask = BEANS.get(PostingGroupTableTask.class);
-    postingGroupTableTask.createRow(sqlService, postingGroupId01, partnerId03_employee, documentId02, "September 2016", LocalDateUtility.toDate(LocalDate.of(2016, 10, 02)), BigDecimal.valueOf(256.5),
+    postingGroupTableTask.createRow(sqlService, postingGroupId01, partnerId03_employee, documentId02, "September 2016", LocalDateUtility.toDate(LocalDate.of(2016, 10, 02)), BigDecimal.valueOf(9.25), BigDecimal.valueOf(256.5),
         BigDecimal.valueOf(230.50), BigDecimal.valueOf(-10.55),
         BigDecimal.valueOf(-5.55),
         BigDecimal.valueOf(9.87));
-    postingGroupTableTask.createRow(sqlService, postingGroupId02, partnerId03_employee, documentId02, "Oktober 2016", LocalDateUtility.toDate(LocalDate.of(2016, 11, 02)), BigDecimal.valueOf(256.5),
+    postingGroupTableTask.createRow(sqlService, postingGroupId02, partnerId03_employee, documentId02, "Oktober 2016", LocalDateUtility.toDate(LocalDate.of(2016, 11, 02)), BigDecimal.valueOf(10.5), BigDecimal.valueOf(256.5),
         BigDecimal.valueOf(230.50), BigDecimal.valueOf(-10.55),
         BigDecimal.valueOf(-5.55),
         BigDecimal.valueOf(9.87));
@@ -330,8 +329,8 @@ public class DevDerbySqlService extends DerbySqlService {
     EntityTableTask entityTableTask = BEANS.get(EntityTableTask.class);
     entityTableTask.createEntityRow(sqlService, entityId01, partnerId03_employee, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 9, 04)), BigDecimal.valueOf(3.5), null, "Sept work 1", null);
     entityTableTask.createEntityRow(sqlService, entityId02, partnerId03_employee, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 9, 11)), BigDecimal.valueOf(4.25), null, "Sept work 2", null);
-    entityTableTask.createEntityRow(sqlService, entityId03, partnerId03_employee, null, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(10)), BigDecimal.valueOf(5.5), null, "First work", null);
-    entityTableTask.createEntityRow(sqlService, entityId04, partnerId03_employee, null, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(1)), BigDecimal.valueOf(2.25), null, "Second work", null);
+    entityTableTask.createEntityRow(sqlService, entityId03, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(10)), BigDecimal.valueOf(5.5), null, "First work", null);
+    entityTableTask.createEntityRow(sqlService, entityId04, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(1)), BigDecimal.valueOf(2.25), null, "Second work", null);
   }
 
 }

@@ -1,16 +1,52 @@
 package ch.ahoegger.docbox.server.hr.billing;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import org.ch.ahoegger.docbox.jasper.PayslipProperties;
+import org.ch.ahoegger.docbox.jasper.WageReportService;
+import org.ch.ahoegger.docbox.jasper.bean.Expense;
+import org.ch.ahoegger.docbox.jasper.bean.WageCalculation;
+import org.ch.ahoegger.docbox.jasper.bean.Work;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.TEXTS;
 
+import ch.ahoegger.docbox.server.document.DocumentService;
+import ch.ahoegger.docbox.server.hr.employee.EmployeeService;
+import ch.ahoegger.docbox.server.hr.entity.EntityService;
+import ch.ahoegger.docbox.shared.ISequenceTable;
+import ch.ahoegger.docbox.shared.backup.IBackupService;
+import ch.ahoegger.docbox.shared.document.DocumentFormData;
+import ch.ahoegger.docbox.shared.document.DocumentFormData.Partners.PartnersRowData;
 import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupService;
 import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupTable;
+import ch.ahoegger.docbox.shared.hr.billing.PostingCalculationBoxData;
+import ch.ahoegger.docbox.shared.hr.billing.PostingCalculationBoxData.Entities.EntitiesRowData;
+import ch.ahoegger.docbox.shared.hr.billing.PostingGroupCodeType.UnbilledCode;
+import ch.ahoegger.docbox.shared.hr.billing.PostingGroupFormData;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupSearchFormData;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupTableData;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupTableData.PostingGroupTableRowData;
+import ch.ahoegger.docbox.shared.hr.employee.EmployeeFormData;
+import ch.ahoegger.docbox.shared.hr.employee.IEmployeeService;
+import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
+import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
+import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData.EntityTableRowData;
+import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
+import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.WorkCode;
+import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
+import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
@@ -66,8 +102,162 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
         new NVPair("td", tableData),
         formData);
     PostingGroupTableRowData unbilledRow = tableData.addRow();
-    unbilledRow.setName(TEXTS.get("Unbilled"));
+    unbilledRow.setId(UnbilledCode.ID);
     unbilledRow.setSortGroup(BigDecimal.valueOf(2));
+    unbilledRow.setPartnerId(formData.getPartnerId());
+    unbilledRow.setName(TEXTS.get("Unbilled"));
     return tableData;
   }
+
+  @Override
+  public PostingGroupFormData prepareCreate(PostingGroupFormData formData) {
+    LocalDate today = LocalDate.now();
+    formData.getDate().setValue(LocalDateUtility.toDate(today));
+
+    DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy", LocalDateUtility.DE_CH);
+    if (today.getDayOfMonth() < 20) {
+      formData.getTitle().setValue(today.minusMonths(1).format(monthFormatter));
+      formData.getDocumentAbstract().setValue(TEXTS.get("PayslipTitle", today.minusMonths(1).format(monthFormatter)));
+    }
+    else {
+      formData.getTitle().setValue(today.format(monthFormatter));
+      formData.getDocumentAbstract().setValue(TEXTS.get("PayslipTitle", today.format(monthFormatter)));
+    }
+    return formData;
+  }
+
+  @Override
+  public PostingGroupFormData create(PostingGroupFormData formData) {
+
+    // create document
+    EmployeeFormData employeeData = new EmployeeFormData();
+    employeeData.setPartnerId(formData.getPartner().getValue());
+    employeeData = BEANS.get(EmployeeService.class).load(employeeData);
+
+    List<EntityTableRowData> unbilledEntities = getUnbilledEntities(formData.getFrom().getValue(), formData.getTo().getValue(), formData.getPartner().getValue());
+
+    WageCalculation wageData = calculateWage(unbilledEntities, employeeData.getHourlyWage().getValue());
+    byte[] docContent = BEANS.get(WageReportService.class).createMonthlyReport(formData.getTitle().getValue(), employeeData.getFirstName().getValue() + " " + employeeData.getLastName().getValue(),
+        employeeData.getAddressLine1().getValue(), employeeData.getAddressLine2().getValue(), formData.getDate().getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), employeeData.getAccountNumber().getValue(),
+        employeeData.getHourlyWage().getValue(), wageData);
+
+    DocumentFormData documentData = new DocumentFormData();
+    DocumentService documentService = BEANS.get(DocumentService.class);
+    documentService.prepareCreate(documentData);
+    documentData.getDocumentDate().setValue(LocalDateUtility.today());
+    documentData.getDocument().setValue(new BinaryResource("payslip.pdf", docContent));
+    PartnersRowData partnerRow = documentData.getPartners().addRow();
+    partnerRow.setPartner(formData.getPartner().getValue());
+    documentData.getAbstract().setValue(formData.getDocumentAbstract().getValue());
+    documentData = documentService.create(documentData);
+    formData.setDocumentId(documentData.getDocumentId());
+
+    // create posting group
+    BigDecimal postingGroupId = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("INSERT INTO ").append(TABLE_NAME);
+    statementBuilder.append(" (").append(SqlFramentBuilder.columns(POSTING_GROUP_NR, PARTNER_NR, DOCUMENT_NR, NAME, STATEMENT_DATE, WORKING_HOURS, BRUTTO_WAGE, NETTO_WAGE, SOURCE_TAX, SOCIAL_SECURITY_TAX, VACATION_EXTRA)).append(")");
+    statementBuilder.append(" VALUES (:postingGroupId, :partner, :documentId, :title, :date, :hoursTotal, :bruttoWage, :nettoWage, :sourceTax, :socialSecuityTax, :vacationExtra)");
+    SQL.insert(statementBuilder.toString(),
+        new NVPair("postingGroupId", postingGroupId),
+        formData, wageData);
+
+    // update entities
+    BEANS.get(EntityService.class).updateGroupId(unbilledEntities.stream().map(e -> e.getEnityId()).collect(Collectors.toSet()), postingGroupId);
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+    return formData;
+  }
+
+  @Override
+  public PostingCalculationBoxData calculateWage(PostingGroupFormData formData) {
+    EmployeeFormData employeeData = new EmployeeFormData();
+    employeeData.setPartnerId(formData.getPartner().getValue());
+    employeeData = BEANS.get(IEmployeeService.class).load(employeeData);
+
+    List<EntityTableRowData> unbilledEntities = getUnbilledEntities(formData.getFrom().getValue(), formData.getTo().getValue(), formData.getPartner().getValue());
+    WageCalculation wageCalc = calculateWage(unbilledEntities, employeeData.getHourlyWage().getValue());
+
+    PostingCalculationBoxData result = new PostingCalculationBoxData();
+    List<EntitiesRowData> entityRows = unbilledEntities.stream().map(row -> {
+      EntitiesRowData rd = new EntitiesRowData();
+      rd.setAmount(row.getAmount());
+      rd.setBilled(row.getBilled());
+      rd.setDate(row.getDate());
+      rd.setEnityId(row.getEnityId());
+      rd.setEntityType(row.getEntityType());
+      rd.setHours(row.getHours());
+      rd.setPartnerId(row.getPartnerId());
+      return rd;
+    }).collect(Collectors.toList());
+
+    result.getEntities().setRows(entityRows.toArray(new EntitiesRowData[0]));
+    result.getBruttoWage().setValue(wageCalc.getBruttoWage());
+    result.getNettoWage().setValue(wageCalc.getNettoWage());
+    result.getWorkingHours().setValue(wageCalc.getHoursTotal());
+    result.getSocialSecurityTax().setValue(wageCalc.getSocialSecuityTax());
+    result.getSourceTax().setValue(wageCalc.getSourceTax());
+    result.getVacationExtra().setValue(wageCalc.getVacationExtra());
+
+    return result;
+  }
+
+  protected List<EntityTableRowData> getUnbilledEntities(Date from, Date to, BigDecimal partnerId) {
+    EntitySearchFormData entitySearchData = new EntitySearchFormData();
+    entitySearchData.getEntityDateFrom().setValue(from);
+    entitySearchData.getEntityDateTo().setValue(to);
+    entitySearchData.getPartnerId().setValue(partnerId);
+    entitySearchData.setPostingGroupId(UnbilledCode.ID);
+    EntityTablePageData entityTableData = BEANS.get(IEntityService.class).getEntityTableData(entitySearchData);
+    return CollectionUtility.arrayList(entityTableData.getRows());
+  }
+
+  protected WageCalculation calculateWage(List<EntityTableRowData> rows, BigDecimal hourlyWage) {
+    List<Work> workItems = rows.stream().filter(row -> WorkCode.isEqual(row.getEntityType()))
+        .map(row -> new Work().widthHours(row.getHours()).withDate(LocalDateUtility.toLocalDate(row.getDate())).withText(row.getText()))
+        .collect(Collectors.toList());
+    List<Expense> expenses = rows.stream().filter(row -> ExpenseCode.isEqual(row.getEntityType()))
+        .map(row -> new Expense().withAmount(row.getAmount()).withDate(LocalDateUtility.toLocalDate(row.getDate())).withText(row.getText()))
+        .collect(Collectors.toList());
+
+    BigDecimal hoursWorked = workItems.stream()
+        .map(workItem -> workItem.getHours())
+        .reduce((h1, h2) -> h1.add(h2))
+        .get()
+        .setScale(2, RoundingMode.HALF_UP);
+
+    BigDecimal expensesTotal = expenses.stream()
+        .map(expense -> expense.getAmount())
+        .reduce((h1, h2) -> h1.add(h2))
+        .orElse(BigDecimal.ZERO)
+        .setScale(2, RoundingMode.HALF_UP);
+
+    BigDecimal bruttoWage = hoursWorked.multiply(hourlyWage).setScale(2, RoundingMode.HALF_UP);
+
+    BigDecimal socialSecurityInsuranceRelative = CONFIG.getPropertyValue(PayslipProperties.SocialInsurancePercentageProperty.class).divide(BigDecimal.valueOf(-100.0));
+    BigDecimal socialSecurityTax = socialSecurityInsuranceRelative.multiply(bruttoWage).setScale(2, RoundingMode.HALF_UP);
+    BigDecimal sourceTaxRelative = CONFIG.getPropertyValue(PayslipProperties.SourceTaxPercentageProperty.class).divide(BigDecimal.valueOf(-100.0));
+    BigDecimal sourceTax = sourceTaxRelative.multiply(bruttoWage).setScale(2, RoundingMode.HALF_UP);
+    BigDecimal vacationExtraRelative = CONFIG.getPropertyValue(PayslipProperties.VacationExtraPercentageProperty.class).divide(BigDecimal.valueOf(100.0));
+    BigDecimal vacationExtra = vacationExtraRelative.multiply(bruttoWage).setScale(2, RoundingMode.HALF_UP);
+    BigDecimal nettoWage = bruttoWage.add(socialSecurityTax).add(sourceTax).add(vacationExtra);
+
+    WageCalculation result = new WageCalculation();
+    result.setWorkItems(workItems);
+    result.setExpenses(expenses);
+    result.setBruttoWage(bruttoWage);
+    result.setNettoWage(nettoWage);
+    result.setExpencesTotal(expensesTotal);
+    result.setHoursTotal(hoursWorked);
+    result.setSocialSecuityTaxRelative(socialSecurityInsuranceRelative);
+    result.setSocialSecuityTax(socialSecurityTax);
+    result.setSourceTaxRelative(sourceTaxRelative);
+    result.setSourceTax(sourceTax);
+    result.setVacationExtraRelative(vacationExtraRelative);
+    result.setVacationExtra(vacationExtra);
+    return result;
+
+  }
+
 }

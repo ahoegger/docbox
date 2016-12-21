@@ -3,15 +3,17 @@
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<parameter name="entitiesDataSource" class="java.util.Collection"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
+	<field name="date" class="java.lang.String">
+		<fieldDescription><![CDATA[date]]></fieldDescription>
+	</field>
 	<field name="hours" class="java.lang.String">
 		<fieldDescription><![CDATA[hours]]></fieldDescription>
 	</field>
-	<field name="date" class="java.lang.String">
-		<fieldDescription><![CDATA[date]]></fieldDescription>
+	<field name="text" class="java.lang.String">
+		<fieldDescription><![CDATA[text]]></fieldDescription>
 	</field>
 	<columnHeader>
 		<band height="22">

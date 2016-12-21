@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.server.database.dev.initialization;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.slf4j.Logger;
@@ -52,7 +54,7 @@ public class DocumentOcrTableTask implements ITableTask, IDocumentOcrTable {
     sqlService.insert(statementBuilder.toString());
   }
 
-  public void createDocumentOcrRow(ISqlService sqlService, Long documentId, String text, boolean parsed, boolean parseFailed) {
+  public void createDocumentOcrRow(ISqlService sqlService, BigDecimal documentId, String text, boolean parsed, boolean parseFailed) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, TEXT, OCR_SCANNED, PARSE_FAILED));

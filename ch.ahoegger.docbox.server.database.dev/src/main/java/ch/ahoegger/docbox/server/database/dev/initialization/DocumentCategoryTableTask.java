@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.server.database.dev.initialization;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.slf4j.Logger;
@@ -51,7 +53,7 @@ public class DocumentCategoryTableTask implements ITableTask, IDocumentCategoryT
     sqlService.insert(statementBuilder.toString());
   }
 
-  public void createDocumentCategoryRow(ISqlService sqlService, Long documentId, Long categoryId) {
+  public void createDocumentCategoryRow(ISqlService sqlService, BigDecimal documentId, Long categoryId) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, CATEGORY_NR));

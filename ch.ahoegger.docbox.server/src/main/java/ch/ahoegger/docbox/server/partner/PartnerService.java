@@ -72,7 +72,7 @@ public class PartnerService implements IPartnerService, IPartnerTable {
   }
 
   @RemoteServiceAccessDenied
-  public List<Partner> getPartners(Long documentId) {
+  public List<Partner> getPartners(BigDecimal documentId) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, PARTNER_NR, NAME, DESCRIPTION, START_DATE, END_DATE));
     statementBuilder.append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS).append(", ").append(IDocumentPartnerTable.TABLE_NAME).append(" AS ").append(IDocumentPartnerTable.TABLE_ALIAS);

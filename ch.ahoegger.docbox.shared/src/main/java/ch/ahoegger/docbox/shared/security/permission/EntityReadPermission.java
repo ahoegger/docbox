@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.shared.security.permission;
 
+import java.math.BigDecimal;
 import java.security.BasicPermission;
 import java.security.Permission;
 
@@ -14,13 +15,13 @@ import org.eclipse.scout.rt.shared.services.common.security.IAccessControlServic
  */
 public class EntityReadPermission extends BasicPermission {
   private static final long serialVersionUID = 1L;
-  private final Long m_entityId;
+  private final BigDecimal m_entityId;
 
   public EntityReadPermission() {
     this(null);
   }
 
-  public EntityReadPermission(Long entityId) {
+  public EntityReadPermission(BigDecimal entityId) {
     super("Entity read permission");
     m_entityId = entityId;
   }
@@ -31,13 +32,13 @@ public class EntityReadPermission extends BasicPermission {
       return true;
     }
     if (p.getClass() == EntityReadPermission.class) {
-      Long entityId = ((EntityReadPermission) p).getEntityId();
+      BigDecimal entityId = ((EntityReadPermission) p).getEntityId();
       return BEANS.get(IPermissionService.class).hasReadAccess(BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject(), entityId);
     }
     return false;
   }
 
-  public Long getEntityId() {
+  public BigDecimal getEntityId() {
     return m_entityId;
   }
 

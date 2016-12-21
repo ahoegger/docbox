@@ -23,7 +23,7 @@ import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 @ApplicationScoped
 public class DocumentPartnerService implements IDocumentPartnerTable {
 
-  public Set<BigDecimal> getPartnerIds(Long documentId) {
+  public Set<BigDecimal> getPartnerIds(BigDecimal documentId) {
     Set<BigDecimal> partnerIds = new HashSet<BigDecimal>();
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("SELECT ").append(PARTNER_NR).append(" FROM ").append(TABLE_NAME);
@@ -36,7 +36,7 @@ public class DocumentPartnerService implements IDocumentPartnerTable {
     return partnerIds;
   }
 
-  public void createDocumentPartners(Long documentId, Set<BigDecimal> partnerIds) {
+  public void createDocumentPartners(BigDecimal documentId, Set<BigDecimal> partnerIds) {
     if (CollectionUtility.hasElements(partnerIds)) {
       for (BigDecimal partnerId : partnerIds) {
         StringBuilder statementBuilder = new StringBuilder();
@@ -61,13 +61,13 @@ public class DocumentPartnerService implements IDocumentPartnerTable {
    * @param value
    */
   @RemoteServiceAccessDenied
-  public void updateDocumentPartner(Long documentId, Set<BigDecimal> partnerIds) {
+  public void updateDocumentPartner(BigDecimal documentId, Set<BigDecimal> partnerIds) {
     deleteByDocumentId(documentId);
     createDocumentPartners(documentId, partnerIds);
   }
 
   @RemoteServiceAccessDenied
-  public void deleteByDocumentId(Long documentId) {
+  public void deleteByDocumentId(BigDecimal documentId) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
     SQL.delete(statementBuilder.toString(), new NVPair("documentId", documentId));

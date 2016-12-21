@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * <h3>{@link Account}</h3>
+ * <h3>{@link ReportMonthPayslip}</h3>
  *
  * @author Andreas Hoegger
  */
-public class Account {
+public class ReportMonthPayslip {
 
   private String m_addressLine1;
   private String m_addressLine2;
@@ -29,7 +29,8 @@ public class Account {
 
   private String m_iban;
 
-  private Collection<EntityBean> m_entities = new ArrayList<>();
+  private Collection<ReportWorkItem> m_workItems = new ArrayList<>();
+  private Collection<ReportExpenseItem> m_expenses = new ArrayList<>();
 
   public String getAddressLine1() {
     return m_addressLine1;
@@ -167,12 +168,19 @@ public class Account {
     m_sourceTaxProcentage = sourceTaxProcentage;
   }
 
-  public Collection<EntityBean> getEntities() {
-    return m_entities;
+  public void setWorkItems(Collection<ReportWorkItem> workItems) {
+    m_workItems = workItems;
   }
 
-  public void setEntities(Collection<EntityBean> entities) {
-    m_entities = entities;
+  public Collection<ReportWorkItem> getWorkItems() {
+    return m_workItems;
   }
 
+  public void setExpenses(Collection<ReportExpenseItem> expenses) {
+    m_expenses = expenses;
+  }
+
+  public Collection<ReportExpenseItem> getExpenses() {
+    return m_expenses;
+  }
 }

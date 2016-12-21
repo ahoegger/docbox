@@ -1,6 +1,9 @@
 package ch.ahoegger.docbox.shared.hr.entity;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
@@ -10,10 +13,10 @@ import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
  *
  * @author Andreas Hoegger
  */
-public class EntityTypeCodeType extends AbstractCodeType<Long, Long> {
+public class EntityTypeCodeType extends AbstractCodeType<BigDecimal, BigDecimal> {
 
   private static final long serialVersionUID = 1L;
-  public static final long ID = 100L;
+  public static final BigDecimal ID = BigDecimal.valueOf(100L);
 
   @Override
   protected String getConfiguredText() {
@@ -21,14 +24,14 @@ public class EntityTypeCodeType extends AbstractCodeType<Long, Long> {
   }
 
   @Override
-  public Long getId() {
+  public BigDecimal getId() {
     return ID;
   }
 
   @Order(1000)
-  public static class WorkCode extends AbstractCode<Long> {
+  public static class WorkCode extends AbstractCode<BigDecimal> {
     private static final long serialVersionUID = 1L;
-    public static final long ID = 101L;
+    public static final BigDecimal ID = BigDecimal.valueOf(101L);
 
     @Override
     protected String getConfiguredText() {
@@ -36,15 +39,19 @@ public class EntityTypeCodeType extends AbstractCodeType<Long, Long> {
     }
 
     @Override
-    public Long getId() {
+    public BigDecimal getId() {
       return ID;
+    }
+
+    public static boolean isEqual(BigDecimal value) {
+      return ObjectUtility.equals(ID, value);
     }
   }
 
   @Order(1000)
-  public static class ExpenseCode extends AbstractCode<Long> {
+  public static class ExpenseCode extends AbstractCode<BigDecimal> {
     private static final long serialVersionUID = 1L;
-    public static final long ID = 100L;
+    public static final BigDecimal ID = BigDecimal.valueOf(100L);
 
     @Override
     protected String getConfiguredText() {
@@ -52,8 +59,12 @@ public class EntityTypeCodeType extends AbstractCodeType<Long, Long> {
     }
 
     @Override
-    public Long getId() {
+    public BigDecimal getId() {
       return ID;
+    }
+
+    public static boolean isEqual(BigDecimal value) {
+      return ObjectUtility.equals(ID, value);
     }
   }
 

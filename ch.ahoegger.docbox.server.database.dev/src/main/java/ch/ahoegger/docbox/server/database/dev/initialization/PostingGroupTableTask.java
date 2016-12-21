@@ -28,6 +28,7 @@ public class PostingGroupTableTask implements ITableTask, IPostingGroupTable {
     statementBuilder.append(DOCUMENT_NR).append(" DECIMAL NOT NULL, ");
     statementBuilder.append(NAME).append(" VARCHAR(").append(NAME_LENGTH).append("), ");
     statementBuilder.append(STATEMENT_DATE).append(" DATE, ");
+    statementBuilder.append(WORKING_HOURS).append(" DECIMAL, ");
     statementBuilder.append(BRUTTO_WAGE).append(" DECIMAL, ");
     statementBuilder.append(NETTO_WAGE).append(" DECIMAL, ");
     statementBuilder.append(SOURCE_TAX).append(" DECIMAL, ");
@@ -60,16 +61,17 @@ public class PostingGroupTableTask implements ITableTask, IPostingGroupTable {
     sqlService.insert(statementBuilder.toString());
   }
 
-  public void createRow(ISqlService sqlService, long postingGroupId, Long partnerId, Long documentId, String name, Date statementDate, BigDecimal bruttoWage, BigDecimal nettoWage, BigDecimal sourceTax,
+  public void createRow(ISqlService sqlService, BigDecimal postingGroupId, Long partnerId, BigDecimal documentId, String name, Date statementDate, BigDecimal workingHours, BigDecimal bruttoWage, BigDecimal nettoWage, BigDecimal sourceTax,
       BigDecimal socialSecurityTax,
       BigDecimal vacationExtra) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(SqlFramentBuilder.columns(POSTING_GROUP_NR, PARTNER_NR, DOCUMENT_NR, NAME, STATEMENT_DATE, BRUTTO_WAGE, NETTO_WAGE, SOURCE_TAX, SOCIAL_SECURITY_TAX, VACATION_EXTRA));
+    statementBuilder.append(SqlFramentBuilder.columns(POSTING_GROUP_NR, PARTNER_NR, DOCUMENT_NR, NAME, STATEMENT_DATE, WORKING_HOURS, BRUTTO_WAGE, NETTO_WAGE, SOURCE_TAX, SOCIAL_SECURITY_TAX, VACATION_EXTRA));
     statementBuilder.append(") VALUES (");
-    statementBuilder.append(":postingGroupId, :partnerId, :documentId, :name, :statementDate,:bruttoWage, :nettoWage, :sourceTax, :socialSecurityTax, :vacationExtra");
+    statementBuilder.append(":postingGroupId, :partnerId, :documentId, :name, :statementDate, :workingHours, :bruttoWage, :nettoWage, :sourceTax, :socialSecurityTax, :vacationExtra");
     statementBuilder.append(")");
     sqlService.insert(statementBuilder.toString(), new NVPair("postingGroupId", postingGroupId), new NVPair("partnerId", partnerId), new NVPair("documentId", documentId), new NVPair("name", name), new NVPair("statementDate", statementDate),
+        new NVPair("workingHours", workingHours),
         new NVPair("bruttoWage", bruttoWage),
         new NVPair("nettoWage", nettoWage),
         new NVPair("sourceTax", sourceTax),

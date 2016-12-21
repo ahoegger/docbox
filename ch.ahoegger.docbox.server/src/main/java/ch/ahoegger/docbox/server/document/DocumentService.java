@@ -221,7 +221,7 @@ public class DocumentService implements IDocumentService, IDocumentTable {
   @Override
   public DocumentFormData create(final DocumentFormData formData) {
     // create document
-    Long documentId = SQL.getSequenceNextval(ISequenceTable.TABLE_NAME);
+    BigDecimal documentId = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
     formData.setDocumentId(documentId);
     final BinaryResource binaryResource = formData.getDocument().getValue();
     String documentPath = BEANS.get(DocumentStoreService.class).store(binaryResource, formData.getCapturedDate().getValue(), documentId);
@@ -365,11 +365,11 @@ public class DocumentService implements IDocumentService, IDocumentTable {
   }
 
   @Override
-  public void buildOcrOfMissingDocuments(List<Long> documentIdsRaw) {
+  public void buildOcrOfMissingDocuments(List<BigDecimal> documentIdsRaw) {
     buildOcrOfMissingDocumentsInternal(documentIdsRaw);
   }
 
-  protected IFuture<Void> buildOcrOfMissingDocumentsInternal(List<Long> documentIdsRaw) {
+  protected IFuture<Void> buildOcrOfMissingDocumentsInternal(List<BigDecimal> documentIdsRaw) {
     if (!ACCESS.check(new AdministratorPermission())) {
       throw new VetoException("Access denied");
     }
@@ -387,13 +387,13 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     }
     Object[][] rawResult = SQL.select(statementBuilder.toString());
 
-    final List<Long> documentIds = Arrays.stream(rawResult).map(row -> TypeCastUtility.castValue(row[0], Long.class)).collect(Collectors.toList());
+    final List<BigDecimal> documentIds = Arrays.stream(rawResult).map(row -> TypeCastUtility.castValue(row[0], BigDecimal.class)).collect(Collectors.toList());
 
     return Jobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
 
-        for (Long docId : documentIds) {
+        for (BigDecimal docId : documentIds) {
           try {
             LOG.info("build ocr for {}.", docId);
             new ParseDocumentJob(docId).schedule().awaitDone();
@@ -409,11 +409,11 @@ public class DocumentService implements IDocumentService, IDocumentTable {
   }
 
   @Override
-  public void deletePasedConent(List<Long> documentIds) {
+  public void deletePasedConent(List<BigDecimal> documentIds) {
     if (!ACCESS.check(new AdministratorPermission())) {
       throw new VetoException("Access denied");
     }
-    for (Long id : documentIds) {
+    for (BigDecimal id : documentIds) {
       DocumentOcrService service = BEANS.get(DocumentOcrService.class);
       service.delete(id);
     }
