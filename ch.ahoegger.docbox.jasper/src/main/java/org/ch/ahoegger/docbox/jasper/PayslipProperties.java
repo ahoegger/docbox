@@ -12,7 +12,7 @@ public final class PayslipProperties {
   public static final class SocialInsurancePercentageProperty extends AbstractProcentageProperty {
     @Override
     public String getKey() {
-      return "docbox.payslip.insurancePercentage";
+      return "docbox.report.payslip.insurancePercentage";
     }
 
     @Override
@@ -24,7 +24,7 @@ public final class PayslipProperties {
   public static final class VacationExtraPercentageProperty extends AbstractProcentageProperty {
     @Override
     public String getKey() {
-      return "docbox.payslip.vacationExtraPercentage";
+      return "docbox.report.payslip.vacationExtraPercentage";
     }
 
     @Override
@@ -36,7 +36,7 @@ public final class PayslipProperties {
   public static final class SourceTaxPercentageProperty extends AbstractProcentageProperty {
     @Override
     public String getKey() {
-      return "docbox.payslip.SourceTaxPercentage";
+      return "docbox.report.payslip.SourceTaxPercentage";
     }
 
     @Override

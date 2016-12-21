@@ -11,11 +11,13 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 import ch.ahoegger.docbox.client.AbstractDocboxPageWithTable;
 import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table;
+import ch.ahoegger.docbox.shared.hr.billing.PostingGroupCodeType.UnbilledCode;
 import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.WorkCode;
@@ -94,10 +96,60 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
       @Override
       protected void execAction() {
-        EntityForm form = new EntityForm();
+        EntityForm form = new EntityForm(getPartnerIdColumn().getSelectedValue());
         form.setEntityType(WorkCode.ID);
-        form.setPartnerId(getPartnerId());
         form.startNew();
+      }
+    }
+
+    @Order(2000)
+    public class EditMenu extends AbstractMenu {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("Edit");
+      }
+
+      @Override
+      protected void execOwnerValueChanged(Object newOwnerValue) {
+        setVisible(ObjectUtility.equals(getEnityIdColumn(), UnbilledCode.ID));
+      }
+
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+      }
+
+      @Override
+      protected void execAction() {
+        EntityForm form = new EntityForm(getPartnerIdColumn().getSelectedValue());
+        form.setEntityId(getEnityIdColumn().getSelectedValue());
+        form.startModify();
+
+      }
+    }
+
+    @Order(3000)
+    public class ViewEntityMenu extends AbstractMenu {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("View");
+      }
+
+      @Override
+      protected void execOwnerValueChanged(Object newOwnerValue) {
+        setVisible(ObjectUtility.notEquals(getEnityIdColumn(), UnbilledCode.ID));
+      }
+
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+      }
+
+      @Override
+      protected void execAction() {
+        EntityForm form = new EntityForm(getPartnerIdColumn().getSelectedValue());
+        form.setEntityId(getEnityIdColumn().getSelectedValue());
+        form.startViewEntity();
       }
     }
 

@@ -8,8 +8,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 
 import ch.ahoegger.docbox.shared.ISequenceTable;
@@ -114,13 +116,35 @@ public class EntityService implements IEntityService, IEntityTable {
 
   @Override
   public EntityFormData load(EntityFormData formData) {
-    // TODO [aho] add business logic here.
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(SqlFramentBuilder.columns(PARTNER_NR, POSTING_GROUP_NR, ENTITY_TYPE, HOURS, AMOUNT, ENTITY_DATE, DESCRIPTION)));
+    statementBuilder.append(" FROM ").append(TABLE_NAME);
+    statementBuilder.append(" WHERE ").append(ENTITY_NR).append(" = :entityId");
+    statementBuilder.append(" INTO :partnerId, :postingGroupId, :entityType, :workHours, :expenseAmount, :entityDate, :text");
+    SQL.selectInto(statementBuilder.toString(), formData);
     return formData;
   }
 
   @Override
   public EntityFormData store(EntityFormData formData) {
-    // TODO [aho] add business logic here.
+    if (ObjectUtility.notEquals(UnbilledCode.ID, formData.getPostingGroupId())) {
+      throw new VetoException("Access denied.");
+    }
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("UPDATE ").append(TABLE_NAME).append(" SET ");
+    statementBuilder.append(PARTNER_NR).append("= :partnerId, ");
+    statementBuilder.append(POSTING_GROUP_NR).append("= :postingGroupId, ");
+    statementBuilder.append(ENTITY_TYPE).append("= :entityType, ");
+    statementBuilder.append(HOURS).append("= :workHours ");
+    statementBuilder.append(AMOUNT).append("= :expenseAmount ");
+    statementBuilder.append(ENTITY_DATE).append("= :entityDate ");
+    statementBuilder.append(DESCRIPTION).append("= :text ");
+    statementBuilder.append(" WHERE ").append(ENTITY_NR).append(" = :entityId");
+    SQL.update(statementBuilder.toString(), formData);
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
     return formData;
   }
 

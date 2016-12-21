@@ -36,6 +36,10 @@ public class EntityForm extends AbstractForm {
   private BigDecimal m_partnerId;
   private BigDecimal m_postingGroupId;
 
+  public EntityForm(BigDecimal partnerId) {
+    m_partnerId = partnerId;
+  }
+
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("Entity");
@@ -108,6 +112,10 @@ public class EntityForm extends AbstractForm {
     startInternal(new NewHandler());
   }
 
+  public void startViewEntity() {
+    startInternal(new ViewEntityHandler());
+  }
+
   public CancelButton getCancelButton() {
     return getFieldByClass(CancelButton.class);
   }
@@ -174,10 +182,6 @@ public class EntityForm extends AbstractForm {
         return IEntityTable.HOURS_MAX;
       }
 
-      @Override
-      protected void execInitField() {
-        setVisible(ObjectUtility.equals(WorkCode.ID, getEntityType()));
-      }
     }
 
     @Order(3000)
@@ -197,10 +201,6 @@ public class EntityForm extends AbstractForm {
         return IEntityTable.AMOUNT_MAX;
       }
 
-      @Override
-      protected void execInitField() {
-        setVisible(ObjectUtility.equals(ExpenseCode.ID, getEntityType()));
-      }
     }
 
     @Order(4000)
@@ -230,6 +230,11 @@ public class EntityForm extends AbstractForm {
     }
   }
 
+  protected void handleEntityCodeUpdated() {
+    getExpenseAmountField().setVisible(ObjectUtility.equals(ExpenseCode.ID, getEntityType()));
+    getWorkHoursField().setVisible(ObjectUtility.equals(WorkCode.ID, getEntityType()));
+  }
+
   public class ModifyHandler extends AbstractFormHandler {
 
     @Override
@@ -239,6 +244,7 @@ public class EntityForm extends AbstractForm {
       exportFormData(formData);
       formData = service.load(formData);
       importFormData(formData);
+      handleEntityCodeUpdated();
     }
 
     @Override
@@ -259,6 +265,7 @@ public class EntityForm extends AbstractForm {
       exportFormData(formData);
       formData = service.prepareCreate(formData);
       importFormData(formData);
+      handleEntityCodeUpdated();
     }
 
     @Override
@@ -269,4 +276,22 @@ public class EntityForm extends AbstractForm {
       service.create(formData);
     }
   }
+
+  public class ViewEntityHandler extends AbstractFormHandler {
+    @Override
+    protected void execLoad() {
+      IEntityService service = BEANS.get(IEntityService.class);
+      EntityFormData formData = new EntityFormData();
+      exportFormData(formData);
+      formData = service.load(formData);
+      importFormData(formData);
+      handleEntityCodeUpdated();
+      setEnabledGranted(false);
+    }
+
+    @Override
+    protected void execStore() {
+    }
+  }
+
 }
