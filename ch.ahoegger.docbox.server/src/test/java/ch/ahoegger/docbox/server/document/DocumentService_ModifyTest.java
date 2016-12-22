@@ -261,7 +261,6 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
         Arrays.stream(refFd.getPartners().getRows())
             .map(row -> row.getPartner())
             .filter(p -> p != null)
-            .map(bd -> bd.longValue())
             .sorted()
             .collect(Collectors.toList()));
 
@@ -309,7 +308,6 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
         Arrays.stream(refFd.getPartners().getRows())
             .map(row -> row.getPartner())
             .filter(p -> p != null)
-            .map(bd -> bd.longValue())
             .sorted()
             .collect(Collectors.toList()));
 

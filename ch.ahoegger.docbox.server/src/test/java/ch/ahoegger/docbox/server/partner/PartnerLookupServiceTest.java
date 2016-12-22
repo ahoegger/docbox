@@ -64,7 +64,6 @@ public class PartnerLookupServiceTest extends AbstractTestWithDatabase {
     Assert.assertEquals(CollectionUtility.arrayList(partnerId01, partnerId02, partnerId03, partnerId04),
         lookupCall.getDataByAll().stream()
             .map(row -> row.getKey())
-            .map(key -> key.longValue())
             .sorted()
             .collect(Collectors.toList()));
   }
@@ -76,7 +75,6 @@ public class PartnerLookupServiceTest extends AbstractTestWithDatabase {
     Assert.assertEquals(CollectionUtility.arrayList(partnerId01, partnerId03, partnerId04),
         lookupCall.getDataByAll().stream()
             .map(row -> row.getKey())
-            .map(key -> key.longValue())
             .sorted()
             .collect(Collectors.toList()));
   }
@@ -88,7 +86,6 @@ public class PartnerLookupServiceTest extends AbstractTestWithDatabase {
     Assert.assertEquals(CollectionUtility.arrayList(partnerId02),
         lookupCall.getDataByAll().stream()
             .map(row -> row.getKey())
-            .map(key -> key.longValue())
             .sorted()
             .collect(Collectors.toList()));
   }
