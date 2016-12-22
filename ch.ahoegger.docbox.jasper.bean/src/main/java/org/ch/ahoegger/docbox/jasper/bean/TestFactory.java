@@ -18,13 +18,19 @@ public class TestFactory {
 
   public static Collection<ReportMonthPayslip> generateCollection() {
     List<ReportWorkItem> workItems = new ArrayList<>();
-    workItems.add(createBean("12. Dez 2016", 5.5));
-    workItems.add(createBean("17. Dez 2016", 2));
-    workItems.add(createBean("07. Dez 2016", 0.25));
-    return Arrays.asList(createAccount("Lohnabrechnung Dezember 2016", "6.251", "-2.50", "8.5", workItems));
+    workItems.add(createWorkItemBean("12. Dez 2016", 5.5));
+    workItems.add(createWorkItemBean("17. Dez 2016", 2));
+    workItems.add(createWorkItemBean("07. Dez 2016", 0.25));
+
+    List<ReportExpenseItem> expenseItems = new ArrayList<>();
+    expenseItems.add(createExpenseItemBean("10. Dez 2016", "Mr Propper", 12.25));
+    expenseItems.add(createExpenseItemBean("24. Dez 2016", "Cleaner for the window outside of the balkony", 124.25));
+    expenseItems.add(createExpenseItemBean("31. Dez 2016", "New Years Prosecco", 33.25));
+
+    return Arrays.asList(createAccount("Lohnabrechnung Dezember 2016", "6.251", "-2.50", "8.5", workItems, expenseItems));
   }
 
-  private static ReportMonthPayslip createAccount(String title, String insuranceRate, String insuranceAbs, String vacationRate, List<ReportWorkItem> workItems) {
+  private static ReportMonthPayslip createAccount(String title, String insuranceRate, String insuranceAbs, String vacationRate, List<ReportWorkItem> workItems, List<ReportExpenseItem> expenseItems) {
     ReportMonthPayslip account = new ReportMonthPayslip();
     account.setAddressLine1("Hans Muster");
     account.setAddressLine2("Bergstrasse 5a");
@@ -44,6 +50,8 @@ public class TestFactory {
     account.setSourceTaxAbsolute("-12.05");
     account.setSourceTaxProcentage("5");
     account.setWorkItems(workItems);
+    account.setExpenseItems(expenseItems);
+    account.setExpenseTotal("322.35");
     account.setEmployerAddressLine1("Bart Employer & Mel Chef");
     account.setEmployerAddressLine2("Sunset Street 23a");
     account.setEmployerAddressLine3("Santa Sunshine, CA 59872-15");
@@ -52,7 +60,7 @@ public class TestFactory {
     return account;
   }
 
-  private static ReportWorkItem createBean(String date, double hours) {
+  private static ReportWorkItem createWorkItemBean(String date, double hours) {
     NumberFormat numFormat = NumberFormat.getInstance(CH);
     numFormat.setMaximumFractionDigits(2);
     numFormat.setMinimumFractionDigits(2);
@@ -61,5 +69,17 @@ public class TestFactory {
     result.setDate(date);
     result.setHours(numFormat.format(hours));
     return result;
+  }
+
+  private static ReportExpenseItem createExpenseItemBean(String date, String text, double amount) {
+    NumberFormat numFormat = NumberFormat.getInstance(CH);
+    numFormat.setMaximumFractionDigits(2);
+    numFormat.setMinimumFractionDigits(2);
+
+    ReportExpenseItem item = new ReportExpenseItem();
+    item.setAmount(numFormat.format(amount));
+    item.setDate(date);
+    item.setText(text);
+    return item;
   }
 }

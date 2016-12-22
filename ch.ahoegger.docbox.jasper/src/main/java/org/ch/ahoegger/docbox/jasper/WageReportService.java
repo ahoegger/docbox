@@ -39,7 +39,7 @@ public class WageReportService {
 
   @PostConstruct
   protected void initFormatters() {
-    m_dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+    m_dateFormatter = DateTimeFormatter.ofPattern("dd.MMM.yyyy");
 
     m_formatFloat2FractionDigits = NumberFormat.getInstance(DE_CH);
     m_formatFloat2FractionDigits.setMaximumFractionDigits(2);
@@ -66,7 +66,7 @@ public class WageReportService {
         })
         .collect(Collectors.toList()));
 
-    account.setExpenses(wageCalculation.getExpenses()
+    account.setExpenseItems(wageCalculation.getExpenses()
         .stream()
         .map(in -> {
           ReportExpenseItem out = new ReportExpenseItem();
@@ -81,6 +81,7 @@ public class WageReportService {
     // calculations
     account.setBruttoWage(m_formatFloat2FractionDigits.format(wageCalculation.getBruttoWage()));
     account.setHoursInPeriod(m_formatFloat2FractionDigits.format(wageCalculation.getHoursTotal()));
+    account.setExpenseTotal(m_formatFloat2FractionDigits.format(financeRound(wageCalculation.getExpencesTotal(), BigDecimal.valueOf(0.05), RoundingMode.UP)));
     account.setHourWage(m_formatFloat2FractionDigits.format(hourWage));
     account.setNettoWage(m_formatFloat2FractionDigits.format(wageCalculation.getNettoWage()));
     account.setNettoWageRounded(m_formatFloat2FractionDigits.format(financeRound(wageCalculation.getNettoWage(), BigDecimal.valueOf(0.05), RoundingMode.UP)));
@@ -98,15 +99,18 @@ public class WageReportService {
     account.setEmployerPhone(employerPhone);
 
     InputStream billStream = getClass().getResourceAsStream("/jasper/bill.jrxml");
-    InputStream billSubreportStream = getClass().getResourceAsStream("/jasper/bill_subreport1.jrxml");
+    InputStream billWorkStream = getClass().getResourceAsStream("/jasper/bill_work.jrxml");
+    InputStream billExpenseStream = getClass().getResourceAsStream("/jasper/bill_expenses.jrxml");
 
     try {
-      JasperReport jasperMasterReport = JasperCompileManager.compileReport(billStream);
-      JasperReport jasperSubReport = JasperCompileManager.compileReport(billSubreportStream);
+      JasperReport jasperBillReport = JasperCompileManager.compileReport(billStream);
+      JasperReport jasperWorkSubreport = JasperCompileManager.compileReport(billWorkStream);
+      JasperReport jasperExpensesSubreport = JasperCompileManager.compileReport(billExpenseStream);
       Map<String, Object> parameters = new HashMap<>();
-      parameters.put("subreportParameter", jasperSubReport);
+      parameters.put("subreportWork", jasperWorkSubreport);
+      parameters.put("subreportExpenses", jasperExpensesSubreport);
       JRBeanCollectionDataSource connection = new JRBeanCollectionDataSource(CollectionUtility.arrayList(account));
-      JasperPrint print = JasperFillManager.fillReport(jasperMasterReport, parameters, connection);
+      JasperPrint print = JasperFillManager.fillReport(jasperBillReport, parameters, connection);
       JasperExportManager.exportReportToPdfFile(print, "D:/test.pdf");
       return JasperExportManager.exportReportToPdf(print);
     }

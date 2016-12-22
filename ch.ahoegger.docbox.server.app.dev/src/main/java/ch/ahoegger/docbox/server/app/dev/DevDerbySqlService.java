@@ -85,14 +85,13 @@ public class DevDerbySqlService extends DerbySqlService {
   private BigDecimal partnerId02;
   private BigDecimal partnerId03_employee;
 
-  private Long entityId01;
-  private Long entityId02;
+  private BigDecimal entityId01;
+  private BigDecimal entityId02;
+  private BigDecimal entityId03;
+  private BigDecimal entityId04;
 
   private BigDecimal postingGroupId01;
   private BigDecimal postingGroupId02;
-
-  private Long entityId03;
-  private Long entityId04;
 
   private static final LocalDate TODAY = LocalDate.now();
 
@@ -299,7 +298,7 @@ public class DevDerbySqlService extends DerbySqlService {
 
     EmployeeTableTask employerTableTask = BEANS.get(EmployeeTableTask.class);
     employerTableTask.createEmployerRow(sqlService, partnerId03_employee, "Hans", "Muster", "Mountainview 01", "CA-90501 Santa Barbara", "12.2568.2154.69", "PC 50-101-89-7", 26.50,
-        "Bart Simpson & Marth Simpson", " 742 Evergreen Terrace", "Springfield", "bart@simpson.spring", "+1 (0)7510 2152");
+        "Bart Simpson & Marth Simpson", "742 Evergreen Terrace", "Springfield", "bart@simpson.spring", "+1 (0)7510 2152");
   }
 
   protected void insertPostingGroups(ISqlService sqlService) {
@@ -322,16 +321,27 @@ public class DevDerbySqlService extends DerbySqlService {
   protected void insertEntities(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", IEntityTable.TABLE_NAME);
 
-    entityId01 = getSequenceNextval(ISequenceTable.TABLE_NAME);
-    entityId02 = getSequenceNextval(ISequenceTable.TABLE_NAME);
-    entityId03 = getSequenceNextval(ISequenceTable.TABLE_NAME);
-    entityId04 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+    entityId01 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
+    entityId02 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
+    entityId03 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
+    entityId04 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
 
     EntityTableTask entityTableTask = BEANS.get(EntityTableTask.class);
     entityTableTask.createEntityRow(sqlService, entityId01, partnerId03_employee, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 9, 04)), BigDecimal.valueOf(3.5), null, "Sept work 1", null);
     entityTableTask.createEntityRow(sqlService, entityId02, partnerId03_employee, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 9, 11)), BigDecimal.valueOf(4.25), null, "Sept work 2", null);
     entityTableTask.createEntityRow(sqlService, entityId03, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(10)), BigDecimal.valueOf(5.5), null, "First work", null);
     entityTableTask.createEntityRow(sqlService, entityId04, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(1)), BigDecimal.valueOf(2.25), null, "Second work", null);
+    for (int i = 0; i < 50; i++) {
+      createEntity(sqlService, i);
+    }
+  }
+
+  protected void createEntity(ISqlService sqlService, int counter) {
+    BigDecimal entityId = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
+
+    EntityTableTask entityTableTask = BEANS.get(EntityTableTask.class);
+    entityTableTask.createEntityRow(sqlService, entityId, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID,
+        LocalDateUtility.toDate(LocalDate.of(2016, 12, 04).plusDays(counter)), BigDecimal.valueOf(2.5), null, "Dez work " + counter, null);
   }
 
 }

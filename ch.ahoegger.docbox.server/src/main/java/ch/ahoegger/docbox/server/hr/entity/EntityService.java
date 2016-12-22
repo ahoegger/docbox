@@ -32,7 +32,7 @@ public class EntityService implements IEntityService, IEntityTable {
   public EntityTablePageData getEntityTableData(EntitySearchFormData formData) {
     List<Object> binds = new ArrayList<>();
     StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, ENTITY_NR, PARTNER_NR, ENTITY_TYPE, ENTITY_DATE, HOURS, AMOUNT, BILLED))
+    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, ENTITY_NR, PARTNER_NR, ENTITY_TYPE, ENTITY_DATE, HOURS, AMOUNT, BILLED, DESCRIPTION))
         .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS).append(" ")
         .append(SqlFramentBuilder.WHERE_DEFAULT);
 
@@ -49,6 +49,16 @@ public class EntityService implements IEntityService, IEntityTable {
     else {
       statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, POSTING_GROUP_NR)).append(" = :postingGroupId");
       binds.add(new NVPair("postingGroupId", formData.getPostingGroupId()));
+    }
+
+    // entity date
+    // document date from
+    if (formData.getEntityDateFrom().getValue() != null) {
+      statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, ENTITY_DATE)).append(" >= ").append(":entityDateFrom");
+    }
+    // document date to
+    if (formData.getEntityDateTo().getValue() != null) {
+      statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, ENTITY_DATE)).append(" <= ").append(":entityDateTo");
     }
 
     if (formData.getBilledBox().getValue() != null) {
@@ -81,7 +91,8 @@ public class EntityService implements IEntityService, IEntityTable {
         .append(":{td.").append(EntityTableRowData.date).append("}, ")
         .append(":{td.").append(EntityTableRowData.hours).append("}, ")
         .append(":{td.").append(EntityTableRowData.amount).append("}, ")
-        .append(":{td.").append(EntityTableRowData.billed).append("} ");
+        .append(":{td.").append(EntityTableRowData.billed).append("}, ")
+        .append(":{td.").append(EntityTableRowData.text).append("} ");
 
     EntityTablePageData tableData = new EntityTablePageData();
     binds.add(new NVPair("td", tableData));

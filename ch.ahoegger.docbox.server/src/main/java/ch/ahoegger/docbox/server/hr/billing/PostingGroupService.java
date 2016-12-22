@@ -243,7 +243,7 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
     BigDecimal sourceTax = sourceTaxRelative.multiply(bruttoWage).setScale(2, RoundingMode.HALF_UP);
     BigDecimal vacationExtraRelative = CONFIG.getPropertyValue(PayslipProperties.VacationExtraPercentageProperty.class).divide(BigDecimal.valueOf(100.0));
     BigDecimal vacationExtra = vacationExtraRelative.multiply(bruttoWage).setScale(2, RoundingMode.HALF_UP);
-    BigDecimal nettoWage = bruttoWage.add(socialSecurityTax).add(sourceTax).add(vacationExtra);
+    BigDecimal nettoWage = bruttoWage.add(expensesTotal).add(socialSecurityTax).add(sourceTax).add(vacationExtra);
 
     WageCalculation result = new WageCalculation();
     result.setWorkItems(workItems);

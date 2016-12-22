@@ -21,6 +21,7 @@ public class ReportMonthPayslip {
   private String m_bruttoWage;
   private String m_nettoWage;
   private String m_nettoWageRounded;
+  private String m_expenseTotal;
   private String m_socialInsuracnePercentage;
   private String m_socialInsuracneAbsolute;
   private String m_vacationExtraPercentage;
@@ -30,7 +31,7 @@ public class ReportMonthPayslip {
   private String m_iban;
 
   private Collection<ReportWorkItem> m_workItems = new ArrayList<>();
-  private Collection<ReportExpenseItem> m_expenses = new ArrayList<>();
+  private Collection<ReportExpenseItem> m_expenseItems = new ArrayList<>();
 
   // employer
   private String m_employerAddressLine1;
@@ -85,6 +86,14 @@ public class ReportMonthPayslip {
 
   public void setHoursInPeriod(String hoursInPeriod) {
     m_hoursInPeriod = hoursInPeriod;
+  }
+
+  public void setExpenseTotal(String expenseTotal) {
+    m_expenseTotal = expenseTotal;
+  }
+
+  public String getExpenseTotal() {
+    return m_expenseTotal;
   }
 
   public String getHourWage() {
@@ -183,12 +192,12 @@ public class ReportMonthPayslip {
     return m_workItems;
   }
 
-  public void setExpenses(Collection<ReportExpenseItem> expenses) {
-    m_expenses = expenses;
+  public void setExpenseItems(Collection<ReportExpenseItem> expenseItems) {
+    m_expenseItems = expenseItems;
   }
 
-  public Collection<ReportExpenseItem> getExpenses() {
-    return m_expenses;
+  public Collection<ReportExpenseItem> getExpenseItems() {
+    return m_expenseItems;
   }
 
   public String getEmployerAddressLine1() {

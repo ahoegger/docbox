@@ -20,6 +20,7 @@ import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupCodeType.UnbilledCode;
 import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
+import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.WorkCode;
 import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
 
@@ -96,8 +97,28 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
       @Override
       protected void execAction() {
-        EntityForm form = new EntityForm(getPartnerIdColumn().getSelectedValue());
+        EntityForm form = new EntityForm(getPartnerId());
         form.setEntityType(WorkCode.ID);
+        form.startNew();
+      }
+    }
+
+    @Order(1000)
+    public class NewExpenseMenu extends AbstractMenu {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("NewExpense");
+      }
+
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TableMenuType.SingleSelection, TableMenuType.EmptySpace);
+      }
+
+      @Override
+      protected void execAction() {
+        EntityForm form = new EntityForm(getPartnerId());
+        form.setEntityType(ExpenseCode.ID);
         form.startNew();
       }
     }

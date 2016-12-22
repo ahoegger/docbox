@@ -2,11 +2,13 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bill" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Error" uuid="77103a51-91bc-4ef3-b556-6f7d49381b00">
 	<property name="ireport.zoom" value="1.771561000000001"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="432"/>
+	<property name="ireport.y" value="673"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["D:/private/softwareDev/docbox/jasperReports/"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["D:/private/softwareDev/docbox/jasperReports/new/"]]></defaultValueExpression>
 	</parameter>
-	<parameter name="subreportParameter" class="net.sf.jasperreports.engine.JasperReport" isForPrompting="false">
+	<parameter name="subreportWork" class="net.sf.jasperreports.engine.JasperReport" isForPrompting="false">
+	</parameter>
+	<parameter name="subreportExpenses" class="net.sf.jasperreports.engine.JasperReport" isForPrompting="false">
 	</parameter>
 	<queryString>
 		<![CDATA[]]>
@@ -65,8 +67,8 @@
 	<field name="nettoWageRounded" class="java.lang.String">
 		<fieldDescription><![CDATA[nettoWageRounded]]></fieldDescription>
 	</field>
-	<field name="expenses" class="java.util.Collection">
-		<fieldDescription><![CDATA[expenses]]></fieldDescription>
+	<field name="expenseTotal" class="java.lang.String">
+		<fieldDescription><![CDATA[expenseTotal]]></fieldDescription>
 	</field>
 	<field name="employerAddressLine1" class="java.lang.String">
 		<fieldDescription><![CDATA[employerAddressLine1]]></fieldDescription>
@@ -82,6 +84,9 @@
 	</field>
 	<field name="employerPhone" class="java.lang.String">
 		<fieldDescription><![CDATA[employerPhone]]></fieldDescription>
+	</field>
+	<field name="expenseItems" class="java.util.Collection">
+		<fieldDescription><![CDATA[expenseItems]]></fieldDescription>
 	</field>
 	<background>
 		<band splitType="Stretch"/>
@@ -142,245 +147,262 @@
 			</textField>
 		</band>
 	</pageHeader>
-	<columnHeader>
-		<band height="423" splitType="Stretch">
+	<detail>
+		<band height="239" splitType="Stretch">
 			<textField>
-				<reportElement x="36" y="164" width="483" height="20" uuid="614f0a96-09ae-4f9f-8703-0555bf16d758"/>
+				<reportElement x="36" y="157" width="483" height="20" uuid="614f0a96-09ae-4f9f-8703-0555bf16d758"/>
 				<textElement>
 					<font size="14"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="36" y="202" width="146" height="20" uuid="6e264ce6-e8b2-4c4f-8919-3c76ec36c99f"/>
+				<reportElement x="36" y="195" width="146" height="20" uuid="6e264ce6-e8b2-4c4f-8919-3c76ec36c99f"/>
 				<textElement>
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Lohnart]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="182" y="202" width="60" height="20" uuid="1968aa36-b26d-4218-af1f-ee06f307085c"/>
+				<reportElement x="182" y="195" width="60" height="20" uuid="1968aa36-b26d-4218-af1f-ee06f307085c"/>
 				<textElement textAlignment="Right">
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Anzahl]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="242" y="203" width="60" height="20" uuid="f9cfbef2-549e-4874-93d9-97c2b1b4ca32"/>
+				<reportElement x="242" y="196" width="60" height="20" uuid="f9cfbef2-549e-4874-93d9-97c2b1b4ca32"/>
 				<textElement textAlignment="Right">
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Ansatz]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="402" y="202" width="117" height="20" uuid="e5aea4cd-c88b-4696-a739-ca77088ca54f"/>
+				<reportElement x="402" y="195" width="117" height="20" uuid="e5aea4cd-c88b-4696-a739-ca77088ca54f"/>
 				<textElement textAlignment="Right">
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Total]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="323" y="203" width="79" height="20" uuid="c56ea9a0-e54b-4fb8-9a66-94e6cec26a3b"/>
+				<reportElement x="323" y="196" width="79" height="20" uuid="c56ea9a0-e54b-4fb8-9a66-94e6cec26a3b"/>
 				<textElement textAlignment="Right">
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Subtotal]]></text>
 			</staticText>
 			<line>
-				<reportElement x="36" y="223" width="483" height="1" uuid="b0ed2b03-bc94-4795-bf39-0c249d1b744b"/>
+				<reportElement x="36" y="216" width="483" height="1" uuid="b0ed2b03-bc94-4795-bf39-0c249d1b744b"/>
 			</line>
 			<staticText>
-				<reportElement x="36" y="224" width="146" height="22" uuid="d3554ba4-07cb-4445-a514-dde1401c08a9"/>
+				<reportElement x="36" y="217" width="146" height="22" uuid="d3554ba4-07cb-4445-a514-dde1401c08a9"/>
 				<textElement verticalAlignment="Middle">
 					<font size="11"/>
 				</textElement>
 				<text><![CDATA[Lohn]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="243" y="224" width="59" height="22" uuid="fd1897e1-f714-4afe-bc14-4851aeefb55c"/>
+				<reportElement x="243" y="217" width="59" height="22" uuid="fd1897e1-f714-4afe-bc14-4851aeefb55c"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{hourWage}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="402" y="224" width="117" height="22" uuid="0d7c483d-f621-4a48-81c4-2f975f1ebdb2"/>
+				<reportElement x="402" y="217" width="117" height="22" uuid="0d7c483d-f621-4a48-81c4-2f975f1ebdb2"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{bruttoWage}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="182" y="224" width="61" height="22" uuid="306aec4f-4252-49c4-b389-5b31a27f07da"/>
+				<reportElement x="182" y="217" width="61" height="22" uuid="306aec4f-4252-49c4-b389-5b31a27f07da"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{hoursInPeriod}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="36" y="246" width="146" height="22" uuid="5ecc2d07-2ab3-40b8-8061-e05f7f66fdfe"/>
-				<textElement verticalAlignment="Middle">
-					<font size="11"/>
-				</textElement>
-				<text><![CDATA[AHV/IV/EO/ALV]]></text>
-			</staticText>
 			<textField>
-				<reportElement x="242" y="246" width="60" height="22" uuid="2d8044b1-160b-4f31-8d23-d895a11801a7"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="11"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{socialInsuracnePercentage}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="323" y="246" width="79" height="22" uuid="1ff633c5-85d1-45bd-9d27-1a60191af38b"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="11"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{socialInsuracneAbsolute}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="36" y="268" width="146" height="22" uuid="c87d69eb-96ae-4e5a-96b6-23785004c937"/>
-				<textElement verticalAlignment="Middle">
-					<font size="11"/>
-				</textElement>
-				<text><![CDATA[Quellensteuer]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="36" y="290" width="146" height="22" uuid="53f89771-a520-4bef-a996-20054e307566"/>
-				<textElement verticalAlignment="Middle">
-					<font size="11"/>
-				</textElement>
-				<text><![CDATA[Ferienzulage]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="323" y="290" width="79" height="22" uuid="817de01d-88c4-40cc-a32d-889a6ca6d19b"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="11"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{vacationExtraAbsolute}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="242" y="290" width="60" height="22" uuid="c4a9765e-be7b-49c6-a761-6028506dc502"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="11"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{vacationExtraPercentage}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="36" y="328" width="146" height="22" uuid="b2c7b725-8b66-4f80-8a43-b43a7177d7c4"/>
-				<textElement>
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Nettolohn]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="419" y="328" width="100" height="22" uuid="d83f2645-5343-4e85-9bc8-9a6af253fb13"/>
-				<textElement textAlignment="Right">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{nettoWage}]]></textFieldExpression>
-			</textField>
-			<line>
-				<reportElement x="36" y="350" width="483" height="1" uuid="138a75ae-5207-4745-a19f-c8716b276774"/>
-			</line>
-			<staticText>
-				<reportElement x="302" y="246" width="21" height="22" uuid="845ce1c6-4012-4975-ad77-8727bd29d97c"/>
-				<textElement verticalAlignment="Middle">
-					<font size="11"/>
-					<paragraph leftIndent="2"/>
-				</textElement>
-				<text><![CDATA[%]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="302" y="290" width="21" height="22" uuid="23261024-a4f0-426a-8636-c0134958c70d"/>
-				<textElement verticalAlignment="Middle">
-					<font size="11"/>
-					<paragraph leftIndent="2"/>
-				</textElement>
-				<text><![CDATA[%]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="323" y="268" width="79" height="22" uuid="8e91b99d-4b88-4bba-9eb7-94bc30922fdb"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="11"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{sourceTaxAbsolute}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="302" y="268" width="21" height="22" uuid="53a7fe80-a446-4569-a999-f4faffcbea95"/>
-				<textElement verticalAlignment="Middle">
-					<font size="11"/>
-					<paragraph leftIndent="2"/>
-				</textElement>
-				<text><![CDATA[%]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="242" y="268" width="60" height="22" uuid="97417899-6bcc-4cb2-a706-0556b9db940e"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="11"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{sourceTaxProcentage}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="343" y="21" width="176" height="22" uuid="c076ddf8-81d3-4f60-9260-a8bab5359da7"/>
+				<reportElement x="343" y="10" width="176" height="22" uuid="c076ddf8-81d3-4f60-9260-a8bab5359da7"/>
 				<textElement>
 					<font size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Boniswil, "+$F{date}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="36" y="385" width="483" height="18" uuid="466d274c-c4d1-436b-9c5b-4000e1ce8224"/>
-				<textElement>
-					<font size="11"/>
-				</textElement>
-				<textFieldExpression><![CDATA["CHF "+$F{nettoWageRounded}+" auf Konto "+$F{iban}+"."]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="36" y="367" width="483" height="18" uuid="50c8894f-3495-46a3-b6e3-c4bca47f8535"/>
-				<textElement>
-					<font size="11"/>
-				</textElement>
-				<text><![CDATA[Auszahlung:]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="36" y="58" width="228" height="18" uuid="0f37e601-4a19-45a0-af40-8cbb2fffaab3"/>
+				<reportElement x="36" y="47" width="228" height="18" uuid="0f37e601-4a19-45a0-af40-8cbb2fffaab3"/>
 				<textElement>
 					<font size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{addressLine1}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="36" y="76" width="228" height="20" uuid="a1eaf819-3a67-4db2-8c76-30c61b5c3bfc"/>
+				<reportElement x="36" y="65" width="228" height="20" uuid="a1eaf819-3a67-4db2-8c76-30c61b5c3bfc"/>
 				<textElement>
 					<font size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{addressLine2}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="36" y="96" width="228" height="20" uuid="bc0f2dc3-57f1-4bd1-98e4-16bbf76b55f1"/>
+				<reportElement x="36" y="85" width="228" height="20" uuid="bc0f2dc3-57f1-4bd1-98e4-16bbf76b55f1"/>
 				<textElement>
 					<font size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{addressLine3}]]></textFieldExpression>
 			</textField>
 		</band>
-	</columnHeader>
-	<detail>
-		<band height="160" splitType="Stretch">
+		<band height="22">
+			<printWhenExpression><![CDATA[!$F{expenseItems}.isEmpty()]]></printWhenExpression>
+			<staticText>
+				<reportElement x="36" y="0" width="146" height="22" uuid="47419bda-a7a9-4415-a299-bda2a878776b"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11"/>
+				</textElement>
+				<text><![CDATA[Spesen]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="323" y="0" width="79" height="22" uuid="be264726-3ec5-4842-be33-ffe5aae5d21d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{expenseTotal}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="185">
+			<staticText>
+				<reportElement x="36" y="0" width="146" height="22" uuid="5ecc2d07-2ab3-40b8-8061-e05f7f66fdfe"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11"/>
+				</textElement>
+				<text><![CDATA[AHV/IV/EO/ALV]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="242" y="0" width="60" height="22" uuid="2d8044b1-160b-4f31-8d23-d895a11801a7"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{socialInsuracnePercentage}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="323" y="0" width="79" height="22" uuid="1ff633c5-85d1-45bd-9d27-1a60191af38b"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{socialInsuracneAbsolute}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="36" y="22" width="146" height="22" uuid="c87d69eb-96ae-4e5a-96b6-23785004c937"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11"/>
+				</textElement>
+				<text><![CDATA[Quellensteuer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="36" y="44" width="146" height="22" uuid="53f89771-a520-4bef-a996-20054e307566"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11"/>
+				</textElement>
+				<text><![CDATA[Ferienzulage]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="323" y="44" width="79" height="22" uuid="817de01d-88c4-40cc-a32d-889a6ca6d19b"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{vacationExtraAbsolute}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="242" y="44" width="60" height="22" uuid="c4a9765e-be7b-49c6-a761-6028506dc502"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{vacationExtraPercentage}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="36" y="82" width="146" height="22" uuid="b2c7b725-8b66-4f80-8a43-b43a7177d7c4"/>
+				<textElement>
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nettolohn]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="419" y="82" width="100" height="22" uuid="d83f2645-5343-4e85-9bc8-9a6af253fb13"/>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nettoWage}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="36" y="104" width="483" height="1" uuid="138a75ae-5207-4745-a19f-c8716b276774"/>
+			</line>
+			<staticText>
+				<reportElement x="302" y="0" width="21" height="22" uuid="845ce1c6-4012-4975-ad77-8727bd29d97c"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="302" y="44" width="21" height="22" uuid="23261024-a4f0-426a-8636-c0134958c70d"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="323" y="22" width="79" height="22" uuid="8e91b99d-4b88-4bba-9eb7-94bc30922fdb"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sourceTaxAbsolute}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="302" y="22" width="21" height="22" uuid="53a7fe80-a446-4569-a999-f4faffcbea95"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="242" y="22" width="60" height="22" uuid="97417899-6bcc-4cb2-a706-0556b9db940e"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sourceTaxProcentage}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="36" y="151" width="483" height="18" uuid="466d274c-c4d1-436b-9c5b-4000e1ce8224"/>
+				<textElement>
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA["CHF "+$F{nettoWageRounded}+" auf Konto "+$F{iban}+"."]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="36" y="121" width="483" height="18" uuid="50c8894f-3495-46a3-b6e3-c4bca47f8535"/>
+				<textElement>
+					<font size="11"/>
+				</textElement>
+				<text><![CDATA[Auszahlung:]]></text>
+			</staticText>
+		</band>
+		<band height="55">
+			<printWhenExpression><![CDATA[!$F{workItems}.isEmpty()]]></printWhenExpression>
 			<subreport>
-				<reportElement x="36" y="26" width="483" height="100" uuid="87694581-1232-4976-8e44-8c70e7b79252"/>
+				<reportElement x="36" y="10" width="483" height="40" uuid="87694581-1232-4976-8e44-8c70e7b79252"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{workItems})]]></dataSourceExpression>
-                                <subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{subreportParameter}]]></subreportExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{subreportWork}]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="50">
+			<printWhenExpression><![CDATA[!$F{expenseItems}.isEmpty()]]></printWhenExpression>
+			<subreport>
+				<reportElement x="36" y="5" width="483" height="40" uuid="6efd9e07-02c3-46a2-9e84-f71db211e9cb"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{expenseItems})]]></dataSourceExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{subreportExpenses}]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>
-	<columnFooter>
-		<band height="45" splitType="Stretch"/>
-	</columnFooter>
-	<pageFooter>
-		<band height="54" splitType="Stretch"/>
-	</pageFooter>
-	<summary>
-		<band height="24" splitType="Stretch"/>
-	</summary>
 </jasperReport>

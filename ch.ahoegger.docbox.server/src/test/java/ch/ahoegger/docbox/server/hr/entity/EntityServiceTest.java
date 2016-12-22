@@ -25,8 +25,8 @@ public class EntityServiceTest extends AbstractTestWithDatabase {
   private BigDecimal partnerId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
   private BigDecimal documentId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
   private BigDecimal postingGroupId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
-  private Long entityId01 = BEANS.get(IdGenerateService.class).getNextId();
-  private Long entityId02 = BEANS.get(IdGenerateService.class).getNextId();
+  private BigDecimal entityId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private BigDecimal entityId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
   public void setupDb() throws Exception {
