@@ -10,6 +10,7 @@ import java.util.Collection;
  */
 public class ReportMonthPayslip {
 
+  // employee
   private String m_addressLine1;
   private String m_addressLine2;
   private String m_addressLine3;
@@ -26,11 +27,17 @@ public class ReportMonthPayslip {
   private String m_vacationExtraAbsolute;
   private String m_sourceTaxAbsolute;
   private String m_sourceTaxProcentage;
-
   private String m_iban;
 
   private Collection<ReportWorkItem> m_workItems = new ArrayList<>();
   private Collection<ReportExpenseItem> m_expenses = new ArrayList<>();
+
+  // employer
+  private String m_employerAddressLine1;
+  private String m_employerAddressLine2;
+  private String m_employerAddressLine3;
+  private String m_employerEmail;
+  private String m_employerPhone;
 
   public String getAddressLine1() {
     return m_addressLine1;
@@ -183,4 +190,45 @@ public class ReportMonthPayslip {
   public Collection<ReportExpenseItem> getExpenses() {
     return m_expenses;
   }
+
+  public String getEmployerAddressLine1() {
+    return m_employerAddressLine1;
+  }
+
+  public void setEmployerAddressLine1(String employerAddressLine1) {
+    m_employerAddressLine1 = employerAddressLine1;
+  }
+
+  public String getEmployerAddressLine2() {
+    return m_employerAddressLine2;
+  }
+
+  public void setEmployerAddressLine2(String employerAddressLine2) {
+    m_employerAddressLine2 = employerAddressLine2;
+  }
+
+  public String getEmployerAddressLine3() {
+    return m_employerAddressLine3;
+  }
+
+  public void setEmployerAddressLine3(String employerAddressLine3) {
+    m_employerAddressLine3 = employerAddressLine3;
+  }
+
+  public String getEmployerEmail() {
+    return m_employerEmail;
+  }
+
+  public void setEmployerEmail(String employerEmail) {
+    m_employerEmail = employerEmail;
+  }
+
+  public String getEmployerPhone() {
+    return m_employerPhone;
+  }
+
+  public void setEmployerPhone(String employerPhone) {
+    m_employerPhone = employerPhone;
+  }
+
 }

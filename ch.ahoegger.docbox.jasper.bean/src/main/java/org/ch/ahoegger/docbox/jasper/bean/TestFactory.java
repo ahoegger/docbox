@@ -44,6 +44,11 @@ public class TestFactory {
     account.setSourceTaxAbsolute("-12.05");
     account.setSourceTaxProcentage("5");
     account.setWorkItems(workItems);
+    account.setEmployerAddressLine1("Bart Employer & Mel Chef");
+    account.setEmployerAddressLine2("Sunset Street 23a");
+    account.setEmployerAddressLine3("Santa Sunshine, CA 59872-15");
+    account.setEmployerEmail("bart.employer.sunshine");
+    account.setEmployerPhone("+1 (0)568 054 21");
     return account;
   }
 

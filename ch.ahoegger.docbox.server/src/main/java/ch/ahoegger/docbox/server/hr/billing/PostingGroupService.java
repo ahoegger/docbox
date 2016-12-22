@@ -139,8 +139,9 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
     WageCalculation wageData = calculateWage(unbilledEntities, employeeData.getEmployeeBox().getHourlyWage().getValue());
     byte[] docContent = BEANS.get(WageReportService.class).createMonthlyReport(formData.getTitle().getValue(), employeeData.getEmployeeBox().getFirstName().getValue() + " " + employeeData.getEmployeeBox().getLastName().getValue(),
         employeeData.getEmployeeBox().getAddressLine1().getValue(), employeeData.getEmployeeBox().getAddressLine2().getValue(), formData.getDate().getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
-        employeeData.getEmployeeBox().getAccountNumber().getValue(),
-        employeeData.getEmployeeBox().getHourlyWage().getValue(), wageData);
+        employeeData.getEmployeeBox().getAccountNumber().getValue(), employeeData.getEmployeeBox().getHourlyWage().getValue(), wageData,
+        employeeData.getEmployerBox().getAddressLine1().getValue(), employeeData.getEmployerBox().getAddressLine2().getValue(), employeeData.getEmployerBox().getAddressLine3().getValue(), employeeData.getEmployerBox().getEmail().getValue(),
+        employeeData.getEmployerBox().getPhone().getValue());
 
     DocumentFormData documentData = new DocumentFormData();
     DocumentService documentService = BEANS.get(DocumentService.class);

@@ -20,14 +20,14 @@
 			<staticText>
 				<reportElement x="0" y="2" width="130" height="20" uuid="0fe9a28c-bb4c-4030-8549-c8e143affaac"/>
 				<textElement>
-					<font size="11"/>
+					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Datum]]></text>
+				<text><![CDATA[Übersicht Arbeit]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="130" y="2" width="100" height="20" uuid="acae6eda-14f6-49b2-9bbc-a9424961110e"/>
 				<textElement textAlignment="Right">
-					<font size="11"/>
+					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Arbeitsstunden]]></text>
 			</staticText>

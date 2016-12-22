@@ -47,7 +47,8 @@ public class WageReportService {
 
   }
 
-  public byte[] createMonthlyReport(String title, String addressLine1, String addressLine2, String addressLine3, LocalDate date, String iban, BigDecimal hourWage, WageCalculation wageCalculation) {
+  public byte[] createMonthlyReport(String title, String addressLine1, String addressLine2, String addressLine3, LocalDate date, String iban, BigDecimal hourWage, WageCalculation wageCalculation,
+      String employerAddressLine1, String employerAddressLine2, String employerAddressLine3, String employerEmail, String employerPhone) {
     ReportMonthPayslip account = new ReportMonthPayslip();
     account.setTitle(title);
     account.setAddressLine1(addressLine1);
@@ -89,6 +90,12 @@ public class WageReportService {
     account.setSourceTaxProcentage(m_formatFloat2FractionDigits.format(wageCalculation.getSourceTaxRelative().multiply(BigDecimal.valueOf(100.0))));
     account.setVacationExtraAbsolute(m_formatFloat2FractionDigits.format(wageCalculation.getVacationExtra()));
     account.setVacationExtraPercentage(m_formatFloat2FractionDigits.format(wageCalculation.getVacationExtraRelative().multiply(BigDecimal.valueOf(100.0))));
+    // employer
+    account.setEmployerAddressLine1(employerAddressLine1);
+    account.setEmployerAddressLine2(employerAddressLine2);
+    account.setEmployerAddressLine3(employerAddressLine3);
+    account.setEmployerEmail(employerEmail);
+    account.setEmployerPhone(employerPhone);
 
     InputStream billStream = getClass().getResourceAsStream("/jasper/bill.jrxml");
     InputStream billSubreportStream = getClass().getResourceAsStream("/jasper/bill_subreport1.jrxml");
