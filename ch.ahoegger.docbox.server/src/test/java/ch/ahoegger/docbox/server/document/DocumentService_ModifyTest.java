@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
@@ -49,8 +50,8 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
   private final Long categoryId02 = BEANS.get(IdGenerateService.class).getNextId();
   private final Long conversationId01 = BEANS.get(IdGenerateService.class).getNextId();
   private final Long conversationId02 = BEANS.get(IdGenerateService.class).getNextId();
-  private final Long partnerId01 = BEANS.get(IdGenerateService.class).getNextId();
-  private final Long partnerId02 = BEANS.get(IdGenerateService.class).getNextId();
+  private final BigDecimal partnerId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private final BigDecimal partnerId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   private Date m_today;
 
@@ -251,7 +252,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     DocumentFormData fd = loadDocument(service, documentId);
     // modify
     PartnersRowData newRow = fd.getPartners().addRow();
-    newRow.setPartner(new BigDecimal(partnerId02));
+    newRow.setPartner(partnerId02);
     service.store(fd);
 
     // compare to new loaded
@@ -273,7 +274,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     DocumentFormData fd = loadDocument(service, documentId);
     // modify
     for (PartnersRowData rd : fd.getPartners().getRows()) {
-      if (partnerId01 == Optional.of(rd.getPartner()).map(bd -> bd.longValue()).orElse(-1l).longValue()) {
+      if (ObjectUtility.equals(partnerId01, rd.getPartner())) {
         fd.getPartners().removeRow(rd);
       }
     }
@@ -299,7 +300,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     // modify
     fd.getPartners().clearRows();
     PartnersRowData newRow = fd.getPartners().addRow();
-    newRow.setPartner(new BigDecimal(partnerId02));
+    newRow.setPartner(partnerId02);
     service.store(fd);
 
     // compare to new loaded

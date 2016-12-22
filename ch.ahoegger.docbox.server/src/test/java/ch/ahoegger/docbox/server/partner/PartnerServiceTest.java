@@ -24,8 +24,8 @@ import ch.ahoegger.docbox.shared.partner.PartnerFormData;
 
 public class PartnerServiceTest extends AbstractTestWithDatabase {
 
-  private static final Long partnerId01 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long partnerId02 = BEANS.get(IdGenerateService.class).getNextId();
+  private static final BigDecimal partnerId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal partnerId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
   public void setupDb() throws Exception {
@@ -70,7 +70,7 @@ public class PartnerServiceTest extends AbstractTestWithDatabase {
     IPartnerService service = BEANS.get(IPartnerService.class);
 
     PartnerFormData fd1 = new PartnerFormData();
-    fd1.setPartnerId(new BigDecimal(partnerId02));
+    fd1.setPartnerId(partnerId02);
     fd1 = service.load(fd1);
 
     fd1.getPartnerBox().getName().setValue("modified.name");
@@ -85,7 +85,7 @@ public class PartnerServiceTest extends AbstractTestWithDatabase {
     fd1 = service.store(fd1);
 
     PartnerFormData fd2 = new PartnerFormData();
-    fd2.setPartnerId(new BigDecimal(partnerId02));
+    fd2.setPartnerId(partnerId02);
     fd2 = service.load(fd2);
 
     DocboxAssert.assertEquals(fd1, fd2);
@@ -98,7 +98,7 @@ public class PartnerServiceTest extends AbstractTestWithDatabase {
     service.delete(partnerId02);
 
     PartnerFormData fd1 = new PartnerFormData();
-    fd1.setPartnerId(new BigDecimal(partnerId02));
+    fd1.setPartnerId(partnerId02);
     fd1 = service.load(fd1);
     Assert.assertNull(fd1);
 

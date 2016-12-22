@@ -136,10 +136,11 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
 
     List<EntityTableRowData> unbilledEntities = getUnbilledEntities(formData.getFrom().getValue(), formData.getTo().getValue(), formData.getPartner().getValue());
 
-    WageCalculation wageData = calculateWage(unbilledEntities, employeeData.getHourlyWage().getValue());
-    byte[] docContent = BEANS.get(WageReportService.class).createMonthlyReport(formData.getTitle().getValue(), employeeData.getFirstName().getValue() + " " + employeeData.getLastName().getValue(),
-        employeeData.getAddressLine1().getValue(), employeeData.getAddressLine2().getValue(), formData.getDate().getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), employeeData.getAccountNumber().getValue(),
-        employeeData.getHourlyWage().getValue(), wageData);
+    WageCalculation wageData = calculateWage(unbilledEntities, employeeData.getEmployeeBox().getHourlyWage().getValue());
+    byte[] docContent = BEANS.get(WageReportService.class).createMonthlyReport(formData.getTitle().getValue(), employeeData.getEmployeeBox().getFirstName().getValue() + " " + employeeData.getEmployeeBox().getLastName().getValue(),
+        employeeData.getEmployeeBox().getAddressLine1().getValue(), employeeData.getEmployeeBox().getAddressLine2().getValue(), formData.getDate().getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+        employeeData.getEmployeeBox().getAccountNumber().getValue(),
+        employeeData.getEmployeeBox().getHourlyWage().getValue(), wageData);
 
     DocumentFormData documentData = new DocumentFormData();
     DocumentService documentService = BEANS.get(DocumentService.class);
@@ -177,7 +178,7 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
     employeeData = BEANS.get(IEmployeeService.class).load(employeeData);
 
     List<EntityTableRowData> unbilledEntities = getUnbilledEntities(formData.getFrom().getValue(), formData.getTo().getValue(), formData.getPartner().getValue());
-    WageCalculation wageCalc = calculateWage(unbilledEntities, employeeData.getHourlyWage().getValue());
+    WageCalculation wageCalc = calculateWage(unbilledEntities, employeeData.getEmployeeBox().getHourlyWage().getValue());
 
     PostingCalculationBoxData result = new PostingCalculationBoxData();
     List<EntitiesRowData> entityRows = unbilledEntities.stream().map(row -> {

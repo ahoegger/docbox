@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.server.partner;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 
@@ -23,10 +24,10 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
  */
 public class PartnerLookupServiceTest extends AbstractTestWithDatabase {
 
-  private static final Long partnerId01 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long partnerId02 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long partnerId03 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long partnerId04 = BEANS.get(IdGenerateService.class).getNextId();
+  private static final BigDecimal partnerId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal partnerId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal partnerId03 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal partnerId04 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
   public void setupDb() throws Exception {

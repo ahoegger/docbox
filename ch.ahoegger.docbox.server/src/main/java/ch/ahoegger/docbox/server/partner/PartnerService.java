@@ -147,7 +147,7 @@ public class PartnerService implements IPartnerService, IPartnerTable {
   }
 
   @Override
-  public void delete(Long partnerId) {
+  public void delete(BigDecimal partnerId) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(PARTNER_NR).append(" = :partnerId");
     SQL.delete(statementBuilder.toString(), new NVPair("partnerId", partnerId));

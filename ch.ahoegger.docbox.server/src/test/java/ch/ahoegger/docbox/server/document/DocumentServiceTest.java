@@ -33,8 +33,8 @@ public class DocumentServiceTest extends AbstractTestWithDatabase {
 
   private static final Long categoryId01 = BEANS.get(IdGenerateService.class).getNextId();
 
-  private static final Long partnerId01 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long partnerId02 = BEANS.get(IdGenerateService.class).getNextId();
+  private static final BigDecimal partnerId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal partnerId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   private static final Long conversationId01 = BEANS.get(IdGenerateService.class).getNextId();
   private static final Long conversationId02 = BEANS.get(IdGenerateService.class).getNextId();
@@ -91,7 +91,7 @@ public class DocumentServiceTest extends AbstractTestWithDatabase {
     fd1.getDocumentDate().setValue(cal.getTime());
     fd1.getConversation().setValue(new BigDecimal(conversationId01));
     PartnersRowData p1 = fd1.getPartners().addRow();
-    p1.setPartner(new BigDecimal(partnerId01));
+    p1.setPartner(partnerId01);
     fd1.getCategoriesBox().setValue(CollectionUtility.hashSet(new BigDecimal(900)));
 
     fd1 = service.create(fd1);

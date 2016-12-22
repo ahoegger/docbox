@@ -81,9 +81,9 @@ public class DevDerbySqlService extends DerbySqlService {
   private Long conversationId02;
   private Long conversationId03;
 
-  private Long partnerId01;
-  private Long partnerId02;
-  private Long partnerId03_employee;
+  private BigDecimal partnerId01;
+  private BigDecimal partnerId02;
+  private BigDecimal partnerId03_employee;
 
   private Long entityId01;
   private Long entityId02;
@@ -202,9 +202,9 @@ public class DevDerbySqlService extends DerbySqlService {
   protected void insertPartners(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", IPartnerTable.TABLE_NAME);
     // ids
-    partnerId01 = getSequenceNextval(ISequenceTable.TABLE_NAME);
-    partnerId02 = getSequenceNextval(ISequenceTable.TABLE_NAME);
-    partnerId03_employee = getSequenceNextval(ISequenceTable.TABLE_NAME);
+    partnerId01 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
+    partnerId02 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
+    partnerId03_employee = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
 
     PartnerTableTask partnerTableTask = BEANS.get(PartnerTableTask.class);
     partnerTableTask.createPartnerRow(sqlService, partnerId01, "Gorak Inc", "A special company", LocalDateUtility.today(), null);
@@ -298,7 +298,8 @@ public class DevDerbySqlService extends DerbySqlService {
     LOG.info("SQL-DEV create rows for: {}", IEmployeeTable.TABLE_NAME);
 
     EmployeeTableTask employerTableTask = BEANS.get(EmployeeTableTask.class);
-    employerTableTask.createEmployerRow(sqlService, partnerId03_employee, "Hans", "Muster", "Mountainview 01", "CA-90501 Santa Barbara", "12.2568.2154.69", "PC 50-101-89-7", 26.50);
+    employerTableTask.createEmployerRow(sqlService, partnerId03_employee, "Hans", "Muster", "Mountainview 01", "CA-90501 Santa Barbara", "12.2568.2154.69", "PC 50-101-89-7", 26.50,
+        "Bart Simpson & Marth Simpson", " 742 Evergreen Terrace", "Springfield", "bart@simpson.spring", "+1 (0)7510 2152");
   }
 
   protected void insertPostingGroups(ISqlService sqlService) {

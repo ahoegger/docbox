@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
-import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
 import ch.ahoegger.docbox.shared.partner.AbstractPartnerBoxData;
@@ -19,32 +18,12 @@ public class EmployeeFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public AccountNumber getAccountNumber() {
-    return getFieldByClass(AccountNumber.class);
+  public EmployeeBox getEmployeeBox() {
+    return getFieldByClass(EmployeeBox.class);
   }
 
-  public AddressLine1 getAddressLine1() {
-    return getFieldByClass(AddressLine1.class);
-  }
-
-  public AddressLine2 getAddressLine2() {
-    return getFieldByClass(AddressLine2.class);
-  }
-
-  public AhvNumber getAhvNumber() {
-    return getFieldByClass(AhvNumber.class);
-  }
-
-  public FirstName getFirstName() {
-    return getFieldByClass(FirstName.class);
-  }
-
-  public HourlyWage getHourlyWage() {
-    return getFieldByClass(HourlyWage.class);
-  }
-
-  public LastName getLastName() {
-    return getFieldByClass(LastName.class);
+  public EmployerBox getEmployerBox() {
+    return getFieldByClass(EmployerBox.class);
   }
 
   public PartnerGroupBox getPartnerGroupBox() {
@@ -69,37 +48,12 @@ public class EmployeeFormData extends AbstractFormData {
     return getPropertyByClass(PartnerIdProperty.class);
   }
 
-  public static class AccountNumber extends AbstractValueFieldData<String> {
+  public static class EmployeeBox extends AbstractEmployeeBoxData {
 
     private static final long serialVersionUID = 1L;
   }
 
-  public static class AddressLine1 extends AbstractValueFieldData<String> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class AddressLine2 extends AbstractValueFieldData<String> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class AhvNumber extends AbstractValueFieldData<String> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class FirstName extends AbstractValueFieldData<String> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class HourlyWage extends AbstractValueFieldData<BigDecimal> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class LastName extends AbstractValueFieldData<String> {
+  public static class EmployerBox extends AbstractEmployerBoxData {
 
     private static final long serialVersionUID = 1L;
   }

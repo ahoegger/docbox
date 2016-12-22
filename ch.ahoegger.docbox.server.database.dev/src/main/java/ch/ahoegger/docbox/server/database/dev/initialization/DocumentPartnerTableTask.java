@@ -52,7 +52,7 @@ public class DocumentPartnerTableTask implements ITableTask, IDocumentPartnerTab
     sqlService.insert(statementBuilder.toString());
   }
 
-  public void createDocumentPartnerRow(ISqlService sqlService, BigDecimal documentId, Long partnerId) {
+  public void createDocumentPartnerRow(ISqlService sqlService, BigDecimal documentId, BigDecimal partnerId) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, PARTNER_NR));

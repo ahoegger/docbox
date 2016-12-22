@@ -22,7 +22,7 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 public class EntityServiceTest extends AbstractTestWithDatabase {
 
-  private Long partnerId01 = BEANS.get(IdGenerateService.class).getNextId();
+  private BigDecimal partnerId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
   private BigDecimal documentId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
   private BigDecimal postingGroupId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
   private Long entityId01 = BEANS.get(IdGenerateService.class).getNextId();
@@ -49,7 +49,7 @@ public class EntityServiceTest extends AbstractTestWithDatabase {
   @Test
   public void testUnbiled() {
     EntitySearchFormData searchFd = new EntitySearchFormData();
-    searchFd.getPartnerId().setValue(BigDecimal.valueOf(partnerId01));
+    searchFd.getPartnerId().setValue(partnerId01);
     searchFd.setPostingGroupId(null);
     EntityTablePageData entityTableData = BEANS.get(IEntityService.class).getEntityTableData(searchFd);
     Assert.assertEquals(1, entityTableData.getRowCount());

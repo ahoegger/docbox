@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.server.database.dev.initialization;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import org.eclipse.scout.rt.platform.holders.NVPair;
@@ -54,7 +55,7 @@ public class PartnerTableTask implements ITableTask, IPartnerTable {
     sqlService.insert(statementBuilder.toString());
   }
 
-  public void createPartnerRow(ISqlService sqlService, Long patnerId, String name, String description, Date startDate,
+  public void createPartnerRow(ISqlService sqlService, BigDecimal patnerId, String name, String description, Date startDate,
       Date endDate) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");

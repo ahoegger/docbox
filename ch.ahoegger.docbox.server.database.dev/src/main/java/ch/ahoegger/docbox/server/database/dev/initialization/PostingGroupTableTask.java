@@ -61,7 +61,8 @@ public class PostingGroupTableTask implements ITableTask, IPostingGroupTable {
     sqlService.insert(statementBuilder.toString());
   }
 
-  public void createRow(ISqlService sqlService, BigDecimal postingGroupId, Long partnerId, BigDecimal documentId, String name, Date statementDate, BigDecimal workingHours, BigDecimal bruttoWage, BigDecimal nettoWage, BigDecimal sourceTax,
+  public void createRow(ISqlService sqlService, BigDecimal postingGroupId, BigDecimal partnerId, BigDecimal documentId, String name, Date statementDate, BigDecimal workingHours, BigDecimal bruttoWage, BigDecimal nettoWage,
+      BigDecimal sourceTax,
       BigDecimal socialSecurityTax,
       BigDecimal vacationExtra) {
     StringBuilder statementBuilder = new StringBuilder();
