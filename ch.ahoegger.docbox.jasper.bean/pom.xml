@@ -10,28 +10,27 @@
 		<version>1.0.1-SNAPSHOT</version>
 		<relativePath>../ch.ahoegger.docbox.parent/pom.xml</relativePath>
 	</parent>
-	  <properties>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
-  </properties>
+	<properties>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
+	</properties>
 
 	<artifactId>ch.ahoegger.docbox.jasper.bean</artifactId>
 	<name>ch.ahoegger.docbox.jasper.bean</name>
-	
-	<dependencies>
 
+	<dependencies>
 	</dependencies>
-	
-	  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
