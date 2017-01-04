@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>ch.ahoegger.docbox</groupId>
 		<artifactId>ch.ahoegger.docbox.parent</artifactId>
-		<version>${ch.ahoegger.docbox.version}</version>
+		<version>1.0.1-SNAPSHOT</version>
 		<relativePath>../ch.ahoegger.docbox.parent/pom.xml</relativePath>
 	</parent>
 

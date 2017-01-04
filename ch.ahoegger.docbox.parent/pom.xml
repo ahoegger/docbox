@@ -11,22 +11,20 @@
 		<relativePath />
 	</parent>
 
+	<groupId>ch.ahoegger.docbox</groupId>
+	<artifactId>ch.ahoegger.docbox.parent</artifactId>
+	<version>1.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>DocBox Parent Module</name>
+
 	<properties>
-		<ch.ahoegger.docbox.version>1.0.2-SNAPSHOT</ch.ahoegger.docbox.version>
+		<ch.ahoegger.docbox.version>${project.version}</ch.ahoegger.docbox.version>
 		<jdk.source.version>1.8</jdk.source.version>
 		<org.eclipse.scout.rt_version>6.1.0.B002</org.eclipse.scout.rt_version>
 		<aspose-pdf.version>11.2.0</aspose-pdf.version>
 		<sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
 	</properties>
-
-	<groupId>ch.ahoegger.docbox</groupId>
-	<artifactId>ch.ahoegger.docbox.parent</artifactId>
-	<version>${ch.ahoegger.docbox.version}</version>
-	<packaging>pom</packaging>
-
-	<name>DocBox Parent Module</name>
-
-
 
 	<modules>
 		<module>../ch.ahoegger.docbox.shared</module>
