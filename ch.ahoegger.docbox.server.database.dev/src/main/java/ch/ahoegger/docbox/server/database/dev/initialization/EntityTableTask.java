@@ -63,7 +63,7 @@ public class EntityTableTask implements ITableTask, IEntityTable {
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
     statementBuilder.append(SqlFramentBuilder.columns(ENTITY_NR, PARTNER_NR, POSTING_GROUP_NR, ENTITY_TYPE, ENTITY_DATE, HOURS, AMOUNT, DESCRIPTION));
     statementBuilder.append(") VALUES (");
-    statementBuilder.append(":entityId, :partnerId, :postingGroupId, :entityType, :entityDate, :hours, :amount, :desc,  :billed");
+    statementBuilder.append(":entityId, :partnerId, :postingGroupId, :entityType, :entityDate, :hours, :amount, :desc");
     statementBuilder.append(")");
     sqlService.insert(statementBuilder.toString(), new NVPair("entityId", entityId), new NVPair("partnerId", partnerId),
         new NVPair("postingGroupId", postingGroupId),
