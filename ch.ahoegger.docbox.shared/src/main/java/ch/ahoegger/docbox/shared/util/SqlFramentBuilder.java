@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.rt.platform.util.NumberUtility;
-
 /**
  * <h3>{@link SqlFramentBuilder}</h3>
  *
@@ -62,21 +60,4 @@ public class SqlFramentBuilder {
     return statementBuilder.toString();
   }
 
-  public static String where(String tableAlias, String column, Number number) {
-    return where(tableAlias + "." + column, number);
-  }
-
-  public static String where(String column, Number number) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append(column);
-    if (number == null) {
-      statementBuilder.append(" IS NULL");
-    }
-    else {
-      NumberFormat.getInstance().setGroupingUsed(false);
-      statementBuilder.append(" = ").append(NumberUtility.format(number));
-
-    }
-    return statementBuilder.toString();
-  }
 }

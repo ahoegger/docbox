@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,6 +59,7 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
 
   @Override
   public PostingGroupTableData getTableData(PostingGroupSearchFormData formData) {
+    List<Object> binds = new ArrayList<>();
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("SELECT 1, ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, POSTING_GROUP_NR, PARTNER_NR, DOCUMENT_NR, NAME, STATEMENT_DATE, BRUTTO_WAGE, NETTO_WAGE, SOURCE_TAX, SOCIAL_SECURITY_TAX, VACATION_EXTRA))
         .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS).append(" ")
@@ -65,7 +67,8 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
 
     // search personId
     if (formData.getPartnerId() != null) {
-      statementBuilder.append(" AND ").append(SqlFramentBuilder.where(TABLE_ALIAS, PARTNER_NR, formData.getPartnerId()));
+      statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, PARTNER_NR)).append(" = :partnerId");
+      binds.add(new NVPair("partnerId", formData.getPartnerId()));
     }
     // search criteria firstname
 //    if (formData.getPartnerId().getValue() != null) {
@@ -98,9 +101,9 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
         .append(":{td.").append(PostingGroupTableRowData.vacationExtra).append("} ");
 
     PostingGroupTableData tableData = new PostingGroupTableData();
-    SQL.selectInto(statementBuilder.toString(),
-        new NVPair("td", tableData),
-        formData);
+    binds.add(new NVPair("td", tableData));
+    binds.add(formData);
+    SQL.selectInto(statementBuilder.toString(), binds.toArray());
     PostingGroupTableRowData unbilledRow = tableData.addRow();
     unbilledRow.setId(UnbilledCode.ID);
     unbilledRow.setSortGroup(BigDecimal.valueOf(2));

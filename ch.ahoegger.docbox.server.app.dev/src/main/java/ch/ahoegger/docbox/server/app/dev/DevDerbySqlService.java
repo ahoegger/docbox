@@ -150,7 +150,7 @@ public class DevDerbySqlService extends DerbySqlService {
   }
 
   protected void insertSequenceInitialValue(ISqlService sqlService) {
-    BEANS.get(SequenceTask.class).insertInitialValue(sqlService, 0);
+    BEANS.get(SequenceTask.class).insertInitialValue(sqlService, 2000);
 
   }
 
