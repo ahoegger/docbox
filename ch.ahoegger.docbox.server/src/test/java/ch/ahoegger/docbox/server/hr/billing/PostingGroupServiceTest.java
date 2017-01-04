@@ -70,6 +70,9 @@ public class PostingGroupServiceTest extends AbstractTestWithDatabase {
 
   @Test
   public void testDelete() {
+    DocumentFormData dfd = new DocumentFormData();
+    dfd.setDocumentId(documentId);
+    Assert.assertNotNull(BEANS.get(DocumentService.class).load(dfd));
     DocumentFormData docData = new DocumentFormData();
     docData.setDocumentId(documentId);
     docData = BEANS.get(DocumentService.class).load(docData);
@@ -86,5 +89,7 @@ public class PostingGroupServiceTest extends AbstractTestWithDatabase {
     Assert.assertEquals(0, BEANS.get(EntityService.class).getEntityTableData(sd).getRowCount());
     sd.setPostingGroupId(UnbilledCode.ID);
     Assert.assertEquals(2, BEANS.get(EntityService.class).getEntityTableData(sd).getRowCount());
+    Assert.assertNull(BEANS.get(DocumentService.class).load(dfd));
+
   }
 }

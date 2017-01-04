@@ -13,6 +13,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -329,11 +330,16 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
   @RemoteServiceAccessDenied
   public DocumentFormData loadTrusted(DocumentFormData formData) {
+    BooleanHolder exists = new BooleanHolder();
+
     StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE, CONVERSATION_NR, PARSE_OCR));
+    statementBuilder.append("SELECT TRUE, ").append(SqlFramentBuilder.columns(ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE, CONVERSATION_NR, PARSE_OCR));
     statementBuilder.append(" FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
-    statementBuilder.append(" INTO ").append(":abstract,  :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage, :conversation, :parseOcr");
-    SQL.selectInto(statementBuilder.toString(), formData);
+    statementBuilder.append(" INTO ").append(":exists, :abstract,  :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage, :conversation, :parseOcr");
+    SQL.selectInto(statementBuilder.toString(), formData, new NVPair("exists", exists));
+    if (exists.getValue() == null) {
+      return null;
+    }
 
     // partners
     for (BigDecimal partnerId : BEANS.get(DocumentPartnerService.class).getPartnerIds(formData.getDocumentId())) {
@@ -428,6 +434,12 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     DocumentFormData documentData = new DocumentFormData();
     documentData.setDocumentId(documentId);
     documentData = load(documentData);
+    if (documentData == null) {
+      return;
+    }
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
+    SQL.delete(statementBuilder.toString(), new NVPair("documentId", documentId));
 
     // document file
     BEANS.get(DocumentStoreService.class).delete(documentData.getDocumentPath());
