@@ -143,7 +143,7 @@
 				<textElement>
 					<font size="11"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{addressLine3}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{employerAddressLine3}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>

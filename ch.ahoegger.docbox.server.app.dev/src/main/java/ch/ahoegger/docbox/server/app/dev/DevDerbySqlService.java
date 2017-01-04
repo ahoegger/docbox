@@ -297,8 +297,8 @@ public class DevDerbySqlService extends DerbySqlService {
     LOG.info("SQL-DEV create rows for: {}", IEmployeeTable.TABLE_NAME);
 
     EmployeeTableTask employerTableTask = BEANS.get(EmployeeTableTask.class);
-    employerTableTask.createEmployerRow(sqlService, partnerId03_employee, "Hans", "Muster", "Mountainview 01", "CA-90501 Santa Barbara", "12.2568.2154.69", "PC 50-101-89-7", 26.50,
-        "Bart Simpson & Marth Simpson", "742 Evergreen Terrace", "Springfield", "bart@simpson.spring", "+1 (0)7510 2152");
+    employerTableTask.createEmployerRow(sqlService, partnerId03_employee, "Hans", "Muster", "Mountainview 01 e", "CA-90501 Santa Barbara e", "12.2568.2154.69", "PC 50-101-89-7", 26.50,
+        "Bart Simpson & Marth Simpson er", "742 Evergreen Terrace er", "Springfield er", "bart@simpson.spring", "+1 (0)7510 2152");
   }
 
   protected void insertPostingGroups(ISqlService sqlService) {

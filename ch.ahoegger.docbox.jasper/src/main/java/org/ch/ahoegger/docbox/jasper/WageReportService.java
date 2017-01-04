@@ -35,11 +35,13 @@ public class WageReportService {
 
   private Locale DE_CH = new Locale("de", "CH");
   private DateTimeFormatter m_dateFormatter;
+  private DateTimeFormatter m_dateFormatterLong;
   private NumberFormat m_formatFloat2FractionDigits;
 
   @PostConstruct
   protected void initFormatters() {
-    m_dateFormatter = DateTimeFormatter.ofPattern("dd.MMM.yyyy");
+    m_dateFormatter = DateTimeFormatter.ofPattern("dd. MMM. yyyy", DE_CH);
+    m_dateFormatterLong = DateTimeFormatter.ofPattern("dd. MMMM yyyy", DE_CH);
 
     m_formatFloat2FractionDigits = NumberFormat.getInstance(DE_CH);
     m_formatFloat2FractionDigits.setMaximumFractionDigits(2);
@@ -54,7 +56,7 @@ public class WageReportService {
     account.setAddressLine1(addressLine1);
     account.setAddressLine2(addressLine2);
     account.setAddressLine3(addressLine3);
-    account.setDate(date.format(m_dateFormatter));
+    account.setDate(date.format(m_dateFormatterLong));
     account.setWorkItems(wageCalculation.getWorkItems()
         .stream()
         .map(in -> {
