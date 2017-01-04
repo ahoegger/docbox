@@ -27,7 +27,7 @@ public class DatabaseUserCredentialVerifier implements ICredentialVerifier {
 
   @Override
   public int verify(final String username, final char[] password) throws IOException {
-    return ServerRunContexts.copyCurrent().withTransactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<Integer>() {
+    return ServerRunContexts.copyCurrent(true).withTransactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<Integer>() {
       @Override
       public Integer call() throws Exception {
         if (StringUtility.isNullOrEmpty(username)) {
