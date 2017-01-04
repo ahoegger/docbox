@@ -134,9 +134,9 @@ public class EntityService implements IEntityService, IEntityTable {
     statementBuilder.append(PARTNER_NR).append("= :partnerId, ");
     statementBuilder.append(POSTING_GROUP_NR).append("= :postingGroupId, ");
     statementBuilder.append(ENTITY_TYPE).append("= :entityType, ");
-    statementBuilder.append(HOURS).append("= :workHours ");
-    statementBuilder.append(AMOUNT).append("= :expenseAmount ");
-    statementBuilder.append(ENTITY_DATE).append("= :entityDate ");
+    statementBuilder.append(HOURS).append("= :workHours, ");
+    statementBuilder.append(AMOUNT).append("= :expenseAmount, ");
+    statementBuilder.append(ENTITY_DATE).append("= :entityDate, ");
     statementBuilder.append(DESCRIPTION).append("= :text ");
     statementBuilder.append(" WHERE ").append(ENTITY_NR).append(" = :entityId");
     SQL.update(statementBuilder.toString(), formData);

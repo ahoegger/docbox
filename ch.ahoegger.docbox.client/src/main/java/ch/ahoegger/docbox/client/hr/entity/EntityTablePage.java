@@ -147,7 +147,7 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
       @Override
       protected void execOwnerValueChanged(Object newOwnerValue) {
-        setVisible(ObjectUtility.equals(getEnityIdColumn(), UnbilledCode.ID));
+        setVisible(ObjectUtility.equals(getPostingGroupId(), UnbilledCode.ID));
       }
 
       @Override
@@ -173,7 +173,7 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
       @Override
       protected void execOwnerValueChanged(Object newOwnerValue) {
-        setVisible(ObjectUtility.notEquals(getEnityIdColumn(), UnbilledCode.ID));
+        setVisible(ObjectUtility.notEquals(getPostingGroupId(), UnbilledCode.ID));
       }
 
       @Override
