@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.shared.hr.billing;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
@@ -33,5 +35,16 @@ public interface IPostingGroupService extends IService {
    * @return
    */
   PostingCalculationBoxData calculateWage(PostingGroupFormData formData);
+
+  /**
+   * @param selectedValue
+   */
+  void delete(BigDecimal selectedValue);
+
+  /**
+   * @param formData
+   * @return
+   */
+  PostingGroupFormData load(PostingGroupFormData formData);
 
 }

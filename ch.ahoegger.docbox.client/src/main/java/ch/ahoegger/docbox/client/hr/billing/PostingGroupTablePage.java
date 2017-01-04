@@ -1,10 +1,9 @@
 package ch.ahoegger.docbox.client.hr.billing;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.dto.PageData;
@@ -17,8 +16,11 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -27,6 +29,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 import ch.ahoegger.docbox.client.AbstractDocboxPageWithTable;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
@@ -36,9 +39,7 @@ import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupService;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupCodeType.UnbilledCode;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupSearchFormData;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupTableData;
-import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
-import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
-import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
+import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 
 /**
  * <h3>{@link PostingGroupTablePage}</h3>
@@ -94,6 +95,10 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
 
   public BigDecimal getPartnerId() {
     return m_partnerId;
+  }
+
+  protected IDesktop getDesktop() {
+    return ClientRunContexts.copyCurrent().getDesktop();
   }
 
   public class Table extends AbstractTable {
@@ -266,7 +271,7 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
 
       @Override
       protected int getConfiguredWidth() {
-        return 100;
+        return 130;
       }
     }
 
@@ -339,16 +344,43 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
         BigDecimal postingGroupId = getIdColumn().getValue(getTable().getSelectedRow());
         PostingGroupForm form = new PostingGroupForm();
         form.getPartnerField().setValue(partnerId);
+        form.setPostingGroupId(postingGroupId);
         form.getPartnerField().setEnabled(false);
-        EntitySearchFormData searchFilter = new EntitySearchFormData();
-        searchFilter.setPostingGroupId(postingGroupId);
-        searchFilter.getPartnerId().setValue(partnerId);
-        EntityTablePageData entityTableData = BEANS.get(IEntityService.class).getEntityTableData(searchFilter);
-        Date fromDate = Arrays.stream(entityTableData.getRows()).map(row -> row.getDate()).min((d1, d2) -> d1.compareTo(d2)).get();
-        Date toDate = Arrays.stream(entityTableData.getRows()).map(row -> row.getDate()).max((d1, d2) -> d1.compareTo(d2)).get();
-        form.getEntityDateFromField().setValue(fromDate);
-        form.getEntityDateToField().setValue(toDate);
         form.startNew();
+      }
+    }
+
+    @Order(2000)
+    public class DeletePayslipMenu extends AbstractMenu {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("Delete");
+      }
+
+      @Override
+      protected boolean getConfiguredVisible() {
+        return ACCESS.check(new AdministratorPermission());
+      }
+
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+      }
+
+      @Override
+      protected void execOwnerValueChanged(Object newOwnerValue) {
+        setVisible(ObjectUtility.notEquals(getIdColumn().getValue(getTable().getSelectedRow()), UnbilledCode.ID));
+      }
+
+      @Override
+      protected void execAction() {
+        if (MessageBox.YES_OPTION == MessageBoxes.createYesNo()
+            .withHeader(TEXTS.get("Delete"))
+            .withBody(TEXTS.get("VerificationDelete", getNameColumn().getSelectedDisplayText())).show()) {
+          BEANS.get(IPostingGroupService.class).delete(getIdColumn().getSelectedValue());
+
+          getDesktop().dataChanged(IPostingGroupEntity.ENTITY_KEY);
+        }
       }
     }
 

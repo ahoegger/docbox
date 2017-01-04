@@ -51,6 +51,24 @@ public class PostingGroupFormData extends AbstractFormData {
     return getFieldByClass(Partner.class);
   }
 
+  /**
+   * access method for property PostingGroupId.
+   */
+  public BigDecimal getPostingGroupId() {
+    return getPostingGroupIdProperty().getValue();
+  }
+
+  /**
+   * access method for property PostingGroupId.
+   */
+  public void setPostingGroupId(BigDecimal postingGroupId) {
+    getPostingGroupIdProperty().setValue(postingGroupId);
+  }
+
+  public PostingGroupIdProperty getPostingGroupIdProperty() {
+    return getPropertyByClass(PostingGroupIdProperty.class);
+  }
+
   public Title getTitle() {
     return getFieldByClass(Title.class);
   }
@@ -80,6 +98,11 @@ public class PostingGroupFormData extends AbstractFormData {
   }
 
   public static class Partner extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class PostingGroupIdProperty extends AbstractPropertyData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

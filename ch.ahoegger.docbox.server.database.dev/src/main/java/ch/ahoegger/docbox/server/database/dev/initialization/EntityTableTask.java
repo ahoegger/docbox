@@ -31,7 +31,6 @@ public class EntityTableTask implements ITableTask, IEntityTable {
     statementBuilder.append(HOURS).append(" DECIMAL(4, 2), ");
     statementBuilder.append(AMOUNT).append(" DECIMAL(8, 2), ");
     statementBuilder.append(DESCRIPTION).append(" VARCHAR(").append(DESCRIPTION_LENGTH).append("), ");
-    statementBuilder.append(BILLED).append(" DATE, ");
     statementBuilder.append("PRIMARY KEY (").append(ENTITY_NR).append(")");
     statementBuilder.append(")");
     return statementBuilder.toString();
@@ -59,10 +58,10 @@ public class EntityTableTask implements ITableTask, IEntityTable {
     sqlService.insert(statementBuilder.toString());
   }
 
-  public void createEntityRow(ISqlService sqlService, BigDecimal entityId, BigDecimal partnerId, BigDecimal postingGroupId, BigDecimal entityType, Date entityDate, BigDecimal hours, BigDecimal amount, String desc, Date billed) {
+  public void createEntityRow(ISqlService sqlService, BigDecimal entityId, BigDecimal partnerId, BigDecimal postingGroupId, BigDecimal entityType, Date entityDate, BigDecimal hours, BigDecimal amount, String desc) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(SqlFramentBuilder.columns(ENTITY_NR, PARTNER_NR, POSTING_GROUP_NR, ENTITY_TYPE, ENTITY_DATE, HOURS, AMOUNT, DESCRIPTION, BILLED));
+    statementBuilder.append(SqlFramentBuilder.columns(ENTITY_NR, PARTNER_NR, POSTING_GROUP_NR, ENTITY_TYPE, ENTITY_DATE, HOURS, AMOUNT, DESCRIPTION));
     statementBuilder.append(") VALUES (");
     statementBuilder.append(":entityId, :partnerId, :postingGroupId, :entityType, :entityDate, :hours, :amount, :desc,  :billed");
     statementBuilder.append(")");
@@ -72,8 +71,7 @@ public class EntityTableTask implements ITableTask, IEntityTable {
         new NVPair("entityDate", entityDate),
         new NVPair("hours", hours),
         new NVPair("amount", amount),
-        new NVPair("desc", desc),
-        new NVPair("billed", billed));
+        new NVPair("desc", desc));
   }
 
 }

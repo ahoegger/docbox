@@ -36,5 +36,4 @@ public interface IEntityTable {
   public static BigDecimal AMOUNT_MIN = BigDecimal.valueOf(0d);
   public static BigDecimal AMOUNT_MAX = BigDecimal.valueOf(999999d);
 
-  public static String BILLED = "BILLED";
 }

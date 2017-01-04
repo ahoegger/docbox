@@ -111,7 +111,6 @@ public class WageReportService {
       parameters.put("subreportExpenses", jasperExpensesSubreport);
       JRBeanCollectionDataSource connection = new JRBeanCollectionDataSource(CollectionUtility.arrayList(account));
       JasperPrint print = JasperFillManager.fillReport(jasperBillReport, parameters, connection);
-      JasperExportManager.exportReportToPdfFile(print, "D:/test.pdf");
       return JasperExportManager.exportReportToPdf(print);
     }
     catch (JRException e) {

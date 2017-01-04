@@ -21,8 +21,7 @@ public class WageReportServiceTest {
     formatFloat2FractionDigits.setMaximumFractionDigits(2);
     formatFloat2FractionDigits.setMinimumFractionDigits(2);
     BigDecimal financeRound = BEANS.get(WageReportService.class).financeRound(BigDecimal.valueOf(175.67), BigDecimal.valueOf(0.05), RoundingMode.UP);
-    System.out.println(financeRound);
-    System.out.println(formatFloat2FractionDigits.format(financeRound));
+
   }
 
 }

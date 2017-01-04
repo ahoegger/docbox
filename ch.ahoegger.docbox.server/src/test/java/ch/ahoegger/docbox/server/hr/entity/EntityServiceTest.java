@@ -41,9 +41,9 @@ public class EntityServiceTest extends AbstractTestWithDatabase {
         BigDecimal.valueOf(-10.0),
         BigDecimal.valueOf(-4.5), BigDecimal.valueOf(5.30));
 
-    BEANS.get(EntityTableTask.class).createEntityRow(sqlService, entityId01, partnerId01, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.today(), BigDecimal.valueOf(3.25), null, "Work01", null);
+    BEANS.get(EntityTableTask.class).createEntityRow(sqlService, entityId01, partnerId01, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.today(), BigDecimal.valueOf(3.25), null, "Work01");
 
-    BEANS.get(EntityTableTask.class).createEntityRow(sqlService, entityId02, partnerId01, null, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.today(), BigDecimal.valueOf(3.25), null, "Work01", null);
+    BEANS.get(EntityTableTask.class).createEntityRow(sqlService, entityId02, partnerId01, null, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.today(), BigDecimal.valueOf(3.25), null, "Work01");
   }
 
   @Test

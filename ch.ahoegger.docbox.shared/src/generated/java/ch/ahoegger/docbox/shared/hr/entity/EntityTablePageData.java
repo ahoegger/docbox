@@ -56,20 +56,20 @@ public class EntityTablePageData extends AbstractTablePageData {
     private static final long serialVersionUID = 1L;
     public static final String enityId = "enityId";
     public static final String partnerId = "partnerId";
+    public static final String postingGroupId = "postingGroupId";
     public static final String date = "date";
     public static final String entityType = "entityType";
     public static final String hours = "hours";
     public static final String amount = "amount";
     public static final String text = "text";
-    public static final String billed = "billed";
     private BigDecimal m_enityId;
     private BigDecimal m_partnerId;
+    private BigDecimal m_postingGroupId;
     private Date m_date;
     private BigDecimal m_entityType;
     private BigDecimal m_hours;
     private BigDecimal m_amount;
     private String m_text;
-    private Date m_billed;
 
     public BigDecimal getEnityId() {
       return m_enityId;
@@ -85,6 +85,14 @@ public class EntityTablePageData extends AbstractTablePageData {
 
     public void setPartnerId(BigDecimal newPartnerId) {
       m_partnerId = newPartnerId;
+    }
+
+    public BigDecimal getPostingGroupId() {
+      return m_postingGroupId;
+    }
+
+    public void setPostingGroupId(BigDecimal newPostingGroupId) {
+      m_postingGroupId = newPostingGroupId;
     }
 
     public Date getDate() {
@@ -125,14 +133,6 @@ public class EntityTablePageData extends AbstractTablePageData {
 
     public void setText(String newText) {
       m_text = newText;
-    }
-
-    public Date getBilled() {
-      return m_billed;
-    }
-
-    public void setBilled(Date newBilled) {
-      m_billed = newBilled;
     }
   }
 }

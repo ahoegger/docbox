@@ -186,6 +186,7 @@ public class AbstractPostingCalculationBox extends AbstractGroupBox {
     }
 
     public class Table extends AbstractEntityTable {
+
     }
   }
 

@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -418,5 +419,32 @@ public class DocumentService implements IDocumentService, IDocumentTable {
       service.delete(id);
     }
 
+  }
+
+  public void delete(BigDecimal documentId) {
+    if (!ACCESS.check(new AdministratorPermission())) {
+      throw new VetoException("Access denied");
+    }
+    DocumentFormData documentData = new DocumentFormData();
+    documentData.setDocumentId(documentId);
+    documentData = load(documentData);
+
+    // document file
+    BEANS.get(DocumentStoreService.class).delete(documentData.getDocumentPath());
+
+    // partner
+    BEANS.get(DocumentPartnerService.class).deleteByDocumentId(documentData.getDocumentId());
+
+    // categories
+    BEANS.get(DocumentCategoryService.class).deleteByDocumentId(documentData.getDocumentId());
+
+    // permissions
+    BEANS.get(DocumentPermissionService.class).deleteDocumentPermissions(documentData.getDocumentId());
+
+    // ocr
+    deletePasedConent(CollectionUtility.arrayList(documentData.getDocumentId()));
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
   }
 }

@@ -9,6 +9,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
+import org.junit.Assert;
 import org.junit.Test;
 
 import ch.ahoegger.docbox.server.database.dev.initialization.CategoryTableTask;
@@ -16,6 +17,7 @@ import ch.ahoegger.docbox.server.database.dev.initialization.ConversationTableTa
 import ch.ahoegger.docbox.server.database.dev.initialization.DocumentTableTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.PartnerTableTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.UserTableTask;
+import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
@@ -100,6 +102,7 @@ public class DocumentServiceTest extends AbstractTestWithDatabase {
     fd2.setDocumentId(fd1.getDocumentId());
     fd2 = service.load(fd2);
 
+    Assert.assertTrue(BEANS.get(DocumentStoreService.class).get(fd1.getDocumentPath()).getContentLength() > 0);
     DocboxAssert.assertEquals(fd1, fd2);
   }
 

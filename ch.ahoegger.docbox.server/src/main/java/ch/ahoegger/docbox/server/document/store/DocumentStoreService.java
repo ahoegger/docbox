@@ -12,6 +12,7 @@ import java.util.Date;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
@@ -31,6 +32,7 @@ import ch.ahoegger.docbox.server.backup.internal.ZipFile;
 import ch.ahoegger.docbox.server.document.DocumentService;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
+import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
 
 /**
@@ -87,16 +89,44 @@ public class DocumentStoreService implements IDocumentStoreService {
         throw new ProcessingException(new ProcessingStatus("document['" + file.getAbsolutePath() + "'] already exists serverside!", Status.ERROR));
       }
       else {
+        FileOutputStream out = null;
         try {
           file.getParentFile().mkdirs();
           file.createNewFile();
-          IOUtility.writeBytes(new FileOutputStream(file), resource.getContent());
+          out = new FileOutputStream(file);
+          IOUtility.writeBytes(out, resource.getContent());
           return pathBuilder.toString();
         }
         catch (IOException e) {
           throw new ProcessingException(new ProcessingStatus("could not write document serverside!", e, 0, Status.ERROR));
         }
+        finally {
+          if (out != null) {
+            try {
+              out.close();
+            }
+            catch (IOException e) {
+              BEANS.get(ExceptionHandler.class).handle(e);
+            }
+          }
+        }
       }
+    }
+  }
+
+  @RemoteServiceAccessDenied
+  public boolean delete(String path) {
+    // permissioncheck
+    if (!ACCESS.check(new AdministratorPermission())) {
+      throw new VetoException("Access denied");
+    }
+
+    synchronized (IO_LOCK) {
+      File file = new File(getDocumentStoreDirectory(), path);
+      if (file.exists()) {
+        return file.delete();
+      }
+      return false;
     }
   }
 
@@ -104,6 +134,14 @@ public class DocumentStoreService implements IDocumentStoreService {
   public void backup(ZipFile zipFile) throws PlatformException, IOException {
     synchronized (IO_LOCK) {
       zipFile.addFile(Paths.get(CONFIG.getPropertyValue(DocumentStoreLocationProperty.class)).toFile());
+    }
+  }
+
+  @RemoteServiceAccessDenied
+  public boolean exists(String path) {
+    synchronized (IO_LOCK) {
+      File f = new File(getDocumentStoreDirectory(), path);
+      return f.exists();
     }
   }
 

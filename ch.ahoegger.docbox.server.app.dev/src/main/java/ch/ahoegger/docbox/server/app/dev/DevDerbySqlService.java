@@ -327,11 +327,11 @@ public class DevDerbySqlService extends DerbySqlService {
     entityId04 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
 
     EntityTableTask entityTableTask = BEANS.get(EntityTableTask.class);
-    entityTableTask.createEntityRow(sqlService, entityId01, partnerId03_employee, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 9, 04)), BigDecimal.valueOf(3.5), null, "Sept work 1", null);
-    entityTableTask.createEntityRow(sqlService, entityId02, partnerId03_employee, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 9, 11)), BigDecimal.valueOf(4.25), null, "Sept work 2", null);
-    entityTableTask.createEntityRow(sqlService, entityId03, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(10)), BigDecimal.valueOf(5.5), null, "First work", null);
-    entityTableTask.createEntityRow(sqlService, entityId04, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(1)), BigDecimal.valueOf(2.25), null, "Second work", null);
-    for (int i = 0; i < 50; i++) {
+    entityTableTask.createEntityRow(sqlService, entityId01, partnerId03_employee, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 9, 04)), BigDecimal.valueOf(3.5), null, "Sept work 1");
+    entityTableTask.createEntityRow(sqlService, entityId02, partnerId03_employee, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 9, 11)), BigDecimal.valueOf(4.25), null, "Sept work 2");
+    entityTableTask.createEntityRow(sqlService, entityId03, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(10)), BigDecimal.valueOf(5.5), null, "First work");
+    entityTableTask.createEntityRow(sqlService, entityId04, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(1)), BigDecimal.valueOf(2.25), null, "Second work");
+    for (int i = 0; i < 5; i++) {
       createEntity(sqlService, i);
     }
   }
@@ -341,7 +341,7 @@ public class DevDerbySqlService extends DerbySqlService {
 
     EntityTableTask entityTableTask = BEANS.get(EntityTableTask.class);
     entityTableTask.createEntityRow(sqlService, entityId, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID,
-        LocalDateUtility.toDate(LocalDate.of(2016, 12, 04).plusDays(counter)), BigDecimal.valueOf(2.5), null, "Dez work " + counter, null);
+        LocalDateUtility.toDate(LocalDate.of(2016, 12, 04).plusDays(counter)), BigDecimal.valueOf(2.5), null, "Dez work " + counter);
   }
 
 }

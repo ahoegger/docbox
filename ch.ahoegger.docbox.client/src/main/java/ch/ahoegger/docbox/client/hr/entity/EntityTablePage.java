@@ -17,6 +17,8 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 import ch.ahoegger.docbox.client.AbstractDocboxPageWithTable;
 import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table;
+import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table.NewExpenseMenu;
+import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table.NewWorkMenu;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupCodeType.UnbilledCode;
 import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
@@ -75,19 +77,27 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
   public void setPostingGroupId(BigDecimal postingGroupId) {
     m_postingGroupId = postingGroupId;
+    getTable().getMenuByClass(NewWorkMenu.class).setVisible(ObjectUtility.equals(UnbilledCode.ID, m_postingGroupId));
+    getTable().getMenuByClass(NewExpenseMenu.class).setVisible(ObjectUtility.equals(UnbilledCode.ID, m_postingGroupId));
   }
 
   public BigDecimal getPostingGroupId() {
+
     return m_postingGroupId;
   }
 
   public class Table extends AbstractEntityTable {
 
     @Order(1000)
-    public class NewMenu extends AbstractMenu {
+    public class NewWorkMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
         return TEXTS.get("NewWork");
+      }
+
+      @Override
+      protected boolean getConfiguredVisible() {
+        return false;
       }
 
       @Override
@@ -108,6 +118,11 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
       @Override
       protected String getConfiguredText() {
         return TEXTS.get("NewExpense");
+      }
+
+      @Override
+      protected boolean getConfiguredVisible() {
+        return false;
       }
 
       @Override

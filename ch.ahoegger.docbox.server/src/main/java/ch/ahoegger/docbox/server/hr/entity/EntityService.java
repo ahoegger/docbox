@@ -32,7 +32,7 @@ public class EntityService implements IEntityService, IEntityTable {
   public EntityTablePageData getEntityTableData(EntitySearchFormData formData) {
     List<Object> binds = new ArrayList<>();
     StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, ENTITY_NR, PARTNER_NR, ENTITY_TYPE, ENTITY_DATE, HOURS, AMOUNT, BILLED, DESCRIPTION))
+    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, ENTITY_NR, PARTNER_NR, POSTING_GROUP_NR, ENTITY_TYPE, ENTITY_DATE, HOURS, AMOUNT, DESCRIPTION))
         .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS).append(" ")
         .append(SqlFramentBuilder.WHERE_DEFAULT);
 
@@ -61,18 +61,6 @@ public class EntityService implements IEntityService, IEntityTable {
       statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, ENTITY_DATE)).append(" <= ").append(":entityDateTo");
     }
 
-    if (formData.getBilledBox().getValue() != null) {
-      switch (formData.getBilledBox().getValue()) {
-        case TRUE:
-          statementBuilder.append(" AND (").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, BILLED)).append(" <= ").append("CURRENT_DATE")
-              .append(" OR ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, BILLED)).append(" IS NULL)");
-          break;
-        case FALSE:
-          statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, BILLED)).append(" IS NULL ");
-          break;
-      }
-    }
-
     if (CollectionUtility.hasElements(formData.getEntityIds())) {
       statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, ENTITY_NR)).append(" IN (")
           .append(
@@ -87,11 +75,11 @@ public class EntityService implements IEntityService, IEntityTable {
     statementBuilder.append(" INTO ")
         .append(":{td.").append(EntityTableRowData.enityId).append("}, ")
         .append(":{td.").append(EntityTableRowData.partnerId).append("}, ")
+        .append(":{td.").append(EntityTableRowData.postingGroupId).append("}, ")
         .append(":{td.").append(EntityTableRowData.entityType).append("}, ")
         .append(":{td.").append(EntityTableRowData.date).append("}, ")
         .append(":{td.").append(EntityTableRowData.hours).append("}, ")
         .append(":{td.").append(EntityTableRowData.amount).append("}, ")
-        .append(":{td.").append(EntityTableRowData.billed).append("}, ")
         .append(":{td.").append(EntityTableRowData.text).append("} ");
 
     EntityTablePageData tableData = new EntityTablePageData();
@@ -163,7 +151,10 @@ public class EntityService implements IEntityService, IEntityTable {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("UPDATE ").append(TABLE_NAME).append(" SET ")
         .append(POSTING_GROUP_NR).append("= :groupId ")
-        .append(" WHERE ").append(SqlFramentBuilder.whereIn(ENTITY_NR, entityIds));
+        .append(SqlFramentBuilder.WHERE_DEFAULT);
+    if (CollectionUtility.hasElements(entityIds)) {
+      statementBuilder.append(" AND ").append(SqlFramentBuilder.whereIn(ENTITY_NR, entityIds));
+    }
     SQL.update(statementBuilder.toString(), new NVPair("groupId", groupId));
 
     // notify backup needed

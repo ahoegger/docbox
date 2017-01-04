@@ -118,10 +118,14 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
     if (today.getDayOfMonth() < 20) {
       formData.getTitle().setValue(today.minusMonths(1).format(monthFormatter));
       formData.getDocumentAbstract().setValue(TEXTS.get("PayslipTitle", today.minusMonths(1).format(monthFormatter)));
+      formData.getFrom().setValue(LocalDateUtility.toDate(today.minusMonths(1).withDayOfMonth(1)));
+      formData.getTo().setValue(LocalDateUtility.toDate(today.minusMonths(1).withDayOfMonth(today.minusMonths(1).lengthOfMonth())));
     }
     else {
       formData.getTitle().setValue(today.format(monthFormatter));
       formData.getDocumentAbstract().setValue(TEXTS.get("PayslipTitle", today.format(monthFormatter)));
+      formData.getFrom().setValue(LocalDateUtility.toDate(today.withDayOfMonth(1)));
+      formData.getTo().setValue(LocalDateUtility.toDate(today.withDayOfMonth(today.lengthOfMonth())));
     }
     return formData;
   }
@@ -156,12 +160,13 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
 
     // create posting group
     BigDecimal postingGroupId = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    formData.setPostingGroupId(postingGroupId);
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME);
     statementBuilder.append(" (").append(SqlFramentBuilder.columns(POSTING_GROUP_NR, PARTNER_NR, DOCUMENT_NR, NAME, STATEMENT_DATE, WORKING_HOURS, BRUTTO_WAGE, NETTO_WAGE, SOURCE_TAX, SOCIAL_SECURITY_TAX, VACATION_EXTRA)).append(")");
     statementBuilder.append(" VALUES (:postingGroupId, :partner, :documentId, :title, :date, :hoursTotal, :bruttoWage, :nettoWage, :sourceTax, :socialSecuityTax, :vacationExtra)");
     SQL.insert(statementBuilder.toString(),
-        new NVPair("postingGroupId", postingGroupId),
+//        new NVPair("postingGroupId", postingGroupId),
         formData, wageData);
 
     // update entities
@@ -185,7 +190,7 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
     List<EntitiesRowData> entityRows = unbilledEntities.stream().map(row -> {
       EntitiesRowData rd = new EntitiesRowData();
       rd.setAmount(row.getAmount());
-      rd.setBilled(row.getBilled());
+      rd.setPostingGroupId(row.getPostingGroupId());
       rd.setDate(row.getDate());
       rd.setEnityId(row.getEnityId());
       rd.setEntityType(row.getEntityType());
@@ -203,6 +208,42 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
     result.getVacationExtra().setValue(wageCalc.getVacationExtra());
 
     return result;
+  }
+
+  @Override
+  public PostingGroupFormData load(PostingGroupFormData formData) {
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(POSTING_GROUP_NR, PARTNER_NR, DOCUMENT_NR, NAME, STATEMENT_DATE));
+    statementBuilder.append(" FROM ").append(TABLE_NAME);
+    statementBuilder.append(" WHERE ").append(POSTING_GROUP_NR).append(" = :postingGroupId");
+    statementBuilder.append(" INTO :postingGroupId, :partner, :documentId, :title, :date");
+    SQL.selectInto(statementBuilder.toString(), formData);
+    return formData;
+
+  }
+
+  @Override
+  public void delete(BigDecimal postingGroupId) {
+    PostingGroupFormData postingGroupData = new PostingGroupFormData();
+    postingGroupData.setPostingGroupId(postingGroupId);
+    postingGroupData = load(postingGroupData);
+    BEANS.get(DocumentService.class).delete(postingGroupData.getDocumentId());
+
+    // update entities
+    EntitySearchFormData entitySearchData = new EntitySearchFormData();
+    entitySearchData.getPartnerId().setValue(postingGroupData.getPartner().getValue());
+    entitySearchData.setPostingGroupId(postingGroupId);
+    EntityTablePageData entityTableData = BEANS.get(IEntityService.class).getEntityTableData(entitySearchData);
+
+    BEANS.get(EntityService.class).updateGroupId(CollectionUtility.arrayList(entityTableData.getRows()).stream().map(e -> e.getEnityId()).collect(Collectors.toSet()), UnbilledCode.ID);
+
+    StringBuilder statementBuilder = new StringBuilder();
+    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(POSTING_GROUP_NR).append(" = :postingGroupId");
+    SQL.delete(statementBuilder.toString(), new NVPair("postingGroupId", postingGroupId));
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+
   }
 
   protected List<EntityTableRowData> getUnbilledEntities(Date from, Date to, BigDecimal partnerId) {
@@ -226,7 +267,7 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
     BigDecimal hoursWorked = workItems.stream()
         .map(workItem -> workItem.getHours())
         .reduce((h1, h2) -> h1.add(h2))
-        .get()
+        .orElse(BigDecimal.ZERO)
         .setScale(2, RoundingMode.HALF_UP);
 
     BigDecimal expensesTotal = expenses.stream()

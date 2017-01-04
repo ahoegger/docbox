@@ -25,10 +25,6 @@ public abstract class AbstractEntityTable extends AbstractTable {
     return getColumnSet().getColumnByClass(DateColumn.class);
   }
 
-  public BilledColumn getBilledColumn() {
-    return getColumnSet().getColumnByClass(BilledColumn.class);
-  }
-
   public AmountColumn getAmountColumn() {
     return getColumnSet().getColumnByClass(AmountColumn.class);
   }
@@ -39,6 +35,10 @@ public abstract class AbstractEntityTable extends AbstractTable {
 
   public TextColumn getTextColumn() {
     return getColumnSet().getColumnByClass(TextColumn.class);
+  }
+
+  public PostingGroupIdColumn getPostingGroupIdColumn() {
+    return getColumnSet().getColumnByClass(PostingGroupIdColumn.class);
   }
 
   public PartnerIdColumn getPartnerIdColumn() {
@@ -70,6 +70,14 @@ public abstract class AbstractEntityTable extends AbstractTable {
     }
   }
 
+  @Order(1750)
+  public class PostingGroupIdColumn extends AbstractBigDecimalColumn {
+    @Override
+    protected boolean getConfiguredDisplayable() {
+      return false;
+    }
+  }
+
   @Order(2000)
   public class DateColumn extends AbstractDateColumn {
     @Override
@@ -80,11 +88,6 @@ public abstract class AbstractEntityTable extends AbstractTable {
     @Override
     public int getSortIndex() {
       return 1;
-    }
-
-    @Override
-    protected boolean getConfiguredSortAscending() {
-      return false;
     }
 
     @Override
@@ -107,7 +110,7 @@ public abstract class AbstractEntityTable extends AbstractTable {
 
     @Override
     protected int getConfiguredWidth() {
-      return 150;
+      return 120;
     }
   }
 
@@ -171,16 +174,4 @@ public abstract class AbstractEntityTable extends AbstractTable {
     }
   }
 
-  @Order(4000)
-  public class BilledColumn extends AbstractDateColumn {
-    @Override
-    protected String getConfiguredHeaderText() {
-      return TEXTS.get("Billed");
-    }
-
-    @Override
-    protected int getConfiguredWidth() {
-      return 120;
-    }
-  }
 }
