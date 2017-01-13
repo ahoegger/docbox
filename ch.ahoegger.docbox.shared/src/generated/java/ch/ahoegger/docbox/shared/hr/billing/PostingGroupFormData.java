@@ -69,6 +69,10 @@ public class PostingGroupFormData extends AbstractFormData {
     return getPropertyByClass(PostingGroupIdProperty.class);
   }
 
+  public TaxGroup getTaxGroup() {
+    return getFieldByClass(TaxGroup.class);
+  }
+
   public Title getTitle() {
     return getFieldByClass(Title.class);
   }
@@ -103,6 +107,11 @@ public class PostingGroupFormData extends AbstractFormData {
   }
 
   public static class PostingGroupIdProperty extends AbstractPropertyData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class TaxGroup extends AbstractValueFieldData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

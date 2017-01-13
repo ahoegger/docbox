@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.PostingGroup;
-import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.jooq.Query;
 import org.jooq.SQLDialect;
@@ -13,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.or.generator.table.PostingGroupTableStatement;
-import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
  * <h3>{@link PostingGroupTableTask}</h3>
@@ -40,28 +38,30 @@ public class PostingGroupTableTask extends PostingGroupTableStatement implements
   @Override
   public void dropTable(ISqlService sqlService) {
     LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DROP TABLE ").append(TABLE_NAME);
-    sqlService.insert(statementBuilder.toString());
+    PostingGroup t = PostingGroup.POSTING_GROUP;
+    Query query = DSL.using(sqlService.getConnection(), SQLDialect.DERBY).dropTable(t);
+    query.execute();
   }
 
-  public void createRow(ISqlService sqlService, BigDecimal postingGroupId, BigDecimal partnerId, BigDecimal documentId, String name, Date statementDate, BigDecimal workingHours, BigDecimal bruttoWage, BigDecimal nettoWage,
-      BigDecimal sourceTax,
-      BigDecimal socialSecurityTax,
-      BigDecimal vacationExtra) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(SqlFramentBuilder.columns(POSTING_GROUP_NR, PARTNER_NR, DOCUMENT_NR, NAME, STATEMENT_DATE, WORKING_HOURS, BRUTTO_WAGE, NETTO_WAGE, SOURCE_TAX, SOCIAL_SECURITY_TAX, VACATION_EXTRA));
-    statementBuilder.append(") VALUES (");
-    statementBuilder.append(":postingGroupId, :partnerId, :documentId, :name, :statementDate, :workingHours, :bruttoWage, :nettoWage, :sourceTax, :socialSecurityTax, :vacationExtra");
-    statementBuilder.append(")");
-    sqlService.insert(statementBuilder.toString(), new NVPair("postingGroupId", postingGroupId), new NVPair("partnerId", partnerId), new NVPair("documentId", documentId), new NVPair("name", name), new NVPair("statementDate", statementDate),
-        new NVPair("workingHours", workingHours),
-        new NVPair("bruttoWage", bruttoWage),
-        new NVPair("nettoWage", nettoWage),
-        new NVPair("sourceTax", sourceTax),
-        new NVPair("socialSecurityTax", socialSecurityTax),
-        new NVPair("vacationExtra", vacationExtra));
+  public void createRow(ISqlService sqlService, BigDecimal postingGroupId, BigDecimal partnerId, BigDecimal taxGroupId, BigDecimal documentId, String name,
+      Date statementDate, BigDecimal workingHours, BigDecimal bruttoWage, BigDecimal nettoWage, BigDecimal sourceTax, BigDecimal socialSecurityTax, BigDecimal vacationExtra) {
+
+    PostingGroup t = PostingGroup.POSTING_GROUP;
+    DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+        .newRecord(t)
+        .with(t.BRUTTO_WAGE, bruttoWage)
+        .with(t.DOCUMENT_NR, documentId)
+        .with(t.NAME, name)
+        .with(t.NETTO_WAGE, nettoWage)
+        .with(t.PARTNER_NR, partnerId)
+        .with(t.POSTING_GROUP_NR, postingGroupId)
+        .with(t.SOCIAL_SECURITY_TAX, socialSecurityTax)
+        .with(t.SOURCE_TAX, sourceTax)
+        .with(t.STATEMENT_DATE, statementDate)
+        .with(t.TAX_GROUP_NR, taxGroupId)
+        .with(t.VACATION_EXTRA, vacationExtra)
+        .with(t.WORKING_HOURS, workingHours)
+        .insert();
   }
 
 }

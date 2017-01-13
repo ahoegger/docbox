@@ -14,12 +14,14 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 import ch.ahoegger.docbox.client.document.AbstractDocumentLinkField;
 import ch.ahoegger.docbox.client.document.IDocumentEntity;
@@ -41,6 +43,8 @@ import ch.ahoegger.docbox.or.definition.table.IPostingGroupTable;
 import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupService;
 import ch.ahoegger.docbox.shared.hr.billing.PostingCalculationBoxData;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupFormData;
+import ch.ahoegger.docbox.shared.hr.tax.TaxGroupLookupCall;
+import ch.ahoegger.docbox.client.hr.billing.PostingGroupForm.MainBox.TaxGroupField;
 
 @FormData(value = PostingGroupFormData.class, sdkCommand = FormData.SdkCommand.CREATE)
 public class PostingGroupForm extends AbstractForm {
@@ -158,6 +162,10 @@ public class PostingGroupForm extends AbstractForm {
     return getFieldByClass(DocumentAbstractField.class);
   }
 
+  public TaxGroupField getTaxGroupField() {
+    return getFieldByClass(TaxGroupField.class);
+  }
+
   public OkButton getOkButton() {
     return getFieldByClass(OkButton.class);
   }
@@ -193,6 +201,19 @@ public class PostingGroupForm extends AbstractForm {
       @Override
       protected String getConfiguredLabel() {
         return TEXTS.get("Date");
+      }
+    }
+
+    @Order(4250)
+    public class TaxGroupField extends AbstractSmartField<BigDecimal> {
+      @Override
+      protected String getConfiguredLabel() {
+        return TEXTS.get("TaxGroup");
+      }
+
+      @Override
+      protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
+        return TaxGroupLookupCall.class;
       }
     }
 

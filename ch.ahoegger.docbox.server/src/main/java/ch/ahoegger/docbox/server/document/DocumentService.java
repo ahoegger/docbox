@@ -188,7 +188,6 @@ public class DocumentService implements IDocumentService {
                                 .and(docPerCheck.USERNAME.eq(username))
                                 .and(docPerCheck.PERMISSION.ge(PermissionCodeType.ReadCode.ID)))));
 
-    System.out.println("QQQ: " + query.toString());
     DocumentTableData tableData = new DocumentTableData();
 
     tableData.setRows(

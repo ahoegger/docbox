@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -30,6 +31,7 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 import ch.ahoegger.docbox.client.AbstractDocboxPageWithTable;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
@@ -39,6 +41,8 @@ import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupService;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupCodeType.UnbilledCode;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupSearchFormData;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupTableData;
+import ch.ahoegger.docbox.shared.hr.tax.TaxGroupLookupCall;
+import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
 import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 
 /**
@@ -50,6 +54,7 @@ import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGroupTablePage.Table> {
 
   private BigDecimal m_partnerId;
+  private BigDecimal m_taxGroupId;
 
   @Override
   protected String getConfiguredTitle() {
@@ -87,6 +92,7 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
   protected void execInitSearchForm() {
     super.execInitSearchForm();
     getSearchFormInternal().setPartnerId(getPartnerId());
+    getSearchFormInternal().setTaxGroupId(getTaxGroupId());
   }
 
   public void setPartnerId(BigDecimal partnerId) {
@@ -95,6 +101,14 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
 
   public BigDecimal getPartnerId() {
     return m_partnerId;
+  }
+
+  public void setTaxGroupId(BigDecimal taxGroupId) {
+    m_taxGroupId = taxGroupId;
+  }
+
+  public BigDecimal getTaxGroupId() {
+    return m_taxGroupId;
   }
 
   protected IDesktop getDesktop() {
@@ -140,6 +154,14 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
       return getColumnSet().getColumnByClass(DocumentIdColumn.class);
     }
 
+    public WorkingHoursColumn getWorkingHoursColumn() {
+      return getColumnSet().getColumnByClass(WorkingHoursColumn.class);
+    }
+
+    public TaxGroupColumn getTaxGroupColumn() {
+      return getColumnSet().getColumnByClass(TaxGroupColumn.class);
+    }
+
     public NameColumn getNameColumn() {
       return getColumnSet().getColumnByClass(NameColumn.class);
     }
@@ -169,23 +191,6 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
     @Order(2000)
     public class IdColumn extends AbstractBigDecimalColumn {
 
-      @Override
-      protected boolean getConfiguredDisplayable() {
-        return false;
-      }
-    }
-
-    @Order(2500)
-    public class PartnerIdColumn extends AbstractBigDecimalColumn {
-      @Override
-      protected boolean getConfiguredDisplayable() {
-        return false;
-      }
-
-    }
-
-    @Order(2750)
-    public class DocumentIdColumn extends AbstractBigDecimalColumn {
       @Override
       protected boolean getConfiguredDisplayable() {
         return false;
@@ -224,10 +229,10 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
     }
 
     @Order(5000)
-    public class BruttoWageColumn extends AbstractBigDecimalColumn {
+    public class WorkingHoursColumn extends AbstractBigDecimalColumn {
       @Override
       protected String getConfiguredHeaderText() {
-        return TEXTS.get("BruttoWage");
+        return TEXTS.get("Hours");
       }
 
       @Override
@@ -237,10 +242,10 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
     }
 
     @Order(6000)
-    public class NettoWageColumn extends AbstractBigDecimalColumn {
+    public class BruttoWageColumn extends AbstractBigDecimalColumn {
       @Override
       protected String getConfiguredHeaderText() {
-        return TEXTS.get("NettoWage");
+        return TEXTS.get("BruttoWage");
       }
 
       @Override
@@ -289,6 +294,64 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
     }
 
     @Order(10000)
+    public class NettoWageColumn extends AbstractBigDecimalColumn {
+      @Override
+      protected String getConfiguredHeaderText() {
+        return TEXTS.get("NettoWage");
+      }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 100;
+      }
+    }
+
+    @Order(11000)
+    public class TaxGroupColumn extends AbstractSmartColumn<BigDecimal> {
+      @Override
+      protected String getConfiguredHeaderText() {
+        return TEXTS.get("TaxGroup");
+      }
+
+      @Override
+      protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
+        return TaxGroupLookupCall.class;
+      }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 140;
+      }
+    }
+
+    @Order(12000)
+    public class PartnerIdColumn extends AbstractSmartColumn<BigDecimal> {
+
+      @Override
+      protected String getConfiguredHeaderText() {
+        return TEXTS.get("Partner");
+      }
+
+      @Override
+      protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
+        return PartnerLookupCall.class;
+      }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 150;
+      }
+    }
+
+    @Order(13000)
+    public class DocumentIdColumn extends AbstractBigDecimalColumn {
+      @Override
+      protected boolean getConfiguredDisplayable() {
+        return false;
+      }
+    }
+
+    @Order(14000)
     @FormData(sdkCommand = SdkCommand.IGNORE)
     public class DocumentLinkColumn extends AbstractStringColumn {
 
@@ -321,7 +384,7 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
       }
     }
 
-    @Order(1000)
+    @Order(50000)
     public class NewPayslipMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -350,7 +413,7 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
       }
     }
 
-    @Order(2000)
+    @Order(51000)
     public class DeletePayslipMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {

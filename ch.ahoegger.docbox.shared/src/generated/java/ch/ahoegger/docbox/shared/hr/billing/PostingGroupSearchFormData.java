@@ -17,6 +17,24 @@ public class PostingGroupSearchFormData extends AbstractFormData {
   private static final long serialVersionUID = 1L;
 
   /**
+   * access method for property IncludeUnbilled.
+   */
+  public Boolean getIncludeUnbilled() {
+    return getIncludeUnbilledProperty().getValue();
+  }
+
+  /**
+   * access method for property IncludeUnbilled.
+   */
+  public void setIncludeUnbilled(Boolean includeUnbilled) {
+    getIncludeUnbilledProperty().setValue(includeUnbilled);
+  }
+
+  public IncludeUnbilledProperty getIncludeUnbilledProperty() {
+    return getPropertyByClass(IncludeUnbilledProperty.class);
+  }
+
+  /**
    * access method for property PartnerId.
    */
   public BigDecimal getPartnerId() {
@@ -34,7 +52,35 @@ public class PostingGroupSearchFormData extends AbstractFormData {
     return getPropertyByClass(PartnerIdProperty.class);
   }
 
+  /**
+   * access method for property TaxGroupId.
+   */
+  public BigDecimal getTaxGroupId() {
+    return getTaxGroupIdProperty().getValue();
+  }
+
+  /**
+   * access method for property TaxGroupId.
+   */
+  public void setTaxGroupId(BigDecimal taxGroupId) {
+    getTaxGroupIdProperty().setValue(taxGroupId);
+  }
+
+  public TaxGroupIdProperty getTaxGroupIdProperty() {
+    return getPropertyByClass(TaxGroupIdProperty.class);
+  }
+
+  public static class IncludeUnbilledProperty extends AbstractPropertyData<Boolean> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
   public static class PartnerIdProperty extends AbstractPropertyData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class TaxGroupIdProperty extends AbstractPropertyData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

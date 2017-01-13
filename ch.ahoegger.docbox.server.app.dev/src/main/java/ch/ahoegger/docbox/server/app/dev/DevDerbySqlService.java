@@ -313,11 +313,11 @@ public class DevDerbySqlService extends DerbySqlService {
     postingGroupId02 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
 
     PostingGroupTableTask postingGroupTableTask = BEANS.get(PostingGroupTableTask.class);
-    postingGroupTableTask.createRow(sqlService, postingGroupId01, partnerId03_employee, documentId02, "September 2016", LocalDateUtility.toDate(LocalDate.of(2016, 10, 02)), BigDecimal.valueOf(9.25), BigDecimal.valueOf(256.5),
+    postingGroupTableTask.createRow(sqlService, postingGroupId01, partnerId03_employee, null, documentId02, "September 2016", LocalDateUtility.toDate(LocalDate.of(2016, 10, 02)), BigDecimal.valueOf(9.25), BigDecimal.valueOf(256.5),
         BigDecimal.valueOf(230.50), BigDecimal.valueOf(-10.55),
         BigDecimal.valueOf(-5.55),
         BigDecimal.valueOf(9.87));
-    postingGroupTableTask.createRow(sqlService, postingGroupId02, partnerId03_employee, documentId02, "Oktober 2016", LocalDateUtility.toDate(LocalDate.of(2016, 11, 02)), BigDecimal.valueOf(10.5), BigDecimal.valueOf(256.5),
+    postingGroupTableTask.createRow(sqlService, postingGroupId02, partnerId03_employee, null, documentId02, "Oktober 2016", LocalDateUtility.toDate(LocalDate.of(2016, 11, 02)), BigDecimal.valueOf(10.5), BigDecimal.valueOf(256.5),
         BigDecimal.valueOf(230.50), BigDecimal.valueOf(-10.55),
         BigDecimal.valueOf(-5.55),
         BigDecimal.valueOf(9.87));

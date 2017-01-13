@@ -26,6 +26,8 @@ import ch.ahoegger.docbox.shared.hr.billing.PostingGroupSearchFormData;
 @FormData(value = PostingGroupSearchFormData.class, sdkCommand = SdkCommand.CREATE)
 public class PostingGroupSearchForm extends AbstractSearchForm {
   private BigDecimal m_partnerId;
+  private BigDecimal m_taxGroupId;
+  private Boolean m_includeUnbilled = Boolean.TRUE;
 
   @FormData
   public void setPartnerId(BigDecimal partnerId) {
@@ -35,6 +37,26 @@ public class PostingGroupSearchForm extends AbstractSearchForm {
   @FormData
   public BigDecimal getPartnerId() {
     return m_partnerId;
+  }
+
+  @FormData
+  public void setTaxGroupId(BigDecimal taxGroupId) {
+    m_taxGroupId = taxGroupId;
+  }
+
+  @FormData
+  public BigDecimal getTaxGroupId() {
+    return m_taxGroupId;
+  }
+
+  @FormData
+  public void setIncludeUnbilled(Boolean includeUnbilled) {
+    m_includeUnbilled = includeUnbilled;
+  }
+
+  @FormData
+  public Boolean getIncludeUnbilled() {
+    return m_includeUnbilled;
   }
 
   public SearchButton getSearchButton() {

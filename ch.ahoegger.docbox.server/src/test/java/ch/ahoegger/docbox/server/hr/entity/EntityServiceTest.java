@@ -41,7 +41,7 @@ public class EntityServiceTest extends AbstractTestWithDatabase {
 
     BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId01, "All fish are wet", LocalDateUtility.toDate(LocalDate.now().minusDays(3)), LocalDateUtility.today(), null, "2016_03_08_124640.pdf", null, null, false);
 
-    BEANS.get(PostingGroupTableTask.class).createRow(sqlService, postingGroupId01, partnerId01, documentId01, "August 2016", LocalDateUtility.today(), BigDecimal.valueOf(234.9), BigDecimal.valueOf(10.5), BigDecimal.valueOf(232.1),
+    BEANS.get(PostingGroupTableTask.class).createRow(sqlService, postingGroupId01, partnerId01, null, documentId01, "August 2016", LocalDateUtility.today(), BigDecimal.valueOf(234.9), BigDecimal.valueOf(10.5), BigDecimal.valueOf(232.1),
         BigDecimal.valueOf(-10.0),
         BigDecimal.valueOf(-4.5), BigDecimal.valueOf(5.30));
 

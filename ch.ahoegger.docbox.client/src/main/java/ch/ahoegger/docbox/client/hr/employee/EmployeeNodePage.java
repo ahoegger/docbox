@@ -8,6 +8,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
 import ch.ahoegger.docbox.client.document.DocumentTablePage;
 import ch.ahoegger.docbox.client.hr.billing.PostingGroupTablePage;
+import ch.ahoegger.docbox.client.hr.tax.TaxGroupTablePage;
 
 public class EmployeeNodePage extends AbstractPageWithNodes {
 
@@ -22,6 +23,10 @@ public class EmployeeNodePage extends AbstractPageWithNodes {
     DocumentTablePage documentTablePage = new DocumentTablePage();
     documentTablePage.setPartnerId(m_partnerId);
     pageList.add(documentTablePage);
+
+    TaxGroupTablePage taxGroupTablePage = new TaxGroupTablePage();
+    taxGroupTablePage.setPartnerId(getPartnerId());
+    pageList.add(taxGroupTablePage);
 
   }
 

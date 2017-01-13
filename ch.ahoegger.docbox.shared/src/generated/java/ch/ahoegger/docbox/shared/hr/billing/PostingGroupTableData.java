@@ -56,27 +56,31 @@ public class PostingGroupTableData extends AbstractTablePageData {
     private static final long serialVersionUID = 1L;
     public static final String sortGroup = "sortGroup";
     public static final String id = "id";
-    public static final String partnerId = "partnerId";
-    public static final String documentId = "documentId";
     public static final String name = "name";
     public static final String date = "date";
+    public static final String workingHours = "workingHours";
     public static final String bruttoWage = "bruttoWage";
-    public static final String nettoWage = "nettoWage";
     public static final String sourceTax = "sourceTax";
     public static final String socialSecurityTax = "socialSecurityTax";
     public static final String vacationExtra = "vacationExtra";
+    public static final String nettoWage = "nettoWage";
+    public static final String taxGroup = "taxGroup";
+    public static final String partnerId = "partnerId";
+    public static final String documentId = "documentId";
     public static final String documentLink = "documentLink";
     private BigDecimal m_sortGroup;
     private BigDecimal m_id;
-    private BigDecimal m_partnerId;
-    private BigDecimal m_documentId;
     private String m_name;
     private Date m_date;
+    private BigDecimal m_workingHours;
     private BigDecimal m_bruttoWage;
-    private BigDecimal m_nettoWage;
     private BigDecimal m_sourceTax;
     private BigDecimal m_socialSecurityTax;
     private BigDecimal m_vacationExtra;
+    private BigDecimal m_nettoWage;
+    private BigDecimal m_taxGroup;
+    private BigDecimal m_partnerId;
+    private BigDecimal m_documentId;
     private String m_documentLink;
 
     public BigDecimal getSortGroup() {
@@ -95,22 +99,6 @@ public class PostingGroupTableData extends AbstractTablePageData {
       m_id = newId;
     }
 
-    public BigDecimal getPartnerId() {
-      return m_partnerId;
-    }
-
-    public void setPartnerId(BigDecimal newPartnerId) {
-      m_partnerId = newPartnerId;
-    }
-
-    public BigDecimal getDocumentId() {
-      return m_documentId;
-    }
-
-    public void setDocumentId(BigDecimal newDocumentId) {
-      m_documentId = newDocumentId;
-    }
-
     public String getName() {
       return m_name;
     }
@@ -127,20 +115,20 @@ public class PostingGroupTableData extends AbstractTablePageData {
       m_date = newDate;
     }
 
+    public BigDecimal getWorkingHours() {
+      return m_workingHours;
+    }
+
+    public void setWorkingHours(BigDecimal newWorkingHours) {
+      m_workingHours = newWorkingHours;
+    }
+
     public BigDecimal getBruttoWage() {
       return m_bruttoWage;
     }
 
     public void setBruttoWage(BigDecimal newBruttoWage) {
       m_bruttoWage = newBruttoWage;
-    }
-
-    public BigDecimal getNettoWage() {
-      return m_nettoWage;
-    }
-
-    public void setNettoWage(BigDecimal newNettoWage) {
-      m_nettoWage = newNettoWage;
     }
 
     public BigDecimal getSourceTax() {
@@ -165,6 +153,38 @@ public class PostingGroupTableData extends AbstractTablePageData {
 
     public void setVacationExtra(BigDecimal newVacationExtra) {
       m_vacationExtra = newVacationExtra;
+    }
+
+    public BigDecimal getNettoWage() {
+      return m_nettoWage;
+    }
+
+    public void setNettoWage(BigDecimal newNettoWage) {
+      m_nettoWage = newNettoWage;
+    }
+
+    public BigDecimal getTaxGroup() {
+      return m_taxGroup;
+    }
+
+    public void setTaxGroup(BigDecimal newTaxGroup) {
+      m_taxGroup = newTaxGroup;
+    }
+
+    public BigDecimal getPartnerId() {
+      return m_partnerId;
+    }
+
+    public void setPartnerId(BigDecimal newPartnerId) {
+      m_partnerId = newPartnerId;
+    }
+
+    public BigDecimal getDocumentId() {
+      return m_documentId;
+    }
+
+    public void setDocumentId(BigDecimal newDocumentId) {
+      m_documentId = newDocumentId;
     }
 
     public String getDocumentLink() {

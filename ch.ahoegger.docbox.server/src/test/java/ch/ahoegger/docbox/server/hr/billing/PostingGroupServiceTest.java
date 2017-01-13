@@ -61,7 +61,7 @@ public class PostingGroupServiceTest extends AbstractTestWithDatabase {
 
     BEANS.get(DocumentPartnerTableTask.class).createDocumentPartnerRow(sqlService, documentId, partnerId);
 
-    BEANS.get(PostingGroupTableTask.class).createRow(sqlService, postingGroupId, partnerId, documentId, "Dez", LocalDateUtility.toDate(LocalDate.now()), BigDecimal.valueOf(5.0), BigDecimal.valueOf(200.3), BigDecimal.valueOf(197.3),
+    BEANS.get(PostingGroupTableTask.class).createRow(sqlService, postingGroupId, partnerId, null, documentId, "Dez", LocalDateUtility.toDate(LocalDate.now()), BigDecimal.valueOf(5.0), BigDecimal.valueOf(200.3), BigDecimal.valueOf(197.3),
         BigDecimal.valueOf(10.3), BigDecimal.valueOf(1.3), BigDecimal.valueOf(2.3));
     BEANS.get(EntityTableTask.class).createEntityRow(sqlService, expenceId, partnerId, postingGroupId, ExpenseCode.ID, LocalDateUtility.toDate(LocalDate.now().minusDays(2)), null, BigDecimal.valueOf(23), "desc");
     BEANS.get(EntityTableTask.class).createEntityRow(sqlService, workId, partnerId, postingGroupId, WorkCode.ID, LocalDateUtility.toDate(LocalDate.now().minusDays(2)), BigDecimal.valueOf(3), null, "desc");

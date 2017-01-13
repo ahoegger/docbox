@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Category extends TableImpl<CategoryRecord> {
 
-    private static final long serialVersionUID = -729489946;
+    private static final long serialVersionUID = -2081574386;
 
     /**
      * The reference instance of <code>APP.CATEGORY</code>
@@ -113,7 +113,7 @@ public class Category extends TableImpl<CategoryRecord> {
      */
     @Override
     public UniqueKey<CategoryRecord> getPrimaryKey() {
-        return Keys.SQL170112154728520;
+        return Keys.SQL170113205923600;
     }
 
     /**
@@ -121,7 +121,7 @@ public class Category extends TableImpl<CategoryRecord> {
      */
     @Override
     public List<UniqueKey<CategoryRecord>> getKeys() {
-        return Arrays.<UniqueKey<CategoryRecord>>asList(Keys.SQL170112154728520);
+        return Arrays.<UniqueKey<CategoryRecord>>asList(Keys.SQL170113205923600);
     }
 
     /**

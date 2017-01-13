@@ -74,7 +74,6 @@ public class EmployeeService implements IEmployeeService {
         .on(emp.PARTNER_NR.eq(ptr.PARTNER_NR))
         .where(condition);
 
-    System.out.println(statement);
     List<EmployeeTableRowData> rows = statement.fetch()
         .stream()
         .map(rec -> {

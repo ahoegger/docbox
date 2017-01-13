@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.jooq.Condition;
@@ -51,6 +53,8 @@ import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData.EntityTableRowDat
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.WorkCode;
 import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
+import ch.ahoegger.docbox.shared.hr.tax.ITaxGroupService;
+import ch.ahoegger.docbox.shared.hr.tax.TaxGroupSearchFormData;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
@@ -69,38 +73,45 @@ public class PostingGroupService implements IPostingGroupService {
     if (formData.getPartnerId() != null) {
       condition = pg.PARTNER_NR.eq(formData.getPartnerId());
     }
+    if (formData.getTaxGroupId() != null) {
+      condition = pg.TAX_GROUP_NR.eq(formData.getTaxGroupId());
+    }
 
     List<PostingGroupTableRowData> rows = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(pg.POSTING_GROUP_NR, pg.PARTNER_NR, pg.DOCUMENT_NR, pg.NAME, pg.STATEMENT_DATE, pg.BRUTTO_WAGE, pg.NETTO_WAGE, pg.SOURCE_TAX, pg.SOCIAL_SECURITY_TAX, pg.VACATION_EXTRA)
+        .select(pg.POSTING_GROUP_NR, pg.PARTNER_NR, pg.DOCUMENT_NR, pg.NAME, pg.STATEMENT_DATE, pg.WORKING_HOURS, pg.BRUTTO_WAGE, pg.NETTO_WAGE, pg.SOURCE_TAX, pg.SOCIAL_SECURITY_TAX, pg.VACATION_EXTRA, pg.TAX_GROUP_NR)
         .from(pg)
         .where(condition)
         .fetch()
         .stream()
         .map(rec -> {
           PostingGroupTableRowData rd = new PostingGroupTableRowData();
-          rd.setId(rec.get(pg.POSTING_GROUP_NR));
           rd.setSortGroup(BigDecimal.valueOf(1));
-          rd.setPartnerId(rec.get(pg.PARTNER_NR));
-          rd.setDocumentId(rec.get(pg.DOCUMENT_NR));
+          rd.setId(rec.get(pg.POSTING_GROUP_NR));
           rd.setName(rec.get(pg.NAME));
           rd.setDate(rec.get(pg.STATEMENT_DATE));
+          rd.setWorkingHours(rec.get(pg.WORKING_HOURS));
           rd.setBruttoWage(rec.get(pg.BRUTTO_WAGE));
-          rd.setNettoWage(rec.get(pg.NETTO_WAGE));
           rd.setSourceTax(rec.get(pg.SOURCE_TAX));
           rd.setSocialSecurityTax(rec.get(pg.SOCIAL_SECURITY_TAX));
           rd.setVacationExtra(rec.get(pg.VACATION_EXTRA));
+          rd.setNettoWage(rec.get(pg.NETTO_WAGE));
+          rd.setTaxGroup(rec.get(pg.TAX_GROUP_NR));
+          rd.setPartnerId(rec.get(pg.PARTNER_NR));
+          rd.setDocumentId(rec.get(pg.DOCUMENT_NR));
           return rd;
         })
         .collect(Collectors.toList());
 
     // unbilled row
-    PostingGroupTableRowData unbilledRow = new PostingGroupTableRowData();
-    unbilledRow.setId(UnbilledCode.ID);
-    unbilledRow.setSortGroup(BigDecimal.valueOf(2));
-    unbilledRow.setPartnerId(formData.getPartnerId());
-    unbilledRow.setName(TEXTS.get("Unbilled"));
-    rows.add(unbilledRow);
+    if (formData.getIncludeUnbilled() != null && formData.getIncludeUnbilled().booleanValue()) {
+      PostingGroupTableRowData unbilledRow = new PostingGroupTableRowData();
+      unbilledRow.setId(UnbilledCode.ID);
+      unbilledRow.setSortGroup(BigDecimal.valueOf(2));
+      unbilledRow.setPartnerId(formData.getPartnerId());
+      unbilledRow.setName(TEXTS.get("Unbilled"));
+      rows.add(unbilledRow);
 
+    }
     PostingGroupTableData tableData = new PostingGroupTableData();
     tableData.setRows(rows.toArray(new PostingGroupTableRowData[0]));
     return tableData;
@@ -124,6 +135,15 @@ public class PostingGroupService implements IPostingGroupService {
       formData.getFrom().setValue(LocalDateUtility.toDate(today.withDayOfMonth(1)));
       formData.getTo().setValue(LocalDateUtility.toDate(today.withDayOfMonth(today.lengthOfMonth())));
     }
+    TaxGroupSearchFormData taxGroupData = new TaxGroupSearchFormData();
+    taxGroupData.setHasEndDate(TriState.FALSE);
+    BigDecimal taxGroupId = Arrays.stream(BEANS.get(ITaxGroupService.class).getTaxGroupTableData(taxGroupData).getRows())
+        .sorted((a, b) -> b.getStartDate().compareTo(a.getStartDate()))
+        .map(row -> row.getTaxGroupId())
+        .findFirst()
+        .orElse(null);
+
+    formData.getTaxGroup().setValue(taxGroupId);
     return formData;
   }
 
@@ -172,6 +192,7 @@ public class PostingGroupService implements IPostingGroupService {
         .with(pg.SOCIAL_SECURITY_TAX, wageData.getSocialSecuityTax())
         .with(pg.SOURCE_TAX, wageData.getSourceTax())
         .with(pg.STATEMENT_DATE, formData.getDate().getValue())
+        .with(pg.TAX_GROUP_NR, formData.getTaxGroup().getValue())
         .with(pg.VACATION_EXTRA, wageData.getVacationExtra())
         .with(pg.WORKING_HOURS, wageData.getHoursTotal())
         .insert();
@@ -330,6 +351,7 @@ public class PostingGroupService implements IPostingGroupService {
 //    SOCIAL_SECURITY_TAX : TableField<PostingGroupRecord, BigDecimal>
 //    SOURCE_TAX : TableField<PostingGroupRecord, BigDecimal>
     fd.getDate().setValue(rec.getStatementDate());
+    fd.getTaxGroup().setValue(rec.getTaxGroupNr());
 //    VACATION_EXTRA : TableField<PostingGroupRecord, BigDecimal>
 //    WORKING_HOURS : TableField<PostingGroupRecord, BigDecimal>
     return fd;

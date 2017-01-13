@@ -50,7 +50,6 @@ public class OcrParseServiceTest {
       Assert.assertTrue(parseResult.isOcrParsed());
       String text = parseResult.getText();
       LOG.info("parsed text: {}", text);
-      System.out.println(text);
 
       Assert.assertFalse("Working direcotry is propperly removed.", Files.exists(parseResult.getWorkingDirectory()));
       Assert.assertTrue(text.contains("einfacher Demo-Text"));

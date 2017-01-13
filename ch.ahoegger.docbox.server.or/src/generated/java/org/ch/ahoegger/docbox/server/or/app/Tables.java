@@ -20,6 +20,7 @@ import org.ch.ahoegger.docbox.server.or.app.tables.Entity;
 import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
 import org.ch.ahoegger.docbox.server.or.app.tables.PostingGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.PrimaryKeySeq;
+import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 
 
 /**
@@ -104,4 +105,9 @@ public class Tables {
      * The table <code>APP.PRIMARY_KEY_SEQ</code>.
      */
     public static final PrimaryKeySeq PRIMARY_KEY_SEQ = org.ch.ahoegger.docbox.server.or.app.tables.PrimaryKeySeq.PRIMARY_KEY_SEQ;
+
+    /**
+     * The table <code>APP.TAX_GROUP</code>.
+     */
+    public static final TaxGroup TAX_GROUP = org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup.TAX_GROUP;
 }

@@ -326,7 +326,6 @@ public class UserForm extends AbstractForm {
 
       UserFormData formData = new UserFormData();
       exportFormData(formData);
-      System.out.println(formData.getUsername().getValue());
       formData = BEANS.get(IUserService.class).load(formData);
       importFormData(formData);
 
