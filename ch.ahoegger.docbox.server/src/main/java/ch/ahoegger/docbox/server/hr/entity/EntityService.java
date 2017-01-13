@@ -16,6 +16,8 @@ import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.jooq.Condition;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
@@ -28,6 +30,7 @@ import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 public class EntityService implements IEntityService {
+  private static final Logger LOG = LoggerFactory.getLogger(EntityService.class);
 
   @Override
   public EntityTablePageData getEntityTableData(EntitySearchFormData formData) {
@@ -137,6 +140,26 @@ public class EntityService implements IEntityService {
     }
     return null;
 
+  }
+
+  @Override
+  public boolean delete(BigDecimal entityId) {
+    Entity e = Entity.ENTITY.as("ent");
+
+    EntityRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(e, e.ENTITY_NR.eq(entityId));
+    if (rec == null) {
+      LOG.warn("Try to delete not existing record with id '{}'!", entityId);
+      return false;
+    }
+    if (rec.delete() != 1) {
+      LOG.error("Could not delete record with id '{}'!", entityId);
+      return false;
+    }
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+    return true;
   }
 
   public void updateGroupId(Set<BigDecimal> entityIds, BigDecimal groupId) {

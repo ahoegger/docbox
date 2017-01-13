@@ -78,6 +78,7 @@ public class PostingGroupService implements IPostingGroupService {
         .stream()
         .map(rec -> {
           PostingGroupTableRowData rd = new PostingGroupTableRowData();
+          rd.setId(rec.get(pg.POSTING_GROUP_NR));
           rd.setSortGroup(BigDecimal.valueOf(1));
           rd.setPartnerId(rec.get(pg.PARTNER_NR));
           rd.setDocumentId(rec.get(pg.DOCUMENT_NR));

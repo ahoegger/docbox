@@ -3,11 +3,15 @@ package ch.ahoegger.docbox.client.hr.entity;
 import java.math.BigDecimal;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.dto.Data;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -84,6 +88,10 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
   public BigDecimal getPostingGroupId() {
 
     return m_postingGroupId;
+  }
+
+  protected IDesktop getDesktop() {
+    return ClientRunContexts.copyCurrent().getDesktop();
   }
 
   public class Table extends AbstractEntityTable {
@@ -186,6 +194,35 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
         EntityForm form = new EntityForm(getPartnerIdColumn().getSelectedValue());
         form.setEntityId(getEnityIdColumn().getSelectedValue());
         form.startViewEntity();
+      }
+    }
+
+    @Order(4000)
+    public class DeleteMenu extends AbstractMenu {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("Delete");
+      }
+
+      @Override
+      protected void execInitAction() {
+        setVisible(ObjectUtility.equals(getPostingGroupId(), UnbilledCode.ID));
+      }
+
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+      }
+
+      @Override
+      protected void execAction() {
+        if (MessageBox.YES_OPTION == MessageBoxes.createYesNo()
+            .withHeader(TEXTS.get("Delete"))
+            .withBody(TEXTS.get("VerificationDelete", getDateColumn().getSelectedDisplayText())).show()) {
+          BEANS.get(IEntityService.class).delete(getEnityIdColumn().getSelectedValue());
+
+          getDesktop().dataChanged(IWorkItemEntity.WORK_ITEM_KEY);
+        }
       }
     }
 

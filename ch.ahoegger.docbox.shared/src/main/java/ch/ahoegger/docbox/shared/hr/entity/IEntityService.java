@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.shared.hr.entity;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
@@ -40,4 +42,6 @@ public interface IEntityService extends IService {
    * @return
    */
   EntityFormData store(EntityFormData formData);
+
+  boolean delete(BigDecimal entityId);
 }
