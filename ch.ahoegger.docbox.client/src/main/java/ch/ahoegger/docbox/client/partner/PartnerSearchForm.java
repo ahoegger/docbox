@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.client.partner;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
@@ -23,7 +25,7 @@ import ch.ahoegger.docbox.client.partner.PartnerSearchForm.MainBox.SearchTabBox;
 import ch.ahoegger.docbox.client.partner.PartnerSearchForm.MainBox.SearchTabBox.SearchBox;
 import ch.ahoegger.docbox.client.partner.PartnerSearchForm.MainBox.SearchTabBox.SearchBox.ActiveBox;
 import ch.ahoegger.docbox.client.partner.PartnerSearchForm.MainBox.SearchTabBox.SearchBox.NameField;
-import ch.ahoegger.docbox.shared.partner.IPartnerTable;
+import ch.ahoegger.docbox.or.definition.table.IPartnerTable;
 import ch.ahoegger.docbox.shared.partner.PartnerSearchFormData;
 
 /**
@@ -33,6 +35,18 @@ import ch.ahoegger.docbox.shared.partner.PartnerSearchFormData;
  */
 @FormData(value = PartnerSearchFormData.class, sdkCommand = SdkCommand.CREATE)
 public class PartnerSearchForm extends AbstractSearchForm {
+
+  private BigDecimal m_documentId;
+
+  @FormData
+  public BigDecimal getDocumentId() {
+    return m_documentId;
+  }
+
+  @FormData
+  public void setDocumentId(BigDecimal documentId) {
+    m_documentId = documentId;
+  }
 
   public PartnerSearchForm() {
     setHandler(new SearchHandler());

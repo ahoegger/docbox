@@ -36,9 +36,9 @@ import ch.ahoegger.docbox.client.hr.billing.PostingGroupForm.MainBox.PostingCalc
 import ch.ahoegger.docbox.client.hr.billing.PostingGroupForm.MainBox.TitleField;
 import ch.ahoegger.docbox.client.hr.entity.IWorkItemEntity;
 import ch.ahoegger.docbox.client.partner.AbstractPartnerSmartField;
-import ch.ahoegger.docbox.shared.document.IDocumentTable;
+import ch.ahoegger.docbox.or.definition.table.IDocumentTable;
+import ch.ahoegger.docbox.or.definition.table.IPostingGroupTable;
 import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupService;
-import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupTable;
 import ch.ahoegger.docbox.shared.hr.billing.PostingCalculationBoxData;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupFormData;
 

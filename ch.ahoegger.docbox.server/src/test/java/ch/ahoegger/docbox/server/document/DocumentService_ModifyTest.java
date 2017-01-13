@@ -32,8 +32,8 @@ import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Partners.PartnersRowData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Permissions.PermissionsRowData;
-import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
+import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
 
 /**
  * <h3>{@link DocumentService_ModifyTest}</h3>
@@ -46,10 +46,10 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
   private final String userId02 = "username02";
 
   private final BigDecimal documentId = BigDecimal.valueOf(BEANS.get(IdGenerateService.class).getNextId());
-  private final Long categoryId01 = BEANS.get(IdGenerateService.class).getNextId();
-  private final Long categoryId02 = BEANS.get(IdGenerateService.class).getNextId();
-  private final Long conversationId01 = BEANS.get(IdGenerateService.class).getNextId();
-  private final Long conversationId02 = BEANS.get(IdGenerateService.class).getNextId();
+  private final BigDecimal categoryId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private final BigDecimal categoryId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private final BigDecimal conversationId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private final BigDecimal conversationId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
   private final BigDecimal partnerId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
   private final BigDecimal partnerId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
@@ -88,7 +88,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     // links
     BEANS.get(DocumentPartnerTableTask.class).createDocumentPartnerRow(sqlService, documentId, partnerId01);
     BEANS.get(DocumentCategoryTableTask.class).createDocumentCategoryRow(sqlService, documentId, categoryId01);
-    BEANS.get(DocumentPermissionTableTask.class).createDocumentPermissionRow(sqlService, userId01, documentId, IDocumentPermissionTable.PERMISSION_READ);
+    BEANS.get(DocumentPermissionTableTask.class).createDocumentPermissionRow(sqlService, userId01, documentId, PermissionCodeType.ReadCode.ID);
 
   }
 
@@ -130,7 +130,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     DocumentFormData fd = loadDocument(service, documentId);
     // modify
     Set<BigDecimal> categories = new HashSet<BigDecimal>(fd.getCategoriesBox().getValue());
-    categories.add(new BigDecimal(categoryId02));
+    categories.add(categoryId02);
     fd.getCategoriesBox().setValue(categories);
     service.store(fd);
 
@@ -138,7 +138,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     DocumentFormData refFd = assertEqualsDb(service, fd);
     Assert.assertEquals(CollectionUtility.arrayList(categoryId01, categoryId02),
         refFd.getCategoriesBox().getValue().stream()
-            .map(bd -> bd.longValue()).sorted()
+            .map(bd -> bd).sorted()
             .collect(Collectors.toList()));
 
   }
@@ -150,7 +150,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     DocumentFormData fd = loadDocument(service, documentId);
     // modify
     Set<BigDecimal> categories = new HashSet<BigDecimal>(fd.getCategoriesBox().getValue());
-    categories.remove(new BigDecimal(categoryId01));
+    categories.remove(categoryId01);
     fd.getCategoriesBox().setValue(categories);
     service.store(fd);
 
@@ -158,7 +158,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     DocumentFormData refFd = assertEqualsDb(service, fd);
     Assert.assertEquals(CollectionUtility.arrayList(),
         refFd.getCategoriesBox().getValue().stream()
-            .map(bd -> bd.longValue()).sorted()
+            .map(bd -> bd).sorted()
             .collect(Collectors.toList()));
 
   }
@@ -170,7 +170,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     DocumentFormData fd = loadDocument(service, documentId);
     // modify
     Set<BigDecimal> categories = new HashSet<BigDecimal>();
-    categories.add(new BigDecimal(categoryId02));
+    categories.add(categoryId02);
     fd.getCategoriesBox().setValue(categories);
     service.store(fd);
 
@@ -179,7 +179,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     Assert.assertEquals(1, refFd.getCategoriesBox().getValue().size());
     Assert.assertEquals(CollectionUtility.arrayList(categoryId02),
         refFd.getCategoriesBox().getValue().stream()
-            .map(bd -> bd.longValue()).sorted()
+            .map(bd -> bd).sorted()
             .collect(Collectors.toList()));
 
   }
@@ -190,12 +190,12 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
     DocumentFormData fd = loadDocument(service, documentId);
     // modify
-    fd.getConversation().setValue(new BigDecimal(conversationId02));
+    fd.getConversation().setValue(conversationId02);
     service.store(fd);
 
     // compare to new loaded
     DocumentFormData refFd = assertEqualsDb(service, fd);
-    Assert.assertEquals(conversationId02, Optional.of(refFd.getConversation().getValue()).map(bd -> bd.longValue()).orElse(null));
+    Assert.assertEquals(conversationId02, Optional.of(refFd.getConversation().getValue()).map(bd -> bd).orElse(null));
   }
 
   @Test
@@ -285,7 +285,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
         Arrays.stream(refFd.getPartners().getRows())
             .map(row -> row.getPartner())
             .filter(p -> p != null)
-            .map(bd -> bd.longValue())
+            .map(bd -> bd)
             .sorted()
             .collect(Collectors.toList()));
 
@@ -320,7 +320,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     DocumentFormData fd = loadDocument(service, documentId);
     // modify
     PermissionsRowData rd = Arrays.stream(fd.getPermissions().getRows()).filter(row -> userId01.equals(row.getUser())).findFirst().get();
-    rd.setPermission(IDocumentPermissionTable.PERMISSION_WRITE);
+    rd.setPermission(PermissionCodeType.WriteCode.ID);
 
     service.store(fd);
 
@@ -335,7 +335,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
     Assert.assertEquals(CollectionUtility.arrayList(userId01),
         sortedValidPermissions.stream().map(row -> row.getUser()).collect(Collectors.toList()));
-    Assert.assertEquals(CollectionUtility.arrayList(IDocumentPermissionTable.PERMISSION_WRITE),
+    Assert.assertEquals(CollectionUtility.arrayList(PermissionCodeType.WriteCode.ID),
         sortedValidPermissions.stream().map(row -> row.getPermission()).collect(Collectors.toList()));
 
   }
@@ -348,7 +348,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     // modify
     PermissionsRowData newRow = fd.getPermissions().addRow();
     newRow.setUser(userId02);
-    newRow.setPermission(IDocumentPermissionTable.PERMISSION_WRITE);
+    newRow.setPermission(PermissionCodeType.WriteCode.ID);
     service.store(fd);
 
     // compare to new loaded
@@ -361,7 +361,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
     Assert.assertEquals(CollectionUtility.arrayList(userId01, userId02),
         sortedValidPermissions.stream().map(row -> row.getUser()).collect(Collectors.toList()));
-    Assert.assertEquals(CollectionUtility.arrayList(IDocumentPermissionTable.PERMISSION_READ, IDocumentPermissionTable.PERMISSION_WRITE),
+    Assert.assertEquals(CollectionUtility.arrayList(PermissionCodeType.ReadCode.ID, PermissionCodeType.WriteCode.ID),
         sortedValidPermissions.stream().map(row -> row.getPermission()).collect(Collectors.toList()));
 
   }
@@ -405,7 +405,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     fd.getPermissions().clearRows();
     PermissionsRowData newRow = fd.getPermissions().addRow();
     newRow.setUser(userId02);
-    newRow.setPermission(IDocumentPermissionTable.PERMISSION_WRITE);
+    newRow.setPermission(PermissionCodeType.WriteCode.ID);
 
     service.store(fd);
 
@@ -420,7 +420,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     Assert.assertEquals(CollectionUtility.arrayList(userId02),
         sortedValidPermissions.stream().map(row -> row.getUser()).collect(Collectors.toList()));
 
-    Assert.assertEquals(CollectionUtility.arrayList(IDocumentPermissionTable.PERMISSION_WRITE),
+    Assert.assertEquals(CollectionUtility.arrayList(PermissionCodeType.WriteCode.ID),
         sortedValidPermissions.stream().map(row -> row.getPermission()).collect(Collectors.toList()));
 
   }

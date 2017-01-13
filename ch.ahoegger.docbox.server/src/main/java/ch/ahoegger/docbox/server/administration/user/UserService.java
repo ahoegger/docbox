@@ -1,89 +1,107 @@
 package ch.ahoegger.docbox.server.administration.user;
 
-import java.util.Arrays;
-
+import org.ch.ahoegger.docbox.server.or.app.tables.DefaultPermissionTable;
+import org.ch.ahoegger.docbox.server.or.app.tables.DocboxUser;
+import org.ch.ahoegger.docbox.server.or.app.tables.records.DocboxUserRecord;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.holders.BooleanHolder;
-import org.eclipse.scout.rt.platform.holders.NVPair;
-import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
+import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.ahoegger.docbox.server.ServerSession;
 import ch.ahoegger.docbox.server.security.SecurityService;
 import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
-import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 import ch.ahoegger.docbox.shared.administration.user.UserFormData;
 import ch.ahoegger.docbox.shared.administration.user.UserTablePageData;
+import ch.ahoegger.docbox.shared.administration.user.UserTablePageData.UserTableRowData;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
-import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
-import ch.ahoegger.docbox.shared.security.permission.IDefaultPermissionTable;
-import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
+import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
 
 /**
  * <h3>{@link UserService}</h3>
  *
  * @author Andreas Hoegger
  */
-public class UserService implements IUserService, IUserTable {
+public class UserService implements IUserService {
   private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
   @Override
   public UserTablePageData getUserTableData() {
     UserTablePageData pageData = new UserTablePageData();
+    DocboxUser user = DocboxUser.DOCBOX_USER;
 
-    // get data from db
+    DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(user.USERNAME, user.NAME, user.FIRSTNAME, user.ACTIVE, user.ADMINISTRATOR)
+        .from(user)
+        .fetch().forEach(rec -> {
+          UserTableRowData row = pageData.addRow();
+          row.setUsername(rec.get(user.USERNAME));
+          row.setName(rec.get(user.NAME));
+          row.setFirstname(rec.get(user.FIRSTNAME));
+          row.setActive(rec.get(user.ACTIVE));
+          row.setAdministrator(rec.get(user.ADMINISTRATOR));
+        });
 
-    ISqlService sqlService = BEANS.get(ISqlService.class);
-
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(USERNAME, NAME, FIRSTNAME, ACTIVE, ADMINISTRATOR)).append(" FROM ").append(TABLE_NAME);
-    statementBuilder.append(" INTO ").append(":{page.username}, :{page.name}, :{page.firstname}, :{page.active}, :{page.administrator}");
-
-    sqlService.selectInto(statementBuilder.toString(), new NVPair("page", pageData));
     return pageData;
   }
 
   @Override
   public UserFormData load(UserFormData formData) {
-    BooleanHolder exists = new BooleanHolder();
 
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT TRUE, ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, FIRSTNAME, NAME, USERNAME, ACTIVE, ADMINISTRATOR))
-        .append(", ").append(SqlFramentBuilder.columnsAliased(IDefaultPermissionTable.TABLE_ALIAS, IDefaultPermissionTable.PERMISSION))
-        .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS)
-        .append(" LEFT OUTER JOIN ").append(IDefaultPermissionTable.TABLE_NAME).append(" AS ").append(IDefaultPermissionTable.TABLE_ALIAS)
-        .append(" ON ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, USERNAME)).append(" = ").append(SqlFramentBuilder.columnsAliased(IDefaultPermissionTable.TABLE_ALIAS, IDefaultPermissionTable.USERNAME))
-        .append(" WHERE ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, USERNAME)).append(" = :username")
-        .append(" INTO ").append(":exists, :firstname, :name, :username, :active, :administrator, :defaultPermission");
-    SQL.selectInto(statementBuilder.toString(),
-        new NVPair("exists", exists),
-        formData);
+    DocboxUser user = DocboxUser.DOCBOX_USER.as("U");
+    DefaultPermissionTable defaultPermission = DefaultPermissionTable.DEFAULT_PERMISSION_TABLE.as("DEF_PER");
 
-    if (exists.getValue() == null) {
-      return null;
-    }
+    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(user.FIRSTNAME, user.NAME, user.USERNAME, user.ACTIVE, user.ADMINISTRATOR)
+        .select(defaultPermission.PERMISSION)
+        .from(user)
+        .leftOuterJoin(defaultPermission)
+        .on(user.USERNAME.eq(defaultPermission.USERNAME))
+        .where(user.USERNAME.eq(formData.getUsername().getValue()))
+        .fetch()
+        .map(rec -> {
+          UserFormData res = (UserFormData) formData.deepCopy();
+          res.getFirstname().setValue(rec.get(user.FIRSTNAME));
+          res.getName().setValue(rec.get(user.NAME));
+          res.getUsername().setValue(rec.get(user.USERNAME));
+          res.getActive().setValue(rec.get(user.ACTIVE));
+          res.getAdministrator().setValue(rec.get(user.ADMINISTRATOR));
+          res.getDefaultPermission().setValue(rec.get(defaultPermission.PERMISSION));
+          return res;
+        })
+        .stream()
+        .findFirst()
+        .orElse(null);
 
-    return formData;
   }
 
   @Override
   public UserFormData store(UserFormData formData) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("UPDATE ").append(TABLE_NAME).append(" SET ")
-        .append(NAME).append("= :name, ")
-        .append(FIRSTNAME).append("= :firstname, ")
-        .append(ACTIVE).append("= :active, ")
-        .append(ADMINISTRATOR).append("= :administrator ");
+
+    DocboxUser user = DocboxUser.DOCBOX_USER.as("U");
+
+    DocboxUserRecord rec = new DocboxUserRecord()
+        .with(user.USERNAME, formData.getUsername().getValue())
+        .with(user.ACTIVE, formData.getActive().getValue())
+        .with(user.ADMINISTRATOR, formData.getAdministrator().getValue())
+        .with(user.FIRSTNAME, formData.getFirstname().getValue())
+        .with(user.NAME, formData.getName().getValue());
     if (formData.getChangePassword().isValueSet() && formData.getChangePassword().getValue()) {
-      statementBuilder.append(", ").append(PASSWORD).append("= :password");
-      formData.getPassword().setValue(new String(BEANS.get(SecurityService.class).createPasswordHash(formData.getPassword().getValue().toCharArray())));
+      rec.setPassword(new String(BEANS.get(SecurityService.class).createPasswordHash(formData.getPassword().getValue().toCharArray())));
     }
-    statementBuilder.append(" WHERE ").append(USERNAME).append(" = :username");
-    SQL.update(statementBuilder.toString(), formData);
+
+    if (DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .executeUpdate(rec) < 1) {
+      return null;
+    }
     formData.getPassword().setValue(null);
 
     BEANS.get(DefaultPermissionService.class).updateDefaultPermission(formData.getUsername().getValue(), formData.getDefaultPermission().getValue());
@@ -98,18 +116,27 @@ public class UserService implements IUserService, IUserTable {
   public UserFormData prepareCreate(UserFormData formData) {
     formData.getActive().setValue(true);
     formData.getAdministrator().setValue(false);
-    formData.getDefaultPermission().setValue(IDocumentPermissionTable.PERMISSION_READ);
+    formData.getDefaultPermission().setValue(PermissionCodeType.ReadCode.ID);
     return formData;
   }
 
   @Override
   public UserFormData create(UserFormData formData) {
-    formData.getPassword().setValue(new String(BEANS.get(SecurityService.class).createPasswordHash(formData.getPassword().getValue().toCharArray())));
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("INSERT INTO ").append(TABLE_NAME);
-    statementBuilder.append(" (").append(SqlFramentBuilder.columns(USERNAME, NAME, FIRSTNAME, ACTIVE, PASSWORD, ADMINISTRATOR)).append(")");
-    statementBuilder.append(" VALUES (:username, :name, :firstname, :active, :password, :administrator)");
-    SQL.insert(statementBuilder.toString(), formData);
+
+    DocboxUser user = DocboxUser.DOCBOX_USER;
+
+    int insertedRows = DSL.using(SQL.getConnection(), SQLDialect.DERBY).newRecord(user)
+        .with(user.USERNAME, formData.getUsername().getValue())
+        .with(user.ACTIVE, formData.getActive().getValue())
+        .with(user.ADMINISTRATOR, formData.getAdministrator().getValue())
+        .with(user.FIRSTNAME, formData.getFirstname().getValue())
+        .with(user.NAME, formData.getName().getValue())
+        .with(user.PASSWORD, new String(BEANS.get(SecurityService.class).createPasswordHash(formData.getPassword().getValue().toCharArray())))
+        .insert();
+
+    if (insertedRows < 1) {
+      return null;
+    }
     formData.getPassword().setValue(null);
 
     BEANS.get(DefaultPermissionService.class).createDefaultPermission(formData.getUsername().getValue(), formData.getDefaultPermission().getValue());
@@ -121,33 +148,49 @@ public class UserService implements IUserService, IUserTable {
   }
 
   @Override
-  public void delete(String username) {
+  public boolean delete(String username) {
+
+    if (StringUtility.equalsIgnoreCase(username, ServerSession.get().getUserId())) {
+      throw new ProcessingException(new ProcessingStatus("Deletion of myself is not allowed.", IStatus.ERROR));
+    }
+
+    DocboxUser user = DocboxUser.DOCBOX_USER;
+
+    DSLContext dsl = DSL.using(SQL.getConnection(), SQLDialect.DERBY);
     // load
     UserFormData fd = new UserFormData();
     fd.getUsername().setValue(username);
     fd = load(fd);
     if (fd.getAdministrator().getValue()) {
       // do not allow to delete last admin
-      StringBuilder statementBuilder = new StringBuilder();
-      statementBuilder.append("SELECT COUNT(1) FROM ").append(TABLE_NAME)
-          .append(" WHERE ").append(USERNAME).append(" = :username");
-      Object[][] rawResult = SQL.select(statementBuilder.toString(), new NVPair("username", username));
-      if (Arrays.stream(rawResult).map(row -> TypeCastUtility.castValue(row[0], Integer.class)).findFirst().get() < 2) {
+      int adminCount = dsl.select(DSL.count())
+          .from(user)
+          .where(user.ADMINISTRATOR)
+          .stream()
+          .map(rec -> rec.get(0, Integer.class))
+          .findFirst()
+          .orElse(-1);
+      if (adminCount < 2) {
         throw new ProcessingException("Can not delete last administrator.");
       }
-    }
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(USERNAME).append(" = :username");
 
-    int deletedRows = SQL.delete(statementBuilder.toString(), new NVPair("username", username));
-    if (deletedRows != 1) {
-      LOG.warn("Deleted {} rows for '{}' username.", deletedRows, username);
+    }
+
+    DocboxUserRecord rec = dsl
+        .fetchOne(user, user.USERNAME.eq(username));
+    if (rec == null) {
+      LOG.warn("Try to delete not existing record with id '{}'!", username);
+      return false;
+    }
+    if (rec.delete() != 1) {
+      LOG.error("Could not delete record with id '{}'!", username);
+      return false;
     }
 
     BEANS.get(DefaultPermissionService.class).deleteByUsername(username);
 
-    // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
+    return true;
 
   }
 

@@ -18,8 +18,7 @@ import ch.ahoegger.docbox.shared.category.CategoryFormData;
 public class CategoryServiceTest extends AbstractTestWithDatabase {
 
   @Test
-  public void testMessageContainsSubjectName() {
-
+  public void testCreate() {
     CategoryFormData fd1 = new CategoryFormData();
     fd1.getName().setValue("SampleCategory");
     fd1.getDescription().setValue("desc");

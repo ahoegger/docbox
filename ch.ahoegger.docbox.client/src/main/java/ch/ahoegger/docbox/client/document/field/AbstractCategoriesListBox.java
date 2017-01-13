@@ -157,7 +157,7 @@ public abstract class AbstractCategoriesListBox extends AbstractListBox<BigDecim
         if (MessageBox.YES_OPTION == MessageBoxes.createYesNo()
             .withHeader(TEXTS.get("Delete"))
             .withBody(TEXTS.get("VerificationDelete", getTextColumn().getSelectedDisplayText())).show()) {
-          BEANS.get(ICategoryService.class).delete(getKeyColumn().getSelectedValue().longValue());
+          BEANS.get(ICategoryService.class).delete(getKeyColumn().getSelectedValue());
 
           getDesktop().dataChanged(ICategoryEntity.ENTITY_KEY);
         }

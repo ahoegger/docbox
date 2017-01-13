@@ -9,8 +9,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TEXTS;
 
+import ch.ahoegger.docbox.or.definition.table.IPartnerTable;
 import ch.ahoegger.docbox.shared.partner.AbstractPartnerBoxData;
-import ch.ahoegger.docbox.shared.partner.IPartnerTable;
 import ch.ahoegger.docbox.shared.validation.DateValidation;
 
 /**

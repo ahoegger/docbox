@@ -24,8 +24,8 @@ import ch.ahoegger.docbox.shared.conversation.IConversationService;
 
 public class ConversationServiceTest extends AbstractTestWithDatabase {
 
-  private static final Long conversationId01 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long conversationId02 = BEANS.get(IdGenerateService.class).getNextId();
+  private static final BigDecimal conversationId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal conversationId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
   public void setupDb() throws Exception {
@@ -70,7 +70,7 @@ public class ConversationServiceTest extends AbstractTestWithDatabase {
     IConversationService service = BEANS.get(IConversationService.class);
 
     ConversationFormData fd1 = new ConversationFormData();
-    fd1.setConversationId(new BigDecimal(conversationId02));
+    fd1.setConversationId(conversationId02);
     fd1 = service.load(fd1);
 
     fd1.getName().setValue("modified.name");
@@ -85,7 +85,7 @@ public class ConversationServiceTest extends AbstractTestWithDatabase {
     fd1 = service.store(fd1);
 
     ConversationFormData fd2 = new ConversationFormData();
-    fd2.setConversationId(new BigDecimal(conversationId02));
+    fd2.setConversationId(conversationId02);
     fd2 = service.load(fd2);
 
     DocboxAssert.assertEquals(fd1, fd2);
@@ -98,7 +98,7 @@ public class ConversationServiceTest extends AbstractTestWithDatabase {
     service.delete(conversationId02);
 
     ConversationFormData fd1 = new ConversationFormData();
-    fd1.setConversationId(new BigDecimal(conversationId02));
+    fd1.setConversationId(conversationId02);
     fd1 = service.load(fd1);
     Assert.assertNull(fd1);
 

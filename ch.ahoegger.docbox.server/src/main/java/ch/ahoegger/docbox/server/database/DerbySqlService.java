@@ -16,8 +16,8 @@ import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
+import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
 import ch.ahoegger.docbox.server.backup.internal.ZipFile;
-import ch.ahoegger.docbox.shared.ISequenceTable;
 import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 import ch.ahoegger.docbox.shared.security.permission.BackupPermission;
 

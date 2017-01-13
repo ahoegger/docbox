@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.server.conversation;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -26,10 +27,10 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
  */
 public class ConversationService_SearchByActiveState extends AbstractTestWithDatabase {
 
-  private static final Long conversationId01 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long conversationId02 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long conversationId03 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long conversationId04 = BEANS.get(IdGenerateService.class).getNextId();
+  private static final BigDecimal conversationId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal conversationId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal conversationId03 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal conversationId04 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
   public void setupDb() throws Exception {
@@ -66,7 +67,7 @@ public class ConversationService_SearchByActiveState extends AbstractTestWithDat
 
     Assert.assertEquals(CollectionUtility.arrayList(conversationId01, conversationId03, conversationId04),
         Arrays.stream(tableData.getRows()).map(row -> row.getConversationId())
-            .map(bigDecKey -> bigDecKey.longValue())
+            .map(bigDecKey -> bigDecKey)
             .sorted()
             .collect(Collectors.toList()));
   }
@@ -80,7 +81,7 @@ public class ConversationService_SearchByActiveState extends AbstractTestWithDat
 
     Assert.assertEquals(CollectionUtility.arrayList(conversationId02),
         Arrays.stream(tableData.getRows()).map(row -> row.getConversationId())
-            .map(bigDecKey -> bigDecKey.longValue())
+            .map(bigDecKey -> bigDecKey)
             .sorted()
             .collect(Collectors.toList()));
   }
@@ -94,7 +95,7 @@ public class ConversationService_SearchByActiveState extends AbstractTestWithDat
 
     Assert.assertEquals(CollectionUtility.arrayList(conversationId01, conversationId02, conversationId03, conversationId04),
         Arrays.stream(tableData.getRows()).map(row -> row.getConversationId())
-            .map(bigDecKey -> bigDecKey.longValue())
+            .map(bigDecKey -> bigDecKey)
             .sorted()
             .collect(Collectors.toList()));
   }

@@ -67,7 +67,7 @@ public class PartnerService_SearchByName extends AbstractTestWithDatabase {
 
     Assert.assertEquals(CollectionUtility.arrayList(partnerId02),
         Arrays.stream(tableData.getRows()).map(row -> row.getPartnerId())
-            .map(bigDecKey -> bigDecKey.longValue())
+            .map(bigDecKey -> bigDecKey)
             .sorted()
             .collect(Collectors.toList()));
   }
@@ -81,7 +81,7 @@ public class PartnerService_SearchByName extends AbstractTestWithDatabase {
 
     Assert.assertEquals(CollectionUtility.arrayList(partnerId04),
         Arrays.stream(tableData.getRows()).map(row -> row.getPartnerId())
-            .map(bigDecKey -> bigDecKey.longValue())
+            .map(bigDecKey -> bigDecKey)
             .sorted()
             .collect(Collectors.toList()));
   }
@@ -95,7 +95,7 @@ public class PartnerService_SearchByName extends AbstractTestWithDatabase {
 
     Assert.assertEquals(CollectionUtility.arrayList(partnerId02, partnerId03),
         Arrays.stream(tableData.getRows()).map(row -> row.getPartnerId())
-            .map(bigDecKey -> bigDecKey.longValue())
+            .map(bigDecKey -> bigDecKey)
             .sorted()
             .collect(Collectors.toList()));
   }

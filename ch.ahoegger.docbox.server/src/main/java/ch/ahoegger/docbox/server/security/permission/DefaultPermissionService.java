@@ -1,19 +1,20 @@
 package ch.ahoegger.docbox.server.security.permission;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.ch.ahoegger.docbox.server.or.app.tables.DefaultPermissionTable;
+import org.ch.ahoegger.docbox.server.or.app.tables.records.DefaultPermissionTableRecord;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.shared.backup.IBackupService;
-import ch.ahoegger.docbox.shared.security.permission.IDefaultPermissionTable;
-import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
  * <h3>{@link DefaultPermissionService}</h3>
@@ -21,16 +22,18 @@ import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
  * @author Andreas Hoegger
  */
 @ApplicationScoped
-public class DefaultPermissionService implements IDefaultPermissionTable {
+public class DefaultPermissionService {
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultPermissionService.class);
 
   public Map<String, Integer> getDefaultPermissions() {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(USERNAME, PERMISSION)).append(" FROM ").append(TABLE_NAME);
-    Object[][] rawResult = SQL.select(statementBuilder.toString());
-    return Arrays.stream(rawResult).collect(Collectors.toMap(
-        row -> (String) TypeCastUtility.castValue(row[0], String.class),
-        row -> (Integer) TypeCastUtility.castValue(row[1], Integer.class),
-        (p1, p2) -> Math.max(p1, p2)));
+
+    DefaultPermissionTable t = DefaultPermissionTable.DEFAULT_PERMISSION_TABLE;
+    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(t.USERNAME, t.PERMISSION)
+        .from(t)
+        .fetch()
+        .stream()
+        .collect(Collectors.toMap(rec -> rec.get(t.USERNAME), rec -> rec.get(t.PERMISSION)));
   }
 
   /**
@@ -38,10 +41,10 @@ public class DefaultPermissionService implements IDefaultPermissionTable {
    * @param permission
    */
   public void updateDefaultPermission(String username, Integer permission) {
-    Assertions.assertNotNull(username);
-
     deleteByUsername(username);
-    createDefaultPermission(username, permission);
+    if (permission != null) {
+      createDefaultPermission(username, permission);
+    }
   }
 
   /**
@@ -50,33 +53,37 @@ public class DefaultPermissionService implements IDefaultPermissionTable {
    */
   public void createDefaultPermission(String username, Integer permission) {
     Assertions.assertNotNull(username);
+    DefaultPermissionTable t = DefaultPermissionTable.DEFAULT_PERMISSION_TABLE;
 
-    if (permission != null) {
-      StringBuilder statementBuilder = new StringBuilder();
-      statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-      statementBuilder.append(SqlFramentBuilder.columns(USERNAME, PERMISSION)).append(" ) VALUES (");
-      statementBuilder.append(":username, :defaultPermission");
-      statementBuilder.append(")");
-
-      SQL.insert(statementBuilder.toString(),
-          new NVPair("username", username),
-          new NVPair("defaultPermission", permission));
-
+    int rowCount = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .newRecord(t)
+        .with(t.USERNAME, username)
+        .with(t.PERMISSION, permission)
+        .insert();
+    if (rowCount == 1) {
       // notify backup needed
       BEANS.get(IBackupService.class).notifyModification();
     }
 
   }
 
-  public void deleteByUsername(String username) {
+  public boolean deleteByUsername(String username) {
     Assertions.assertNotNull(username);
-
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(USERNAME).append(" = :username");
-    SQL.delete(statementBuilder.toString(), new NVPair("username", username));
+    DefaultPermissionTable t = DefaultPermissionTable.DEFAULT_PERMISSION_TABLE;
+    DefaultPermissionTableRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(t, t.USERNAME.eq(username));
+    if (rec == null) {
+      LOG.warn("Try to delete not existing record with id '{}'!", username);
+      return false;
+    }
+    if (rec.delete() != 1) {
+      LOG.error("Could not delete record with id '{}'!", username);
+      return false;
+    }
 
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
-
+    return true;
   }
+
 }

@@ -2,135 +2,164 @@ package ch.ahoegger.docbox.server.conversation;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import org.ch.ahoegger.docbox.server.or.app.tables.Conversation;
+import org.ch.ahoegger.docbox.server.or.app.tables.records.ConversationRecord;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.holders.BooleanHolder;
-import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.jooq.Condition;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.shared.ISequenceTable;
+import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.conversation.ConversationFormData;
 import ch.ahoegger.docbox.shared.conversation.ConversationSearchFormData;
 import ch.ahoegger.docbox.shared.conversation.ConversationTableData;
+import ch.ahoegger.docbox.shared.conversation.ConversationTableData.ConversationTableRowData;
 import ch.ahoegger.docbox.shared.conversation.IConversationService;
-import ch.ahoegger.docbox.shared.conversation.IConversationTable;
-import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
+import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
  * <h3>{@link ConversationService}</h3>
  *
  * @author Andreas Hoegger
  */
-public class ConversationService implements IConversationService, IConversationTable {
+public class ConversationService implements IConversationService {
+  private static final Logger LOG = LoggerFactory.getLogger(ConversationService.class);
 
   @Override
   public ConversationTableData getTableData(ConversationSearchFormData formData) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, CONVERSATION_NR, NAME, START_DATE, END_DATE))
-        .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS).append(" ")
-        .append(SqlFramentBuilder.WHERE_DEFAULT);
 
-    // search criteria name
+    Conversation c = Conversation.CONVERSATION.as("con");
+
+    Condition condition = DSL.trueCondition();
+    // name
     if (StringUtility.hasText(formData.getName().getValue())) {
-      statementBuilder.append(" AND ").append(SqlFramentBuilder.whereStringContains(NAME, formData.getName().getValue()));
+      condition = condition.and(c.NAME.lower().contains(formData.getName().getValue().toLowerCase()));
     }
-    // seach criteria active
+    // active
     if (formData.getActiveBox().getValue() != null) {
       switch (formData.getActiveBox().getValue()) {
         case TRUE:
-          statementBuilder.append(" AND (").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, END_DATE)).append(" >= ").append("CURRENT_DATE")
-              .append(" OR ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, END_DATE)).append(" IS NULL)");
+          condition = condition.and(
+              c.END_DATE.ge(new Date())
+                  .or(c.END_DATE.isNull()));
           break;
         case FALSE:
-          statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, END_DATE)).append(" < ").append("CURRENT_DATE");
+          condition = condition.and(
+              c.END_DATE.lessThan(new Date()));
           break;
       }
     }
 
-    statementBuilder.append(" INTO ")
-        .append(":{td.conversationId}, ")
-        .append(":{td.name}, ")
-        .append(":{td.startDate}, ")
-        .append(":{td.endDate} ");
+    List<ConversationTableRowData> rows = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(c.CONVERSATION_NR, c.NAME, c.START_DATE, c.END_DATE)
+        .from(c)
+        .where(condition)
+        .fetch()
+        .stream()
+        .map(rec -> {
+          ConversationTableRowData row = new ConversationTableRowData();
+          row.setConversationId(rec.get(c.CONVERSATION_NR));
+          row.setName(rec.get(c.NAME));
+          row.setStartDate(rec.get(c.START_DATE));
+          row.setEndDate(rec.get(c.END_DATE));
+          return row;
+        })
+        .collect(Collectors.toList());
 
     ConversationTableData tableData = new ConversationTableData();
-    SQL.selectInto(statementBuilder.toString(),
-        new NVPair("td", tableData),
-        formData);
+    tableData.setRows(rows.toArray(new ConversationTableRowData[0]));
     return tableData;
   }
 
   @Override
   public ConversationFormData prepareCreate(ConversationFormData formData) {
-    formData.getStartDate().setValue(new Date());
+    formData.getStartDate().setValue(LocalDateUtility.today());
     return formData;
   }
 
   @Override
   public ConversationFormData create(ConversationFormData formData) {
     formData.setConversationId(new BigDecimal(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME)));
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("INSERT INTO ").append(TABLE_NAME);
-    statementBuilder.append(" (").append(SqlFramentBuilder.columns(CONVERSATION_NR, NAME, NOTES, START_DATE, END_DATE)).append(")");
-    statementBuilder.append(" VALUES ( :conversationId, :name, :notes, :startDate, :endDate )");
-    SQL.insert(statementBuilder.toString(),
-        formData);
 
-    // notify backup needed
-    BEANS.get(IBackupService.class).notifyModification();
+    if (DSL.using(SQL.getConnection(), SQLDialect.DERBY).executeInsert(toRecord(formData)) == 1) {
+      // notify backup needed
+      BEANS.get(IBackupService.class).notifyModification();
 
-    return formData;
+      return formData;
+    }
+    return null;
+
   }
 
   @Override
   public ConversationFormData load(ConversationFormData formData) {
-    BooleanHolder exists = new BooleanHolder();
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT TRUE, ").append(SqlFramentBuilder.columns(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, NAME, NOTES, START_DATE, END_DATE)))
-        .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS)
-        // criteria
-        .append(" ").append(SqlFramentBuilder.WHERE_DEFAULT)
-        .append(" AND ").append(SqlFramentBuilder.columns(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, CONVERSATION_NR))).append(" = :conversationId")
-        .append(" INTO :exists, :name, :notes,  :startDate, :endDate");
 
-    SQL.selectInto(statementBuilder.toString(),
-        new NVPair("exists", exists),
-        formData);
-    if (exists.getValue() == null) {
-      return null;
-    }
+    Conversation c = Conversation.CONVERSATION.as("con");
+    ConversationRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(c, c.CONVERSATION_NR.eq(formData.getConversationId()));
+    return toFormData(rec);
 
-    return formData;
   }
 
   @Override
   public ConversationFormData store(ConversationFormData formData) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("UPDATE ").append(TABLE_NAME).append(" SET ");
-    statementBuilder.append(NAME).append("= :name, ");
-    statementBuilder.append(NOTES).append("= :notes, ");
-    statementBuilder.append(START_DATE).append("= :startDate, ");
-    statementBuilder.append(END_DATE).append("= :endDate ");
-    statementBuilder.append(" WHERE ").append(CONVERSATION_NR).append(" = :conversationId");
-    SQL.update(statementBuilder.toString(), formData);
-
-    // notify backup needed
-    BEANS.get(IBackupService.class).notifyModification();
-
-    return formData;
+    if (DSL.using(SQL.getConnection(), SQLDialect.DERBY).executeUpdate(toRecord(formData)) == 1) {
+      // notify backup needed
+      BEANS.get(IBackupService.class).notifyModification();
+      return formData;
+    }
+    return null;
   }
 
   @Override
-  public void delete(Long conversationId) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(CONVERSATION_NR).append(" = :conversationId");
-
-    SQL.delete(statementBuilder.toString(),
-        new NVPair("conversationId", conversationId));
-
-    // notify backup needed
+  public boolean delete(BigDecimal conversationId) {
+    Conversation c = Conversation.CONVERSATION.as("con");
+    ConversationRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(c, c.CONVERSATION_NR.eq(conversationId));
+    if (rec == null) {
+      LOG.warn("Try to delete not existing record with id '{}'!", conversationId);
+      return false;
+    }
+    if (rec.delete() != 1) {
+      LOG.error("Could not delete record with id '{}'!", conversationId);
+      return false;
+    }
     BEANS.get(IBackupService.class).notifyModification();
+    return true;
+  }
+
+  private ConversationRecord toRecord(ConversationFormData formData) {
+    ConversationRecord rec = new ConversationRecord();
+    rec.setConversationNr(formData.getConversationId());
+    rec.setName(formData.getName().getValue());
+    rec.setNotes(formData.getNotes().getValue());
+    rec.setStartDate(formData.getStartDate().getValue());
+    rec.setEndDate(formData.getEndDate().getValue());
+    return rec;
+  }
+
+  /**
+   * @param rec
+   * @return
+   */
+  private ConversationFormData toFormData(ConversationRecord rec) {
+    if (rec == null) {
+      return null;
+    }
+    ConversationFormData fd = new ConversationFormData();
+    fd.setConversationId(rec.getConversationNr());
+    fd.getName().setValue(rec.getName());
+    fd.getNotes().setValue(rec.getNotes());
+    fd.getStartDate().setValue(rec.getStartDate());
+    fd.getEndDate().setValue(rec.getEndDate());
+    return fd;
   }
 }

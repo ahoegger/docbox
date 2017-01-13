@@ -1,19 +1,19 @@
 package ch.ahoegger.docbox.server.document;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPartner;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 
 import ch.ahoegger.docbox.shared.backup.IBackupService;
-import ch.ahoegger.docbox.shared.document.IDocumentPartnerTable;
-import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
  * <h3>{@link DocumentPartnerService}</h3>
@@ -21,38 +21,38 @@ import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
  * @author Andreas Hoegger
  */
 @ApplicationScoped
-public class DocumentPartnerService implements IDocumentPartnerTable {
+public class DocumentPartnerService {
 
   public Set<BigDecimal> getPartnerIds(BigDecimal documentId) {
-    Set<BigDecimal> partnerIds = new HashSet<BigDecimal>();
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(PARTNER_NR).append(" FROM ").append(TABLE_NAME);
-    statementBuilder.append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
-    Object[][] rawResult = SQL.select(statementBuilder.toString(),
-        new NVPair("documentId", documentId));
-    for (Object[] o : rawResult) {
-      partnerIds.add((BigDecimal) o[0]);
-    }
-    return partnerIds;
+    DocumentPartner t = DocumentPartner.DOCUMENT_PARTNER;
+
+    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(t.PARTNER_NR)
+        .from(t)
+        .where(t.DOCUMENT_NR.eq(documentId))
+        .fetch()
+        .stream()
+        .map(rec -> rec.get(t.PARTNER_NR))
+        .collect(Collectors.toSet());
   }
 
   public void createDocumentPartners(BigDecimal documentId, Set<BigDecimal> partnerIds) {
     if (CollectionUtility.hasElements(partnerIds)) {
-      for (BigDecimal partnerId : partnerIds) {
-        StringBuilder statementBuilder = new StringBuilder();
-        statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-        statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, PARTNER_NR));
-        statementBuilder.append(") VALUES (");
-        statementBuilder.append(":documentId, :partnerId");
-        statementBuilder.append(")");
-        SQL.insert(statementBuilder.toString(),
-            new NVPair("documentId", documentId),
-            new NVPair("partnerId", partnerId));
+      DocumentPartner t = DocumentPartner.DOCUMENT_PARTNER;
 
-        // notify backup needed
-        BEANS.get(IBackupService.class).notifyModification();
+      DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+          .batchInsert(
+              partnerIds
+                  .stream()
+                  .map(id -> t.newRecord()
+                      .with(t.DOCUMENT_NR, documentId)
+                      .with(t.PARTNER_NR, id))
+                  .collect(Collectors.toList()))
+          .execute();
 
-      }
+      // notify backup needed
+      BEANS.get(IBackupService.class).notifyModification();
+
     }
   }
 
@@ -68,21 +68,27 @@ public class DocumentPartnerService implements IDocumentPartnerTable {
 
   @RemoteServiceAccessDenied
   public void deleteByDocumentId(BigDecimal documentId) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
-    SQL.delete(statementBuilder.toString(), new NVPair("documentId", documentId));
+    DocumentPartner t = DocumentPartner.DOCUMENT_PARTNER;
+
+    DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .delete(t)
+        .where(t.DOCUMENT_NR.eq(documentId))
+        .execute();
 
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
 
   }
 
-  public void deletePartnerId(BigDecimal partnerId) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(PARTNER_NR).append(" = :partnerId");
-    SQL.delete(statementBuilder.toString(), new NVPair("partnerId", partnerId));
+  public void deleteByPartnerId(BigDecimal partnerId) {
+    DocumentPartner t = DocumentPartner.DOCUMENT_PARTNER;
+
+    DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .delete(t)
+        .where(t.PARTNER_NR.eq(partnerId))
+        .execute();
+
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
-
   }
 }

@@ -22,11 +22,11 @@ import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.ExpenseAmountField
 import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.OkButton;
 import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.TextField;
 import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.WorkHoursField;
+import ch.ahoegger.docbox.or.definition.table.IEntityTable;
 import ch.ahoegger.docbox.shared.hr.entity.EntityFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.WorkCode;
 import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
-import ch.ahoegger.docbox.shared.hr.entity.IEntityTable;
 
 @FormData(value = EntityFormData.class, sdkCommand = FormData.SdkCommand.CREATE)
 public class EntityForm extends AbstractForm {
@@ -174,12 +174,12 @@ public class EntityForm extends AbstractForm {
 
       @Override
       protected BigDecimal getConfiguredMinValue() {
-        return IEntityTable.HOURS_MIN;
+        return IEntityTable.WORKING_HOURS_MIN;
       }
 
       @Override
       protected BigDecimal getConfiguredMaxValue() {
-        return IEntityTable.HOURS_MAX;
+        return IEntityTable.WORKING_HOURS_MAX;
       }
 
     }
@@ -193,12 +193,12 @@ public class EntityForm extends AbstractForm {
 
       @Override
       protected BigDecimal getConfiguredMinValue() {
-        return IEntityTable.AMOUNT_MIN;
+        return IEntityTable.EXPENSE_AMOUNT_MIN;
       }
 
       @Override
       protected BigDecimal getConfiguredMaxValue() {
-        return IEntityTable.AMOUNT_MAX;
+        return IEntityTable.EXPENSE_AMOUNT_MAX;
       }
 
     }

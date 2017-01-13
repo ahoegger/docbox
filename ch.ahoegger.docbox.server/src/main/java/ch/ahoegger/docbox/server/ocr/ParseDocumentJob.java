@@ -41,7 +41,7 @@ public class ParseDocumentJob {
         BinaryResource resource = getBinaryResource(getDocumentId()).awaitDoneAndGet();
         OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(resource);
         if (parseResult != null) {
-          persist(getDocumentId(), parseResult);
+          persist(getDocumentId(), parseResult).awaitDone();
           return parseResult.getText();
         }
         return null;

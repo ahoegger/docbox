@@ -2,6 +2,7 @@ package ch.ahoegger.docbox.client.administration.user;
 
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.dto.PageData;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
@@ -10,11 +11,15 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
@@ -175,6 +180,40 @@ public class UserTablePage extends AbstractPageWithTable<UserTablePage.Table> {
       protected void execAction() {
         UserForm form = new UserForm(FORM_MODE.NEW);
         form.start();
+      }
+    }
+
+    @Order(3000)
+    public class DeleteMenu extends AbstractMenu {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("Delete");
+      }
+
+      @Override
+      protected void execOwnerValueChanged(Object newOwnerValue) {
+        if (getSelectedRowCount() != 1) {
+          setVisible(false);
+          return;
+        }
+        if (ObjectUtility.equals(IClientSession.CURRENT.get().getUserId(), getUsernameColumn().getSelectedValue())) {
+          setVisible(false);
+          return;
+        }
+        setVisible(true);
+      }
+
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+      }
+
+      @Override
+      protected void execAction() {
+        if (MessageBoxes.createYesNo().withBody(TEXTS.get("DeleteConfirmationTextX", getUsernameColumn().getSelectedDisplayText())).show() == MessageBox.YES_OPTION) {
+          BEANS.get(IUserService.class).delete(getUsernameColumn().getSelectedValue());
+          IDesktop.CURRENT.get().dataChanged(IUserEntity.ENTITY_KEY);
+        }
       }
     }
 

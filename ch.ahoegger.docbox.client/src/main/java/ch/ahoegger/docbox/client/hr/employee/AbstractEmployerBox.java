@@ -6,8 +6,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TEXTS;
 
+import ch.ahoegger.docbox.or.definition.table.IEmployeeTable;
 import ch.ahoegger.docbox.shared.hr.employee.AbstractEmployerBoxData;
-import ch.ahoegger.docbox.shared.hr.employee.IEmployeeTable;
 
 /**
  * <h3>{@link AbstractEmployerBox}</h3>

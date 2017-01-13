@@ -2,69 +2,55 @@ package ch.ahoegger.docbox.server.database.dev.initialization;
 
 import java.math.BigDecimal;
 
-import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.ch.ahoegger.docbox.server.or.app.tables.DocumentOcr;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
+import org.jooq.Query;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.shared.ocr.IDocumentOcrTable;
-import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
+import ch.ahoegger.docbox.server.or.generator.table.DocumentOcrTableStatement;
 
 /**
  * <h3>{@link DocumentOcrTableTask}</h3>
  *
  * @author Andreas Hoegger
  */
-public class DocumentOcrTableTask implements ITableTask, IDocumentOcrTable {
+public class DocumentOcrTableTask extends DocumentOcrTableStatement implements ITableTask {
 
   private static final Logger LOG = LoggerFactory.getLogger(DocumentOcrTableTask.class);
 
   @Override
-  public String getCreateStatement() {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("CREATE TABLE ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(DOCUMENT_NR).append(" DECIMAL NOT NULL, ");
-    statementBuilder.append(TEXT).append(" CLOB(").append(TEXT_LENGHT).append(") , ");
-    statementBuilder.append(OCR_SCANNED).append(" BOOLEAN NOT NULL, ");
-    statementBuilder.append(PARSE_FAILED).append(" BOOLEAN NOT NULL, ");
-    statementBuilder.append("PRIMARY KEY (").append(SqlFramentBuilder.columns(DOCUMENT_NR)).append(")");
-    statementBuilder.append(")");
-    return statementBuilder.toString();
-  }
-
-  @Override
   public void createTable(ISqlService sqlService) {
     LOG.info("SQL-DEV create Table: {}", TABLE_NAME);
-    sqlService.insert(getCreateStatement());
+    sqlService.insert(getCreateTable());
   }
 
   @Override
   public void deleteTable(ISqlService sqlService) {
     LOG.info("SQL-DEV delete table: {}", TABLE_NAME);
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DELETE FROM ").append(TABLE_NAME);
-    sqlService.insert(statementBuilder.toString());
+    DocumentOcr t = DocumentOcr.DOCUMENT_OCR;
+    Query query = DSL.using(sqlService.getConnection(), SQLDialect.DERBY).delete(t);
+    query.execute();
   }
 
   @Override
   public void dropTable(ISqlService sqlService) {
     LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DROP TABLE ").append(TABLE_NAME);
-    sqlService.insert(statementBuilder.toString());
+    DocumentOcr t = DocumentOcr.DOCUMENT_OCR;
+    Query query = DSL.using(sqlService.getConnection(), SQLDialect.DERBY).dropTable(t);
+    query.execute();
   }
 
   public void createDocumentOcrRow(ISqlService sqlService, BigDecimal documentId, String text, boolean parsed, boolean parseFailed) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, TEXT, OCR_SCANNED, PARSE_FAILED));
-    statementBuilder.append(") VALUES (");
-    statementBuilder.append(":documentId, :text, :parsed, :parseFailed");
-    statementBuilder.append(")");
-    sqlService.insert(statementBuilder.toString(),
-        new NVPair("documentId", documentId),
-        new NVPair("text", text),
-        new NVPair("parsed", parsed),
-        new NVPair("parseFailed", parseFailed));
+    DocumentOcr t = DocumentOcr.DOCUMENT_OCR;
+    DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+        .newRecord(t)
+        .with(t.DOCUMENT_NR, documentId)
+        .with(t.OCR_SCANNED, parsed)
+        .with(t.PARSE_FAILED, parseFailed)
+        .with(t.TEXT, text)
+        .insert();
   }
 }

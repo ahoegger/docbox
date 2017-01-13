@@ -11,8 +11,8 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 
+import ch.ahoegger.docbox.or.definition.table.IEntityTable;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType;
-import ch.ahoegger.docbox.shared.hr.entity.IEntityTable;
 
 /**
  * <h3>{@link AbstractEntityTable}</h3>
@@ -123,12 +123,12 @@ public abstract class AbstractEntityTable extends AbstractTable {
 
     @Override
     protected BigDecimal getConfiguredMinValue() {
-      return IEntityTable.HOURS_MIN;
+      return IEntityTable.WORKING_HOURS_MIN;
     }
 
     @Override
     protected BigDecimal getConfiguredMaxValue() {
-      return IEntityTable.HOURS_MAX;
+      return IEntityTable.WORKING_HOURS_MAX;
     }
 
     @Override
@@ -152,12 +152,12 @@ public abstract class AbstractEntityTable extends AbstractTable {
 
     @Override
     protected BigDecimal getConfiguredMinValue() {
-      return IEntityTable.AMOUNT_MIN;
+      return IEntityTable.EXPENSE_AMOUNT_MIN;
     }
 
     @Override
     protected BigDecimal getConfiguredMaxValue() {
-      return IEntityTable.AMOUNT_MIN;
+      return IEntityTable.EXPENSE_AMOUNT_MIN;
     }
   }
 

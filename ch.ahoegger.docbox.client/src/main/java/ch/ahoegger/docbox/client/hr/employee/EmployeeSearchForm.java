@@ -24,7 +24,7 @@ import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTa
 import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox.ActiveBox;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox.FirstNameField;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox.LastNameField;
-import ch.ahoegger.docbox.shared.hr.employee.IEmployeeTable;
+import ch.ahoegger.docbox.or.definition.table.IEmployeeTable;
 import ch.ahoegger.docbox.shared.hr.employer.EmployeeSearchFormData;
 
 /**

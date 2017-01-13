@@ -19,8 +19,8 @@ import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
-import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
+import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
 
 /**
  * <h3>{@link DocumentService_WithNoPermission}</h3>
@@ -58,9 +58,9 @@ public class DocumentService_WithNoPermission extends AbstractTestWithDatabase {
     BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId03, "Dogs Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false);
 
     // permissions
-    BEANS.get(DocumentPermissionTableTask.class).createDocumentPermissionRow(sqlService, username03, documentId03, IDocumentPermissionTable.PERMISSION_WRITE);
-    BEANS.get(DocumentPermissionTableTask.class).createDocumentPermissionRow(sqlService, username04, documentId02, IDocumentPermissionTable.PERMISSION_READ);
-    BEANS.get(DocumentPermissionTableTask.class).createDocumentPermissionRow(sqlService, username04, documentId03, IDocumentPermissionTable.PERMISSION_WRITE);
+    BEANS.get(DocumentPermissionTableTask.class).createDocumentPermissionRow(sqlService, username03, documentId03, PermissionCodeType.WriteCode.ID);
+    BEANS.get(DocumentPermissionTableTask.class).createDocumentPermissionRow(sqlService, username04, documentId02, PermissionCodeType.ReadCode.ID);
+    BEANS.get(DocumentPermissionTableTask.class).createDocumentPermissionRow(sqlService, username04, documentId03, PermissionCodeType.WriteCode.ID);
   }
 
   @Test

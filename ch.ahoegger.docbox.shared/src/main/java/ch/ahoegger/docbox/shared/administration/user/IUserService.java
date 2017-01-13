@@ -38,7 +38,7 @@ public interface IUserService extends IService {
    * @param string
    * @return
    */
-  void delete(String string);
+  boolean delete(String string);
 
   /**
    * @param formData

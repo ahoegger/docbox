@@ -2,20 +2,20 @@ package ch.ahoegger.docbox.server.ocr;
 
 import java.math.BigDecimal;
 
+import org.ch.ahoegger.docbox.server.or.app.tables.DocumentOcr;
+import org.ch.ahoegger.docbox.server.or.app.tables.records.DocumentOcrRecord;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.holders.BooleanHolder;
-import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
 import ch.ahoegger.docbox.shared.ocr.IDocumentOcrService;
-import ch.ahoegger.docbox.shared.ocr.IDocumentOcrTable;
-import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
  * <h3>{@link DocumentOcrService}</h3>
@@ -23,48 +23,43 @@ import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
  * @author Andreas Hoegger
  */
 @ApplicationScoped
-public class DocumentOcrService implements IDocumentOcrService, IDocumentOcrTable {
-  @SuppressWarnings("unused")
+public class DocumentOcrService implements IDocumentOcrService {
   private static final Logger LOG = LoggerFactory.getLogger(DocumentOcrService.class);
 
   @RemoteServiceAccessDenied
   public void create(BigDecimal documentId, OcrParseResult parseResult) {
-    String text = null;
-    boolean ocrParsed = false;
-    boolean notParsable = false;
-    text = parseResult.getText();
-    ocrParsed = parseResult.isOcrParsed();
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, TEXT, OCR_SCANNED, PARSE_FAILED));
-    statementBuilder.append(") VALUES (");
-    statementBuilder.append(":documentId, :text, :ocrParsed, :notParsable");
-    statementBuilder.append(")");
-    SQL.insert(statementBuilder.toString(),
-        new NVPair("documentId", documentId),
-        new NVPair("text", text),
-        new NVPair("ocrParsed", ocrParsed),
-        new NVPair("notParsable", notParsable));
 
-    // notify backup needed
-    BEANS.get(IBackupService.class).notifyModification();
+    DocumentOcr docOcr = DocumentOcr.DOCUMENT_OCR.as("DOC_OCR");
+    int rowCount = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .newRecord(docOcr)
+        .with(docOcr.DOCUMENT_NR, documentId)
+        .with(docOcr.OCR_SCANNED, parseResult.isOcrParsed())
+        .with(docOcr.PARSE_FAILED, false)
+        .with(docOcr.TEXT, parseResult.getText())
+        .insert();
+
+    if (rowCount == 1) {
+      // notify backup needed
+      BEANS.get(IBackupService.class).notifyModification();
+    }
   }
 
   @Override
   public DocumentOcrFormData load(DocumentOcrFormData formData) {
-    BooleanHolder exists = new BooleanHolder();
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT TRUE, ").append(SqlFramentBuilder.columns(SqlFramentBuilder.columns(TEXT, OCR_SCANNED, PARSE_FAILED)));
-    statementBuilder.append(" FROM ").append(TABLE_NAME);
-    statementBuilder.append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
-    statementBuilder.append(" INTO :exists,  :text, :ocrParsed, :notParsable");
-    SQL.selectInto(statementBuilder.toString(),
-        new NVPair("exists", exists),
-        formData);
-    if (exists.getValue() == null) {
-      return null;
-    }
-    return formData;
+    DocumentOcr docOcr = DocumentOcr.DOCUMENT_OCR.as("DOC_OCR");
+    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetch(docOcr, docOcr.DOCUMENT_NR.eq(formData.getDocumentId()))
+        .stream()
+        .map(rec -> {
+          DocumentOcrFormData fd = new DocumentOcrFormData();
+          fd.setDocumentId(rec.get(docOcr.DOCUMENT_NR));
+          fd.getOcrParsed().setValue(rec.get(docOcr.OCR_SCANNED));
+          fd.getNotParsable().setValue(rec.get(docOcr.PARSE_FAILED));
+          fd.getText().setValue(rec.get(docOcr.TEXT));
+          return fd;
+        })
+        .findFirst()
+        .orElse(null);
   }
 
   /**
@@ -72,32 +67,33 @@ public class DocumentOcrService implements IDocumentOcrService, IDocumentOcrTabl
    * @return
    */
   public Boolean exists(BigDecimal documentId) {
-    BooleanHolder exists = new BooleanHolder();
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT TRUE ");
-    statementBuilder.append(" FROM ").append(TABLE_NAME);
-    statementBuilder.append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
-    statementBuilder.append(" INTO :exists");
-    SQL.selectInto(statementBuilder.toString(),
-        new NVPair("documentId", documentId),
-        new NVPair("exists", exists));
-    if (exists.getValue() == null) {
-      return Boolean.FALSE;
-    }
-    return Boolean.TRUE;
+    DocumentOcrFormData fd = new DocumentOcrFormData();
+    fd.setDocumentId(documentId);
+    return load(fd) != null;
   }
 
   /**
    * @param documentId
    * @param value
    */
-  public void delete(BigDecimal documentId) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
-    SQL.delete(statementBuilder.toString(), new NVPair("documentId", documentId));
+  public boolean delete(BigDecimal documentId) {
+
+    DocumentOcr docOcr = DocumentOcr.DOCUMENT_OCR.as("DOC_OCR");
+
+    DocumentOcrRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(docOcr, docOcr.DOCUMENT_NR.eq(documentId));
+    if (rec == null) {
+      LOG.warn("Try to delete not existing record with id '{}'!", documentId);
+      return false;
+    }
+    if (rec.delete() != 1) {
+      LOG.error("Could not delete record with id '{}'!", documentId);
+      return false;
+    }
 
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
+    return true;
   }
 
 }

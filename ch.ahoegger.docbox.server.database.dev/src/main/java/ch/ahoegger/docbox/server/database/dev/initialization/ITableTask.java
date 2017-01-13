@@ -1,17 +1,15 @@
 package ch.ahoegger.docbox.server.database.dev.initialization;
 
-import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
+
+import ch.ahoegger.docbox.server.or.generator.table.ITableStatement;
 
 /**
  * <h3>{@link ITableTask}</h3>
  *
  * @author Andreas Hoegger
  */
-@Bean
-public interface ITableTask {
-
-  String getCreateStatement();
+public interface ITableTask extends ITableStatement {
 
   void createTable(ISqlService sqlService);
 

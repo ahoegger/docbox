@@ -54,7 +54,7 @@ public class PostingGroupServiceTest extends AbstractTestWithDatabase {
     ISqlService sqlService = BEANS.get(ISqlService.class);
 
     BEANS.get(PartnerTableTask.class).createPartnerRow(sqlService, partnerId, "employee01", "desc01", docCaptureDate, null);
-    BEANS.get(EmployeeTableTask.class).createEmployerRow(sqlService, partnerId, "Homer", "Simpson", "Nashvill Street 12a", "Santa Barbara CA-90051", "ahv123564789", "iban987654321", 26.30,
+    BEANS.get(EmployeeTableTask.class).createEmployerRow(sqlService, partnerId, "Homer", "Simpson", "Nashvill Street 12a", "Santa Barbara CA-90051", "ahv123564789", "iban987654321", BigDecimal.valueOf(26.30),
         "Master Bob & Minor Molar", "Mountainview 12", "CA-90153 Santa Tropee", "master.bob@blu.com", "5445621236");
 
     BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId, "Abstract", docCaptureDate, LocalDateUtility.toDate(LocalDate.now().minusDays(4)), null, documentPath, null, null, true);

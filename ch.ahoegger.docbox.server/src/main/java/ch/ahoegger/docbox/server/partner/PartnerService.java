@@ -1,94 +1,90 @@
 package ch.ahoegger.docbox.server.partner;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPartner;
+import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
+import org.ch.ahoegger.docbox.server.or.app.tables.records.PartnerRecord;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.holders.BooleanHolder;
-import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
-import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
+import org.jooq.Condition;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.server.document.DocumentPartnerService;
-import ch.ahoegger.docbox.shared.ISequenceTable;
+import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
-import ch.ahoegger.docbox.shared.document.IDocumentPartnerTable;
 import ch.ahoegger.docbox.shared.partner.IPartnerService;
-import ch.ahoegger.docbox.shared.partner.IPartnerTable;
-import ch.ahoegger.docbox.shared.partner.Partner;
 import ch.ahoegger.docbox.shared.partner.PartnerFormData;
 import ch.ahoegger.docbox.shared.partner.PartnerSearchFormData;
 import ch.ahoegger.docbox.shared.partner.PartnerTableData;
+import ch.ahoegger.docbox.shared.partner.PartnerTableData.PartnerTableRowData;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
-import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
  * <h3>{@link PartnerService}</h3>
  *
  * @author Andreas Hoegger
  */
-public class PartnerService implements IPartnerService, IPartnerTable {
+public class PartnerService implements IPartnerService {
+  private static final Logger LOG = LoggerFactory.getLogger(PartnerService.class);
 
   @Override
   public PartnerTableData getTableData(PartnerSearchFormData formData) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, PARTNER_NR, NAME, START_DATE, END_DATE))
-        .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS).append(" ")
-        .append(SqlFramentBuilder.WHERE_DEFAULT);
+    Partner p = Partner.PARTNER.as("P");
+    DocumentPartner docPar = DocumentPartner.DOCUMENT_PARTNER.as("DOC_PAR");
 
+    Condition condition = DSL.trueCondition();
     // search criteria name
     if (StringUtility.hasText(formData.getName().getValue())) {
-      statementBuilder.append(" AND ").append(SqlFramentBuilder.whereStringContains(NAME, formData.getName().getValue()));
+      condition = condition.and(p.NAME.lower().contains(formData.getName().getValue().toLowerCase()));
     }
-    // seach criteria active
+    // active
     if (formData.getActiveBox().getValue() != null) {
       switch (formData.getActiveBox().getValue()) {
         case TRUE:
-          statementBuilder.append(" AND (").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, END_DATE)).append(" >= ").append("CURRENT_DATE")
-              .append(" OR ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, END_DATE)).append(" IS NULL)");
+          condition = condition.and(
+              p.END_DATE.ge(LocalDateUtility.today())
+                  .or(p.END_DATE.isNull()));
           break;
         case FALSE:
-          statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, END_DATE)).append(" < ").append("CURRENT_DATE");
+          condition = condition.and(
+              p.END_DATE.lessThan(new Date()));
           break;
       }
     }
+    // document id
+    if (formData.getDocumentId() != null) {
+      condition = condition.and(docPar.DOCUMENT_NR.eq(formData.getDocumentId()));
+    }
 
-    statementBuilder.append(" INTO ")
-        .append(":{td.partnerId}, ")
-        .append(":{td.name}, ")
-        .append(":{td.startDate}, ")
-        .append(":{td.endDate} ");
-
-    PartnerTableData tableData = new PartnerTableData();
-    SQL.selectInto(statementBuilder.toString(),
-        new NVPair("td", tableData),
-        formData);
-    return tableData;
-  }
-
-  @RemoteServiceAccessDenied
-  public List<Partner> getPartners(BigDecimal documentId) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, PARTNER_NR, NAME, DESCRIPTION, START_DATE, END_DATE));
-    statementBuilder.append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS).append(", ").append(IDocumentPartnerTable.TABLE_NAME).append(" AS ").append(IDocumentPartnerTable.TABLE_ALIAS);
-    statementBuilder.append(" WHERE ").append(SqlFramentBuilder.columnsAliased(IDocumentPartnerTable.TABLE_ALIAS, IDocumentPartnerTable.PARTNER_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, PARTNER_NR));
-    statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentPartnerTable.TABLE_ALIAS, IDocumentPartnerTable.DOCUMENT_NR)).append(" = ").append(":documentId");
-    statementBuilder.append(" ORDER BY ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, NAME));
-    Object[][] rawResult = SQL.select(statementBuilder.toString(), new NVPair("documentId", documentId));
-
-    return Arrays.stream(rawResult).map(row -> new Partner()
-        .withPartnerId(TypeCastUtility.castValue(row[0], Long.class))
-        .withName(TypeCastUtility.castValue(row[1], String.class))
-        .withDescription(TypeCastUtility.castValue(row[2], String.class))
-        .withStartDate(TypeCastUtility.castValue(row[3], Date.class))
-        .withEndDate(TypeCastUtility.castValue(row[4], Date.class)))
+    List<PartnerTableRowData> rowDatas = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(p.PARTNER_NR, p.NAME, p.START_DATE, p.END_DATE)
+        .from(p)
+        .leftOuterJoin(docPar)
+        .on(p.PARTNER_NR.eq(docPar.PARTNER_NR))
+        .where(condition)
+        .fetch()
+        .stream()
+        .map(rec -> {
+          PartnerTableRowData rd = new PartnerTableRowData();
+          rd.setPartnerId(rec.get(p.PARTNER_NR));
+          rd.setName(rec.get(p.NAME));
+          rd.setStartDate(rec.get(p.START_DATE));
+          rd.setEndDate(rec.get(p.END_DATE));
+          return rd;
+        })
         .collect(Collectors.toList());
 
+    PartnerTableData tableData = new PartnerTableData();
+    tableData.setRows(rowDatas.toArray(new PartnerTableRowData[0]));
+
+    return tableData;
   }
 
   @Override
@@ -99,64 +95,87 @@ public class PartnerService implements IPartnerService, IPartnerTable {
 
   @Override
   public PartnerFormData create(PartnerFormData formData) {
+
     formData.setPartnerId(new BigDecimal(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME)));
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("INSERT INTO ").append(TABLE_NAME);
-    statementBuilder.append(" (").append(SqlFramentBuilder.columns(PARTNER_NR, NAME, DESCRIPTION, START_DATE, END_DATE)).append(")");
-    statementBuilder.append(" VALUES (:partnerId, :name, :description, :startDate, :endDate )");
-    SQL.insert(statementBuilder.toString(), formData, formData.getPartnerBox());
 
-    // notify backup needed
-    BEANS.get(IBackupService.class).notifyModification();
-
-    return formData;
+    Partner p = Partner.PARTNER;
+    if (DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .insertInto(p)
+        .set(toRecord(formData))
+        .execute() == 1) {
+      // notify backup needed
+      BEANS.get(IBackupService.class).notifyModification();
+      return formData;
+    }
+    return null;
   }
 
   @Override
   public PartnerFormData load(PartnerFormData formData) {
-    BooleanHolder exists = new BooleanHolder();
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT TRUE, ").append(SqlFramentBuilder.columns(SqlFramentBuilder.columns(NAME, DESCRIPTION, START_DATE, END_DATE)));
-    statementBuilder.append(" FROM ").append(TABLE_NAME);
-    statementBuilder.append(" WHERE ").append(PARTNER_NR).append(" = :partnerId");
-    statementBuilder.append(" INTO :exists, :name, :description, :startDate, :endDate");
-    SQL.selectInto(statementBuilder.toString(),
-        new NVPair("exists", exists),
-        formData, formData.getPartnerBox());
-    if (exists.getValue() == null) {
-      return null;
-    }
-    return formData;
+    Partner p = Partner.PARTNER;
+    return toFormData(DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(p, p.PARTNER_NR.eq(formData.getPartnerId())));
   }
 
   @Override
   public PartnerFormData store(PartnerFormData formData) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("UPDATE ").append(TABLE_NAME).append(" SET ");
-    statementBuilder.append(NAME).append("= :name, ");
-    statementBuilder.append(DESCRIPTION).append("= :description, ");
-    statementBuilder.append(START_DATE).append("= :startDate, ");
-    statementBuilder.append(END_DATE).append("= :endDate ");
-    statementBuilder.append(" WHERE ").append(PARTNER_NR).append(" = :partnerId");
-    SQL.update(statementBuilder.toString(), formData, formData.getPartnerBox());
+    Partner p = Partner.PARTNER;
+    if (DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(p, p.PARTNER_NR.eq(formData.getPartnerId()))
+        .with(p.NAME, formData.getPartnerBox().getName().getValue())
+        .with(p.DESCRIPTION, formData.getPartnerBox().getDescription().getValue())
+        .with(p.START_DATE, formData.getPartnerBox().getStartDate().getValue())
+        .with(p.END_DATE, formData.getPartnerBox().getEndDate().getValue())
+        .update() == 1) {
+      // notify backup needed
+      BEANS.get(IBackupService.class).notifyModification();
+      return formData;
+    }
+    return null;
 
-    // notify backup needed
-    BEANS.get(IBackupService.class).notifyModification();
-
-    return formData;
   }
 
   @Override
-  public void delete(BigDecimal partnerId) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(PARTNER_NR).append(" = :partnerId");
-    SQL.delete(statementBuilder.toString(), new NVPair("partnerId", partnerId));
+  public boolean delete(BigDecimal partnerId) {
+    Partner p = Partner.PARTNER;
+    PartnerRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(p, p.PARTNER_NR.eq(partnerId));
+    if (rec == null) {
+      LOG.warn("Try to delete not existing record with id '{}'!", partnerId);
+      return false;
+    }
+    if (rec.delete() != 1) {
+      LOG.error("Could not delete record with id '{}'!", partnerId);
+      return false;
+    }
 
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
+    return true;
 
-    // delete document category connection
-    BEANS.get(DocumentPartnerService.class).deletePartnerId(partnerId);
   }
 
+  protected PartnerFormData toFormData(PartnerRecord rec) {
+    if (rec == null) {
+      return null;
+    }
+    PartnerFormData fd = new PartnerFormData();
+    fd.setPartnerId(rec.getPartnerNr());
+    fd.getPartnerBox().getName().setValue(rec.getName());
+    fd.getPartnerBox().getDescription().setValue(rec.getDescription());
+    fd.getPartnerBox().getEndDate().setValue(rec.getEndDate());
+    fd.getPartnerBox().getStartDate().setValue(rec.getStartDate());
+    return fd;
+  }
+
+  protected PartnerRecord toRecord(PartnerFormData fd) {
+    PartnerRecord rec = new PartnerRecord();
+    rec.setPartnerNr(fd.getPartnerId());
+    rec.setName(fd.getPartnerBox().getName().getValue());
+    rec.setDescription(fd.getPartnerBox().getDescription().getValue());
+    rec.setStartDate(fd.getPartnerBox().getStartDate().getValue());
+    rec.setEndDate(fd.getPartnerBox().getEndDate().getValue());
+    return rec;
+
+  }
 }

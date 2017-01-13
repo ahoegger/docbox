@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.server.conversation;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 
@@ -23,10 +24,10 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
  */
 public class ConversationLookupServiceTest extends AbstractTestWithDatabase {
 
-  private static final Long conversationId01 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long conversationId02 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long conversationId03 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long conversationId04 = BEANS.get(IdGenerateService.class).getNextId();
+  private static final BigDecimal conversationId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal conversationId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal conversationId03 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal conversationId04 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
   public void setupDb() throws Exception {
@@ -62,7 +63,7 @@ public class ConversationLookupServiceTest extends AbstractTestWithDatabase {
     Assert.assertEquals(CollectionUtility.arrayList(conversationId01, conversationId02, conversationId03, conversationId04),
         lookupCall.getDataByAll().stream()
             .map(row -> row.getKey())
-            .map(key -> key.longValue())
+            .map(key -> key)
             .sorted()
             .collect(Collectors.toList()));
   }
@@ -74,7 +75,7 @@ public class ConversationLookupServiceTest extends AbstractTestWithDatabase {
     Assert.assertEquals(CollectionUtility.arrayList(conversationId01, conversationId03, conversationId04),
         lookupCall.getDataByAll().stream()
             .map(row -> row.getKey())
-            .map(key -> key.longValue())
+            .map(key -> key)
             .sorted()
             .collect(Collectors.toList()));
   }
@@ -86,7 +87,7 @@ public class ConversationLookupServiceTest extends AbstractTestWithDatabase {
     Assert.assertEquals(CollectionUtility.arrayList(conversationId02),
         lookupCall.getDataByAll().stream()
             .map(row -> row.getKey())
-            .map(key -> key.longValue())
+            .map(key -> key)
             .sorted()
             .collect(Collectors.toList()));
   }

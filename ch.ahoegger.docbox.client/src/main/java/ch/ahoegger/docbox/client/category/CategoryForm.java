@@ -23,9 +23,9 @@ import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.FieldBox.EndDateF
 import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.FieldBox.NameField;
 import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.FieldBox.StartDateField;
 import ch.ahoegger.docbox.client.category.CategoryForm.MainBox.OkButton;
+import ch.ahoegger.docbox.or.definition.table.ICategoryTable;
 import ch.ahoegger.docbox.shared.category.CategoryFormData;
 import ch.ahoegger.docbox.shared.category.ICategoryService;
-import ch.ahoegger.docbox.shared.category.ICategoryTable;
 import ch.ahoegger.docbox.shared.validation.DateValidation;
 
 /**

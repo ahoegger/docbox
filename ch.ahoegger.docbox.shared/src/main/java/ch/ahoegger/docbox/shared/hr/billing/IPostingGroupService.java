@@ -39,7 +39,7 @@ public interface IPostingGroupService extends IService {
   /**
    * @param selectedValue
    */
-  void delete(BigDecimal selectedValue);
+  boolean delete(BigDecimal selectedValue);
 
   /**
    * @param formData

@@ -16,6 +16,10 @@
 			<groupId>ch.ahoegger.docbox</groupId>
 		</dependency>
 		<dependency>
+			<artifactId>ch.ahoegger.docbox.server.or</artifactId>
+			<groupId>ch.ahoegger.docbox</groupId>
+		</dependency>
+		<dependency>
 			<groupId>org.eclipse.scout.rt</groupId>
 			<artifactId>org.eclipse.scout.rt.server.jdbc</artifactId>
 		</dependency>

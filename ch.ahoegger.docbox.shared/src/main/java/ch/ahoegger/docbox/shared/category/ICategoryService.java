@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.shared.category;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
@@ -30,9 +32,9 @@ public interface ICategoryService extends IService {
   CategoryFormData create(CategoryFormData formData);
 
   /**
-   * @param selectedValue
+   * @param categoryId
    */
-  void delete(Long selectedValue);
+  boolean delete(BigDecimal categoryId);
 
   /**
    * @param formData

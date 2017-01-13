@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.shared.conversation;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
@@ -31,7 +33,7 @@ public interface IConversationService extends IService {
   /**
    * @param selectedValue
    */
-  void delete(Long selectedValue);
+  boolean delete(BigDecimal selectedValue);
 
   /**
    * @param formData

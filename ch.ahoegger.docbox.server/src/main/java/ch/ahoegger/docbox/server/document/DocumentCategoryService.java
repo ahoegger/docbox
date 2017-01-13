@@ -1,21 +1,21 @@
 package ch.ahoegger.docbox.server.document;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.ch.ahoegger.docbox.server.or.app.tables.DocumentCategory;
+import org.ch.ahoegger.docbox.server.or.app.tables.records.DocumentCategoryRecord;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.holders.NVPair;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
+import org.jooq.InsertValuesStep2;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 
+import ch.ahoegger.docbox.or.definition.table.IDocumentCategoryTable;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
-import ch.ahoegger.docbox.shared.document.IDocumentCategoryTable;
-import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
  * <h3>{@link DocumentCategoryService}</h3>
@@ -26,39 +26,43 @@ import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 public class DocumentCategoryService implements IDocumentCategoryTable {
 
   public Set<BigDecimal> getCategoryIds(BigDecimal documentId) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(CATEGORY_NR).append(" FROM ").append(TABLE_NAME);
-    statementBuilder.append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
+    DocumentCategory dc = DocumentCategory.DOCUMENT_CATEGORY;
 
-    Object[][] rawResult = SQL.select(statementBuilder.toString(),
-        new NVPair("documentId", documentId));
-    return Arrays.stream(rawResult).map(row -> TypeCastUtility.castValue(row[0], BigDecimal.class)).collect(Collectors.toSet());
+    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(dc.CATEGORY_NR)
+        .from(dc)
+        .where(dc.DOCUMENT_NR.eq(documentId))
+        .fetch()
+        .stream()
+        .map(rec -> rec.get(dc.CATEGORY_NR))
+        .collect(Collectors.toSet());
   }
 
   public void createDocumentCategories(BigDecimal documentId, Set<BigDecimal> categoryIds) {
-    if (CollectionUtility.hasElements(categoryIds)) {
-      for (BigDecimal categoryId : categoryIds) {
-        StringBuilder statementBuilder = new StringBuilder();
-        statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-        statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, CATEGORY_NR));
-        statementBuilder.append(") VALUES (");
-        statementBuilder.append(":documentId, :categoryId");
-        statementBuilder.append(")");
-        SQL.insert(statementBuilder.toString(),
-            new NVPair("documentId", documentId),
-            new NVPair("categoryId", categoryId));
-      }
-
-      // notify backup needed
-      BEANS.get(IBackupService.class).notifyModification();
-
+    if (categoryIds == null) {
+      return;
     }
+    DocumentCategory dc = DocumentCategory.DOCUMENT_CATEGORY;
+    InsertValuesStep2<DocumentCategoryRecord, BigDecimal, BigDecimal> insertInto = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .insertInto(dc, dc.DOCUMENT_NR, dc.CATEGORY_NR);
+
+    categoryIds.forEach(catId -> {
+      insertInto.values(documentId, catId);
+    });
+
+    insertInto.execute();
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
   }
 
-  public void deleteByCategoryId(Long categoryId) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(CATEGORY_NR).append(" = :categoryId");
-    SQL.delete(statementBuilder.toString(), new NVPair("categoryId", categoryId));
+  public void deleteByCategoryId(BigDecimal categoryId) {
+    DocumentCategory dc = DocumentCategory.DOCUMENT_CATEGORY;
+
+    DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .delete(dc)
+        .where(dc.CATEGORY_NR.eq(categoryId))
+        .execute();
 
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
@@ -77,9 +81,12 @@ public class DocumentCategoryService implements IDocumentCategoryTable {
 
   @RemoteServiceAccessDenied
   public void deleteByDocumentId(BigDecimal documentId) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
-    SQL.delete(statementBuilder.toString(), new NVPair("documentId", documentId));
+    DocumentCategory dc = DocumentCategory.DOCUMENT_CATEGORY;
+
+    DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .delete(dc)
+        .where(dc.DOCUMENT_NR.eq(documentId))
+        .execute();
 
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();

@@ -23,8 +23,8 @@ import ch.ahoegger.docbox.client.conversation.ConversationSearchForm.MainBox.Sea
 import ch.ahoegger.docbox.client.conversation.ConversationSearchForm.MainBox.SearchTabBox.SearchBox;
 import ch.ahoegger.docbox.client.conversation.ConversationSearchForm.MainBox.SearchTabBox.SearchBox.ActiveBox;
 import ch.ahoegger.docbox.client.conversation.ConversationSearchForm.MainBox.SearchTabBox.SearchBox.NameField;
+import ch.ahoegger.docbox.or.definition.table.IConversationTable;
 import ch.ahoegger.docbox.shared.conversation.ConversationSearchFormData;
-import ch.ahoegger.docbox.shared.conversation.IConversationTable;
 
 /**
  * <h3>{@link ConversationSearchForm}</h3>

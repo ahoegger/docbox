@@ -23,10 +23,10 @@ import ch.ahoegger.docbox.client.conversation.ConversationForm.MainBox.FieldBox.
 import ch.ahoegger.docbox.client.conversation.ConversationForm.MainBox.FieldBox.NotesField;
 import ch.ahoegger.docbox.client.conversation.ConversationForm.MainBox.FieldBox.StartDateField;
 import ch.ahoegger.docbox.client.conversation.ConversationForm.MainBox.OkButton;
-import ch.ahoegger.docbox.shared.category.ICategoryTable;
+import ch.ahoegger.docbox.or.definition.table.ICategoryTable;
+import ch.ahoegger.docbox.or.definition.table.IConversationTable;
 import ch.ahoegger.docbox.shared.conversation.ConversationFormData;
 import ch.ahoegger.docbox.shared.conversation.IConversationService;
-import ch.ahoegger.docbox.shared.conversation.IConversationTable;
 import ch.ahoegger.docbox.shared.validation.DateValidation;
 
 /**

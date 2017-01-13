@@ -1,10 +1,13 @@
 package ch.ahoegger.docbox.shared.partner;
 
+import java.math.BigDecimal;
+
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
 /**
  * <b>NOTE:</b><br>
@@ -19,11 +22,34 @@ public class PartnerSearchFormData extends AbstractFormData {
     return getFieldByClass(ActiveBox.class);
   }
 
+  /**
+   * access method for property DocumentId.
+   */
+  public BigDecimal getDocumentId() {
+    return getDocumentIdProperty().getValue();
+  }
+
+  /**
+   * access method for property DocumentId.
+   */
+  public void setDocumentId(BigDecimal documentId) {
+    getDocumentIdProperty().setValue(documentId);
+  }
+
+  public DocumentIdProperty getDocumentIdProperty() {
+    return getPropertyByClass(DocumentIdProperty.class);
+  }
+
   public Name getName() {
     return getFieldByClass(Name.class);
   }
 
   public static class ActiveBox extends AbstractValueFieldData<TriState> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class DocumentIdProperty extends AbstractPropertyData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

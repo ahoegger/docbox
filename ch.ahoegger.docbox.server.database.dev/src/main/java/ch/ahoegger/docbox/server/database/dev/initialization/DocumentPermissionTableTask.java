@@ -2,67 +2,54 @@ package ch.ahoegger.docbox.server.database.dev.initialization;
 
 import java.math.BigDecimal;
 
-import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPermission;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
+import org.jooq.Query;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.shared.administration.user.IUserTable;
-import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
-import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
+import ch.ahoegger.docbox.server.or.generator.table.DocumentPermissionTableStatement;
 
 /**
  * <h3>{@link DocumentPermissionTableTask}</h3>
  *
  * @author Andreas Hoegger
  */
-public class DocumentPermissionTableTask implements ITableTask, IDocumentPermissionTable {
+public class DocumentPermissionTableTask extends DocumentPermissionTableStatement implements ITableTask {
   private static final Logger LOG = LoggerFactory.getLogger(DocumentPermissionTableTask.class);
-
-  @Override
-  public String getCreateStatement() {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("CREATE TABLE ").append(TABLE_NAME).append(" ( ");
-    statementBuilder.append(USERNAME).append(" VARCHAR(").append(IUserTable.USERNAME_LENGTH).append(") NOT NULL, ");
-    statementBuilder.append(DOCUMENT_NR).append(" DECIMAL NOT NULL, ");
-    statementBuilder.append(PERMISSION).append(" SMALLINT NOT NULL, ");
-    statementBuilder.append("PRIMARY KEY (").append(SqlFramentBuilder.columns(IUserTable.USERNAME, DOCUMENT_NR))
-        .append(")");
-    statementBuilder.append(" )");
-    return statementBuilder.toString();
-  }
 
   @Override
   public void createTable(ISqlService sqlService) {
     LOG.info("SQL-DEV create Table: {}", TABLE_NAME);
-    sqlService.insert(getCreateStatement());
+    sqlService.insert(getCreateTable());
   }
 
   @Override
   public void deleteTable(ISqlService sqlService) {
     LOG.info("SQL-DEV delete table: {}", TABLE_NAME);
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DELETE FROM ").append(TABLE_NAME);
-    sqlService.insert(statementBuilder.toString());
+    DocumentPermission t = DocumentPermission.DOCUMENT_PERMISSION;
+    Query query = DSL.using(sqlService.getConnection(), SQLDialect.DERBY).delete(t);
+    query.execute();
   }
 
   @Override
   public void dropTable(ISqlService sqlService) {
     LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DROP TABLE ").append(TABLE_NAME);
-    sqlService.insert(statementBuilder.toString());
+    DocumentPermission t = DocumentPermission.DOCUMENT_PERMISSION;
+    Query query = DSL.using(sqlService.getConnection(), SQLDialect.DERBY).dropTable(t);
+    query.execute();
   }
 
   public void createDocumentPermissionRow(ISqlService sqlService, String userId, BigDecimal documentId, int permission) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(SqlFramentBuilder.columns(IUserTable.USERNAME, DOCUMENT_NR, PERMISSION));
-    statementBuilder.append(") VALUES (");
-    statementBuilder.append(":userId, :documentId, :permission");
-    statementBuilder.append(")");
-    sqlService.insert(statementBuilder.toString(), new NVPair("userId", userId),
-        new NVPair("documentId", documentId), new NVPair("permission", permission));
+    DocumentPermission t = DocumentPermission.DOCUMENT_PERMISSION;
+    DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+        .newRecord(t)
+        .with(t.DOCUMENT_NR, documentId)
+        .with(t.PERMISSION, permission)
+        .with(t.USERNAME, userId)
+        .insert();
   }
 
 }

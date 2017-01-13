@@ -1,38 +1,75 @@
 package ch.ahoegger.docbox.server.partner;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.eclipse.scout.rt.server.jdbc.lookup.AbstractSqlLookupService;
+import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
+import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.eclipse.scout.rt.server.services.lookup.AbstractLookupService;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.jooq.Condition;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 
 import ch.ahoegger.docbox.shared.partner.IParterLookupService;
-import ch.ahoegger.docbox.shared.partner.IPartnerTable;
-import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
+import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
  * <h3>{@link PartnerLookupService}</h3>
  *
  * @author Andreas Hoegger
  */
-public class PartnerLookupService extends AbstractSqlLookupService<BigDecimal> implements IParterLookupService, IPartnerTable {
+public class PartnerLookupService extends AbstractLookupService<BigDecimal> implements IParterLookupService {
 
   @Override
-  protected String getConfiguredSqlSelect() {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(PARTNER_NR, NAME)).append(", ")
-        .append(" CAST(null as CHAR) AS A1, ") // icon id
-        .append(" CAST(null as CHAR) AS A2, ") // tooltip
-        .append(" CAST(null as CHAR) AS A3, ") // background color
-        .append(" CAST(null as CHAR) AS A4, ") // foreground color
-        .append(" CAST(null as CHAR) AS A5, ") // font
-        .append(" CAST(null as BOOLEAN) AS A6, ") // enable
-        .append(" CAST(null as CHAR), ") // parent key
-        .append("(").append(END_DATE).append(" IS NULL")
-        .append(" OR ").append(END_DATE).append(" >= ").append("CURRENT_DATE")
-        .append(") ").append(" AS ACTIVE") // active
-        .append(" FROM ").append(TABLE_NAME)
-        .append(" ").append(SqlFramentBuilder.WHERE_DEFAULT).append(" ");
-    statementBuilder.append("<key>").append("AND ").append(PARTNER_NR).append(" = :key").append("</key>");
-    statementBuilder.append("<text>").append("AND UPPER(").append(NAME).append(") LIKE UPPER(:text||'%')").append("</text>");
-    return statementBuilder.toString();
+  public List<? extends ILookupRow<BigDecimal>> getDataByKey(ILookupCall<BigDecimal> call) {
+    return getData(Partner.PARTNER.PARTNER_NR.eq(call.getKey()), call);
   }
+
+  @Override
+  public List<? extends ILookupRow<BigDecimal>> getDataByText(ILookupCall<BigDecimal> call) {
+    return getData(Partner.PARTNER.NAME.likeIgnoreCase(call.getText() + "%"), call);
+  }
+
+  @Override
+  public List<? extends ILookupRow<BigDecimal>> getDataByAll(ILookupCall<BigDecimal> call) {
+    return getData(DSL.trueCondition(), call);
+  }
+
+  @Override
+  public List<? extends ILookupRow<BigDecimal>> getDataByRec(ILookupCall<BigDecimal> call) {
+    return null;
+  }
+
+  protected List<? extends ILookupRow<BigDecimal>> getData(Condition conditions, ILookupCall<BigDecimal> call) {
+    Partner t = Partner.PARTNER;
+    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(t.PARTNER_NR, t.NAME, t.START_DATE, t.END_DATE)
+        .from(t)
+        .where(conditions)
+        .fetch().stream().map(rec -> {
+          LookupRow<BigDecimal> row = new LookupRow<BigDecimal>(rec.get(t.PARTNER_NR), rec.get(t.NAME));
+          row.withActive(Optional.ofNullable(rec.get(t.END_DATE)).map(d -> LocalDateUtility.toLocalDate(d).plusDays(1)).orElse(LocalDate.now().plusDays(1)).isAfter(LocalDate.now()));
+          return row;
+
+        })
+        .filter(r -> {
+          if (call.getActive().isUndefined()) {
+            return true;
+          }
+          else if (call.getActive().isTrue()) {
+            return r.isActive();
+          }
+          else {
+            return !r.isActive();
+          }
+        })
+        .collect(Collectors.toList());
+  }
+
 }

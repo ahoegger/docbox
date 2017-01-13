@@ -13,10 +13,14 @@ import ch.ahoegger.docbox.server.database.dev.initialization.EntityTableTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.PartnerTableTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.PostingGroupTableTask;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
+import ch.ahoegger.docbox.server.test.util.DocboxAssert;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.shared.hr.billing.PostingGroupCodeType.UnbilledCode;
+import ch.ahoegger.docbox.shared.hr.entity.EntityFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType;
+import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
 import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
@@ -55,5 +59,27 @@ public class EntityServiceTest extends AbstractTestWithDatabase {
     Assert.assertEquals(1, entityTableData.getRowCount());
   }
 
-  // TODO [aho] add test cases
+  @Test
+  public void testCreate() {
+    IEntityService service = BEANS.get(IEntityService.class);
+
+    EntityFormData fd1 = new EntityFormData();
+    fd1 = service.prepareCreate(fd1);
+
+    fd1.getExpenseAmount().setValue(BigDecimal.valueOf(10).setScale(2));
+    fd1.getText().setValue("a desc");
+    fd1.getEntityDate().setValue(LocalDateUtility.today());
+    fd1.setEntityType(ExpenseCode.ID);
+    fd1.getWorkHours().setValue(BigDecimal.valueOf(2.50).setScale(2));
+    fd1.setPartnerId(BigDecimal.valueOf(2222));
+    fd1.setPostingGroupId(UnbilledCode.ID);
+
+    fd1 = service.create(fd1);
+
+    EntityFormData fd2 = new EntityFormData();
+    fd2.setEntityId(fd1.getEntityId());
+    fd2 = service.load(fd2);
+
+    DocboxAssert.assertEquals(fd1, fd2);
+  }
 }

@@ -21,7 +21,7 @@ public class DumpDbStatementsTest {
   @Test
   public void dumpCreateStatements() {
     for (ITableTask task : BEANS.all(ITableTask.class)) {
-      System.out.println(task.getCreateStatement() + ";");
+      System.out.println(task.getCreateTable() + ";");
       System.out.println();
     }
   }

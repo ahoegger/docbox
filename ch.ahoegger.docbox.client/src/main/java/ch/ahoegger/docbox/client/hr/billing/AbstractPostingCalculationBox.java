@@ -10,7 +10,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 import ch.ahoegger.docbox.client.hr.entity.AbstractEntityTable;
-import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupTable;
+import ch.ahoegger.docbox.or.definition.table.IPostingGroupTable;
 import ch.ahoegger.docbox.shared.hr.billing.PostingCalculationBoxData;
 
 /**

@@ -3,12 +3,16 @@ package ch.ahoegger.docbox.server.database.dev.initialization;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import org.ch.ahoegger.docbox.server.or.app.tables.PostingGroup;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
+import org.jooq.Query;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupTable;
+import ch.ahoegger.docbox.server.or.generator.table.PostingGroupTableStatement;
 import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
@@ -16,41 +20,21 @@ import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
  *
  * @author Andreas Hoegger
  */
-public class PostingGroupTableTask implements ITableTask, IPostingGroupTable {
+public class PostingGroupTableTask extends PostingGroupTableStatement implements ITableTask {
   private static final Logger LOG = LoggerFactory.getLogger(PostingGroupTableTask.class);
-
-  @Override
-  public String getCreateStatement() {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("CREATE TABLE ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(POSTING_GROUP_NR).append(" DECIMAL NOT NULL, ");
-    statementBuilder.append(PARTNER_NR).append(" DECIMAL NOT NULL, ");
-    statementBuilder.append(DOCUMENT_NR).append(" DECIMAL NOT NULL, ");
-    statementBuilder.append(NAME).append(" VARCHAR(").append(NAME_LENGTH).append("), ");
-    statementBuilder.append(STATEMENT_DATE).append(" DATE, ");
-    statementBuilder.append(WORKING_HOURS).append(" DECIMAL, ");
-    statementBuilder.append(BRUTTO_WAGE).append(" DECIMAL, ");
-    statementBuilder.append(NETTO_WAGE).append(" DECIMAL, ");
-    statementBuilder.append(SOURCE_TAX).append(" DECIMAL, ");
-    statementBuilder.append(SOCIAL_SECURITY_TAX).append(" DECIMAL, ");
-    statementBuilder.append(VACATION_EXTRA).append(" DECIMAL, ");
-    statementBuilder.append("PRIMARY KEY (").append(POSTING_GROUP_NR).append(")");
-    statementBuilder.append(")");
-    return statementBuilder.toString();
-  }
 
   @Override
   public void createTable(ISqlService sqlService) {
     LOG.info("SQL-DEV create Table: {}", TABLE_NAME);
-    sqlService.insert(getCreateStatement());
+    sqlService.insert(getCreateTable());
   }
 
   @Override
   public void deleteTable(ISqlService sqlService) {
     LOG.info("SQL-DEV delete table: {}", TABLE_NAME);
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DELETE FROM ").append(TABLE_NAME);
-    sqlService.insert(statementBuilder.toString());
+    PostingGroup t = PostingGroup.POSTING_GROUP;
+    Query query = DSL.using(sqlService.getConnection(), SQLDialect.DERBY).delete(t);
+    query.execute();
   }
 
   @Override

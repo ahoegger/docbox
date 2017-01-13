@@ -64,6 +64,9 @@ public class TableBuilder {
         else if (ObjectUtility.equals(IColumn.TYPE.SMALLINT.toString(), columnType)) {
           columns.add(new SmallIntColumn((String) columnResult[0]));
         }
+        else if (ObjectUtility.equals(IColumn.TYPE.INTEGER.toString(), columnType)) {
+          columns.add(new IntegerColumn((String) columnResult[0]));
+        }
         else {
           errorStatusList.add(new Status("Column type '" + columnType + "' could not be resolved. Column '" + columnResult[0] + "' will be ignored!", IStatus.ERROR));
         }

@@ -12,7 +12,8 @@ public interface IColumn<T> {
     BIGINT,
     BOOLEAN,
     CLOB,
-    SMALLINT
+    SMALLINT,
+    INTEGER
   }
 
   String formatValueRaw(Object o);

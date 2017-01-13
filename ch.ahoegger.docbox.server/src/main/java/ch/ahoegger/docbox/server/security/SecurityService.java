@@ -5,15 +5,18 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 
+import org.ch.ahoegger.docbox.server.or.app.tables.DocboxUser;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.shared.administration.user.IUserTable;
+import ch.ahoegger.docbox.or.definition.table.IUserTable;
 
 /**
  * <h3>{@link SecurityService}</h3>
@@ -29,29 +32,36 @@ public class SecurityService implements IUserTable {
   public boolean authenticate(String username, final char[] passwordPlainText) {
     String passwordPlain = new String(passwordPlainText);
 
-    StringBuilder statementBuilder = new StringBuilder()
-        .append("SELECT ").append(PASSWORD).append(" FROM ").append(TABLE_NAME)
-        .append(" WHERE ").append(ACTIVE)
-        .append(" AND ").append(USERNAME).append(" = :username");
+    DocboxUser t = DocboxUser.DOCBOX_USER;
 
-    Object[][] result = SQL.select(statementBuilder.toString(), new NVPair("username", username));
+    String dbPass = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(t.PASSWORD)
+        .from(t)
+        .where(t.ACTIVE)
+        .and(t.USERNAME.eq(username))
+        .fetch()
+        .stream()
+        .map(rec -> rec.get(t.PASSWORD))
+        .findFirst()
+        .orElse(null);
 
-    if (result.length == 1) {
+    if (StringUtility.hasText(dbPass)) {
       if ("empty".equalsIgnoreCase(passwordPlain)) {
         LOG.warn("Authenicate user({}) with empty password. Do not use hash compare.", username);
-        final boolean authenticated = result[0][0].equals(passwordPlain);
+        final boolean authenticated = dbPass.equals(passwordPlain);
         LOG.warn("Authenicate user({}) with empty password. Do not use hash compare. Login successful:'{}'", username, authenticated);
         return authenticated;
       }
       else {
         String pwHash = new String(createPasswordHash(passwordPlainText));
-        final boolean authenicated = result[0][0].equals(pwHash);
+        final boolean authenicated = dbPass.equals(pwHash);
         if (LOG.isInfoEnabled()) {
           LOG.warn("Authenicate user({}). Login successful:'{}'", username, authenicated);
         }
         return authenicated;
       }
     }
+
     return false;
 
   }

@@ -5,7 +5,6 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,23 +14,28 @@ import org.ch.ahoegger.docbox.jasper.WageReportService;
 import org.ch.ahoegger.docbox.jasper.bean.Expense;
 import org.ch.ahoegger.docbox.jasper.bean.WageCalculation;
 import org.ch.ahoegger.docbox.jasper.bean.Work;
+import org.ch.ahoegger.docbox.server.or.app.tables.PostingGroup;
+import org.ch.ahoegger.docbox.server.or.app.tables.records.PostingGroupRecord;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.jooq.Condition;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
 import ch.ahoegger.docbox.server.document.DocumentService;
 import ch.ahoegger.docbox.server.hr.employee.EmployeeService;
 import ch.ahoegger.docbox.server.hr.entity.EntityService;
-import ch.ahoegger.docbox.shared.ISequenceTable;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Partners.PartnersRowData;
 import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupService;
-import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupTable;
 import ch.ahoegger.docbox.shared.hr.billing.PostingCalculationBoxData;
 import ch.ahoegger.docbox.shared.hr.billing.PostingCalculationBoxData.Entities.EntitiesRowData;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupCodeType.UnbilledCode;
@@ -48,67 +52,56 @@ import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.WorkCode;
 import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
-import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
 
 /**
  * <h3>{@link PostingGroupService}</h3>
  *
  * @author Andreas Hoegger
  */
-public class PostingGroupService implements IPostingGroupService, IPostingGroupTable {
+public class PostingGroupService implements IPostingGroupService {
+  private static final Logger LOG = LoggerFactory.getLogger(PostingGroupService.class);
 
   @Override
   public PostingGroupTableData getTableData(PostingGroupSearchFormData formData) {
-    List<Object> binds = new ArrayList<>();
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT 1, ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, POSTING_GROUP_NR, PARTNER_NR, DOCUMENT_NR, NAME, STATEMENT_DATE, BRUTTO_WAGE, NETTO_WAGE, SOURCE_TAX, SOCIAL_SECURITY_TAX, VACATION_EXTRA))
-        .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS).append(" ")
-        .append(SqlFramentBuilder.WHERE_DEFAULT);
+    Condition condition = DSL.trueCondition();
+    PostingGroup pg = PostingGroup.POSTING_GROUP.as("PG");
 
-    // search personId
     if (formData.getPartnerId() != null) {
-      statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, PARTNER_NR)).append(" = :partnerId");
-      binds.add(new NVPair("partnerId", formData.getPartnerId()));
+      condition = pg.PARTNER_NR.eq(formData.getPartnerId());
     }
-    // search criteria firstname
-//    if (formData.getPartnerId().getValue() != null) {
-//      statementBuilder.append(" AND ").append(SqlFramentBuilder.where(PARTNER_NR, formData.getPartnerId().getValue()));
-//    }
-//
-//    if (formData.getBilledBox().getValue() != null) {
-//      switch (formData.getBilledBox().getValue()) {
-//        case TRUE:
-//          statementBuilder.append(" AND (").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, BILLED)).append(" <= ").append("CURRENT_DATE")
-//              .append(" OR ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, BILLED)).append(" IS NULL)");
-//          break;
-//        case FALSE:
-//          statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, BILLED)).append(" IS NULL ");
-//          break;
-//      }
-//    }
 
-    statementBuilder.append(" INTO ")
-        .append(":{td.").append(PostingGroupTableRowData.sortGroup).append("}, ")
-        .append(":{td.").append(PostingGroupTableRowData.id).append("}, ")
-        .append(":{td.").append(PostingGroupTableRowData.partnerId).append("}, ")
-        .append(":{td.").append(PostingGroupTableRowData.documentId).append("}, ")
-        .append(":{td.").append(PostingGroupTableRowData.name).append("}, ")
-        .append(":{td.").append(PostingGroupTableRowData.date).append("}, ")
-        .append(":{td.").append(PostingGroupTableRowData.bruttoWage).append("}, ")
-        .append(":{td.").append(PostingGroupTableRowData.nettoWage).append("}, ")
-        .append(":{td.").append(PostingGroupTableRowData.sourceTax).append("}, ")
-        .append(":{td.").append(PostingGroupTableRowData.socialSecurityTax).append("}, ")
-        .append(":{td.").append(PostingGroupTableRowData.vacationExtra).append("} ");
+    List<PostingGroupTableRowData> rows = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(pg.POSTING_GROUP_NR, pg.PARTNER_NR, pg.DOCUMENT_NR, pg.NAME, pg.STATEMENT_DATE, pg.BRUTTO_WAGE, pg.NETTO_WAGE, pg.SOURCE_TAX, pg.SOCIAL_SECURITY_TAX, pg.VACATION_EXTRA)
+        .from(pg)
+        .where(condition)
+        .fetch()
+        .stream()
+        .map(rec -> {
+          PostingGroupTableRowData rd = new PostingGroupTableRowData();
+          rd.setSortGroup(BigDecimal.valueOf(1));
+          rd.setPartnerId(rec.get(pg.PARTNER_NR));
+          rd.setDocumentId(rec.get(pg.DOCUMENT_NR));
+          rd.setName(rec.get(pg.NAME));
+          rd.setDate(rec.get(pg.STATEMENT_DATE));
+          rd.setBruttoWage(rec.get(pg.BRUTTO_WAGE));
+          rd.setNettoWage(rec.get(pg.NETTO_WAGE));
+          rd.setSourceTax(rec.get(pg.SOURCE_TAX));
+          rd.setSocialSecurityTax(rec.get(pg.SOCIAL_SECURITY_TAX));
+          rd.setVacationExtra(rec.get(pg.VACATION_EXTRA));
+          return rd;
+        })
+        .collect(Collectors.toList());
 
-    PostingGroupTableData tableData = new PostingGroupTableData();
-    binds.add(new NVPair("td", tableData));
-    binds.add(formData);
-    SQL.selectInto(statementBuilder.toString(), binds.toArray());
-    PostingGroupTableRowData unbilledRow = tableData.addRow();
+    // unbilled row
+    PostingGroupTableRowData unbilledRow = new PostingGroupTableRowData();
     unbilledRow.setId(UnbilledCode.ID);
     unbilledRow.setSortGroup(BigDecimal.valueOf(2));
     unbilledRow.setPartnerId(formData.getPartnerId());
     unbilledRow.setName(TEXTS.get("Unbilled"));
+    rows.add(unbilledRow);
+
+    PostingGroupTableData tableData = new PostingGroupTableData();
+    tableData.setRows(rows.toArray(new PostingGroupTableRowData[0]));
     return tableData;
   }
 
@@ -152,32 +145,46 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
 
     DocumentFormData documentData = new DocumentFormData();
     DocumentService documentService = BEANS.get(DocumentService.class);
-    documentService.prepareCreate(documentData);
+    documentData = documentService.prepareCreate(documentData);
     documentData.getDocumentDate().setValue(LocalDateUtility.today());
     documentData.getDocument().setValue(new BinaryResource("payslip.pdf", docContent));
     PartnersRowData partnerRow = documentData.getPartners().addRow();
     partnerRow.setPartner(formData.getPartner().getValue());
     documentData.getAbstract().setValue(formData.getDocumentAbstract().getValue());
+    documentData.getCategoriesBox().setValue(CollectionUtility.emptyTreeSet());
     documentData = documentService.create(documentData);
     formData.setDocumentId(documentData.getDocumentId());
 
     // create posting group
     BigDecimal postingGroupId = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+
     formData.setPostingGroupId(postingGroupId);
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("INSERT INTO ").append(TABLE_NAME);
-    statementBuilder.append(" (").append(SqlFramentBuilder.columns(POSTING_GROUP_NR, PARTNER_NR, DOCUMENT_NR, NAME, STATEMENT_DATE, WORKING_HOURS, BRUTTO_WAGE, NETTO_WAGE, SOURCE_TAX, SOCIAL_SECURITY_TAX, VACATION_EXTRA)).append(")");
-    statementBuilder.append(" VALUES (:postingGroupId, :partner, :documentId, :title, :date, :hoursTotal, :bruttoWage, :nettoWage, :sourceTax, :socialSecuityTax, :vacationExtra)");
-    SQL.insert(statementBuilder.toString(),
-//        new NVPair("postingGroupId", postingGroupId),
-        formData, wageData);
 
-    // update entities
-    BEANS.get(EntityService.class).updateGroupId(unbilledEntities.stream().map(e -> e.getEnityId()).collect(Collectors.toSet()), postingGroupId);
+    PostingGroup pg = PostingGroup.POSTING_GROUP;
+    int rowCouont = DSL.using(SQL.getConnection(), SQLDialect.DERBY).newRecord(pg)
+        .with(pg.BRUTTO_WAGE, wageData.getBruttoWage())
+        .with(pg.DOCUMENT_NR, formData.getDocumentId())
+        .with(pg.NAME, formData.getTitle().getValue())
+        .with(pg.NETTO_WAGE, wageData.getNettoWage())
+        .with(pg.PARTNER_NR, formData.getPartner().getValue())
+        .with(pg.POSTING_GROUP_NR, formData.getPostingGroupId())
+        .with(pg.SOCIAL_SECURITY_TAX, wageData.getSocialSecuityTax())
+        .with(pg.SOURCE_TAX, wageData.getSourceTax())
+        .with(pg.STATEMENT_DATE, formData.getDate().getValue())
+        .with(pg.VACATION_EXTRA, wageData.getVacationExtra())
+        .with(pg.WORKING_HOURS, wageData.getHoursTotal())
+        .insert();
 
-    // notify backup needed
-    BEANS.get(IBackupService.class).notifyModification();
-    return formData;
+    if (rowCouont == 1) {
+
+      // update entities
+      BEANS.get(EntityService.class).updateGroupId(unbilledEntities.stream().map(e -> e.getEnityId()).collect(Collectors.toSet()), postingGroupId);
+
+      // notify backup needed
+      BEANS.get(IBackupService.class).notifyModification();
+      return formData;
+    }
+    return null;
   }
 
   @Override
@@ -215,38 +222,40 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
 
   @Override
   public PostingGroupFormData load(PostingGroupFormData formData) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columns(POSTING_GROUP_NR, PARTNER_NR, DOCUMENT_NR, NAME, STATEMENT_DATE));
-    statementBuilder.append(" FROM ").append(TABLE_NAME);
-    statementBuilder.append(" WHERE ").append(POSTING_GROUP_NR).append(" = :postingGroupId");
-    statementBuilder.append(" INTO :postingGroupId, :partner, :documentId, :title, :date");
-    SQL.selectInto(statementBuilder.toString(), formData);
-    return formData;
-
+    PostingGroup pg = PostingGroup.POSTING_GROUP;
+    return toFormData(DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(pg, pg.POSTING_GROUP_NR.eq(formData.getPostingGroupId())));
   }
 
   @Override
-  public void delete(BigDecimal postingGroupId) {
-    PostingGroupFormData postingGroupData = new PostingGroupFormData();
-    postingGroupData.setPostingGroupId(postingGroupId);
-    postingGroupData = load(postingGroupData);
-    BEANS.get(DocumentService.class).delete(postingGroupData.getDocumentId());
+  public boolean delete(BigDecimal postingGroupId) {
+
+    PostingGroup pg = PostingGroup.POSTING_GROUP;
+
+    PostingGroupRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(pg, pg.POSTING_GROUP_NR.eq(postingGroupId));
+    if (rec == null) {
+      LOG.warn("Try to delete not existing record with id '{}'!", postingGroupId);
+      return false;
+    }
+    if (rec.delete() != 1) {
+      LOG.error("Could not delete record with id '{}'!", postingGroupId);
+      return false;
+    }
+
+    BEANS.get(DocumentService.class).delete(rec.getDocumentNr());
 
     // update entities
     EntitySearchFormData entitySearchData = new EntitySearchFormData();
-    entitySearchData.getPartnerId().setValue(postingGroupData.getPartner().getValue());
+    entitySearchData.getPartnerId().setValue(rec.getPartnerNr());
     entitySearchData.setPostingGroupId(postingGroupId);
     EntityTablePageData entityTableData = BEANS.get(IEntityService.class).getEntityTableData(entitySearchData);
 
     BEANS.get(EntityService.class).updateGroupId(CollectionUtility.arrayList(entityTableData.getRows()).stream().map(e -> e.getEnityId()).collect(Collectors.toSet()), UnbilledCode.ID);
 
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(POSTING_GROUP_NR).append(" = :postingGroupId");
-    SQL.delete(statementBuilder.toString(), new NVPair("postingGroupId", postingGroupId));
-
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
-
+    return true;
   }
 
   protected List<EntityTableRowData> getUnbilledEntities(Date from, Date to, BigDecimal partnerId) {
@@ -303,6 +312,26 @@ public class PostingGroupService implements IPostingGroupService, IPostingGroupT
     result.setVacationExtraRelative(vacationExtraRelative);
     result.setVacationExtra(vacationExtra);
     return result;
+
+  }
+
+  protected PostingGroupFormData toFormData(PostingGroupRecord rec) {
+    if (rec == null) {
+      return null;
+    }
+    PostingGroupFormData fd = new PostingGroupFormData();
+//    BRUTTO_WAGE : TableField<PostingGroupRecord, BigDecimal>
+    fd.setDocumentId(rec.getDocumentNr());
+    fd.getTitle().setValue(rec.getName());
+//    NETTO_WAGE : TableField<PostingGroupRecord, BigDecimal>
+    fd.getPartner().setValue(rec.getPartnerNr());
+    fd.setPostingGroupId(rec.getPostingGroupNr());
+//    SOCIAL_SECURITY_TAX : TableField<PostingGroupRecord, BigDecimal>
+//    SOURCE_TAX : TableField<PostingGroupRecord, BigDecimal>
+    fd.getDate().setValue(rec.getStatementDate());
+//    VACATION_EXTRA : TableField<PostingGroupRecord, BigDecimal>
+//    WORKING_HOURS : TableField<PostingGroupRecord, BigDecimal>
+    return fd;
 
   }
 

@@ -2,8 +2,11 @@ package ch.ahoegger.docbox.server.document;
 
 import java.math.BigDecimal;
 import java.security.AccessController;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,144 +14,131 @@ import java.util.stream.Collectors;
 
 import javax.security.auth.Subject;
 
+import org.ch.ahoegger.docbox.server.or.app.tables.DocboxUser;
+import org.ch.ahoegger.docbox.server.or.app.tables.Document;
+import org.ch.ahoegger.docbox.server.or.app.tables.DocumentCategory;
+import org.ch.ahoegger.docbox.server.or.app.tables.DocumentOcr;
+import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPartner;
+import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPermission;
+import org.ch.ahoegger.docbox.server.or.app.tables.records.DocumentRecord;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.VetoException;
-import org.eclipse.scout.rt.platform.holders.BooleanHolder;
-import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.SQLDialect;
+import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
 import ch.ahoegger.docbox.server.ServerSession;
 import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.ocr.ParseDocumentJob;
 import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
-import ch.ahoegger.docbox.shared.ISequenceTable;
-import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Permissions.PermissionsRowData;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
-import ch.ahoegger.docbox.shared.document.IDocumentCategoryTable;
-import ch.ahoegger.docbox.shared.document.IDocumentPartnerTable;
-import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
+import ch.ahoegger.docbox.shared.document.DocumentTableData.DocumentTableRowData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
-import ch.ahoegger.docbox.shared.document.IDocumentTable;
-import ch.ahoegger.docbox.shared.ocr.IDocumentOcrTable;
+import ch.ahoegger.docbox.shared.partner.PartnerSearchFormData;
 import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
-import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
+import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
+import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
  * <h3>{@link DocumentService}</h3>
  *
  * @author Andreas Hoegger
  */
-public class DocumentService implements IDocumentService, IDocumentTable {
+public class DocumentService implements IDocumentService {
   private static final Logger LOG = LoggerFactory.getLogger(DocumentService.class);
 
   @Override
   public DocumentTableData getTableData(DocumentSearchFormData formData) {
 
-    StringBuilder sqlBuilder = new StringBuilder();
-    sqlBuilder.append("SELECT ")
-        .append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR, ABSTRACT, CONVERSATION_NR, DOCUMENT_DATE, INSERT_DATE, DOCUMENT_URL))
-        .append(", ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_OWNER", IDocumentPermissionTable.USERNAME));
+    String username = ServerSession.get().getUserId();
+    Date today = LocalDateUtility.toDate(LocalDate.now());
+    Document doc = Document.DOCUMENT.as("DOC");
+    DocumentPermission docPerOwner = DocumentPermission.DOCUMENT_PERMISSION.as("DOC_PER_OWNER");
+    DocumentOcr docOcr = DocumentOcr.DOCUMENT_OCR.as("DOC_OCR");
+    DocboxUser user = DocboxUser.DOCBOX_USER.as("USR");
+    DocumentPermission docPerCheck = DocumentPermission.DOCUMENT_PERMISSION.as("DOC_PER_CHECK");
 
-    sqlBuilder.append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS);
-    // join with owner
-    sqlBuilder.append(" LEFT OUTER JOIN ").append(IDocumentPermissionTable.TABLE_NAME).append(" AS ").append(IDocumentPermissionTable.TABLE_ALIAS + "_OWNER")
-        .append(" ON ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_OWNER", IDocumentPermissionTable.DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR))
-        .append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_OWNER", IDocumentPermissionTable.PERMISSION)).append(" = ").append(IDocumentPermissionTable.PERMISSION_OWNER);
-
-    // join with ocr
-    sqlBuilder.append(" LEFT OUTER JOIN ").append(IDocumentOcrTable.TABLE_NAME).append(" AS ").append(IDocumentOcrTable.TABLE_ALIAS)
-        .append(" ON ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.DOCUMENT_NR));
-
-    sqlBuilder.append(" WHERE 1 = 1");
-    // permission
-    // either admin
-    sqlBuilder.append(" AND ( EXISTS ( SELECT 1 FROM ").append(IUserTable.TABLE_NAME).append(" AS ").append(IUserTable.TABLE_ALIAS)
-        .append(" WHERE ").append(SqlFramentBuilder.columnsAliased(IUserTable.TABLE_ALIAS, IUserTable.USERNAME)).append(" = :username")
-        .append(" AND ").append(SqlFramentBuilder.columnsAliased(IUserTable.TABLE_ALIAS, IUserTable.ADMINISTRATOR))
-        .append(")");
-    // or permission
-    sqlBuilder.append(" OR EXISTS (SELECT 1 FROM ").append(IDocumentPermissionTable.TABLE_NAME).append(" AS ").append(IDocumentPermissionTable.TABLE_ALIAS + "_1")
-        .append(" WHERE ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_1", IDocumentPermissionTable.DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR))
-        .append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_1", IDocumentPermissionTable.USERNAME)).append(" = :username")
-        .append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_1", IDocumentPermissionTable.PERMISSION)).append(" >= ").append(IDocumentPermissionTable.PERMISSION_READ)
-        .append(")");
-    sqlBuilder.append(" )");
-
+    DSLContext dsl = DSL.using(SQL.getConnection(), SQLDialect.DERBY);
+    // conditions
+    List<Condition> conditions = new ArrayList<>();
     // abstract search criteria
     if (StringUtility.hasText(formData.getAbstract().getValue())) {
-      sqlBuilder.append(" AND ").append(SqlFramentBuilder.whereStringContains(TABLE_ALIAS, ABSTRACT, formData.getAbstract().getValue()));
+      conditions.add(doc.ABSTRACT.lower().contains(formData.getAbstract().getValue().toLowerCase()));
     }
+
     // partner search criteria
+
     if (formData.getPartner().getValue() != null) {
-      sqlBuilder.append(" AND EXISTS ( SELECT 1 FROM ").append(IDocumentPartnerTable.TABLE_NAME).append(" AS ").append(IDocumentPartnerTable.TABLE_ALIAS);
-      sqlBuilder.append(" WHERE ").append(SqlFramentBuilder.columnsAliased(IDocumentPartnerTable.TABLE_ALIAS, IDocumentPartnerTable.PARTNER_NR)).append(" = ").append(":partner");
-      sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentPartnerTable.TABLE_ALIAS, IDocumentPartnerTable.DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR));
-      sqlBuilder.append(")");
+      DocumentPartner docPartner = DocumentPartner.DOCUMENT_PARTNER.as("DOC_PAR");
+      conditions.add(DSL.exists(
+          dsl.selectOne()
+              .from(docPartner)
+              .where(
+                  docPartner.PARTNER_NR.eq(formData.getPartner().getValue())
+                      .and(docPartner.DOCUMENT_NR.eq(doc.DOCUMENT_NR)))));
     }
     // conversation search criteria
     if (formData.getConversation().getValue() != null) {
-      sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, CONVERSATION_NR)).append(" = ").append(":conversation");
+      conditions.add(doc.CONVERSATION_NR.eq(formData.getConversation().getValue()));
     }
     // document date from
     if (formData.getDocumentDateFrom().getValue() != null) {
-      sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_DATE)).append(" >= ").append(":documentDateFrom");
+      conditions.add(doc.DOCUMENT_DATE.ge(formData.getDocumentDateFrom().getValue()));
     }
     // document date to
     if (formData.getDocumentDateTo().getValue() != null) {
-      sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_DATE)).append(" <= ").append(":documentDateTo");
+      conditions.add(doc.DOCUMENT_DATE.le(formData.getDocumentDateTo().getValue()));
     }
     // active document (valid date)
     if (formData.getActiveBox().getValue() != null) {
       switch (formData.getActiveBox().getValue()) {
         case TRUE:
-          sqlBuilder.append(" AND (").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, VALID_DATE)).append(" >= ").append(":today")
-              .append(" OR ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, VALID_DATE)).append(" IS NULL)");
+          conditions.add(doc.VALID_DATE.ge(today)
+              .or(doc.VALID_DATE.isNull()));
           break;
         case FALSE:
-          sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, VALID_DATE)).append(" < ").append(":today");
+          conditions.add(doc.VALID_DATE.lessThan(today));
           break;
       }
     }
     // owner
     if (StringUtility.hasText(formData.getOwner().getValue())) {
-      sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentPermissionTable.TABLE_ALIAS + "_OWNER", IDocumentPermissionTable.USERNAME))
-          .append(" = :owner");
+      conditions.add(docPerOwner.USERNAME.eq(formData.getOwner().getValue()));
 
     }
-// search criteria cagegories
+    // search criteria cagegories
     if (formData.getCategoriesBox().getValue() != null) {
-      sqlBuilder.append(" AND ( SELECT COUNT(1) FROM ").append(IDocumentCategoryTable.TABLE_NAME).append(" AS ").append(IDocumentCategoryTable.TABLE_ALIAS)
-          .append(" WHERE ").append(SqlFramentBuilder.columnsAliased(IDocumentCategoryTable.TABLE_ALIAS, IDocumentCategoryTable.DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR))
-          .append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentCategoryTable.TABLE_ALIAS, IDocumentCategoryTable.CATEGORY_NR)).append(" IN (")
-          .append(
-              formData.getCategoriesBox().getValue()
-                  .stream()
-                  .filter(key -> key != null)
-                  .map(key -> key.toString())
-                  .collect(Collectors.joining(", ")))
-          .append("))")
-          .append(" = ").append(formData.getCategoriesBox().getValue().size());
+      DocumentCategory docCat = DocumentCategory.DOCUMENT_CATEGORY.as("DOC_CAT");
+      conditions.add(DSL.selectCount().from(docCat)
+          .where(docCat.DOCUMENT_NR.eq(doc.DOCUMENT_NR)
+              .and(docCat.CATEGORY_NR.in(formData.getCategoriesBox().getValue())))
+          .asField().eq(formData.getCategoriesBox().getValue().size()));
+
     }
 
     // search criteria ocr text
@@ -158,46 +148,73 @@ public class DocumentService implements IDocumentService, IDocumentTable {
         .map(text -> text.toLowerCase())
         .collect(Collectors.toList());
     if (lowerCaseOcrSearchTerms.size() > 0) {
+      Condition cond = DSL.trueCondition();
       for (String ocrSearchItem : lowerCaseOcrSearchTerms) {
-        sqlBuilder.append(" AND ").append(SqlFramentBuilder.whereStringContains(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.TEXT, ocrSearchItem));
+        cond = cond.and(docOcr.TEXT.lower().contains(ocrSearchItem));
       }
+      conditions.add(cond);
     }
     // active document (valid date)
     if (formData.getParsedContentBox().getValue() != null) {
       switch (formData.getParsedContentBox().getValue()) {
         case TRUE:
-          sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.TEXT)).append(" IS NOT NULL ");
+          conditions.add(docOcr.TEXT.isNotNull());
           break;
         case FALSE:
-          sqlBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.TEXT)).append(" IS NULL ");
+          conditions.add(docOcr.TEXT.isNull());
           break;
       }
     }
 
-    sqlBuilder.append(" INTO ");
-    sqlBuilder.append(":{td.documentId}, ");
-    sqlBuilder.append(":{td.abstract}, ");
-    sqlBuilder.append(":{td.conversation}, ");
-    sqlBuilder.append(":{td.documentDate}, ");
-    sqlBuilder.append(":{td.capturedDate}, ");
-    sqlBuilder.append(":{td.documentPath}, ");
-    sqlBuilder.append(":{td.owner} ");
+    SelectConditionStep<Record> query = dsl.select(doc.DOCUMENT_NR, doc.ABSTRACT, doc.CONVERSATION_NR, doc.DOCUMENT_DATE, doc.INSERT_DATE, doc.DOCUMENT_URL)
+        .select(docPerOwner.USERNAME)
+        .from(doc)
+        .leftOuterJoin(docPerOwner)
+        .on(docPerOwner.DOCUMENT_NR.eq(doc.DOCUMENT_NR).and(docPerOwner.PERMISSION.eq(PermissionCodeType.OwnerCode.ID)))
+        .leftOuterJoin(docOcr)
+        .on(doc.DOCUMENT_NR.eq(docOcr.DOCUMENT_NR))
+        .where(conditions)
+        .andExists(
+            dsl.selectOne()
+                .from(user)
+                .where(
+                    user.USERNAME.eq(username)
+                        .and(user.ADMINISTRATOR))
+                .orExists(
+                    dsl.selectOne()
+                        .from(docPerCheck)
+                        .where(
+                            doc.DOCUMENT_NR.eq(docPerCheck.DOCUMENT_NR)
+                                .and(docPerCheck.USERNAME.eq(username))
+                                .and(docPerCheck.PERMISSION.ge(PermissionCodeType.ReadCode.ID)))));
+
+    System.out.println("QQQ: " + query.toString());
     DocumentTableData tableData = new DocumentTableData();
-    Calendar cal = Calendar.getInstance();
-    DateUtility.truncCalendar(cal);
-    SQL.selectInto(sqlBuilder.toString(),
-        new NVPair("td", tableData),
-        new NVPair("username", ServerSession.get().getUserId()),
-        new NVPair("today", cal.getTime()),
-        formData);
 
-    // partners
+    tableData.setRows(
+        query.fetch()
+            .stream()
+            .map(rec -> {
+              DocumentTableRowData row = new DocumentTableRowData();
+              row.setDocumentId(rec.get(doc.DOCUMENT_NR));
+              row.setAbstract(rec.get(doc.ABSTRACT));
+              row.setConversation(rec.get(doc.CONVERSATION_NR));
+              row.setDocumentDate(rec.get(doc.DOCUMENT_DATE));
+              row.setCapturedDate(rec.get(doc.INSERT_DATE));
+              row.setDocumentPath(rec.get(doc.DOCUMENT_URL));
+              row.setOwner(rec.get(docPerOwner.USERNAME));
 
-    Arrays.stream(tableData.getRows()).forEach(row -> row.setPartner(BEANS.get(PartnerService.class).getPartners(row.getDocumentId())
-        .stream().map(p -> p.getName()).reduce((p1, p2) -> p1 + ", " + p2)
-        .orElse("")));
+              PartnerSearchFormData partnerSeachData = new PartnerSearchFormData();
+              partnerSeachData.setDocumentId(row.getDocumentId());
+              row.setPartner(Arrays.stream(BEANS.get(PartnerService.class).getTableData(partnerSeachData).getRows())
+                  .map(r -> r.getName())
+                  .reduce((p1, p2) -> p1 + ", " + p2)
+                  .orElse(""));
 
-    Arrays.stream(tableData.getRows()).map(row -> row.getAbstract() + " - " + row.getConversation()).forEach(System.out::println);
+              return row;
+            })
+            .collect(Collectors.toList())
+            .toArray(new DocumentTableRowData[]{}));
 
     return tableData;
   }
@@ -210,7 +227,7 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     formData.getParseOcr().setValue(true);
     Map<String, Integer> defaultPermissions = BEANS.get(DefaultPermissionService.class).getDefaultPermissions();
     defaultPermissions.remove(ServerSession.get().getUserId());
-    defaultPermissions.put(ServerSession.get().getUserId(), IDocumentPermissionTable.PERMISSION_OWNER);
+    defaultPermissions.put(ServerSession.get().getUserId(), PermissionCodeType.OwnerCode.ID);
     for (Entry<String, Integer> permission : defaultPermissions.entrySet()) {
       PermissionsRowData row = formData.getPermissions().addRow();
       row.setUser(permission.getKey());
@@ -232,13 +249,18 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     formData.getDocument().setValue(null);
 
     // create document
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(SqlFramentBuilder.columns(DOCUMENT_NR, ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE, CONVERSATION_NR, PARSE_OCR));
-    statementBuilder.append(") VALUES (");
-    statementBuilder.append(":documentId, :abstract, :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage, :conversation, :parseOcr");
-    statementBuilder.append(" )");
-    SQL.insert(statementBuilder.toString(), formData);
+    DSLContext dsl = DSL.using(SQL.getConnection(), SQLDialect.DERBY);
+    DocumentRecord newDoc = dsl.newRecord(Document.DOCUMENT);
+    newDoc.setDocumentNr(formData.getDocumentId());
+    newDoc.setAbstract(formData.getAbstract().getValue());
+    newDoc.setDocumentDate(formData.getDocumentDate().getValue());
+    newDoc.setInsertDate(formData.getCapturedDate().getValue());
+    newDoc.setValidDate(formData.getValidDate().getValue());
+    newDoc.setDocumentUrl(formData.getDocumentPath());
+    newDoc.setOriginalStorage(formData.getOriginalStorage().getValue());
+    newDoc.setConversationNr(formData.getConversation().getValue());
+    newDoc.setParseOcr(formData.getParseOcr().getValue());
+    newDoc.insert();
 
     // partner
     BEANS.get(DocumentPartnerService.class).createDocumentPartners(documentId,
@@ -273,16 +295,16 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
   @Override
   public void store(DocumentFormData formData) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("UPDATE ").append(TABLE_NAME).append(" SET ")
-        .append(ABSTRACT).append("= :abstract, ")
-        .append(DOCUMENT_DATE).append("= :documentDate, ")
-        .append(VALID_DATE).append("= :validDate, ")
-        .append(ORIGINAL_STORAGE).append("= :originalStorage, ")
-        .append(CONVERSATION_NR).append("= :conversation, ")
-        .append(PARSE_OCR).append("= :parseOcr ")
-        .append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
-    SQL.update(statementBuilder.toString(), formData);
+    DSLContext dsl = DSL.using(SQL.getConnection(), SQLDialect.DERBY);
+    Document doc = Document.DOCUMENT;
+    dsl.update(doc)
+        .set(doc.ABSTRACT, formData.getAbstract().getValue())
+        .set(doc.CONVERSATION_NR, formData.getConversation().getValue())
+        .set(doc.DOCUMENT_DATE, formData.getDocumentDate().getValue())
+        .set(doc.ORIGINAL_STORAGE, formData.getOriginalStorage().getValue())
+        .set(doc.PARSE_OCR, formData.getParseOcr().getValue())
+        .set(doc.VALID_DATE, formData.getValidDate().getValue())
+        .execute();
 
     // partner
     BEANS.get(DocumentPartnerService.class).updateDocumentPartner(formData.getDocumentId(),
@@ -330,39 +352,53 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
   @RemoteServiceAccessDenied
   public DocumentFormData loadTrusted(DocumentFormData formData) {
-    BooleanHolder exists = new BooleanHolder();
+    Document doc = Document.DOCUMENT;
+    DocumentFormData result = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(doc.ABSTRACT, doc.DOCUMENT_DATE, doc.INSERT_DATE, doc.VALID_DATE, doc.DOCUMENT_URL, doc.ORIGINAL_STORAGE, doc.CONVERSATION_NR, doc.PARSE_OCR)
+        .from(doc)
+        .where(doc.DOCUMENT_NR.eq(formData.getDocumentId()))
+        .fetch(rec -> {
+          DocumentFormData res = (DocumentFormData) formData.deepCopy();
+          res.getAbstract().setValue(rec.get(doc.ABSTRACT));
+          res.getDocumentDate().setValue(rec.get(doc.DOCUMENT_DATE));
+          res.getCapturedDate().setValue(rec.get(doc.INSERT_DATE));
+          res.getValidDate().setValue(rec.get(doc.VALID_DATE));
+          res.setDocumentPath(rec.get(doc.DOCUMENT_URL));
+          res.getOriginalStorage().setValue(rec.get(doc.ORIGINAL_STORAGE));
+          res.getConversation().setValue(rec.get(doc.CONVERSATION_NR));
+          res.getParseOcr().setValue(rec.get(doc.PARSE_OCR));
+          return res;
+        })
+        .stream()
+        .findFirst()
+        .orElse(null);
 
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT TRUE, ").append(SqlFramentBuilder.columns(ABSTRACT, DOCUMENT_DATE, INSERT_DATE, VALID_DATE, DOCUMENT_URL, ORIGINAL_STORAGE, CONVERSATION_NR, PARSE_OCR));
-    statementBuilder.append(" FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
-    statementBuilder.append(" INTO ").append(":exists, :abstract,  :documentDate, :capturedDate, :validDate, :documentPath, :originalStorage, :conversation, :parseOcr");
-    SQL.selectInto(statementBuilder.toString(), formData, new NVPair("exists", exists));
-    if (exists.getValue() == null) {
+    if (result == null) {
       return null;
     }
 
     // partners
-    for (BigDecimal partnerId : BEANS.get(DocumentPartnerService.class).getPartnerIds(formData.getDocumentId())) {
-      formData.getPartners().addRow().setPartner(partnerId);
+    for (BigDecimal partnerId : BEANS.get(DocumentPartnerService.class).getPartnerIds(result.getDocumentId())) {
+      result.getPartners().addRow().setPartner(partnerId);
     }
     // categories
-    formData.getCategoriesBox().setValue(BEANS.get(DocumentCategoryService.class).getCategoryIds(formData.getDocumentId()));
+    result.getCategoriesBox().setValue(BEANS.get(DocumentCategoryService.class).getCategoryIds(result.getDocumentId()));
 
     // permissions
-    for (Entry<String, Integer> permission : BEANS.get(DocumentPermissionService.class).getPermissions(formData.getDocumentId()).entrySet()) {
-      PermissionsRowData row = formData.getPermissions().addRow();
+    for (Entry<String, Integer> permission : BEANS.get(DocumentPermissionService.class).getPermissions(result.getDocumentId()).entrySet()) {
+      PermissionsRowData row = result.getPermissions().addRow();
       row.setUser(permission.getKey());
       row.setPermission(permission.getValue());
     }
     // ocr
-    if (BooleanUtility.nvl(formData.getParseOcr().getValue(), false)) {
-      formData.setHasOcrText(BEANS.get(DocumentOcrService.class).exists(formData.getDocumentId()));
+    if (BooleanUtility.nvl(result.getParseOcr().getValue(), false)) {
+      result.setHasOcrText(BEANS.get(DocumentOcrService.class).exists(result.getDocumentId()));
     }
     else {
-      formData.setHasOcrText(false);
+      result.setHasOcrText(false);
     }
 
-    return formData;
+    return result;
   }
 
   @Override
@@ -380,21 +416,24 @@ public class DocumentService implements IDocumentService, IDocumentTable {
     if (!ACCESS.check(new AdministratorPermission())) {
       throw new VetoException("Access denied");
     }
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("SELECT ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR))
-        .append(" FROM ").append(TABLE_NAME).append(" AS ").append(TABLE_ALIAS)
-        .append(" LEFT JOIN ").append(IDocumentOcrTable.TABLE_NAME).append(" AS ").append(IDocumentOcrTable.TABLE_ALIAS)
-        .append(" ON ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR)).append(" = ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.DOCUMENT_NR))
-        .append(" WHERE ").append(SqlFramentBuilder.columnsAliased(IDocumentOcrTable.TABLE_ALIAS, IDocumentOcrTable.DOCUMENT_NR)).append(" IS NULL")
-        .append(" AND ").append(PARSE_OCR);
-    if (documentIdsRaw != null) {
-      statementBuilder.append(" AND ").append(SqlFramentBuilder.columnsAliased(TABLE_ALIAS, DOCUMENT_NR)).append(" IN (")
-          .append(documentIdsRaw.stream().map(id -> id.toString()).collect(Collectors.joining(", ")))
-          .append(")");
-    }
-    Object[][] rawResult = SQL.select(statementBuilder.toString());
 
-    final List<BigDecimal> documentIds = Arrays.stream(rawResult).map(row -> TypeCastUtility.castValue(row[0], BigDecimal.class)).collect(Collectors.toList());
+    Document doc = Document.DOCUMENT.as("DOC");
+    DocumentOcr docOcr = DocumentOcr.DOCUMENT_OCR.as("DOC_OCR");
+    Condition condition = DSL.trueCondition();
+    if (documentIdsRaw != null) {
+      condition = doc.DOCUMENT_NR.in(documentIdsRaw);
+    }
+    final List<BigDecimal> documentIds = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(doc.DOCUMENT_NR)
+        .from(doc)
+        .leftJoin(docOcr)
+        .on(doc.DOCUMENT_NR.eq(docOcr.DOCUMENT_NR))
+        .where(docOcr.DOCUMENT_NR.isNull())
+        .and(doc.PARSE_OCR)
+        .and(condition)
+        .fetch(rec -> rec.get(doc.DOCUMENT_NR))
+        .stream()
+        .collect(Collectors.toList());
 
     return Jobs.schedule(new IRunnable() {
       @Override
@@ -427,19 +466,24 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
   }
 
-  public void delete(BigDecimal documentId) {
+  public boolean delete(BigDecimal documentId) {
     if (!ACCESS.check(new AdministratorPermission())) {
       throw new VetoException("Access denied");
     }
+
     DocumentFormData documentData = new DocumentFormData();
     documentData.setDocumentId(documentId);
     documentData = load(documentData);
     if (documentData == null) {
-      return;
+      return false;
     }
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DELETE FROM ").append(TABLE_NAME).append(" WHERE ").append(DOCUMENT_NR).append(" = :documentId");
-    SQL.delete(statementBuilder.toString(), new NVPair("documentId", documentId));
+    Document doc = Document.DOCUMENT;
+    if (DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .delete(doc)
+        .where(doc.DOCUMENT_NR.eq(documentId))
+        .execute() < 1) {
+      return false;
+    }
 
     // document file
     BEANS.get(DocumentStoreService.class).delete(documentData.getDocumentPath());
@@ -458,5 +502,6 @@ public class DocumentService implements IDocumentService, IDocumentTable {
 
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
+    return true;
   }
 }

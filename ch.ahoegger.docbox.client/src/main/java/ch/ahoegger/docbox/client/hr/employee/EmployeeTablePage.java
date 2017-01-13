@@ -21,8 +21,8 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
+import ch.ahoegger.docbox.or.definition.table.IEmployeeTable;
 import ch.ahoegger.docbox.shared.hr.employee.IEmployeeService;
-import ch.ahoegger.docbox.shared.hr.employee.IEmployeeTable;
 import ch.ahoegger.docbox.shared.hr.employer.EmployeeSearchFormData;
 import ch.ahoegger.docbox.shared.hr.employer.EmployeeTableData;
 

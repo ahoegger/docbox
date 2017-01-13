@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.CancelButton;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox;
@@ -26,13 +27,13 @@ import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.N
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.PasswordField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.UsernameField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.OkButton;
+import ch.ahoegger.docbox.or.definition.table.IUserTable;
 import ch.ahoegger.docbox.shared.administration.user.AdministratorLookupCall;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
-import ch.ahoegger.docbox.shared.administration.user.IUserTable;
 import ch.ahoegger.docbox.shared.administration.user.UserFormData;
 import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
 import ch.ahoegger.docbox.shared.administration.user.UserValidationStatus;
-import ch.ahoegger.docbox.shared.permission.PermissionLookupCall;
+import ch.ahoegger.docbox.shared.security.permission.PermissionLookupCall;
 
 /**
  * <h3>{@link UserForm}</h3>
@@ -292,8 +293,8 @@ public class UserForm extends AbstractForm {
         }
 
         @Override
-        protected void execInitField() {
-          setLookupCall(new PermissionLookupCall(false));
+        protected Class<? extends ILookupCall<Integer>> getConfiguredLookupCall() {
+          return PermissionLookupCall.class;
         }
 
       }

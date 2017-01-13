@@ -1,64 +1,52 @@
 package ch.ahoegger.docbox.server.database.dev.initialization;
 
-import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.ch.ahoegger.docbox.server.or.app.tables.DefaultPermissionTable;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
+import org.jooq.Query;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.shared.administration.user.IUserTable;
-import ch.ahoegger.docbox.shared.security.permission.IDefaultPermissionTable;
-import ch.ahoegger.docbox.shared.util.SqlFramentBuilder;
+import ch.ahoegger.docbox.server.or.generator.table.DefaultPermissionTableStatement;
 
 /**
  * <h3>{@link DefaultPermissionTableTask}</h3>
  *
  * @author Andreas Hoegger
  */
-public class DefaultPermissionTableTask implements ITableTask, IDefaultPermissionTable {
+public class DefaultPermissionTableTask extends DefaultPermissionTableStatement implements ITableTask {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultPermissionTableTask.class);
 
   @Override
-  public String getCreateStatement() {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("CREATE TABLE ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(USERNAME).append(" VARCHAR(").append(IUserTable.USERNAME_LENGTH).append(") NOT NULL, ");
-    statementBuilder.append(PERMISSION).append(" SMALLINT NOT NULL, ");
-    statementBuilder.append("PRIMARY KEY (").append(SqlFramentBuilder.columns(USERNAME)).append(")");
-    statementBuilder.append(")");
-    return statementBuilder.toString();
-  }
-
-  @Override
   public void createTable(ISqlService sqlService) {
     LOG.info("SQL-DEV create Table: {}", TABLE_NAME);
-    sqlService.insert(getCreateStatement());
+    sqlService.insert(getCreateTable());
   }
 
   @Override
   public void deleteTable(ISqlService sqlService) {
     LOG.info("SQL-DEV delete table: {}", TABLE_NAME);
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DELETE FROM ").append(TABLE_NAME);
-    sqlService.insert(statementBuilder.toString());
+    DefaultPermissionTable t = DefaultPermissionTable.DEFAULT_PERMISSION_TABLE;
+    Query query = DSL.using(sqlService.getConnection(), SQLDialect.DERBY).delete(t);
+    query.execute();
   }
 
   @Override
   public void dropTable(ISqlService sqlService) {
     LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("DROP TABLE ").append(TABLE_NAME);
-    sqlService.insert(statementBuilder.toString());
+    DefaultPermissionTable t = DefaultPermissionTable.DEFAULT_PERMISSION_TABLE;
+    Query query = DSL.using(sqlService.getConnection(), SQLDialect.DERBY).dropTable(t);
+    query.execute();
   }
 
   public void createDefaultPermissionRow(ISqlService sqlService, String username, int permission) {
-    StringBuilder statementBuilder = new StringBuilder();
-    statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");
-    statementBuilder.append(SqlFramentBuilder.columns(USERNAME, PERMISSION));
-    statementBuilder.append(") VALUES (");
-    statementBuilder.append(":username, :permission");
-    statementBuilder.append(")");
-    sqlService.insert(statementBuilder.toString(), new NVPair("username", username),
-        new NVPair("permission", permission));
+    DefaultPermissionTable t = DefaultPermissionTable.DEFAULT_PERMISSION_TABLE;
+    DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+        .newRecord(t)
+        .with(t.PERMISSION, permission)
+        .with(t.USERNAME, username)
+        .insert();
   }
 }

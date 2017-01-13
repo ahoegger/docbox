@@ -13,7 +13,7 @@ import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
 import ch.ahoegger.docbox.shared.administration.user.UserFormData;
-import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
+import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
 
 /**
  * <h3>{@link HelloWorldFormServiceTest}</h3>
@@ -28,15 +28,18 @@ public class UserServiceTest extends AbstractTestWithDatabase {
   private final String userId04 = "username04";
   private final String userId05 = "username05";
 
+  private final String userIdAdmin01 = "admin01";
+
   @Override
   public void setupDb() throws Exception {
     super.setupDb();
     ISqlService sqlService = BEANS.get(ISqlService.class);
-    BEANS.get(UserTableTask.class).insertUser(sqlService, "adminstrator", "first.admin", userId01, "secret", true, true);
+    BEANS.get(UserTableTask.class).insertUser(sqlService, "first.myself", "last.myself", userId01, "secret", true, false);
     BEANS.get(UserTableTask.class).insertUser(sqlService, "name02", "firstname02", userId02, passwordHash("secret02"), true, false);
     BEANS.get(UserTableTask.class).insertUser(sqlService, "name03", "firstname03", userId03, passwordHash("secret03"), false, false);
     BEANS.get(UserTableTask.class).insertUser(sqlService, "name04", "firstname04", userId04, passwordHash("secret04"), true, false);
     BEANS.get(UserTableTask.class).insertUser(sqlService, "name05", "firstname05", userId05, passwordHash("secret05"), true, false);
+    BEANS.get(UserTableTask.class).insertUser(sqlService, "admin01", "first.admin01", userIdAdmin01, passwordHash("secret05"), true, true);
   }
 
   @Test
@@ -50,7 +53,7 @@ public class UserServiceTest extends AbstractTestWithDatabase {
     fd1.getName().setValue("name");
     fd1.getFirstname().setValue("firstname");
     fd1.getAdministrator().setValue(false);
-    fd1.getDefaultPermission().setValue(IDocumentPermissionTable.PERMISSION_WRITE);
+    fd1.getDefaultPermission().setValue(PermissionCodeType.WriteCode.ID);
     fd1 = userService.create(fd1);
 
     UserFormData fd2 = new UserFormData();
@@ -72,7 +75,7 @@ public class UserServiceTest extends AbstractTestWithDatabase {
     fd1.getFirstname().setValue("modified.firstname");
     fd1.getActive().setValue(false);
     fd1.getAdministrator().setValue(true);
-    fd1.getDefaultPermission().setValue(IDocumentPermissionTable.PERMISSION_OWNER);
+    fd1.getDefaultPermission().setValue(PermissionCodeType.OwnerCode.ID);
 
     userService.store(fd1);
 
@@ -115,9 +118,28 @@ public class UserServiceTest extends AbstractTestWithDatabase {
   }
 
   @Test(expected = ProcessingException.class)
+  public void testDeleteMySelf() {
+    IUserService service = BEANS.get(IUserService.class);
+    service.delete(SUBJECT_NAME);
+  }
+
+  @Test
+  public void testDeleteAdministrator() {
+    String adminId01 = "adminId01";
+    ISqlService sqlService = BEANS.get(ISqlService.class);
+    BEANS.get(UserTableTask.class).insertUser(sqlService, "last.admin", "first.admin", adminId01, "secret", true, true);
+
+    IUserService service = BEANS.get(IUserService.class);
+    Assert.assertTrue(service.delete(adminId01));
+    UserFormData fd1 = new UserFormData();
+    fd1.getUsername().setValue(adminId01);
+    Assert.assertNull(service.load(fd1));
+  }
+
+  @Test(expected = ProcessingException.class)
   public void testDeleteLastAdmin() {
     IUserService userService = BEANS.get(IUserService.class);
-    userService.delete("admin");
+    userService.delete(userIdAdmin01);
   }
 
   @Test
@@ -125,4 +147,5 @@ public class UserServiceTest extends AbstractTestWithDatabase {
     Assert.assertTrue(BEANS.get(SecurityService.class).authenticate(userId02, "secret02".toCharArray()));
     Assert.assertFalse(BEANS.get(SecurityService.class).authenticate(userId03, "secret03".toCharArray()));
   }
+
 }

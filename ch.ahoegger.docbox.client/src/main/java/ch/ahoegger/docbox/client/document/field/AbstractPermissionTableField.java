@@ -25,8 +25,8 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
-import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
-import ch.ahoegger.docbox.shared.permission.PermissionLookupCall;
+import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
+import ch.ahoegger.docbox.shared.security.permission.PermissionLookupCall;
 
 /**
  * <h3>{@link AbstractPermissionTableField}</h3>
@@ -69,7 +69,7 @@ public abstract class AbstractPermissionTableField extends AbstractTableField<Ab
   protected void validateOwners() {
     if (getTable().getPermissionColumn().getValues().stream()
         .filter(p -> p != null)
-        .filter(p -> p.intValue() == IDocumentPermissionTable.PERMISSION_OWNER)
+        .filter(p -> p.intValue() == PermissionCodeType.OwnerCode.ID)
         .collect(Collectors.toList()).size() > 1) {
       addErrorStatus(TEXTS.get("Validate_OneOwnerOnly"));
     }

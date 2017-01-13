@@ -9,6 +9,16 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.ch.ahoegger.docbox.server.or.app.tables.Category;
+import org.ch.ahoegger.docbox.server.or.app.tables.Conversation;
+import org.ch.ahoegger.docbox.server.or.app.tables.DefaultPermissionTable;
+import org.ch.ahoegger.docbox.server.or.app.tables.Document;
+import org.ch.ahoegger.docbox.server.or.app.tables.DocumentCategory;
+import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPartner;
+import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPermission;
+import org.ch.ahoegger.docbox.server.or.app.tables.Entity;
+import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
+import org.ch.ahoegger.docbox.server.or.app.tables.PrimaryKeySeq;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.Replace;
@@ -21,9 +31,14 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.ahoegger.docbox.or.definition.table.IEmployeeTable;
+import ch.ahoegger.docbox.or.definition.table.IPostingGroupTable;
+import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
 import ch.ahoegger.docbox.server.SuperUserRunContextProducer;
 import ch.ahoegger.docbox.server.database.DerbySqlService;
 import ch.ahoegger.docbox.server.database.dev.initialization.CategoryTableTask;
@@ -38,24 +53,12 @@ import ch.ahoegger.docbox.server.database.dev.initialization.EntityTableTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.ITableTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.PartnerTableTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.PostingGroupTableTask;
-import ch.ahoegger.docbox.server.database.dev.initialization.SequenceTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.UserTableTask;
 import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.server.security.SecurityService;
-import ch.ahoegger.docbox.shared.ISequenceTable;
-import ch.ahoegger.docbox.shared.category.ICategoryTable;
-import ch.ahoegger.docbox.shared.conversation.IConversationTable;
-import ch.ahoegger.docbox.shared.document.IDocumentCategoryTable;
-import ch.ahoegger.docbox.shared.document.IDocumentPartnerTable;
-import ch.ahoegger.docbox.shared.document.IDocumentPermissionTable;
-import ch.ahoegger.docbox.shared.document.IDocumentTable;
-import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupTable;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupCodeType.UnbilledCode;
-import ch.ahoegger.docbox.shared.hr.employee.IEmployeeTable;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType;
-import ch.ahoegger.docbox.shared.hr.entity.IEntityTable;
-import ch.ahoegger.docbox.shared.partner.IPartnerTable;
-import ch.ahoegger.docbox.shared.security.permission.IDefaultPermissionTable;
+import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
@@ -73,13 +76,13 @@ public class DevDerbySqlService extends DerbySqlService {
   private BigDecimal documentId03;
   private BigDecimal documentId04;
 
-  private Long categoryId01;
-  private Long categoryId02;
-  private Long categoryId03;
+  private BigDecimal categoryId01;
+  private BigDecimal categoryId02;
+  private BigDecimal categoryId03;
 
-  private Long conversationId01;
-  private Long conversationId02;
-  private Long conversationId03;
+  private BigDecimal conversationId01;
+  private BigDecimal conversationId02;
+  private BigDecimal conversationId03;
 
   private BigDecimal partnerId01;
   private BigDecimal partnerId02;
@@ -132,6 +135,7 @@ public class DevDerbySqlService extends DerbySqlService {
     for (ITableTask task : tableTasks) {
       task.createTable(this);
     }
+
     // create test data
     insertSequenceInitialValue(this);
     createUsers(this);
@@ -150,7 +154,8 @@ public class DevDerbySqlService extends DerbySqlService {
   }
 
   protected void insertSequenceInitialValue(ISqlService sqlService) {
-    BEANS.get(SequenceTask.class).insertInitialValue(sqlService, 2000);
+    String sql = DSL.using(SQLDialect.DERBY).insertInto(PrimaryKeySeq.PRIMARY_KEY_SEQ, PrimaryKeySeq.PRIMARY_KEY_SEQ.LAST_VAL).values(BigDecimal.valueOf(2000l)).toString();
+    sqlService.insert(sql);
 
   }
 
@@ -163,12 +168,12 @@ public class DevDerbySqlService extends DerbySqlService {
   }
 
   protected void insertCategories(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {}", ICategoryTable.TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", Category.CATEGORY.getName());
 
     // ids
-    categoryId01 = getSequenceNextval(ISequenceTable.TABLE_NAME);
-    categoryId02 = getSequenceNextval(ISequenceTable.TABLE_NAME);
-    categoryId03 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+    categoryId01 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
+    categoryId02 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
+    categoryId03 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
 
     CategoryTableTask categoryTableTask = BEANS.get(CategoryTableTask.class);
     categoryTableTask.createCategoryRow(sqlService, categoryId01, "Work", "anything work related.", LocalDateUtility.today(), null);
@@ -179,11 +184,11 @@ public class DevDerbySqlService extends DerbySqlService {
   }
 
   protected void insertConversations(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {}", IConversationTable.TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", Conversation.CONVERSATION.getName());
     // ids
-    conversationId01 = getSequenceNextval(ISequenceTable.TABLE_NAME);
-    conversationId02 = getSequenceNextval(ISequenceTable.TABLE_NAME);
-    conversationId03 = getSequenceNextval(ISequenceTable.TABLE_NAME);
+    conversationId01 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
+    conversationId02 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
+    conversationId03 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
 
     ConversationTableTask conversationTableTask = BEANS.get(ConversationTableTask.class);
     conversationTableTask.createConversationRow(sqlService, conversationId01, "House selling", "everything related with house selling.", LocalDateUtility.today(), null);
@@ -192,14 +197,14 @@ public class DevDerbySqlService extends DerbySqlService {
   }
 
   protected void insertDefaultPermissions(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {}", IDefaultPermissionTable.TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", DefaultPermissionTable.DEFAULT_PERMISSION_TABLE.getName());
     DefaultPermissionTableTask defaultPermissionTableTask = BEANS.get(DefaultPermissionTableTask.class);
-    defaultPermissionTableTask.createDefaultPermissionRow(sqlService, "admin", IDocumentPermissionTable.PERMISSION_WRITE);
-    defaultPermissionTableTask.createDefaultPermissionRow(sqlService, "bob", IDocumentPermissionTable.PERMISSION_READ);
+    defaultPermissionTableTask.createDefaultPermissionRow(sqlService, "admin", PermissionCodeType.WriteCode.ID);
+    defaultPermissionTableTask.createDefaultPermissionRow(sqlService, "bob", PermissionCodeType.ReadCode.ID);
   }
 
   protected void insertPartners(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {}", IPartnerTable.TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", Partner.PARTNER.getName());
     // ids
     partnerId01 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
     partnerId02 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
@@ -212,7 +217,7 @@ public class DevDerbySqlService extends DerbySqlService {
   }
 
   protected void insertDocuments(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {}", IDocumentTable.TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", Document.DOCUMENT.getName());
 
     DocumentTableTask documentTableTask = BEANS.get(DocumentTableTask.class);
     try {
@@ -250,7 +255,7 @@ public class DevDerbySqlService extends DerbySqlService {
   }
 
   protected void insertDocument(ISqlService sqlService, DocumentTableTask documentTableTask, BigDecimal documentId, String abstractText, Date documentDate,
-      Date insertDate, Date validDate, String fileName, String originalStorage, Long conversationId)
+      Date insertDate, Date validDate, String fileName, String originalStorage, BigDecimal conversationId)
       throws IOException {
 
     // create db record
@@ -266,7 +271,7 @@ public class DevDerbySqlService extends DerbySqlService {
   }
 
   protected void insertDocumentCategory(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {}", IDocumentCategoryTable.TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", DocumentCategory.DOCUMENT_CATEGORY.getName());
     DocumentCategoryTableTask documentCategoryTableTask = BEANS.get(DocumentCategoryTableTask.class);
     documentCategoryTableTask.createDocumentCategoryRow(sqlService, documentId01, categoryId01);
     documentCategoryTableTask.createDocumentCategoryRow(sqlService, documentId02, categoryId02);
@@ -276,7 +281,7 @@ public class DevDerbySqlService extends DerbySqlService {
   }
 
   protected void insertDocumentPartner(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {}", IDocumentPartnerTable.TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", DocumentPartner.DOCUMENT_PARTNER.getName());
     DocumentPartnerTableTask documentPartnerTableTask = BEANS.get(DocumentPartnerTableTask.class);
     documentPartnerTableTask.createDocumentPartnerRow(sqlService, documentId01, partnerId01);
     documentPartnerTableTask.createDocumentPartnerRow(sqlService, documentId03, partnerId01);
@@ -284,20 +289,20 @@ public class DevDerbySqlService extends DerbySqlService {
   }
 
   protected void insertDocumentPermission(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {}", IDocumentPermissionTable.TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", DocumentPermission.DOCUMENT_PERMISSION.getName());
     DocumentPermissionTableTask documentPermissionTableTask = BEANS.get(DocumentPermissionTableTask.class);
-    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "admin", documentId01, IDocumentPermissionTable.PERMISSION_WRITE);
-    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "admin", documentId02, IDocumentPermissionTable.PERMISSION_WRITE);
-    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "admin", documentId03, IDocumentPermissionTable.PERMISSION_WRITE);
-    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "cuttis", documentId02, IDocumentPermissionTable.PERMISSION_READ);
-    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "bob", documentId02, IDocumentPermissionTable.PERMISSION_WRITE);
+    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "admin", documentId01, PermissionCodeType.WriteCode.ID);
+    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "admin", documentId02, PermissionCodeType.WriteCode.ID);
+    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "admin", documentId03, PermissionCodeType.WriteCode.ID);
+    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "cuttis", documentId02, PermissionCodeType.ReadCode.ID);
+    documentPermissionTableTask.createDocumentPermissionRow(sqlService, "bob", documentId02, PermissionCodeType.WriteCode.ID);
   }
 
   protected void insertEmployers(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", IEmployeeTable.TABLE_NAME);
 
     EmployeeTableTask employerTableTask = BEANS.get(EmployeeTableTask.class);
-    employerTableTask.createEmployerRow(sqlService, partnerId03_employee, "Hans", "Muster", "Mountainview 01 e", "CA-90501 Santa Barbara e", "12.2568.2154.69", "PC 50-101-89-7", 26.50,
+    employerTableTask.createEmployerRow(sqlService, partnerId03_employee, "Hans", "Muster", "Mountainview 01 e", "CA-90501 Santa Barbara e", "12.2568.2154.69", "PC 50-101-89-7", BigDecimal.valueOf(26.50),
         "Bart Simpson & Marth Simpson er", "742 Evergreen Terrace er", "Springfield er", "bart@simpson.spring", "+1 (0)7510 2152");
   }
 
@@ -319,7 +324,7 @@ public class DevDerbySqlService extends DerbySqlService {
   }
 
   protected void insertEntities(ISqlService sqlService) {
-    LOG.info("SQL-DEV create rows for: {}", IEntityTable.TABLE_NAME);
+    LOG.info("SQL-DEV create rows for: {}", Entity.ENTITY.getName());
 
     entityId01 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
     entityId02 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));

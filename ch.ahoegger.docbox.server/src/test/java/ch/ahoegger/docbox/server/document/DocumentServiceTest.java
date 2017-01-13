@@ -33,13 +33,13 @@ import ch.ahoegger.docbox.shared.document.IDocumentService;
 public class DocumentServiceTest extends AbstractTestWithDatabase {
   private static final String username01 = SUBJECT_NAME;
 
-  private static final Long categoryId01 = BEANS.get(IdGenerateService.class).getNextId();
+  private static final BigDecimal categoryId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   private static final BigDecimal partnerId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
   private static final BigDecimal partnerId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
-  private static final Long conversationId01 = BEANS.get(IdGenerateService.class).getNextId();
-  private static final Long conversationId02 = BEANS.get(IdGenerateService.class).getNextId();
+  private static final BigDecimal conversationId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static final BigDecimal conversationId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   private static final BigDecimal documentId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
   private static final BigDecimal documentId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
@@ -91,7 +91,7 @@ public class DocumentServiceTest extends AbstractTestWithDatabase {
     cal.set(1997, 12, 25);
     DateUtility.truncCalendar(cal);
     fd1.getDocumentDate().setValue(cal.getTime());
-    fd1.getConversation().setValue(new BigDecimal(conversationId01));
+    fd1.getConversation().setValue(conversationId01);
     PartnersRowData p1 = fd1.getPartners().addRow();
     p1.setPartner(partnerId01);
     fd1.getCategoriesBox().setValue(CollectionUtility.hashSet(new BigDecimal(900)));
