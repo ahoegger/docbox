@@ -25,6 +25,7 @@ public class ClobColumn extends AbstractColumn<String> {
     if (value == null) {
       return "NULL";
     }
+    value = value.replace("'", "''");
     return "'" + value + "'";
   }
 }
