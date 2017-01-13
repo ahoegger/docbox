@@ -86,9 +86,11 @@ public class TableBuilder {
       StringBuilder statementBuilder = new StringBuilder();
       statementBuilder.append(StatementFactory.createDeleteTableStatement(getTableName())).append("\r\n");
       Object[][] allRows = service.select(selectAllBuilder.toString(), new Object[0]);
-      for (Object[] row : allRows) {
-        statementBuilder.append(StatementFactory.createInsertStatement(getTableName(), columns, row)).append("\r\n");
-      }
+
+      statementBuilder.append(StatementFactory.createInsertStatement(getTableName(), columns, allRows)).append("\r\n");
+//      for (Object[] row : allRows) {
+//        statementBuilder.append(StatementFactory.createInsertStatement(getTableName(), columns, row)).append("\r\n");
+//      }
       return statementBuilder.toString();
     }
     else {
