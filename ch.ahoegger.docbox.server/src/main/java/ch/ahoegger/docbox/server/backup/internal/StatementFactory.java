@@ -11,6 +11,28 @@ import java.util.stream.IntStream;
 public class StatementFactory {
 
   public static String createInsertStatement(String tableName, List<IColumn> columns, Object[][] rows) {
+    StringBuilder statementBuilder = new StringBuilder();
+    if (columns.stream().filter(c -> c instanceof ClobColumn)
+        .count() > 0) {
+      // create single statement
+      for (Object[] row : rows) {
+        statementBuilder.append(createInsertStatement(tableName, columns, row)).append("\r\n");
+      }
+
+    }
+    else {
+      // create 100 blocks
+      for (int i = 0; i < rows.length + 1;) {
+        statementBuilder.append(createMultiInsertStatement(tableName, columns, Arrays.copyOfRange(rows, i, (rows.length + 1 < i + 100) ? rows.length + 1 : i + 100))).append("\r\n");
+        i += 100;
+      }
+
+    }
+    return statementBuilder.toString();
+
+  }
+
+  protected static String createMultiInsertStatement(String tableName, List<IColumn> columns, Object[][] rows) {
     StringBuilder columnBuilder = new StringBuilder("(");
     for (int i = 0; i < columns.size(); i++) {
       IColumn<?> column = columns.get(i);
@@ -23,6 +45,7 @@ public class StatementFactory {
 
     String values = Arrays.stream(rows)
         .map(r -> (Object[]) r)
+        .filter(row -> row != null)
         .map(row -> {
           StringBuilder valRow = new StringBuilder("  (");
           valRow.append(
