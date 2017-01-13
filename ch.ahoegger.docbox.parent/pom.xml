@@ -38,8 +38,6 @@
 		<module>../ch.ahoegger.docbox.ui.html.app.war</module>
 		<module>../ch.ahoegger.docbox.jasper</module>
 		<module>../ch.ahoegger.docbox.jasper.bean</module>
-		<module>ch.ahoegger.docbox.server.or</module>
-		<module>ch.ahoegger.docbox.or.definition</module>
 	</modules>
 
 	<!-- <repositories> -->
