@@ -81,7 +81,7 @@ public class PostingGroupServiceTest extends AbstractTestWithDatabase {
 
     Assert.assertFalse(BEANS.get(DocumentStoreService.class).exists(docData.getDocumentPath()));
     // unbilled group still exists
-    Assert.assertEquals(1, BEANS.get(PostingGroupService.class).getTableData(new PostingGroupSearchFormData()).getRowCount());
+    Assert.assertEquals(0, BEANS.get(PostingGroupService.class).getTableData(new PostingGroupSearchFormData()).getRowCount());
     Assert.assertEquals(0, BEANS.get(DocumentService.class).getTableData(new DocumentSearchFormData()).getRowCount());
     Assert.assertEquals(0, BEANS.get(DocumentPartnerService.class).getPartnerIds(documentId).size());
     EntitySearchFormData sd = new EntitySearchFormData();
