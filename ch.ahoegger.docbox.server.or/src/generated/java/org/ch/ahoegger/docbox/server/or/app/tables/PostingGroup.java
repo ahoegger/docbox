@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PostingGroup extends TableImpl<PostingGroupRecord> {
 
-    private static final long serialVersionUID = -1711577436;
+    private static final long serialVersionUID = 1322984002;
 
     /**
      * The reference instance of <code>APP.POSTING_GROUP</code>
@@ -148,7 +148,7 @@ public class PostingGroup extends TableImpl<PostingGroupRecord> {
      */
     @Override
     public UniqueKey<PostingGroupRecord> getPrimaryKey() {
-        return Keys.SQL170113205923810;
+        return Keys.SQL170113231839410;
     }
 
     /**
@@ -156,7 +156,7 @@ public class PostingGroup extends TableImpl<PostingGroupRecord> {
      */
     @Override
     public List<UniqueKey<PostingGroupRecord>> getKeys() {
-        return Arrays.<UniqueKey<PostingGroupRecord>>asList(Keys.SQL170113205923810);
+        return Arrays.<UniqueKey<PostingGroupRecord>>asList(Keys.SQL170113231839410);
     }
 
     /**

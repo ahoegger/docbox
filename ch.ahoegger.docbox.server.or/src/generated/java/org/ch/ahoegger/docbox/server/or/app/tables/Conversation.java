@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Conversation extends TableImpl<ConversationRecord> {
 
-    private static final long serialVersionUID = 1969650914;
+    private static final long serialVersionUID = 709702202;
 
     /**
      * The reference instance of <code>APP.CONVERSATION</code>
@@ -113,7 +113,7 @@ public class Conversation extends TableImpl<ConversationRecord> {
      */
     @Override
     public UniqueKey<ConversationRecord> getPrimaryKey() {
-        return Keys.SQL170113205923630;
+        return Keys.SQL170113231839200;
     }
 
     /**
@@ -121,7 +121,7 @@ public class Conversation extends TableImpl<ConversationRecord> {
      */
     @Override
     public List<UniqueKey<ConversationRecord>> getKeys() {
-        return Arrays.<UniqueKey<ConversationRecord>>asList(Keys.SQL170113205923630);
+        return Arrays.<UniqueKey<ConversationRecord>>asList(Keys.SQL170113231839200);
     }
 
     /**
