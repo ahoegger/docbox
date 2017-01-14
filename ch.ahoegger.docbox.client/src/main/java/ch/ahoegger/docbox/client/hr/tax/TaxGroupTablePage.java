@@ -164,5 +164,25 @@ public class TaxGroupTablePage extends AbstractPageWithTable<Table> {
       }
     }
 
+    @Order(3000)
+    public class EditMenu extends AbstractMenu {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("Edit");
+      }
+
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+      }
+
+      @Override
+      protected void execAction() {
+        TaxGroupForm form = new TaxGroupForm();
+        form.setTaxGroupId(getTaxGroupIdColumn().getSelectedValue());
+        form.startModify();
+      }
+    }
+
   }
 }

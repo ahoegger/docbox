@@ -69,6 +69,7 @@ public class PartnerService implements IPartnerService {
         .leftOuterJoin(docPar)
         .on(p.PARTNER_NR.eq(docPar.PARTNER_NR))
         .where(condition)
+        .groupBy(p.PARTNER_NR, p.NAME, p.START_DATE, p.END_DATE)
         .fetch()
         .stream()
         .map(rec -> {

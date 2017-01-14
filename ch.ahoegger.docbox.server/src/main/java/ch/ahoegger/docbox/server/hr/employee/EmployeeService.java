@@ -157,7 +157,7 @@ public class EmployeeService implements IEmployeeService {
     Employee emp = Employee.EMPLOYEE.as("EMP");
     Partner p = Partner.PARTNER.as("P");
 
-    EmployeeFormData result = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+    Record empRec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .select(emp.PARTNER_NR, emp.FIRST_NAME, emp.LAST_NAME, emp.ADDRESS_LINE1, emp.ADDRESS_LINE2, emp.AHV_NUMBER, emp.ACCOUNT_NUMBER, emp.HOURLY_WAGE, emp.EMPLOYER_ADDRESS_LINE1,
             emp.EMPLOYER_ADDRESS_LINE2, emp.EMPLOYER_ADDRESS_LINE3, emp.EMPLOYER_EMAIL, emp.EMPLOYER_PHONE)
         .select(p.NAME, p.DESCRIPTION, p.START_DATE, p.END_DATE)
@@ -165,7 +165,11 @@ public class EmployeeService implements IEmployeeService {
         .leftOuterJoin(p)
         .on(p.PARTNER_NR.eq(emp.PARTNER_NR))
         .where(emp.PARTNER_NR.eq(formData.getPartnerId()))
-        .fetchOne()
+        .fetchOne();
+    if (empRec == null) {
+      return null;
+    }
+    EmployeeFormData result = empRec
         .map(rec -> {
           EmployeeFormData fd = new EmployeeFormData();
           fd.setPartnerId(rec.get(emp.PARTNER_NR));
