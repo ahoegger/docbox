@@ -303,6 +303,7 @@ public class DocumentService implements IDocumentService {
         .set(doc.ORIGINAL_STORAGE, formData.getOriginalStorage().getValue())
         .set(doc.PARSE_OCR, formData.getParseOcr().getValue())
         .set(doc.VALID_DATE, formData.getValidDate().getValue())
+        .where(doc.DOCUMENT_NR.eq(formData.getDocumentId()))
         .execute();
 
     // partner
