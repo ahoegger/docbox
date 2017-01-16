@@ -53,6 +53,10 @@ public class DocumentSearchFormData extends AbstractFormData {
     return getFieldByClass(Owner.class);
   }
 
+  public ParseFailure getParseFailure() {
+    return getFieldByClass(ParseFailure.class);
+  }
+
   public ParsedContentBox getParsedContentBox() {
     return getFieldByClass(ParsedContentBox.class);
   }
@@ -146,6 +150,11 @@ public class DocumentSearchFormData extends AbstractFormData {
   }
 
   public static class Owner extends AbstractValueFieldData<String> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class ParseFailure extends AbstractValueFieldData<Boolean> {
 
     private static final long serialVersionUID = 1L;
   }

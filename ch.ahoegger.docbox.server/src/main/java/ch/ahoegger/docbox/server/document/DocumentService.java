@@ -165,8 +165,13 @@ public class DocumentService implements IDocumentService {
           break;
       }
     }
+    // search criteria parse failure
+    if (formData.getParseFailure().getValue() != null && formData.getParseFailure().getValue()) {
+      conditions.add(docOcr.FAILED_REASON.isNotNull());
+    }
 
     SelectConditionStep<Record> query = dsl.select(doc.DOCUMENT_NR, doc.ABSTRACT, doc.CONVERSATION_NR, doc.DOCUMENT_DATE, doc.INSERT_DATE, doc.DOCUMENT_URL)
+        .select(docOcr.PARSE_COUNT)
         .select(docPerOwner.USERNAME)
         .from(doc)
         .leftOuterJoin(docPerOwner)
@@ -201,6 +206,7 @@ public class DocumentService implements IDocumentService {
               row.setDocumentDate(rec.get(doc.DOCUMENT_DATE));
               row.setCapturedDate(rec.get(doc.INSERT_DATE));
               row.setDocumentPath(rec.get(doc.DOCUMENT_URL));
+              row.setOcrParseCount(rec.get(docOcr.PARSE_COUNT));
               row.setOwner(rec.get(docPerOwner.USERNAME));
 
               PartnerSearchFormData partnerSeachData = new PartnerSearchFormData();
@@ -428,8 +434,8 @@ public class DocumentService implements IDocumentService {
         .from(doc)
         .leftJoin(docOcr)
         .on(doc.DOCUMENT_NR.eq(docOcr.DOCUMENT_NR))
-        .where(docOcr.DOCUMENT_NR.isNull())
-        .and(doc.PARSE_OCR)
+        .where(doc.PARSE_OCR)
+        .and(docOcr.DOCUMENT_NR.isNull().or(docOcr.FAILED_REASON.isNotNull().and(docOcr.PARSE_COUNT.le(5))))
         .and(condition)
         .fetch(rec -> rec.get(doc.DOCUMENT_NR))
         .stream()

@@ -10,16 +10,19 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanFi
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 import ch.ahoegger.docbox.client.document.ocr.DocumentOcrForm.MainBox.CancelButton;
-import ch.ahoegger.docbox.client.document.ocr.DocumentOcrForm.MainBox.FieldBox.NotParsableField;
 import ch.ahoegger.docbox.client.document.ocr.DocumentOcrForm.MainBox.FieldBox.OcrParsedField;
+import ch.ahoegger.docbox.client.document.ocr.DocumentOcrForm.MainBox.FieldBox.ParseCountField;
+import ch.ahoegger.docbox.client.document.ocr.DocumentOcrForm.MainBox.FieldBox.ParseFailedReasonField;
 import ch.ahoegger.docbox.client.document.ocr.DocumentOcrForm.MainBox.FieldBox.TextField;
 import ch.ahoegger.docbox.client.document.ocr.DocumentOcrForm.MainBox.OkButton;
+import ch.ahoegger.docbox.or.definition.table.IDocumentOcrTable;
 import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
 import ch.ahoegger.docbox.shared.ocr.IDocumentOcrService;
 
@@ -65,8 +68,12 @@ public class DocumentOcrForm extends AbstractForm {
     return getFieldByClass(TextField.class);
   }
 
-  public NotParsableField getNotParsableField() {
-    return getFieldByClass(NotParsableField.class);
+  public ParseCountField getParseCountField() {
+    return getFieldByClass(ParseCountField.class);
+  }
+
+  public ParseFailedReasonField getParseFailedReasonField() {
+    return getFieldByClass(ParseFailedReasonField.class);
   }
 
   public OcrParsedField getOcrParsedField() {
@@ -142,10 +149,29 @@ public class DocumentOcrForm extends AbstractForm {
       }
 
       @Order(3000)
-      public class NotParsableField extends AbstractBooleanField {
+      public class ParseCountField extends AbstractIntegerField {
         @Override
         protected String getConfiguredLabel() {
-          return TEXTS.get("NotParsable");
+          return TEXTS.get("ParseCount");
+        }
+
+        @Override
+        protected boolean getConfiguredEnabled() {
+          return false;
+        }
+
+      }
+
+      @Order(4000)
+      public class ParseFailedReasonField extends AbstractStringField {
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("ParseFailedReason");
+        }
+
+        @Override
+        protected int getConfiguredMaxLength() {
+          return IDocumentOcrTable.FAILED_REASON_LENGTH;
         }
 
         @Override

@@ -42,6 +42,8 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.ahoegger.docbox.server.ocr.OcrParseResult.ParseError;
+
 /**
  * <h3>{@link OcrParseService}</h3>
  *
@@ -102,7 +104,13 @@ public class OcrParseService {
           tifFiles = pdfToTif(pddoc, workingDirectory);
           pddoc.close();
           pddoc = null;
-          result.withText(computeText(tifFiles, tessdataDirectory)).withOcrParsed(true);
+          String text = computeText(tifFiles, tessdataDirectory);
+          if (StringUtility.hasText(text)) {
+            result.withText(text).withOcrParsed(true);
+          }
+          else {
+            result.withParseError(ParseError.CouldNotParseText);
+          }
         }
         return result;
       }
@@ -157,6 +165,7 @@ public class OcrParseService {
     List<Path> tiffPaths = new ArrayList<>();
 
     PDFRenderer pdfRenderer = new PDFRenderer(pddoc);
+
     for (int i = 0; i < pddoc.getPages().getCount(); i++) {
       OutputStream os = null;
       FileChannel channel = null;
@@ -168,10 +177,10 @@ public class OcrParseService {
         // suffix in filename will be used as the file format
         BufferedImage img = pdfRenderer.renderImageWithDPI(i, 300, ImageType.RGB);
         ImageIOUtil.writeImage(img, "tiff", os, 300);
-
       }
       finally {
         if (channel != null) {
+          channel.force(false);
           channel.close();
         }
         if (os != null) {
@@ -201,6 +210,7 @@ public class OcrParseService {
           }
           image = lept.pixRead(tifPath.toString());
           api.SetImage(image);
+
           outText = api.GetUTF8Text();
           if (outText != null) {
             result.append(outText.getString());
@@ -218,6 +228,7 @@ public class OcrParseService {
             }
           }
           if (outText != null) {
+
             outText.deallocate();
           }
           pixDestroy(image);

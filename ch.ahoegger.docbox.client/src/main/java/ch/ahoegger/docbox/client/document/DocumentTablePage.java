@@ -13,6 +13,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -175,6 +176,10 @@ public class DocumentTablePage extends AbstractDocboxPageWithTable<DocumentTable
       return getColumnSet().getColumnByClass(ConversationColumn.class);
     }
 
+    public OcrParseCountColumn getOcrParseCountColumn() {
+      return getColumnSet().getColumnByClass(OcrParseCountColumn.class);
+    }
+
     public OwnerColumn getOwnerColumn() {
       return getColumnSet().getColumnByClass(OwnerColumn.class);
     }
@@ -297,6 +302,24 @@ public class DocumentTablePage extends AbstractDocboxPageWithTable<DocumentTable
       @Override
       protected Class<? extends ILookupCall<String>> getConfiguredLookupCall() {
         return UserLookupCall.class;
+      }
+    }
+
+    @Order(1876)
+    public class OcrParseCountColumn extends AbstractIntegerColumn {
+      @Override
+      protected String getConfiguredHeaderText() {
+        return TEXTS.get("OCRParseCount");
+      }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 80;
+      }
+
+      @Override
+      protected boolean getConfiguredVisible() {
+        return false;
       }
     }
 

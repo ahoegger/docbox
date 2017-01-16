@@ -67,7 +67,7 @@ public class ParseDocumentJob {
 
       @Override
       public void run() throws Exception {
-        BEANS.get(DocumentOcrService.class).create(documentId, result);
+        BEANS.get(DocumentOcrService.class).updateOrCreate(documentId, result);
 
       }
     }, Jobs.newInput().withRunContext(

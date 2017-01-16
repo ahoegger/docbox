@@ -35,12 +35,16 @@ public class DocumentOcrFormData extends AbstractFormData {
     return getPropertyByClass(DocumentIdProperty.class);
   }
 
-  public NotParsable getNotParsable() {
-    return getFieldByClass(NotParsable.class);
-  }
-
   public OcrParsed getOcrParsed() {
     return getFieldByClass(OcrParsed.class);
+  }
+
+  public ParseCount getParseCount() {
+    return getFieldByClass(ParseCount.class);
+  }
+
+  public ParseFailedReason getParseFailedReason() {
+    return getFieldByClass(ParseFailedReason.class);
   }
 
   public Text getText() {
@@ -52,12 +56,17 @@ public class DocumentOcrFormData extends AbstractFormData {
     private static final long serialVersionUID = 1L;
   }
 
-  public static class NotParsable extends AbstractValueFieldData<Boolean> {
+  public static class OcrParsed extends AbstractValueFieldData<Boolean> {
 
     private static final long serialVersionUID = 1L;
   }
 
-  public static class OcrParsed extends AbstractValueFieldData<Boolean> {
+  public static class ParseCount extends AbstractValueFieldData<Integer> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class ParseFailedReason extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
   }

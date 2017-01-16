@@ -13,6 +13,8 @@ public interface IDocumentOcrTable {
   public static String TEXT = "TEXT";
   public static int TEXT_LENGHT = Integer.MAX_VALUE;
   public static String OCR_SCANNED = "OCR_SCANNED";
-  public static String PARSE_FAILED = "PARSE_FAILED";
+  public static String PARSE_COUNT = "PARSE_COUNT";
+  public static String FAILED_REASON = "FAILED_REASON";
+  public static int FAILED_REASON_LENGTH = 2400;
 
 }

@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DocumentOcr extends TableImpl<DocumentOcrRecord> {
 
-    private static final long serialVersionUID = -1505178599;
+    private static final long serialVersionUID = -1238999193;
 
     /**
      * The reference instance of <code>APP.DOCUMENT_OCR</code>
@@ -67,9 +67,14 @@ public class DocumentOcr extends TableImpl<DocumentOcrRecord> {
     public final TableField<DocumentOcrRecord, Boolean> OCR_SCANNED = createField("OCR_SCANNED", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
-     * The column <code>APP.DOCUMENT_OCR.PARSE_FAILED</code>.
+     * The column <code>APP.DOCUMENT_OCR.PARSE_COUNT</code>.
      */
-    public final TableField<DocumentOcrRecord, Boolean> PARSE_FAILED = createField("PARSE_FAILED", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<DocumentOcrRecord, Integer> PARSE_COUNT = createField("PARSE_COUNT", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>APP.DOCUMENT_OCR.FAILED_REASON</code>.
+     */
+    public final TableField<DocumentOcrRecord, String> FAILED_REASON = createField("FAILED_REASON", org.jooq.impl.SQLDataType.VARCHAR.length(2400), this, "");
 
     /**
      * Create a <code>APP.DOCUMENT_OCR</code> table reference
@@ -106,7 +111,7 @@ public class DocumentOcr extends TableImpl<DocumentOcrRecord> {
      */
     @Override
     public UniqueKey<DocumentOcrRecord> getPrimaryKey() {
-        return Keys.SQL170113231839300;
+        return Keys.SQL170116213141190;
     }
 
     /**
@@ -114,7 +119,7 @@ public class DocumentOcr extends TableImpl<DocumentOcrRecord> {
      */
     @Override
     public List<UniqueKey<DocumentOcrRecord>> getKeys() {
-        return Arrays.<UniqueKey<DocumentOcrRecord>>asList(Keys.SQL170113231839300);
+        return Arrays.<UniqueKey<DocumentOcrRecord>>asList(Keys.SQL170116213141190);
     }
 
     /**

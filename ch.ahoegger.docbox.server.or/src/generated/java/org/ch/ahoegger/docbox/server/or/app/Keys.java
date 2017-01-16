@@ -61,20 +61,20 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final UniqueKey<CategoryRecord> SQL170113231839160 = UniqueKeys0.SQL170113231839160;
-    public static final UniqueKey<ConversationRecord> SQL170113231839200 = UniqueKeys0.SQL170113231839200;
-    public static final UniqueKey<DefaultPermissionTableRecord> SQL170113231839210 = UniqueKeys0.SQL170113231839210;
-    public static final UniqueKey<DocboxUserRecord> SQL170113231839430 = UniqueKeys0.SQL170113231839430;
-    public static final UniqueKey<DocumentRecord> SQL170113231839330 = UniqueKeys0.SQL170113231839330;
-    public static final UniqueKey<DocumentCategoryRecord> SQL170113231839290 = UniqueKeys0.SQL170113231839290;
-    public static final UniqueKey<DocumentOcrRecord> SQL170113231839300 = UniqueKeys0.SQL170113231839300;
-    public static final UniqueKey<DocumentPartnerRecord> SQL170113231839310 = UniqueKeys0.SQL170113231839310;
-    public static final UniqueKey<DocumentPermissionRecord> SQL170113231839320 = UniqueKeys0.SQL170113231839320;
-    public static final UniqueKey<EmployeeRecord> SQL170113231839360 = UniqueKeys0.SQL170113231839360;
-    public static final UniqueKey<EntityRecord> SQL170113231839380 = UniqueKeys0.SQL170113231839380;
-    public static final UniqueKey<PartnerRecord> SQL170113231839390 = UniqueKeys0.SQL170113231839390;
-    public static final UniqueKey<PostingGroupRecord> SQL170113231839410 = UniqueKeys0.SQL170113231839410;
-    public static final UniqueKey<TaxGroupRecord> SQL170113231839420 = UniqueKeys0.SQL170113231839420;
+    public static final UniqueKey<CategoryRecord> SQL170116213141060 = UniqueKeys0.SQL170116213141060;
+    public static final UniqueKey<ConversationRecord> SQL170116213141100 = UniqueKeys0.SQL170116213141100;
+    public static final UniqueKey<DefaultPermissionTableRecord> SQL170116213141110 = UniqueKeys0.SQL170116213141110;
+    public static final UniqueKey<DocboxUserRecord> SQL170116213141330 = UniqueKeys0.SQL170116213141330;
+    public static final UniqueKey<DocumentRecord> SQL170116213141230 = UniqueKeys0.SQL170116213141230;
+    public static final UniqueKey<DocumentCategoryRecord> SQL170116213141180 = UniqueKeys0.SQL170116213141180;
+    public static final UniqueKey<DocumentOcrRecord> SQL170116213141190 = UniqueKeys0.SQL170116213141190;
+    public static final UniqueKey<DocumentPartnerRecord> SQL170116213141200 = UniqueKeys0.SQL170116213141200;
+    public static final UniqueKey<DocumentPermissionRecord> SQL170116213141220 = UniqueKeys0.SQL170116213141220;
+    public static final UniqueKey<EmployeeRecord> SQL170116213141260 = UniqueKeys0.SQL170116213141260;
+    public static final UniqueKey<EntityRecord> SQL170116213141280 = UniqueKeys0.SQL170116213141280;
+    public static final UniqueKey<PartnerRecord> SQL170116213141290 = UniqueKeys0.SQL170116213141290;
+    public static final UniqueKey<PostingGroupRecord> SQL170116213141310 = UniqueKeys0.SQL170116213141310;
+    public static final UniqueKey<TaxGroupRecord> SQL170116213141320 = UniqueKeys0.SQL170116213141320;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -86,19 +86,19 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     private static class UniqueKeys0 extends AbstractKeys {
-        public static final UniqueKey<CategoryRecord> SQL170113231839160 = createUniqueKey(Category.CATEGORY, "SQL170113231839160", Category.CATEGORY.CATEGORY_NR);
-        public static final UniqueKey<ConversationRecord> SQL170113231839200 = createUniqueKey(Conversation.CONVERSATION, "SQL170113231839200", Conversation.CONVERSATION.CONVERSATION_NR);
-        public static final UniqueKey<DefaultPermissionTableRecord> SQL170113231839210 = createUniqueKey(DefaultPermissionTable.DEFAULT_PERMISSION_TABLE, "SQL170113231839210", DefaultPermissionTable.DEFAULT_PERMISSION_TABLE.USERNAME);
-        public static final UniqueKey<DocboxUserRecord> SQL170113231839430 = createUniqueKey(DocboxUser.DOCBOX_USER, "SQL170113231839430", DocboxUser.DOCBOX_USER.USERNAME);
-        public static final UniqueKey<DocumentRecord> SQL170113231839330 = createUniqueKey(Document.DOCUMENT, "SQL170113231839330", Document.DOCUMENT.DOCUMENT_NR);
-        public static final UniqueKey<DocumentCategoryRecord> SQL170113231839290 = createUniqueKey(DocumentCategory.DOCUMENT_CATEGORY, "SQL170113231839290", DocumentCategory.DOCUMENT_CATEGORY.DOCUMENT_NR, DocumentCategory.DOCUMENT_CATEGORY.CATEGORY_NR);
-        public static final UniqueKey<DocumentOcrRecord> SQL170113231839300 = createUniqueKey(DocumentOcr.DOCUMENT_OCR, "SQL170113231839300", DocumentOcr.DOCUMENT_OCR.DOCUMENT_NR);
-        public static final UniqueKey<DocumentPartnerRecord> SQL170113231839310 = createUniqueKey(DocumentPartner.DOCUMENT_PARTNER, "SQL170113231839310", DocumentPartner.DOCUMENT_PARTNER.DOCUMENT_NR, DocumentPartner.DOCUMENT_PARTNER.PARTNER_NR);
-        public static final UniqueKey<DocumentPermissionRecord> SQL170113231839320 = createUniqueKey(DocumentPermission.DOCUMENT_PERMISSION, "SQL170113231839320", DocumentPermission.DOCUMENT_PERMISSION.USERNAME, DocumentPermission.DOCUMENT_PERMISSION.DOCUMENT_NR);
-        public static final UniqueKey<EmployeeRecord> SQL170113231839360 = createUniqueKey(Employee.EMPLOYEE, "SQL170113231839360", Employee.EMPLOYEE.PARTNER_NR);
-        public static final UniqueKey<EntityRecord> SQL170113231839380 = createUniqueKey(Entity.ENTITY, "SQL170113231839380", Entity.ENTITY.ENTITY_NR);
-        public static final UniqueKey<PartnerRecord> SQL170113231839390 = createUniqueKey(Partner.PARTNER, "SQL170113231839390", Partner.PARTNER.PARTNER_NR);
-        public static final UniqueKey<PostingGroupRecord> SQL170113231839410 = createUniqueKey(PostingGroup.POSTING_GROUP, "SQL170113231839410", PostingGroup.POSTING_GROUP.POSTING_GROUP_NR);
-        public static final UniqueKey<TaxGroupRecord> SQL170113231839420 = createUniqueKey(TaxGroup.TAX_GROUP, "SQL170113231839420", TaxGroup.TAX_GROUP.TAX_GROUP_NR);
+        public static final UniqueKey<CategoryRecord> SQL170116213141060 = createUniqueKey(Category.CATEGORY, "SQL170116213141060", Category.CATEGORY.CATEGORY_NR);
+        public static final UniqueKey<ConversationRecord> SQL170116213141100 = createUniqueKey(Conversation.CONVERSATION, "SQL170116213141100", Conversation.CONVERSATION.CONVERSATION_NR);
+        public static final UniqueKey<DefaultPermissionTableRecord> SQL170116213141110 = createUniqueKey(DefaultPermissionTable.DEFAULT_PERMISSION_TABLE, "SQL170116213141110", DefaultPermissionTable.DEFAULT_PERMISSION_TABLE.USERNAME);
+        public static final UniqueKey<DocboxUserRecord> SQL170116213141330 = createUniqueKey(DocboxUser.DOCBOX_USER, "SQL170116213141330", DocboxUser.DOCBOX_USER.USERNAME);
+        public static final UniqueKey<DocumentRecord> SQL170116213141230 = createUniqueKey(Document.DOCUMENT, "SQL170116213141230", Document.DOCUMENT.DOCUMENT_NR);
+        public static final UniqueKey<DocumentCategoryRecord> SQL170116213141180 = createUniqueKey(DocumentCategory.DOCUMENT_CATEGORY, "SQL170116213141180", DocumentCategory.DOCUMENT_CATEGORY.DOCUMENT_NR, DocumentCategory.DOCUMENT_CATEGORY.CATEGORY_NR);
+        public static final UniqueKey<DocumentOcrRecord> SQL170116213141190 = createUniqueKey(DocumentOcr.DOCUMENT_OCR, "SQL170116213141190", DocumentOcr.DOCUMENT_OCR.DOCUMENT_NR);
+        public static final UniqueKey<DocumentPartnerRecord> SQL170116213141200 = createUniqueKey(DocumentPartner.DOCUMENT_PARTNER, "SQL170116213141200", DocumentPartner.DOCUMENT_PARTNER.DOCUMENT_NR, DocumentPartner.DOCUMENT_PARTNER.PARTNER_NR);
+        public static final UniqueKey<DocumentPermissionRecord> SQL170116213141220 = createUniqueKey(DocumentPermission.DOCUMENT_PERMISSION, "SQL170116213141220", DocumentPermission.DOCUMENT_PERMISSION.USERNAME, DocumentPermission.DOCUMENT_PERMISSION.DOCUMENT_NR);
+        public static final UniqueKey<EmployeeRecord> SQL170116213141260 = createUniqueKey(Employee.EMPLOYEE, "SQL170116213141260", Employee.EMPLOYEE.PARTNER_NR);
+        public static final UniqueKey<EntityRecord> SQL170116213141280 = createUniqueKey(Entity.ENTITY, "SQL170116213141280", Entity.ENTITY.ENTITY_NR);
+        public static final UniqueKey<PartnerRecord> SQL170116213141290 = createUniqueKey(Partner.PARTNER, "SQL170116213141290", Partner.PARTNER.PARTNER_NR);
+        public static final UniqueKey<PostingGroupRecord> SQL170116213141310 = createUniqueKey(PostingGroup.POSTING_GROUP, "SQL170116213141310", PostingGroup.POSTING_GROUP.POSTING_GROUP_NR);
+        public static final UniqueKey<TaxGroupRecord> SQL170116213141320 = createUniqueKey(TaxGroup.TAX_GROUP, "SQL170116213141320", TaxGroup.TAX_GROUP.TAX_GROUP_NR);
     }
 }

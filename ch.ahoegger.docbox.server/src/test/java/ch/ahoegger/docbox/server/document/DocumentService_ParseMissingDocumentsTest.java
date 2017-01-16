@@ -104,7 +104,7 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
         LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, false);
 
-    BEANS.get(DocumentOcrTableTask.class).createDocumentOcrRow(sqlService, documentId01, "parsed01", true, false);
+    BEANS.get(DocumentOcrTableTask.class).createDocumentOcrRow(sqlService, documentId01, "parsed01", true, 1, null);
 
   }
 

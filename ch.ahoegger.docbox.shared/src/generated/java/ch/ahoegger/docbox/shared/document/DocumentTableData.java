@@ -61,6 +61,7 @@ public class DocumentTableData extends AbstractTablePageData {
     public static final String documentDate = "documentDate";
     public static final String capturedDate = "capturedDate";
     public static final String owner = "owner";
+    public static final String ocrParseCount = "ocrParseCount";
     public static final String documentPath = "documentPath";
     private BigDecimal m_documentId;
     private String m_abstract;
@@ -69,6 +70,7 @@ public class DocumentTableData extends AbstractTablePageData {
     private Date m_documentDate;
     private Date m_capturedDate;
     private String m_owner;
+    private Integer m_ocrParseCount;
     private String m_documentPath;
 
     public BigDecimal getDocumentId() {
@@ -125,6 +127,14 @@ public class DocumentTableData extends AbstractTablePageData {
 
     public void setOwner(String newOwner) {
       m_owner = newOwner;
+    }
+
+    public Integer getOcrParseCount() {
+      return m_ocrParseCount;
+    }
+
+    public void setOcrParseCount(Integer newOcrParseCount) {
+      m_ocrParseCount = newOcrParseCount;
     }
 
     public String getDocumentPath() {

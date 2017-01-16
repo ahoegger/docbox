@@ -10,6 +10,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractSearchForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
+import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractResetButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractSearchButton;
@@ -31,6 +32,7 @@ import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchButto
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.OcrBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.OcrBox.OcrSearchTableField;
+import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.OcrBox.ParseFailureField;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.OcrBox.ParsedContentBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox;
 import ch.ahoegger.docbox.client.document.DocumentSearchForm.MainBox.SearchTabBox.SearchBox.AbstractField;
@@ -114,6 +116,10 @@ public class DocumentSearchForm extends AbstractSearchForm {
 
   public CagegoriesActiveBox getCagegoriesActiveBox() {
     return getFieldByClass(CagegoriesActiveBox.class);
+  }
+
+  public ParseFailureField getParseFailureField() {
+    return getFieldByClass(ParseFailureField.class);
   }
 
   public OcrBox getOcrBox() {
@@ -427,6 +433,14 @@ public class DocumentSearchForm extends AbstractSearchForm {
             }
           }
 
+        }
+
+        @Order(3000)
+        public class ParseFailureField extends AbstractBooleanField {
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("ParseFailure");
+          }
         }
 
       }

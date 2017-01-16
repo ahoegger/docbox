@@ -8,9 +8,15 @@ import java.nio.file.Path;
  * @author Andreas Hoegger
  */
 public class OcrParseResult {
+
+  public static enum ParseError {
+    CouldNotParseText
+  }
+
   private String m_text;
   private Path m_workingDirectory;
   private boolean m_ocrParsed;
+  private ParseError m_parseError;
 
   public OcrParseResult withText(String text) {
     m_text = text;
@@ -37,5 +43,14 @@ public class OcrParseResult {
 
   public Path getWorkingDirectory() {
     return m_workingDirectory;
+  }
+
+  public ParseError getParseError() {
+    return m_parseError;
+  }
+
+  public OcrParseResult withParseError(ParseError parseError) {
+    m_parseError = parseError;
+    return this;
   }
 }

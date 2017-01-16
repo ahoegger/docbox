@@ -26,7 +26,7 @@ public class DocumentOcrServiceTest extends AbstractTestWithDatabase {
 
     ISqlService sqlService = BEANS.get(ISqlService.class);
 
-    BEANS.get(DocumentOcrTableTask.class).createDocumentOcrRow(sqlService, documentId, "sample", true, false);
+    BEANS.get(DocumentOcrTableTask.class).createDocumentOcrRow(sqlService, documentId, "sample", true, 1, null);
 
   }
 

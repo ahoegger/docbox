@@ -16,7 +16,8 @@ public class DocumentOcrTableStatement implements ITableStatement, IDocumentOcrT
     statementBuilder.append(DOCUMENT_NR).append(" BIGINT NOT NULL, ");
     statementBuilder.append(TEXT).append(" CLOB(").append(TEXT_LENGHT).append(") , ");
     statementBuilder.append(OCR_SCANNED).append(" BOOLEAN NOT NULL, ");
-    statementBuilder.append(PARSE_FAILED).append(" BOOLEAN NOT NULL, ");
+    statementBuilder.append(PARSE_COUNT).append(" INT, ");
+    statementBuilder.append(FAILED_REASON).append(" VARCHAR(").append(FAILED_REASON_LENGTH).append("), ");
     statementBuilder.append("PRIMARY KEY (").append(ITableStatement.columns(DOCUMENT_NR)).append(")");
     statementBuilder.append(")");
     return statementBuilder.toString();

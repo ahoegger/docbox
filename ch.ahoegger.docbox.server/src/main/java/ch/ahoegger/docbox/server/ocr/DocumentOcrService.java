@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.ocr;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.DocumentOcr;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.DocumentOcrRecord;
@@ -27,16 +28,28 @@ public class DocumentOcrService implements IDocumentOcrService {
   private static final Logger LOG = LoggerFactory.getLogger(DocumentOcrService.class);
 
   @RemoteServiceAccessDenied
-  public void create(BigDecimal documentId, OcrParseResult parseResult) {
+  public void updateOrCreate(BigDecimal documentId, OcrParseResult parseResult) {
 
     DocumentOcr docOcr = DocumentOcr.DOCUMENT_OCR.as("DOC_OCR");
-    int rowCount = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .newRecord(docOcr)
-        .with(docOcr.DOCUMENT_NR, documentId)
+
+    DocumentOcrRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(docOcr, docOcr.DOCUMENT_NR.eq(documentId));
+
+    if (rec == null) {
+      rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY).newRecord(docOcr)
+          .with(docOcr.DOCUMENT_NR, documentId);
+
+    }
+    int rowCount = rec
+        .with(docOcr.PARSE_COUNT, Optional.ofNullable(rec.getParseCount())
+            .map(c -> c + 1)
+            .orElse(1))
+        .with(docOcr.FAILED_REASON, Optional.ofNullable(parseResult.getParseError())
+            .map(e -> e.toString())
+            .orElse(null))
         .with(docOcr.OCR_SCANNED, parseResult.isOcrParsed())
-        .with(docOcr.PARSE_FAILED, false)
         .with(docOcr.TEXT, parseResult.getText())
-        .insert();
+        .store();
 
     if (rowCount == 1) {
       // notify backup needed
@@ -54,7 +67,8 @@ public class DocumentOcrService implements IDocumentOcrService {
           DocumentOcrFormData fd = new DocumentOcrFormData();
           fd.setDocumentId(rec.get(docOcr.DOCUMENT_NR));
           fd.getOcrParsed().setValue(rec.get(docOcr.OCR_SCANNED));
-          fd.getNotParsable().setValue(rec.get(docOcr.PARSE_FAILED));
+          fd.getParseCount().setValue(rec.get(docOcr.PARSE_COUNT));
+          fd.getParseFailedReason().setValue(rec.get(docOcr.FAILED_REASON));
           fd.getText().setValue(rec.get(docOcr.TEXT));
           return fd;
         })
