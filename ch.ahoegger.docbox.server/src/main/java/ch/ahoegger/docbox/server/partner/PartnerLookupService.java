@@ -2,20 +2,25 @@ package ch.ahoegger.docbox.server.partner;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
-import org.eclipse.scout.rt.server.services.lookup.AbstractLookupService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.jooq.Condition;
+import org.jooq.Record4;
 import org.jooq.SQLDialect;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
+import ch.ahoegger.docbox.server.service.lookup.AbstractDocboxLookupService;
 import ch.ahoegger.docbox.shared.partner.IParterLookupService;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
@@ -24,34 +29,41 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
  *
  * @author Andreas Hoegger
  */
-public class PartnerLookupService extends AbstractLookupService<BigDecimal> implements IParterLookupService {
+public class PartnerLookupService extends AbstractDocboxLookupService<BigDecimal> implements IParterLookupService {
 
   @Override
-  public List<? extends ILookupRow<BigDecimal>> getDataByKey(ILookupCall<BigDecimal> call) {
+  public List<? extends ILookupRow<BigDecimal>> getDataByKeyInternal(ILookupCall<BigDecimal> call) {
     return getData(Partner.PARTNER.PARTNER_NR.eq(call.getKey()), call);
   }
 
   @Override
-  public List<? extends ILookupRow<BigDecimal>> getDataByText(ILookupCall<BigDecimal> call) {
-    return getData(Partner.PARTNER.NAME.likeIgnoreCase(call.getText() + "%"), call);
+  public List<? extends ILookupRow<BigDecimal>> getDataByTextInternal(ILookupCall<BigDecimal> call) {
+    if (call.getText() != null) {
+      String s = call.getText();
+      String sqlWildcard = BEANS.get(ISqlService.class).getSqlStyle().getLikeWildcard();
+      call.setText(s.replace(call.getWildcard(), sqlWildcard));
+    }
+    return getData(Partner.PARTNER.NAME.likeIgnoreCase(call.getText()), call);
   }
 
   @Override
-  public List<? extends ILookupRow<BigDecimal>> getDataByAll(ILookupCall<BigDecimal> call) {
+  public List<? extends ILookupRow<BigDecimal>> getDataByAllInternal(ILookupCall<BigDecimal> call) {
     return getData(DSL.trueCondition(), call);
   }
 
   @Override
-  public List<? extends ILookupRow<BigDecimal>> getDataByRec(ILookupCall<BigDecimal> call) {
+  public List<? extends ILookupRow<BigDecimal>> getDataByRecInternal(ILookupCall<BigDecimal> call) {
     return null;
   }
 
   protected List<? extends ILookupRow<BigDecimal>> getData(Condition conditions, ILookupCall<BigDecimal> call) {
     Partner t = Partner.PARTNER;
-    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+    SelectConditionStep<Record4<BigDecimal, String, Date, Date>> query = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .select(t.PARTNER_NR, t.NAME, t.START_DATE, t.END_DATE)
         .from(t)
-        .where(conditions)
+        .where(conditions);
+    System.out.println(query.toString());
+    return query
         .fetch().stream().map(rec -> {
           LookupRow<BigDecimal> row = new LookupRow<BigDecimal>(rec.get(t.PARTNER_NR), rec.get(t.NAME));
           row.withActive(Optional.ofNullable(rec.get(t.END_DATE)).map(d -> LocalDateUtility.toLocalDate(d).plusDays(1)).orElse(LocalDate.now().plusDays(1)).isAfter(LocalDate.now()));

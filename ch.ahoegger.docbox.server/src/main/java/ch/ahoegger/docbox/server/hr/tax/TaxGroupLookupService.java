@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 import org.eclipse.scout.rt.server.jdbc.SQL;
-import org.eclipse.scout.rt.server.services.lookup.AbstractLookupService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -16,6 +15,7 @@ import org.jooq.Condition;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
+import ch.ahoegger.docbox.server.service.lookup.AbstractDocboxLookupService;
 import ch.ahoegger.docbox.shared.hr.tax.ITaxGroupLookupService;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
@@ -24,25 +24,25 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
  *
  * @author Andreas Hoegger
  */
-public class TaxGroupLookupService extends AbstractLookupService<BigDecimal> implements ITaxGroupLookupService {
+public class TaxGroupLookupService extends AbstractDocboxLookupService<BigDecimal> implements ITaxGroupLookupService {
 
   @Override
-  public List<? extends ILookupRow<BigDecimal>> getDataByKey(ILookupCall<BigDecimal> call) {
+  public List<? extends ILookupRow<BigDecimal>> getDataByKeyInternal(ILookupCall<BigDecimal> call) {
     return getData(TaxGroup.TAX_GROUP.TAX_GROUP_NR.eq(call.getKey()), call);
   }
 
   @Override
-  public List<? extends ILookupRow<BigDecimal>> getDataByText(ILookupCall<BigDecimal> call) {
-    return getData(TaxGroup.TAX_GROUP.NAME.likeIgnoreCase(call.getText() + "%"), call);
+  public List<? extends ILookupRow<BigDecimal>> getDataByTextInternal(ILookupCall<BigDecimal> call) {
+    return getData(TaxGroup.TAX_GROUP.NAME.likeIgnoreCase(call.getText()), call);
   }
 
   @Override
-  public List<? extends ILookupRow<BigDecimal>> getDataByAll(ILookupCall<BigDecimal> call) {
+  public List<? extends ILookupRow<BigDecimal>> getDataByAllInternal(ILookupCall<BigDecimal> call) {
     return getData(DSL.trueCondition(), call);
   }
 
   @Override
-  public List<? extends ILookupRow<BigDecimal>> getDataByRec(ILookupCall<BigDecimal> call) {
+  public List<? extends ILookupRow<BigDecimal>> getDataByRecInternal(ILookupCall<BigDecimal> call) {
     return null;
   }
 

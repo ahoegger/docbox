@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.DocboxUser;
 import org.eclipse.scout.rt.server.jdbc.SQL;
-import org.eclipse.scout.rt.server.services.lookup.AbstractLookupService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -13,32 +12,34 @@ import org.jooq.Condition;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
+import ch.ahoegger.docbox.server.service.lookup.AbstractDocboxLookupService;
+
 /**
  * <h3>{@link AbstractUserLookupService}</h3>
  *
  * @author aho
  */
-public class AbstractUserLookupService extends AbstractLookupService<String> {
+public class AbstractUserLookupService extends AbstractDocboxLookupService<String> {
 
   private static final String COLUMN_DISPLAY_NAME = "DISPLAY_NAME";
 
   @Override
-  public List<? extends ILookupRow<String>> getDataByKey(ILookupCall<String> call) {
+  public List<? extends ILookupRow<String>> getDataByKeyInternal(ILookupCall<String> call) {
     return getData(DocboxUser.DOCBOX_USER.USERNAME.eq(call.getKey()), call);
   }
 
   @Override
-  public List<? extends ILookupRow<String>> getDataByText(ILookupCall<String> call) {
-    return getData(DocboxUser.DOCBOX_USER.field(COLUMN_DISPLAY_NAME).likeIgnoreCase(call.getText() + "%"), call);
+  public List<? extends ILookupRow<String>> getDataByTextInternal(ILookupCall<String> call) {
+    return getData(DocboxUser.DOCBOX_USER.field(COLUMN_DISPLAY_NAME).likeIgnoreCase(call.getText()), call);
   }
 
   @Override
-  public List<? extends ILookupRow<String>> getDataByAll(ILookupCall<String> call) {
+  public List<? extends ILookupRow<String>> getDataByAllInternal(ILookupCall<String> call) {
     return getData(DSL.trueCondition(), call);
   }
 
   @Override
-  public List<? extends ILookupRow<String>> getDataByRec(ILookupCall<String> call) {
+  public List<? extends ILookupRow<String>> getDataByRecInternal(ILookupCall<String> call) {
     return null;
   }
 
