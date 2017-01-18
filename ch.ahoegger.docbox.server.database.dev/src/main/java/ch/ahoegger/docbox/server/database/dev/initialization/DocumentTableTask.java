@@ -43,7 +43,7 @@ public class DocumentTableTask extends DocumentTableStatement implements ITableT
     query.execute();
   }
 
-  public void createDocumentRow(ISqlService sqlService, BigDecimal documentId, String abstractText, Date documentDate,
+  public void insert(ISqlService sqlService, BigDecimal documentId, String abstractText, Date documentDate,
       Date capturedDate, Date validDate, String docPath, String originalStorage, BigDecimal conversationId, boolean parseOcr) {
     Document t = Document.DOCUMENT;
     DSL.using(sqlService.getConnection(), SQLDialect.DERBY)

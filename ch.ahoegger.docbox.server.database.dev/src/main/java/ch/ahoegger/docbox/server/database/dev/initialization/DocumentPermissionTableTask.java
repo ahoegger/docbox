@@ -42,7 +42,7 @@ public class DocumentPermissionTableTask extends DocumentPermissionTableStatemen
     query.execute();
   }
 
-  public void createDocumentPermissionRow(ISqlService sqlService, String userId, BigDecimal documentId, int permission) {
+  public void insert(ISqlService sqlService, String userId, BigDecimal documentId, int permission) {
     DocumentPermission t = DocumentPermission.DOCUMENT_PERMISSION;
     DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
         .newRecord(t)

@@ -43,7 +43,7 @@ public class UserTableTask extends UserTableStatement implements ITableTask {
     sqlService.insert(statementBuilder.toString());
   }
 
-  public void insertUser(ISqlService sqlService, String name, String firstname, String username, String password,
+  public void insert(ISqlService sqlService, String name, String firstname, String username, String password,
       boolean active, boolean administrator) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");

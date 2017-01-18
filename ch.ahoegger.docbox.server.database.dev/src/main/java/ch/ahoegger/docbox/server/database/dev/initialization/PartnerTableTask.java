@@ -45,7 +45,7 @@ public class PartnerTableTask extends PartnerTableStatement implements ITableTas
     sqlService.insert(statementBuilder.toString());
   }
 
-  public void createPartnerRow(ISqlService sqlService, BigDecimal patnerId, String name, String description, Date startDate,
+  public void insert(ISqlService sqlService, BigDecimal patnerId, String name, String description, Date startDate,
       Date endDate) {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("INSERT INTO ").append(TABLE_NAME).append(" (");

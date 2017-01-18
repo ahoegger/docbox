@@ -41,7 +41,7 @@ public class DefaultPermissionTableTask extends DefaultPermissionTableStatement 
     query.execute();
   }
 
-  public void createDefaultPermissionRow(ISqlService sqlService, String username, int permission) {
+  public void insert(ISqlService sqlService, String username, int permission) {
     DefaultPermissionTable t = DefaultPermissionTable.DEFAULT_PERMISSION_TABLE;
     DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
         .newRecord(t)

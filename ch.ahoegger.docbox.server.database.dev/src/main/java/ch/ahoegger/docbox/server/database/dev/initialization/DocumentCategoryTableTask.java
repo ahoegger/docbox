@@ -44,7 +44,7 @@ public class DocumentCategoryTableTask extends DocumentCategoryTableStatement im
     query.execute();
   }
 
-  public void createDocumentCategoryRow(ISqlService sqlService, BigDecimal documentId, BigDecimal categoryId) {
+  public void insert(ISqlService sqlService, BigDecimal documentId, BigDecimal categoryId) {
 
     DocumentCategoryRecord newRecord = DSL.using(sqlService.getConnection(), SQLDialect.DERBY).newRecord(DocumentCategory.DOCUMENT_CATEGORY);
     newRecord.setDocumentNr(documentId);

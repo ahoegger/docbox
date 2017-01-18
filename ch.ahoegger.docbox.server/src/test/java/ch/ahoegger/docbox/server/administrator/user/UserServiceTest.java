@@ -34,12 +34,12 @@ public class UserServiceTest extends AbstractTestWithDatabase {
   public void setupDb() throws Exception {
     super.setupDb();
     ISqlService sqlService = BEANS.get(ISqlService.class);
-    BEANS.get(UserTableTask.class).insertUser(sqlService, "first.myself", "last.myself", userId01, "secret", true, false);
-    BEANS.get(UserTableTask.class).insertUser(sqlService, "name02", "firstname02", userId02, passwordHash("secret02"), true, false);
-    BEANS.get(UserTableTask.class).insertUser(sqlService, "name03", "firstname03", userId03, passwordHash("secret03"), false, false);
-    BEANS.get(UserTableTask.class).insertUser(sqlService, "name04", "firstname04", userId04, passwordHash("secret04"), true, false);
-    BEANS.get(UserTableTask.class).insertUser(sqlService, "name05", "firstname05", userId05, passwordHash("secret05"), true, false);
-    BEANS.get(UserTableTask.class).insertUser(sqlService, "admin01", "first.admin01", userIdAdmin01, passwordHash("secret05"), true, true);
+    BEANS.get(UserTableTask.class).insert(sqlService, "first.myself", "last.myself", userId01, "secret", true, false);
+    BEANS.get(UserTableTask.class).insert(sqlService, "name02", "firstname02", userId02, passwordHash("secret02"), true, false);
+    BEANS.get(UserTableTask.class).insert(sqlService, "name03", "firstname03", userId03, passwordHash("secret03"), false, false);
+    BEANS.get(UserTableTask.class).insert(sqlService, "name04", "firstname04", userId04, passwordHash("secret04"), true, false);
+    BEANS.get(UserTableTask.class).insert(sqlService, "name05", "firstname05", userId05, passwordHash("secret05"), true, false);
+    BEANS.get(UserTableTask.class).insert(sqlService, "admin01", "first.admin01", userIdAdmin01, passwordHash("secret05"), true, true);
   }
 
   @Test
@@ -127,7 +127,7 @@ public class UserServiceTest extends AbstractTestWithDatabase {
   public void testDeleteAdministrator() {
     String adminId01 = "adminId01";
     ISqlService sqlService = BEANS.get(ISqlService.class);
-    BEANS.get(UserTableTask.class).insertUser(sqlService, "last.admin", "first.admin", adminId01, "secret", true, true);
+    BEANS.get(UserTableTask.class).insert(sqlService, "last.admin", "first.admin", adminId01, "secret", true, true);
 
     IUserService service = BEANS.get(IUserService.class);
     Assert.assertTrue(service.delete(adminId01));

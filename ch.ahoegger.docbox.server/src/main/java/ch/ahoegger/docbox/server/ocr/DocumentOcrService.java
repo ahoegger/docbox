@@ -83,7 +83,7 @@ public class DocumentOcrService implements IDocumentOcrService {
   public Boolean exists(BigDecimal documentId) {
     DocumentOcrFormData fd = new DocumentOcrFormData();
     fd.setDocumentId(documentId);
-    return load(fd) != null;
+    return load(fd) != null && fd.getParseFailedReason().getValue() == null;
   }
 
   /**

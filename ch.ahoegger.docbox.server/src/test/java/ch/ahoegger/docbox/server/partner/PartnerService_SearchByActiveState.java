@@ -40,20 +40,20 @@ public class PartnerService_SearchByActiveState extends AbstractTestWithDatabase
     ISqlService sqlService = BEANS.get(ISqlService.class);
     LocalDate today = LocalDate.now();
 
-    BEANS.get(PartnerTableTask.class).createPartnerRow(sqlService, partnerId01, "sample conversation 01", "some notes",
+    BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId01, "sample conversation 01", "some notes",
         Date.from(today.minusDays(20).atStartOfDay(ZoneId.systemDefault()).toInstant()), null);
 
     // till yesterday
-    BEANS.get(PartnerTableTask.class).createPartnerRow(sqlService, partnerId02, "sample conversation 02", "some notes",
+    BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId02, "sample conversation 02", "some notes",
         Date.from(today.minusDays(10).atStartOfDay(ZoneId.systemDefault()).toInstant()), Date.from(today.minusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
     // till today
-    BEANS.get(PartnerTableTask.class).createPartnerRow(sqlService, partnerId03, "sample conversation 03", "some notes",
+    BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId03, "sample conversation 03", "some notes",
         Date.from(today.minusDays(10).atStartOfDay(ZoneId.systemDefault()).toInstant()),
         Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
     // till tomorrow
-    BEANS.get(PartnerTableTask.class).createPartnerRow(sqlService, partnerId04, "sample conversation 04", "some notes",
+    BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId04, "sample conversation 04", "some notes",
         Date.from(today.minusDays(10).atStartOfDay(ZoneId.systemDefault()).toInstant()),
         Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
   }

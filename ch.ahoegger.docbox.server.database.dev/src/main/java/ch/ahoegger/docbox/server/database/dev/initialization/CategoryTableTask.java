@@ -45,7 +45,7 @@ public class CategoryTableTask extends CategoryTableStatement implements ITableT
     query.execute();
   }
 
-  public void createCategoryRow(ISqlService sqlService, BigDecimal categoryId, String name, String description,
+  public void insert(ISqlService sqlService, BigDecimal categoryId, String name, String description,
       Date startDate, Date endDate) {
     CategoryRecord newCatetory = DSL.using(sqlService.getConnection(), SQLDialect.DERBY).newRecord(Category.CATEGORY);
     newCatetory.setCategoryNr(categoryId);

@@ -41,23 +41,23 @@ public class PartnerServiceSearchTest extends AbstractTestWithDatabase {
     ISqlService sqlService = BEANS.get(ISqlService.class);
     LocalDate today = LocalDate.now();
 
-    BEANS.get(PartnerTableTask.class).createPartnerRow(sqlService, partnerId01, "partner01", "some notes",
+    BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId01, "partner01", "some notes",
         LocalDateUtility.toDate(today.minusDays(20)),
         null);
 
     // till yesterday
-    BEANS.get(PartnerTableTask.class).createPartnerRow(sqlService, partnerId02, "partner02", "some notes",
+    BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId02, "partner02", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         LocalDateUtility.toDate(today.minusDays(1)));
 
     // till today
-    BEANS.get(PartnerTableTask.class).createPartnerRow(sqlService, partnerId03, "partner03", "some notes",
+    BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId03, "partner03", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         LocalDateUtility.toDate(today));
 
-    BEANS.get(DocumentPartnerTableTask.class).createDocumentPartnerRow(sqlService, documentId01, partnerId01);
-    BEANS.get(DocumentPartnerTableTask.class).createDocumentPartnerRow(sqlService, documentId01, partnerId02);
-    BEANS.get(DocumentPartnerTableTask.class).createDocumentPartnerRow(sqlService, documentId02, partnerId03);
+    BEANS.get(DocumentPartnerTableTask.class).insert(sqlService, documentId01, partnerId01);
+    BEANS.get(DocumentPartnerTableTask.class).insert(sqlService, documentId01, partnerId02);
+    BEANS.get(DocumentPartnerTableTask.class).insert(sqlService, documentId02, partnerId03);
   }
 
   @Test

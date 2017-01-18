@@ -53,18 +53,18 @@ public class PostingGroupServiceTest extends AbstractTestWithDatabase {
     String documentPath = BEANS.get(DocumentStoreService.class).store(new BinaryResource("payslip.pdf", "content".getBytes()), docCaptureDate, documentId);
     ISqlService sqlService = BEANS.get(ISqlService.class);
 
-    BEANS.get(PartnerTableTask.class).createPartnerRow(sqlService, partnerId, "employee01", "desc01", docCaptureDate, null);
-    BEANS.get(EmployeeTableTask.class).createEmployerRow(sqlService, partnerId, "Homer", "Simpson", "Nashvill Street 12a", "Santa Barbara CA-90051", "ahv123564789", "iban987654321", BigDecimal.valueOf(26.30),
+    BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId, "employee01", "desc01", docCaptureDate, null);
+    BEANS.get(EmployeeTableTask.class).insert(sqlService, partnerId, "Homer", "Simpson", "Nashvill Street 12a", "Santa Barbara CA-90051", "ahv123564789", "iban987654321", BigDecimal.valueOf(26.30),
         "Master Bob & Minor Molar", "Mountainview 12", "CA-90153 Santa Tropee", "master.bob@blu.com", "5445621236");
 
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId, "Abstract", docCaptureDate, LocalDateUtility.toDate(LocalDate.now().minusDays(4)), null, documentPath, null, null, true);
+    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId, "Abstract", docCaptureDate, LocalDateUtility.toDate(LocalDate.now().minusDays(4)), null, documentPath, null, null, true);
 
-    BEANS.get(DocumentPartnerTableTask.class).createDocumentPartnerRow(sqlService, documentId, partnerId);
+    BEANS.get(DocumentPartnerTableTask.class).insert(sqlService, documentId, partnerId);
 
-    BEANS.get(PostingGroupTableTask.class).createRow(sqlService, postingGroupId, partnerId, null, documentId, "Dez", LocalDateUtility.toDate(LocalDate.now()), BigDecimal.valueOf(5.0), BigDecimal.valueOf(200.3), BigDecimal.valueOf(197.3),
+    BEANS.get(PostingGroupTableTask.class).insert(sqlService, postingGroupId, partnerId, null, documentId, "Dez", LocalDateUtility.toDate(LocalDate.now()), BigDecimal.valueOf(5.0), BigDecimal.valueOf(200.3), BigDecimal.valueOf(197.3),
         BigDecimal.valueOf(10.3), BigDecimal.valueOf(1.3), BigDecimal.valueOf(2.3));
-    BEANS.get(EntityTableTask.class).createEntityRow(sqlService, expenceId, partnerId, postingGroupId, ExpenseCode.ID, LocalDateUtility.toDate(LocalDate.now().minusDays(2)), null, BigDecimal.valueOf(23), "desc");
-    BEANS.get(EntityTableTask.class).createEntityRow(sqlService, workId, partnerId, postingGroupId, WorkCode.ID, LocalDateUtility.toDate(LocalDate.now().minusDays(2)), BigDecimal.valueOf(3), null, "desc");
+    BEANS.get(EntityTableTask.class).insert(sqlService, expenceId, partnerId, postingGroupId, ExpenseCode.ID, LocalDateUtility.toDate(LocalDate.now().minusDays(2)), null, BigDecimal.valueOf(23), "desc");
+    BEANS.get(EntityTableTask.class).insert(sqlService, workId, partnerId, postingGroupId, WorkCode.ID, LocalDateUtility.toDate(LocalDate.now().minusDays(2)), BigDecimal.valueOf(3), null, "desc");
 
   }
 

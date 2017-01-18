@@ -43,7 +43,7 @@ public class ConversationTableTask extends ConversationTableStatement implements
     query.execute();
   }
 
-  public void createConversationRow(ISqlService sqlService, BigDecimal conversationId, String name, String description,
+  public void insert(ISqlService sqlService, BigDecimal conversationId, String name, String description,
       Date startDate, Date endDate) {
     Conversation t = Conversation.CONVERSATION;
     DSL.using(sqlService.getConnection(), SQLDialect.DERBY)

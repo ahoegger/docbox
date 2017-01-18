@@ -42,7 +42,7 @@ public class EmployeeTableTask extends EmployeeTableStatement implements ITableT
     query.execute();
   }
 
-  public void createEmployerRow(ISqlService sqlService, BigDecimal partnerId, String firstName, String lastName, String addressLine1, String addressLine2, String ahvNumber, String accountNumber, BigDecimal hourlyWage,
+  public void insert(ISqlService sqlService, BigDecimal partnerId, String firstName, String lastName, String addressLine1, String addressLine2, String ahvNumber, String accountNumber, BigDecimal hourlyWage,
       String employerAddressLine1, String employerAddressLine2, String employerAddressLine3, String employerEmail, String employerPhone) {
     Employee t = Employee.EMPLOYEE;
     DSL.using(sqlService.getConnection(), SQLDialect.DERBY)

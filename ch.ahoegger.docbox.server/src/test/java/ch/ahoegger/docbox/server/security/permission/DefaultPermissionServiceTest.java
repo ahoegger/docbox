@@ -32,9 +32,9 @@ public class DefaultPermissionServiceTest extends AbstractTestWithDatabase {
     ISqlService sqlService = BEANS.get(ISqlService.class);
     LocalDate today = LocalDate.now();
 
-    BEANS.get(DefaultPermissionTableTask.class).createDefaultPermissionRow(sqlService, user01, ReadCode.ID);
-    BEANS.get(DefaultPermissionTableTask.class).createDefaultPermissionRow(sqlService, user02, WriteCode.ID);
-    BEANS.get(DefaultPermissionTableTask.class).createDefaultPermissionRow(sqlService, user03, OwnerCode.ID);
+    BEANS.get(DefaultPermissionTableTask.class).insert(sqlService, user01, ReadCode.ID);
+    BEANS.get(DefaultPermissionTableTask.class).insert(sqlService, user02, WriteCode.ID);
+    BEANS.get(DefaultPermissionTableTask.class).insert(sqlService, user03, OwnerCode.ID);
   }
 
   @Test

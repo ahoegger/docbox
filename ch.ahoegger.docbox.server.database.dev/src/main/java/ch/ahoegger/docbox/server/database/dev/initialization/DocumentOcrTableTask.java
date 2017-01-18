@@ -43,7 +43,7 @@ public class DocumentOcrTableTask extends DocumentOcrTableStatement implements I
     query.execute();
   }
 
-  public void createDocumentOcrRow(ISqlService sqlService, BigDecimal documentId, String text, boolean parsed, int parseCount, String parseFailedReason) {
+  public void insert(ISqlService sqlService, BigDecimal documentId, String text, boolean parsed, int parseCount, String parseFailedReason) {
     DocumentOcr t = DocumentOcr.DOCUMENT_OCR;
     DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
         .newRecord(t)

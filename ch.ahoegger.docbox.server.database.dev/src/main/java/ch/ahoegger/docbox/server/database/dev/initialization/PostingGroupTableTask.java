@@ -43,7 +43,7 @@ public class PostingGroupTableTask extends PostingGroupTableStatement implements
     query.execute();
   }
 
-  public void createRow(ISqlService sqlService, BigDecimal postingGroupId, BigDecimal partnerId, BigDecimal taxGroupId, BigDecimal documentId, String name,
+  public void insert(ISqlService sqlService, BigDecimal postingGroupId, BigDecimal partnerId, BigDecimal taxGroupId, BigDecimal documentId, String name,
       Date statementDate, BigDecimal workingHours, BigDecimal bruttoWage, BigDecimal nettoWage, BigDecimal sourceTax, BigDecimal socialSecurityTax, BigDecimal vacationExtra) {
 
     PostingGroup t = PostingGroup.POSTING_GROUP;

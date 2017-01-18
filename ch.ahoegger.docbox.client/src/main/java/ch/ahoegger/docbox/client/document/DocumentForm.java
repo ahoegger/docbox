@@ -131,6 +131,10 @@ public class DocumentForm extends AbstractForm {
     m_hasOcrText = hasOcrText;
   }
 
+  public MainBox getMainBox() {
+    return getFieldByClass(MainBox.class);
+  }
+
   public FieldBox getFieldBox() {
     return getFieldByClass(FieldBox.class);
   }
@@ -253,7 +257,6 @@ public class DocumentForm extends AbstractForm {
 
           @Override
           protected boolean getConfiguredVisible() {
-            // TODO
             return true;
           }
 
@@ -637,6 +640,7 @@ public class DocumentForm extends AbstractForm {
 
       getForm().getOpenHtmlField().setDocumentId(formData.getDocumentId());
 
+      System.out.println("hasOcrText: " + getForm().getHasOcrText());
       getForm().setEnabledGranted(false);
       getForm().getShowOcrButton().setEnabledGranted(true);
       getForm().getShowOcrButton().setEnabled(getForm().getHasOcrText());

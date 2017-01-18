@@ -43,7 +43,7 @@ public class DocumentPartnerTableTask extends DocumentPartnerTableStatement impl
     query.execute();
   }
 
-  public void createDocumentPartnerRow(ISqlService sqlService, BigDecimal documentId, BigDecimal partnerId) {
+  public void insert(ISqlService sqlService, BigDecimal documentId, BigDecimal partnerId) {
     DocumentPartner t = DocumentPartner.DOCUMENT_PARTNER;
     DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
         .newRecord(t)

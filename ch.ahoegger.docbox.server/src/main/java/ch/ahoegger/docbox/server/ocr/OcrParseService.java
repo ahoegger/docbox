@@ -205,6 +205,7 @@ public class OcrParseService {
         // Get OCR result
         try {
           api = new TessBaseAPI();
+
           if (api.Init(tessdataDirectory.toString(), CONFIG.getPropertyValue(TesseractLanguageProperty.class)) != 0) {
             throw new ProcessingException(new ProcessingStatus("Could not initialize tesseract.", IStatus.ERROR));
           }
@@ -220,6 +221,7 @@ public class OcrParseService {
           if (api != null) {
             api.Clear();
             api.End();
+
             try {
               api.close();
             }
@@ -228,10 +230,15 @@ public class OcrParseService {
             }
           }
           if (outText != null) {
-
+            outText.setNull();
             outText.deallocate();
           }
+          if (image != null) {
+            image.setNull();
+            image.deallocate();
+          }
           pixDestroy(image);
+          TessBaseAPI.deallocateReferences();
 
         }
 

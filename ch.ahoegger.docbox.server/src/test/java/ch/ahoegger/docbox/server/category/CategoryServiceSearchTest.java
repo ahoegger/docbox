@@ -35,11 +35,11 @@ public class CategoryServiceSearchTest extends AbstractTestWithDatabase {
     super.setupDb();
     ISqlService sqlService = BEANS.get(ISqlService.class);
 
-    BEANS.get(CategoryTableTask.class).createCategoryRow(sqlService, id01, "cat01", "desc01",
+    BEANS.get(CategoryTableTask.class).insert(sqlService, id01, "cat01", "desc01",
         LocalDateUtility.toDate(LocalDate.now()), null);
-    BEANS.get(CategoryTableTask.class).createCategoryRow(sqlService, id02, "cat02", "desc02",
+    BEANS.get(CategoryTableTask.class).insert(sqlService, id02, "cat02", "desc02",
         LocalDateUtility.toDate(LocalDate.now()), LocalDateUtility.toDate(LocalDate.now()));
-    BEANS.get(CategoryTableTask.class).createCategoryRow(sqlService, id03, "cat03", "desc03",
+    BEANS.get(CategoryTableTask.class).insert(sqlService, id03, "cat03", "desc03",
         LocalDateUtility.toDate(LocalDate.now().minusDays(2)),
         LocalDateUtility.toDate(LocalDate.now().minusDays(1)));
 

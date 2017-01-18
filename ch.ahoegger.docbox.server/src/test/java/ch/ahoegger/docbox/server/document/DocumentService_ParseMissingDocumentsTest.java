@@ -80,31 +80,31 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
 
     ISqlService sqlService = BEANS.get(ISqlService.class);
 
-    BEANS.get(UserTableTask.class).insertUser(sqlService, "name01", "firstname01", username01, "secret", true, true);
+    BEANS.get(UserTableTask.class).insert(sqlService, "name01", "firstname01", username01, "secret", true, true);
     // categories
     LocalDate today = LocalDate.now();
 
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId01, "Cats Document",
+    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId01, "Cats Document",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, true);
 
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId02, "Abstract Document",
+    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId02, "Abstract Document",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, true);
 
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId03, "Dogs Document",
+    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId03, "Dogs Document",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, true);
 
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId04, "All fish are wet",
+    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId04, "All fish are wet",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, false);
 
-    BEANS.get(DocumentOcrTableTask.class).createDocumentOcrRow(sqlService, documentId01, "parsed01", true, 1, null);
+    BEANS.get(DocumentOcrTableTask.class).insert(sqlService, documentId01, "parsed01", true, 1, null);
 
   }
 

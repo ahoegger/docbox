@@ -37,17 +37,17 @@ public class EntityServiceTest extends AbstractTestWithDatabase {
     super.setupDb();
 
     ISqlService sqlService = BEANS.get(ISqlService.class);
-    BEANS.get(PartnerTableTask.class).createPartnerRow(sqlService, partnerId01, "patnerName01", "desc01", LocalDateUtility.today(), null);
+    BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId01, "patnerName01", "desc01", LocalDateUtility.today(), null);
 
-    BEANS.get(DocumentTableTask.class).createDocumentRow(sqlService, documentId01, "All fish are wet", LocalDateUtility.toDate(LocalDate.now().minusDays(3)), LocalDateUtility.today(), null, "2016_03_08_124640.pdf", null, null, false);
+    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId01, "All fish are wet", LocalDateUtility.toDate(LocalDate.now().minusDays(3)), LocalDateUtility.today(), null, "2016_03_08_124640.pdf", null, null, false);
 
-    BEANS.get(PostingGroupTableTask.class).createRow(sqlService, postingGroupId01, partnerId01, null, documentId01, "August 2016", LocalDateUtility.today(), BigDecimal.valueOf(234.9), BigDecimal.valueOf(10.5), BigDecimal.valueOf(232.1),
+    BEANS.get(PostingGroupTableTask.class).insert(sqlService, postingGroupId01, partnerId01, null, documentId01, "August 2016", LocalDateUtility.today(), BigDecimal.valueOf(234.9), BigDecimal.valueOf(10.5), BigDecimal.valueOf(232.1),
         BigDecimal.valueOf(-10.0),
         BigDecimal.valueOf(-4.5), BigDecimal.valueOf(5.30));
 
-    BEANS.get(EntityTableTask.class).createEntityRow(sqlService, entityId01, partnerId01, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.today(), BigDecimal.valueOf(3.25), null, "Work01");
+    BEANS.get(EntityTableTask.class).insert(sqlService, entityId01, partnerId01, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.today(), BigDecimal.valueOf(3.25), null, "Work01");
 
-    BEANS.get(EntityTableTask.class).createEntityRow(sqlService, entityId02, partnerId01, null, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.today(), BigDecimal.valueOf(3.25), null, "Work01");
+    BEANS.get(EntityTableTask.class).insert(sqlService, entityId02, partnerId01, null, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.today(), BigDecimal.valueOf(3.25), null, "Work01");
   }
 
   @Test

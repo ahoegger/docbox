@@ -35,9 +35,9 @@ public class ConversationServiceTest extends AbstractTestWithDatabase {
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.set(1999, 04, 29);
-    BEANS.get(ConversationTableTask.class).createConversationRow(sqlService, conversationId01, "sample conversation 01", "some notes", cal.getTime(), null);
+    BEANS.get(ConversationTableTask.class).insert(sqlService, conversationId01, "sample conversation 01", "some notes", cal.getTime(), null);
     cal.set(1999, 04, 30);
-    BEANS.get(ConversationTableTask.class).createConversationRow(sqlService, conversationId02, "sample conversation 02", "some notes", cal.getTime(), null);
+    BEANS.get(ConversationTableTask.class).insert(sqlService, conversationId02, "sample conversation 02", "some notes", cal.getTime(), null);
   }
 
   @Test
