@@ -1,4 +1,4 @@
-package ch.ahoegger.docbox.server.test.util;
+package ch.ahoegger.docbox.server.util;
 
 /**
  * <h3>{@link OS}</h3>

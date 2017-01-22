@@ -43,7 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.ocr.OcrParseResult.ParseError;
-import ch.ahoegger.docbox.server.test.util.OS;
+import ch.ahoegger.docbox.server.util.OS;
 
 /**
  * <h3>{@link OcrParseService}</h3>
