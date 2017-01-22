@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.ocr.OcrParseResult.ParseError;
+import ch.ahoegger.docbox.server.test.util.OS;
 
 /**
  * <h3>{@link OcrParseService}</h3>
@@ -133,6 +134,9 @@ public class OcrParseService {
               @Override
               public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
                 Files.delete(filePath);
+                if (Files.exists(filePath)) {
+                  LOG.error("File '{}' could not be deleted.", filePath);
+                }
                 return FileVisitResult.CONTINUE;
               }
 
@@ -169,23 +173,24 @@ public class OcrParseService {
     for (int i = 0; i < pddoc.getPages().getCount(); i++) {
       OutputStream os = null;
       FileChannel channel = null;
+      BufferedImage img = null;
       try {
         Path tifPath = Files.createFile(workingDirectory.resolve("TIFF_" + i + ".tiff"));
         tiffPaths.add(tifPath);
         channel = FileChannel.open(tifPath, StandardOpenOption.WRITE);
         os = Channels.newOutputStream(channel);
         // suffix in filename will be used as the file format
-        BufferedImage img = pdfRenderer.renderImageWithDPI(i, 300, ImageType.RGB);
+        img = pdfRenderer.renderImageWithDPI(i, 300, ImageType.RGB);
         ImageIOUtil.writeImage(img, "tiff", os, 300);
+
       }
       finally {
+        if (img != null) {
+          img.flush();
+        }
         if (channel != null) {
           channel.force(false);
           channel.close();
-        }
-        if (os != null) {
-          os.flush();
-          os.close();
         }
       }
     }
@@ -199,51 +204,51 @@ public class OcrParseService {
       PIX image = null;
       BytePointer outText = null;
 
-      StringBuilder result = new StringBuilder();
-      for (Path tifPath : tifPaths) {
-        // Open input image with leptonica library
-        // Get OCR result
-        try {
-          api = new TessBaseAPI();
+      try {
+        StringBuilder result = new StringBuilder();
+        api = new TessBaseAPI();
 
-          if (api.Init(tessdataDirectory.toString(), CONFIG.getPropertyValue(TesseractLanguageProperty.class)) != 0) {
-            throw new ProcessingException(new ProcessingStatus("Could not initialize tesseract.", IStatus.ERROR));
-          }
-          image = lept.pixRead(tifPath.toString());
-          api.SetImage(image);
-
-          outText = api.GetUTF8Text();
-          if (outText != null) {
-            result.append(outText.getString());
-          }
+        if (api.Init(tessdataDirectory.toString(), CONFIG.getPropertyValue(TesseractLanguageProperty.class)) != 0) {
+          throw new ProcessingException(new ProcessingStatus("Could not initialize tesseract.", IStatus.ERROR));
         }
-        finally {
-          if (api != null) {
-            api.Clear();
-            api.End();
+        for (Path tifPath : tifPaths) {
+          // Open input image with leptonica library
+          // Get OCR result
+          try {
 
-            try {
-              api.close();
-            }
-            catch (Exception e) {
-              throw new ProcessingException(new ProcessingStatus("Could not close api tesseract.", e, 0, IStatus.ERROR));
+            image = lept.pixRead(tifPath.toString());
+            api.SetImage(image);
+
+            outText = api.GetUTF8Text();
+            if (outText != null) {
+              result.append(outText.getString());
             }
           }
-          if (outText != null) {
-            outText.setNull();
-            outText.deallocate();
+          finally {
+            if (outText != null) {
+              outText.setNull();
+              outText.deallocate();
+            }
+            pixDestroy(image);
+            TessBaseAPI.ClearPersistentCache();
+            TessBaseAPI.deallocateReferences();
           }
-          if (image != null) {
-            image.setNull();
-            image.deallocate();
-          }
-          pixDestroy(image);
-          TessBaseAPI.deallocateReferences();
-
         }
-
+        return result.toString();
       }
-      return result.toString();
+      finally {
+        if (api != null) {
+          api.Clear();
+          api.End();
+
+          try {
+            api.close();
+          }
+          catch (Exception e) {
+            throw new ProcessingException(new ProcessingStatus("Could not close api tesseract.", e, 0, IStatus.ERROR));
+          }
+        }
+      }
     }
 
   }
@@ -259,7 +264,10 @@ public class OcrParseService {
 
     @Override
     protected Path getDefaultValue() {
-      return Paths.get("C:/tesseract/tessdata");
+      if (OS.isWindows()) {
+        return Paths.get("C:/tesseract/tessdata");
+      }
+      return Paths.get("/var/lib/tesseract/tessdata");
     }
 
     @Override

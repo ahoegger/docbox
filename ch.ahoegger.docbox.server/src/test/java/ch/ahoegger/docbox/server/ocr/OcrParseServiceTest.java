@@ -3,21 +3,14 @@ package ch.ahoegger.docbox.server.ocr;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ch.ahoegger.docbox.server.ocr.OcrParseService.TessdataDirectoryProperty;
-import ch.ahoegger.docbox.server.test.util.OS;
 
 /**
  * <h3>{@link OcrParseServiceTest}</h3>
@@ -28,25 +21,14 @@ import ch.ahoegger.docbox.server.test.util.OS;
 public class OcrParseServiceTest {
   private static final Logger LOG = LoggerFactory.getLogger(OcrParseServiceTest.class);
 
-  private static Path tessdataDirectory;
-
-  @BeforeClass
-  public static void beforeClass() {
-    if (OS.isWindows()) {
-      tessdataDirectory = Paths.get("C:/tesseract/tessdata");
-    }
-    else {
-      tessdataDirectory = CONFIG.getPropertyValue(TessdataDirectoryProperty.class);
-    }
-  }
-
   @Test
   public void testPdfParse() throws Exception {
+
     URL resource = Test.class.getClassLoader().getResource("devDocuments/withoutTextInfo.pdf");
     InputStream is = null;
     try {
       is = resource.openStream();
-      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is, tessdataDirectory);
+      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is);
       Assert.assertTrue(parseResult.isOcrParsed());
       String text = parseResult.getText();
       LOG.info("parsed text: {}", text);
@@ -73,7 +55,7 @@ public class OcrParseServiceTest {
     InputStream is = null;
     try {
       is = resource.openStream();
-      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is, tessdataDirectory);
+      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is);
       Assert.assertFalse(parseResult.isOcrParsed());
       String text = parseResult.getText();
       Assert.assertFalse("Working direcotry is propperly removed.", Files.exists(parseResult.getWorkingDirectory()));
@@ -92,7 +74,7 @@ public class OcrParseServiceTest {
     InputStream is = null;
     try {
       is = resource.openStream();
-      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is, tessdataDirectory);
+      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is);
       Assert.assertTrue(parseResult.isOcrParsed());
       String text = parseResult.getText();
       Assert.assertTrue(text.contains(" Sections 2(a) and 2(b) above"));

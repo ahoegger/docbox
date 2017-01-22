@@ -35,7 +35,7 @@ public class TestDocumentStoreService extends DocumentStoreService {
 
   public void clearStore() throws IOException {
     synchronized (IO_LOCK) {
-      Path documentStorePath = getDocumentStoreDirectory().toPath();
+      Path documentStorePath = getDocumentStore();
       Files.walkFileTree(documentStorePath, new SimpleFileVisitor<Path>() {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {

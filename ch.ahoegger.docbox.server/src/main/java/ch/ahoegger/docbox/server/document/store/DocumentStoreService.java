@@ -1,9 +1,10 @@
 package ch.ahoegger.docbox.server.document.store;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -12,7 +13,6 @@ import java.util.Date;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.FileUtility;
-import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
@@ -41,14 +40,14 @@ import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
  * @author Andreas Hoegger
  */
 public class DocumentStoreService implements IDocumentStoreService {
-  @SuppressWarnings("unused")
+
   private static final Logger LOG = LoggerFactory.getLogger(DocumentStoreService.class);
 
-  private File m_documentStoreDirectory;
+  private Path m_documentStore;
   protected static final Object IO_LOCK = new Object();
 
   public DocumentStoreService() {
-    m_documentStoreDirectory = new File(getConfiguredDocumentStoreLocation());
+    m_documentStore = Paths.get(getConfiguredDocumentStoreLocation());
   }
 
   protected String getConfiguredDocumentStoreLocation() {
@@ -59,8 +58,8 @@ public class DocumentStoreService implements IDocumentStoreService {
     return docStoreLocation;
   }
 
-  protected File getDocumentStoreDirectory() {
-    return m_documentStoreDirectory;
+  protected Path getDocumentStore() {
+    return m_documentStore;
   }
 
   @Override
@@ -82,23 +81,24 @@ public class DocumentStoreService implements IDocumentStoreService {
     DateFormat dfYear = new SimpleDateFormat("yyyy");
     DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
     StringBuilder pathBuilder = new StringBuilder();
-    pathBuilder.append("/").append(dfYear.format(capturedDate)).append("/").append(df.format(capturedDate)).append("_").append(documentId).append(".").append(FileUtility.getFileExtension(resource.getFilename()));
+    pathBuilder.append(dfYear.format(capturedDate)).append("/").append(df.format(capturedDate)).append("_").append(documentId).append(".").append(FileUtility.getFileExtension(resource.getFilename()));
     synchronized (IO_LOCK) {
-      File file = new File(getDocumentStoreDirectory(), pathBuilder.toString());
-      if (file.exists()) {
-        throw new ProcessingException(new ProcessingStatus("document['" + file.getAbsolutePath() + "'] already exists serverside!", Status.ERROR));
+      Path file = getDocumentStore().resolve(pathBuilder.toString());
+      if (Files.exists(file)) {
+        throw new ProcessingException(new ProcessingStatus("document['" + file + "'] already exists serverside!", Status.ERROR));
       }
       else {
-        FileOutputStream out = null;
+        java.io.OutputStream out = null;
         try {
-          file.getParentFile().mkdirs();
-          file.createNewFile();
-          out = new FileOutputStream(file);
-          IOUtility.writeBytes(out, resource.getContent());
-          return pathBuilder.toString();
+          Files.createDirectories(file.getParent());
+          file = Files.createFile(file);
+          out = new BufferedOutputStream(Files.newOutputStream(file));
+          out.write(resource.getContent());
+          out.flush();
+          return file.toString();
         }
-        catch (IOException e) {
-          throw new ProcessingException(new ProcessingStatus("could not write document serverside!", e, 0, Status.ERROR));
+        catch (IOException ex) {
+          throw new ProcessingException(new ProcessingStatus("could not write document ['" + file + "']!", ex, 0, Status.ERROR));
         }
         finally {
           if (out != null) {
@@ -106,11 +106,12 @@ public class DocumentStoreService implements IDocumentStoreService {
               out.close();
             }
             catch (IOException e) {
-              BEANS.get(ExceptionHandler.class).handle(e);
+              LOG.error("Could not close output stream for file '{}'.", file);
             }
           }
         }
       }
+
     }
   }
 
@@ -122,9 +123,15 @@ public class DocumentStoreService implements IDocumentStoreService {
     }
 
     synchronized (IO_LOCK) {
-      File file = new File(getDocumentStoreDirectory(), path);
-      if (file.exists()) {
-        return file.delete();
+      Path file = getDocumentStore().resolve(Paths.get(path));
+      if (Files.exists(file)) {
+        try {
+          Files.delete(file);
+          return true;
+        }
+        catch (IOException e) {
+          LOG.error("Could not delete file '" + file + "'.", e);
+        }
       }
       return false;
     }
@@ -140,20 +147,30 @@ public class DocumentStoreService implements IDocumentStoreService {
   @RemoteServiceAccessDenied
   public boolean exists(String path) {
     synchronized (IO_LOCK) {
-      File f = new File(getDocumentStoreDirectory(), path);
-      return f.exists();
+      Path file = getDocumentStore().resolve(Paths.get(path));
+      return Files.exists(file);
     }
   }
 
   @RemoteServiceAccessDenied
   public BinaryResource get(String path) {
     synchronized (IO_LOCK) {
-      File f = new File(getDocumentStoreDirectory(), path);
-      if (f.exists() && f.canRead()) {
-        return BinaryResources.create().withFilename(f.getName()).withContentType(FileUtility.getContentType(f)).withContent(IOUtility.getContent(f)).withLastModified(f.lastModified()).withCachingAllowed(false).build();
+      Path file = getDocumentStore().resolve(Paths.get(path));
+      if (Files.exists(file) && Files.isReadable(file)) {
+
+        try {
+          return BinaryResources.create().withFilename(file.getFileName().toString())
+              .withContentType(Files.probeContentType(file))
+              .withContent(Files.readAllBytes(file))
+              .withLastModified(Files.getLastModifiedTime(file).toMillis())
+              .withCachingAllowed(false).build();
+        }
+        catch (IOException ex) {
+          throw new ProcessingException(new ProcessingStatus("could not read document ['" + file + "']!", ex, 0, Status.ERROR));
+        }
       }
       else {
-        throw new ProcessingException(new ProcessingStatus("document '" + f.getAbsolutePath() + "' does not exist serverside!", Status.ERROR));
+        throw new ProcessingException(new ProcessingStatus("document '" + file + "' does not exist serverside!", Status.ERROR));
       }
     }
   }

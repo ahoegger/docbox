@@ -3,6 +3,7 @@ package ch.ahoegger.docbox.server.ocr;
 import java.math.BigDecimal;
 import java.security.AccessController;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
@@ -46,7 +47,10 @@ public class ParseDocumentJob {
         }
         return null;
       }
-    }, Jobs.newInput().withRunContext(RunContexts.empty().withSubject(Subject.getSubject(AccessController.getContext()))));
+    },
+        Jobs.newInput()
+            .withExecutionTrigger(Jobs.newExecutionTrigger().withStartIn(30, TimeUnit.SECONDS))
+            .withRunContext(RunContexts.empty().withSubject(Subject.getSubject(AccessController.getContext()))));
   }
 
   protected IFuture<BinaryResource> getBinaryResource(final BigDecimal documentId) {
@@ -63,6 +67,7 @@ public class ParseDocumentJob {
   }
 
   protected IFuture<Void> persist(BigDecimal documentId, OcrParseResult result) {
+
     return Jobs.schedule(new IRunnable() {
 
       @Override
