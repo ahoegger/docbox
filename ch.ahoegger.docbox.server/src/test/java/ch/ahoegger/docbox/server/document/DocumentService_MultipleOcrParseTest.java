@@ -13,13 +13,17 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
+import org.junit.Assert;
 import org.junit.Test;
 
 import ch.ahoegger.docbox.server.database.dev.initialization.DocumentTableTask;
 import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
+import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
@@ -59,6 +63,13 @@ public class DocumentService_MultipleOcrParseTest extends AbstractTestWithDataba
   public void createAllOcr() {
 
     BEANS.get(DocumentService.class).buildOcrOfMissingDocumentsInternal(m_documentIds).awaitDone();
+    for (BigDecimal docId : m_documentIds) {
+      DocumentOcrFormData fd = new DocumentOcrFormData();
+      fd.setDocumentId(docId);
+      fd = BEANS.get(DocumentOcrService.class).load(fd);
+      Assert.assertTrue(StringUtility.hasText(fd.getText().getValue()));
+      Assert.assertTrue(StringUtility.isNullOrEmpty(fd.getParseFailedReason().getValue()));
+    }
 
   }
 }
