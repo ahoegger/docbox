@@ -155,7 +155,7 @@ public class DocumentStoreService implements IDocumentStoreService {
   @RemoteServiceAccessDenied
   public BinaryResource get(String path) {
     synchronized (IO_LOCK) {
-      Path file = getDocumentStore().resolve(Paths.get(path));
+      Path file = getDocumentStore().resolve(Paths.get(path.substring(1)));
       if (Files.exists(file) && Files.isReadable(file)) {
 
         try {

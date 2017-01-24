@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ch.ahoegger.docbox.server.database.dev.initialization.DocumentTableTask;
@@ -31,6 +32,7 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
  *
  * @author aho
  */
+@Ignore
 public class DocumentService_MultipleOcrParseTest extends AbstractTestWithDatabase {
 
   private List<BigDecimal> m_documentIds = new ArrayList<>();
