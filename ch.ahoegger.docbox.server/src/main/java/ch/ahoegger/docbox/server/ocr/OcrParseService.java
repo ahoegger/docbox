@@ -191,7 +191,7 @@ public class OcrParseService {
         channel = FileChannel.open(tifPath, StandardOpenOption.WRITE);
         os = Channels.newOutputStream(channel);
         // suffix in filename will be used as the file format
-        img = pdfRenderer.renderImageWithDPI(i, 150, ImageType.BINARY);
+        img = pdfRenderer.renderImageWithDPI(i, 200, ImageType.RGB);
         ImageIOUtil.writeImage(img, "tiff", os);
       }
       finally {
