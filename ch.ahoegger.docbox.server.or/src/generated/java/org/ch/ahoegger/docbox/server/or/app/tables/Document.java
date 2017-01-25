@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Document extends TableImpl<DocumentRecord> {
 
-    private static final long serialVersionUID = -1948240911;
+    private static final long serialVersionUID = -853931811;
 
     /**
      * The reference instance of <code>APP.DOCUMENT</code>
@@ -99,6 +99,11 @@ public class Document extends TableImpl<DocumentRecord> {
     public final TableField<DocumentRecord, Boolean> PARSE_OCR = createField("PARSE_OCR", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
+     * The column <code>APP.DOCUMENT.OCR_LANGUAGE</code>.
+     */
+    public final TableField<DocumentRecord, String> OCR_LANGUAGE = createField("OCR_LANGUAGE", org.jooq.impl.SQLDataType.VARCHAR.length(10), this, "");
+
+    /**
      * Create a <code>APP.DOCUMENT</code> table reference
      */
     public Document() {
@@ -133,7 +138,7 @@ public class Document extends TableImpl<DocumentRecord> {
      */
     @Override
     public UniqueKey<DocumentRecord> getPrimaryKey() {
-        return Keys.SQL170116213141230;
+        return Keys.SQL170125202441950;
     }
 
     /**
@@ -141,7 +146,7 @@ public class Document extends TableImpl<DocumentRecord> {
      */
     @Override
     public List<UniqueKey<DocumentRecord>> getKeys() {
-        return Arrays.<UniqueKey<DocumentRecord>>asList(Keys.SQL170116213141230);
+        return Arrays.<UniqueKey<DocumentRecord>>asList(Keys.SQL170125202441950);
     }
 
     /**

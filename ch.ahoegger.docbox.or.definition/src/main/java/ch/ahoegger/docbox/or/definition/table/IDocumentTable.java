@@ -22,4 +22,7 @@ public interface IDocumentTable {
   static int ORIGINAL_STORAGE_LENGTH = 1200;
   static String CONVERSATION_NR = IConversationTable.CONVERSATION_NR;
   static String PARSE_OCR = "PARSE_OCR";
+  static String OCR_LANGUAGE = "OCR_LANGUAGE";
+  static int OCR_LANGUAGE_LENGTH = 10;
+
 }

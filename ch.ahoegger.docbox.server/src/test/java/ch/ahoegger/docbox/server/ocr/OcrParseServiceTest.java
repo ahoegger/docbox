@@ -12,6 +12,8 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
+
 /**
  * <h3>{@link OcrParseServiceTest}</h3>
  *
@@ -28,19 +30,18 @@ public class OcrParseServiceTest {
     InputStream is = null;
     try {
       is = resource.openStream();
-      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is);
+      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is, OcrLanguageCodeType.GermanCode.ID);
       Assert.assertTrue(parseResult.isOcrParsed());
-      String text = parseResult.getText();
+      String text = parseResult.getText().toLowerCase();
       LOG.info("parsed text: {}", text);
 
       Assert.assertFalse("Working direcotry is propperly removed.", Files.exists(parseResult.getWorkingDirectory()));
-      Assert.assertTrue(text.contains("einfacher Demo-Text"));
-      Assert.assertTrue(text.contains("Industrie"));
-      Assert.assertTrue(text.contains("Demo-Text"));
-      Assert.assertTrue(text.contains("1500"));
-      Assert.assertTrue(text.contains("Schriftsteller"));
-      Assert.assertTrue(text.contains("Wörter"));
-      Assert.assertTrue(text.contains("Musterbuch"));
+      Assert.assertTrue(text.contains("einfacher demo"));
+      Assert.assertTrue(text.contains("industrie"));
+      Assert.assertTrue(text.contains("demo-text"));
+      Assert.assertTrue(text.contains("schriftsteller"));
+      Assert.assertTrue(text.contains("wörter"));
+      Assert.assertTrue(text.contains("musterbuch"));
     }
     finally {
       if (is != null) {
@@ -55,7 +56,7 @@ public class OcrParseServiceTest {
     InputStream is = null;
     try {
       is = resource.openStream();
-      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is);
+      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is, OcrLanguageCodeType.GermanCode.ID);
       Assert.assertFalse(parseResult.isOcrParsed());
       String text = parseResult.getText();
       Assert.assertFalse("Working direcotry is propperly removed.", Files.exists(parseResult.getWorkingDirectory()));
@@ -74,7 +75,7 @@ public class OcrParseServiceTest {
     InputStream is = null;
     try {
       is = resource.openStream();
-      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is);
+      OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(is, OcrLanguageCodeType.EnglishCode.ID);
       Assert.assertTrue(parseResult.isOcrParsed());
       String text = parseResult.getText();
       Assert.assertTrue(text.contains(" Sections 2(a) and 2(b) above"));

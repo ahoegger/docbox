@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ch.ahoegger.docbox.server.database.dev.initialization.DocumentTableTask;
@@ -24,6 +25,7 @@ import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
+import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
@@ -31,6 +33,7 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
  *
  * @author aho
  */
+@Ignore
 public class DocumentService_MultipleOcrParseTest extends AbstractTestWithDatabase {
 
   private List<BigDecimal> m_documentIds = new ArrayList<>();
@@ -56,7 +59,7 @@ public class DocumentService_MultipleOcrParseTest extends AbstractTestWithDataba
     BinaryResource br = BinaryResources.create().withFilename(fileName).withContentType(FileUtility.getContentTypeForExtension(FileUtility.getFileExtension(fileName))).withContent(IOUtility.readFromUrl(resource))
         .withLastModified(System.currentTimeMillis()).build();
     String docPath = BEANS.get(DocumentStoreService.class).store(br, insertDate, documentId);
-    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId, "", insertDate, insertDate, null, docPath, null, null, true);
+    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId, "", insertDate, insertDate, null, docPath, null, null, true, OcrLanguageCodeType.GermanCode.ID);
   }
 
   @Test

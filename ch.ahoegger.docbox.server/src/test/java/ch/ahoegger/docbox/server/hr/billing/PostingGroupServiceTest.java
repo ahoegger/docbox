@@ -29,6 +29,7 @@ import ch.ahoegger.docbox.shared.hr.billing.PostingGroupSearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.WorkCode;
+import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
@@ -57,7 +58,7 @@ public class PostingGroupServiceTest extends AbstractTestWithDatabase {
     BEANS.get(EmployeeTableTask.class).insert(sqlService, partnerId, "Homer", "Simpson", "Nashvill Street 12a", "Santa Barbara CA-90051", "ahv123564789", "iban987654321", BigDecimal.valueOf(26.30),
         "Master Bob & Minor Molar", "Mountainview 12", "CA-90153 Santa Tropee", "master.bob@blu.com", "5445621236");
 
-    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId, "Abstract", docCaptureDate, LocalDateUtility.toDate(LocalDate.now().minusDays(4)), null, documentPath, null, null, true);
+    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId, "Abstract", docCaptureDate, LocalDateUtility.toDate(LocalDate.now().minusDays(4)), null, documentPath, null, null, true, OcrLanguageCodeType.GermanCode.ID);
 
     BEANS.get(DocumentPartnerTableTask.class).insert(sqlService, documentId, partnerId);
 

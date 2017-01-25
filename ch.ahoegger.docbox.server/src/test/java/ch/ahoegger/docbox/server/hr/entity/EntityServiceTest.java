@@ -22,6 +22,7 @@ import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
 import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
+import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 public class EntityServiceTest extends AbstractTestWithDatabase {
@@ -39,7 +40,8 @@ public class EntityServiceTest extends AbstractTestWithDatabase {
     ISqlService sqlService = BEANS.get(ISqlService.class);
     BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId01, "patnerName01", "desc01", LocalDateUtility.today(), null);
 
-    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId01, "All fish are wet", LocalDateUtility.toDate(LocalDate.now().minusDays(3)), LocalDateUtility.today(), null, "2016_03_08_124640.pdf", null, null, false);
+    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId01, "All fish are wet", LocalDateUtility.toDate(LocalDate.now().minusDays(3)), LocalDateUtility.today(), null, "2016_03_08_124640.pdf", null, null, false,
+        OcrLanguageCodeType.GermanCode.ID);
 
     BEANS.get(PostingGroupTableTask.class).insert(sqlService, postingGroupId01, partnerId01, null, documentId01, "August 2016", LocalDateUtility.today(), BigDecimal.valueOf(234.9), BigDecimal.valueOf(10.5), BigDecimal.valueOf(232.1),
         BigDecimal.valueOf(-10.0),

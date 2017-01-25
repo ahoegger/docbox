@@ -60,6 +60,7 @@ import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.server.security.SecurityService;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupCodeType.UnbilledCode;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType;
+import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
@@ -270,7 +271,7 @@ public class DevDerbySqlService extends DerbySqlService {
 //        System.currentTimeMillis());
     String docPath = BEANS.get(DocumentStoreService.class).store(br, insertDate, documentId);
 
-    documentTableTask.insert(sqlService, documentId, abstractText, documentDate, insertDate, validDate, docPath, originalStorage, conversationId, true);
+    documentTableTask.insert(sqlService, documentId, abstractText, documentDate, insertDate, validDate, docPath, originalStorage, conversationId, true, OcrLanguageCodeType.GermanCode.ID);
   }
 
   protected void insertDocumentCategory(ISqlService sqlService) {

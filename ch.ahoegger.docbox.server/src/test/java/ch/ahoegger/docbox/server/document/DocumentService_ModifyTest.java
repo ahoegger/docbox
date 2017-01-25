@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.document;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -11,11 +12,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanManager;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ch.ahoegger.docbox.server.database.dev.initialization.CategoryTableTask;
@@ -26,6 +33,7 @@ import ch.ahoegger.docbox.server.database.dev.initialization.DocumentPermissionT
 import ch.ahoegger.docbox.server.database.dev.initialization.DocumentTableTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.PartnerTableTask;
 import ch.ahoegger.docbox.server.database.dev.initialization.UserTableTask;
+import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
@@ -33,6 +41,7 @@ import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Partners.PartnersRowData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Permissions.PermissionsRowData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
+import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
 
 /**
@@ -54,6 +63,8 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
   private final BigDecimal partnerId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   private Date m_today;
+
+  private static List<IBean<?>> s_mockBeans = new ArrayList<IBean<?>>();
 
   @Override
   public void setupDb() throws Exception {
@@ -84,12 +95,32 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     // create document
     Date docData = cal.getTime();
     Date insertDate = m_today;
-    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId, "doc 01", docData, insertDate, null, "2016_03_08_124640.pdf", "origStorage", conversationId01, false);
+    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId, "doc 01", docData, insertDate, null, "2016_03_08_124640.pdf", "origStorage", conversationId01, false, null);
     // links
     BEANS.get(DocumentPartnerTableTask.class).insert(sqlService, documentId, partnerId01);
     BEANS.get(DocumentCategoryTableTask.class).insert(sqlService, documentId, categoryId01);
     BEANS.get(DocumentPermissionTableTask.class).insert(sqlService, userId01, documentId, PermissionCodeType.ReadCode.ID);
 
+  }
+
+  @BeforeClass
+  public static void createMocks() {
+    IBeanManager beanManager = Platform.get().getBeanManager();
+    s_mockBeans.add(beanManager.registerBean(
+        new BeanMetaData(DocumentOcrService.class)
+            .withOrder(-10).withInitialInstance(new DocumentOcrService() {
+              @Override
+              public Boolean exists(BigDecimal documentId) {
+                return true;
+              }
+
+            })));
+  }
+
+  @AfterClass
+  public static void afterClass() {
+    IBeanManager beanManager = Platform.get().getBeanManager();
+    s_mockBeans.forEach(b -> beanManager.unregisterBean(b));
   }
 
   @Test
@@ -229,6 +260,34 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     // compare to new loaded
     DocumentFormData refFd = loadDocument(service, documentId);
     Assert.assertFalse("modified/path".equals(refFd.getDocumentPath()));
+  }
+
+  @Test
+  public void testOcrLanguage() {
+    IDocumentService service = BEANS.get(IDocumentService.class);
+
+    DocumentFormData fd = loadDocument(service, documentId);
+    // modify
+    fd.getOcrLanguage().setValue(OcrLanguageCodeType.EnglishCode.ID);
+    service.store(fd);
+
+    // compare to new loaded
+    DocumentFormData refFd = loadDocument(service, documentId);
+    Assert.assertEquals(OcrLanguageCodeType.EnglishCode.ID, refFd.getOcrLanguage().getValue());
+  }
+
+  @Test
+  public void testParseOcr() {
+    IDocumentService service = BEANS.get(IDocumentService.class);
+
+    DocumentFormData fd = loadDocument(service, documentId);
+    // modify
+    fd.getParseOcr().setValue(true);
+    service.store(fd);
+
+    // compare to new loaded
+    DocumentFormData refFd = loadDocument(service, documentId);
+    Assert.assertTrue(refFd.getParseOcr().getValue());
   }
 
   @Test

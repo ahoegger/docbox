@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 import ch.ahoegger.docbox.client.conversation.ConversationForm;
@@ -48,8 +49,10 @@ import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.Document
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.LinksBox;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.LinksBox.OpenHtmlField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.LinksBox.ShowOcrButton;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OcrBox;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OcrBox.OcrLanguageField;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OcrBox.ParseOcrField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OriginalStorageField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.ParseOcrField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PartnersField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PermissionsField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.ValidDateField;
@@ -62,6 +65,7 @@ import ch.ahoegger.docbox.client.document.ocr.DocumentOcrForm;
 import ch.ahoegger.docbox.shared.conversation.ConversationLookupCall;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
+import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.validation.DateValidation;
 
 /**
@@ -193,6 +197,14 @@ public class DocumentForm extends AbstractForm {
 
   public ShowOcrButton getShowOcrButton() {
     return getFieldByClass(ShowOcrButton.class);
+  }
+
+  public OcrBox getOcrBox() {
+    return getFieldByClass(OcrBox.class);
+  }
+
+  public OcrLanguageField getOcrLanguageField() {
+    return getFieldByClass(OcrLanguageField.class);
   }
 
   public OkButton getOkButton() {
@@ -435,14 +447,6 @@ public class DocumentForm extends AbstractForm {
 
       }
 
-      @Order(75)
-      public class ParseOcrField extends AbstractBooleanField {
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("ParseContent");
-        }
-      }
-
       @Order(80)
       public class OriginalStorageField extends AbstractStringField {
         @Override
@@ -470,8 +474,38 @@ public class DocumentForm extends AbstractForm {
       public class CategoriesBox extends AbstractCategoriesListBox {
         @Override
         protected int getConfiguredGridH() {
-          return 9;
+          return 8;
         }
+      }
+
+      @Order(2000)
+      public class OcrBox extends AbstractGroupBox {
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("OCR");
+        }
+
+        @Order(100)
+        public class ParseOcrField extends AbstractBooleanField {
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("ParseContent");
+          }
+        }
+
+        @Order(200)
+        public class OcrLanguageField extends AbstractSmartField<String> {
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("Language");
+          }
+
+          @Override
+          protected Class<? extends ICodeType<?, String>> getConfiguredCodeType() {
+            return OcrLanguageCodeType.class;
+          }
+        }
+
       }
 
     }

@@ -14,6 +14,13 @@
 	<artifactId>ch.ahoegger.docbox.server</artifactId>
 
 	<name>DocBox Server</name>
+
+	<properties>
+<!-- 		<tesseract-version>3.04.01-1.3</tesseract-version> -->
+				<tesseract-version>3.04-1.1</tesseract-version>
+		
+	</properties>
+
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -99,8 +106,10 @@
 		<dependency>
 			<groupId>org.bytedeco.javacpp-presets</groupId>
 			<artifactId>tesseract</artifactId>
-			<version>3.04-1.1</version>
+			<version>${tesseract-version}</version>
+<!-- 			<version>3.04-1.1</version> -->
 		</dependency>
+		
 
 		<!-- TEST Dependencies -->
 		<dependency>

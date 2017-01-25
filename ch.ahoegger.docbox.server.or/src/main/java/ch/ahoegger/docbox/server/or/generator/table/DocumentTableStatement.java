@@ -22,6 +22,7 @@ public class DocumentTableStatement implements ITableStatement, IDocumentTable {
     statementBuilder.append(ORIGINAL_STORAGE).append(" VARCHAR(").append(ORIGINAL_STORAGE_LENGTH).append("), ");
     statementBuilder.append(CONVERSATION_NR).append(" BIGINT, ");
     statementBuilder.append(PARSE_OCR).append(" BOOLEAN NOT NULL, ");
+    statementBuilder.append(OCR_LANGUAGE).append(" VARCHAR(").append(OCR_LANGUAGE_LENGTH).append("), ");
     statementBuilder.append("PRIMARY KEY (").append(DOCUMENT_NR).append(")");
     statementBuilder.append(" )");
     return statementBuilder.toString();

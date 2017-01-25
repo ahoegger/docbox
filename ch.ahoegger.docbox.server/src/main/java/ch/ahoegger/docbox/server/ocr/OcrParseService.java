@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.ocr.OcrParseResult.ParseError;
 import ch.ahoegger.docbox.server.util.OS;
+import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 
 /**
  * <h3>{@link OcrParseService}</h3>
@@ -52,10 +53,15 @@ import ch.ahoegger.docbox.server.util.OS;
  */
 @ApplicationScoped
 public class OcrParseService {
+
   private static final Logger LOG = LoggerFactory.getLogger(OcrParseService.class);
   private static final Object LOCK = new Object();
 
   public OcrParseResult parsePdf(BinaryResource pdfResource) {
+    return parsePdf(pdfResource, OcrLanguageCodeType.GermanCode.ID);
+  }
+
+  public OcrParseResult parsePdf(BinaryResource pdfResource, String language) {
     LOG.info("About to parse file {} .", pdfResource);
     if (!"pdf".equalsIgnoreCase(FileUtility.getFileExtension(pdfResource.getFilename()))) {
       LOG.warn("File {} is not a parsable file. Parsable files are [*.pdf].", pdfResource);
@@ -65,7 +71,7 @@ public class OcrParseService {
     ByteArrayInputStream in = null;
     try {
       in = new ByteArrayInputStream(pdfResource.getContent());
-      OcrParseResult result = parsePdf(in);
+      OcrParseResult result = parsePdf(in, language);
       LOG.info("Parsed file {} .", pdfResource);
       return result;
     }
@@ -82,10 +88,14 @@ public class OcrParseService {
   }
 
   public OcrParseResult parsePdf(InputStream pdfInputStream) {
-    return parsePdf(pdfInputStream, CONFIG.getPropertyValue(TessdataDirectoryProperty.class));
+    return parsePdf(pdfInputStream, OcrLanguageCodeType.GermanCode.ID);
   }
 
-  public OcrParseResult parsePdf(InputStream pdfInputStream, Path tessdataDirectory) {
+  public OcrParseResult parsePdf(InputStream pdfInputStream, String language) {
+    return parsePdf(pdfInputStream, language, CONFIG.getPropertyValue(TessdataDirectoryProperty.class));
+  }
+
+  protected OcrParseResult parsePdf(InputStream pdfInputStream, String language, Path tessdataDirectory) {
     synchronized (LOCK) {
 
       Path workingDirectory = null;
@@ -96,6 +106,7 @@ public class OcrParseService {
         result.withWorkingDirectory(workingDirectory);
         List<Path> tifFiles = CollectionUtility.emptyArrayList();
         pddoc = PDDocument.load(pdfInputStream);
+        pdfInputStream.close();
         // try to get text straight
         String content = getTextOfPdf(pddoc);
         if (StringUtility.hasText(content)) {
@@ -105,7 +116,7 @@ public class OcrParseService {
           tifFiles = pdfToTif(pddoc, workingDirectory);
           pddoc.close();
           pddoc = null;
-          String text = computeText(tifFiles, tessdataDirectory);
+          String text = computeText(tifFiles, language, tessdataDirectory);
           if (StringUtility.hasText(text)) {
             result.withText(text).withOcrParsed(true);
           }
@@ -180,9 +191,8 @@ public class OcrParseService {
         channel = FileChannel.open(tifPath, StandardOpenOption.WRITE);
         os = Channels.newOutputStream(channel);
         // suffix in filename will be used as the file format
-        img = pdfRenderer.renderImageWithDPI(i, 300, ImageType.RGB);
-        ImageIOUtil.writeImage(img, "tiff", os, 300);
-
+        img = pdfRenderer.renderImageWithDPI(i, 150, ImageType.BINARY);
+        ImageIOUtil.writeImage(img, "tiff", os);
       }
       finally {
         if (img != null) {
@@ -197,9 +207,11 @@ public class OcrParseService {
     return tiffPaths;
   }
 
-  protected String computeText(List<Path> tifPaths, Path tessdataDirectory) throws IOException {
+  protected String computeText(List<Path> tifPaths, String language, Path tessdataDirectory) throws IOException {
+    if (language == null) {
+      language = OcrLanguageCodeType.GermanCode.ID;
+    }
     synchronized (LOCK) {
-
       TessBaseAPI api = null;
       PIX image = null;
       BytePointer outText = null;
@@ -208,7 +220,7 @@ public class OcrParseService {
         StringBuilder result = new StringBuilder();
         api = new TessBaseAPI();
 
-        if (api.Init(tessdataDirectory.toString(), CONFIG.getPropertyValue(TesseractLanguageProperty.class)) != 0) {
+        if (api.Init(tessdataDirectory.toString(), language) != 0) {
           throw new ProcessingException(new ProcessingStatus("Could not initialize tesseract.", IStatus.ERROR));
         }
         for (Path tifPath : tifPaths) {
@@ -265,9 +277,9 @@ public class OcrParseService {
     @Override
     protected Path getDefaultValue() {
       if (OS.isWindows()) {
-        return Paths.get("C:/tesseract/tessdata");
+        return Paths.get("C:/tesseract/tessdata-3.04.00/tessdata");
       }
-      return Paths.get("/var/lib/tesseract/tessdata");
+      return Paths.get("/var/lib/tesseract/tessdata-3.04.00/tessdata");
     }
 
     @Override

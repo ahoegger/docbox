@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
+import org.jooq.Record2;
 import org.jooq.SQLDialect;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
@@ -58,6 +59,7 @@ import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData.DocumentTableRowData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
+import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.partner.PartnerSearchFormData;
 import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 import ch.ahoegger.docbox.shared.security.permission.EntityReadPermission;
@@ -229,7 +231,6 @@ public class DocumentService implements IDocumentService {
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     formData.getCapturedDate().setValue(cal.getTime());
-    formData.getParseOcr().setValue(true);
     Map<String, Integer> defaultPermissions = BEANS.get(DefaultPermissionService.class).getDefaultPermissions();
     defaultPermissions.remove(ServerSession.get().getUserId());
     defaultPermissions.put(ServerSession.get().getUserId(), PermissionCodeType.OwnerCode.ID);
@@ -239,6 +240,9 @@ public class DocumentService implements IDocumentService {
       row.setPermission(permission.getValue());
 
     }
+    formData.getParseOcr().setValue(true);
+    formData.getOcrLanguage().setValue(OcrLanguageCodeType.GermanCode.ID);
+
     return formData;
   }
 
@@ -263,6 +267,7 @@ public class DocumentService implements IDocumentService {
     newDoc.setValidDate(formData.getValidDate().getValue());
     newDoc.setDocumentUrl(formData.getDocumentPath());
     newDoc.setOriginalStorage(formData.getOriginalStorage().getValue());
+    newDoc.setOcrLanguage(formData.getOcrLanguage().getValue());
     newDoc.setConversationNr(formData.getConversation().getValue());
     newDoc.setParseOcr(formData.getParseOcr().getValue());
     newDoc.insert();
@@ -287,7 +292,7 @@ public class DocumentService implements IDocumentService {
 
     // ocr
     if (formData.getParseOcr().getValue()) {
-      ParseDocumentJob job = new ParseDocumentJob(formData.getDocumentId());
+      ParseDocumentJob job = new ParseDocumentJob(formData.getDocumentId(), OcrLanguageCodeType.GermanCode.ID);
       job.schedule();
     }
 
@@ -306,6 +311,7 @@ public class DocumentService implements IDocumentService {
         .set(doc.ABSTRACT, formData.getAbstract().getValue())
         .set(doc.CONVERSATION_NR, formData.getConversation().getValue())
         .set(doc.DOCUMENT_DATE, formData.getDocumentDate().getValue())
+        .set(doc.OCR_LANGUAGE, formData.getOcrLanguage().getValue())
         .set(doc.ORIGINAL_STORAGE, formData.getOriginalStorage().getValue())
         .set(doc.PARSE_OCR, formData.getParseOcr().getValue())
         .set(doc.VALID_DATE, formData.getValidDate().getValue())
@@ -333,7 +339,7 @@ public class DocumentService implements IDocumentService {
     // ocr
     if (formData.getParseOcr().getValue()) {
       if (!BEANS.get(DocumentOcrService.class).exists(formData.getDocumentId())) {
-        ParseDocumentJob job = new ParseDocumentJob(formData.getDocumentId());
+        ParseDocumentJob job = new ParseDocumentJob(formData.getDocumentId(), formData.getOcrLanguage().getValue());
         job.schedule();
       }
     }
@@ -360,7 +366,7 @@ public class DocumentService implements IDocumentService {
   public DocumentFormData loadTrusted(DocumentFormData formData) {
     Document doc = Document.DOCUMENT;
     DocumentFormData result = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(doc.ABSTRACT, doc.DOCUMENT_DATE, doc.INSERT_DATE, doc.VALID_DATE, doc.DOCUMENT_URL, doc.ORIGINAL_STORAGE, doc.CONVERSATION_NR, doc.PARSE_OCR)
+        .select(doc.ABSTRACT, doc.DOCUMENT_DATE, doc.INSERT_DATE, doc.VALID_DATE, doc.DOCUMENT_URL, doc.ORIGINAL_STORAGE, doc.CONVERSATION_NR, doc.PARSE_OCR, doc.OCR_LANGUAGE)
         .from(doc)
         .where(doc.DOCUMENT_NR.eq(formData.getDocumentId()))
         .fetch(rec -> {
@@ -370,6 +376,7 @@ public class DocumentService implements IDocumentService {
           res.getCapturedDate().setValue(rec.get(doc.INSERT_DATE));
           res.getValidDate().setValue(rec.get(doc.VALID_DATE));
           res.setDocumentPath(rec.get(doc.DOCUMENT_URL));
+          res.getOcrLanguage().setValue(rec.get(doc.OCR_LANGUAGE));
           res.getOriginalStorage().setValue(rec.get(doc.ORIGINAL_STORAGE));
           res.getConversation().setValue(rec.get(doc.CONVERSATION_NR));
           res.getParseOcr().setValue(rec.get(doc.PARSE_OCR));
@@ -429,15 +436,16 @@ public class DocumentService implements IDocumentService {
     if (documentIdsRaw != null) {
       condition = doc.DOCUMENT_NR.in(documentIdsRaw);
     }
-    final List<BigDecimal> documentIds = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(doc.DOCUMENT_NR)
+
+    List<Record2<BigDecimal, String>> res = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(doc.DOCUMENT_NR, doc.OCR_LANGUAGE)
         .from(doc)
         .leftJoin(docOcr)
         .on(doc.DOCUMENT_NR.eq(docOcr.DOCUMENT_NR))
         .where(doc.PARSE_OCR)
         .and(docOcr.DOCUMENT_NR.isNull().or(docOcr.FAILED_REASON.isNotNull().and(docOcr.PARSE_COUNT.le(5))))
         .and(condition)
-        .fetch(rec -> rec.get(doc.DOCUMENT_NR))
+        .fetch()
         .stream()
         .collect(Collectors.toList());
 
@@ -445,15 +453,17 @@ public class DocumentService implements IDocumentService {
       @Override
       public void run() throws Exception {
 
-        for (BigDecimal docId : documentIds) {
+        res.forEach(rec -> {
+          BigDecimal docId = rec.get(doc.DOCUMENT_NR);
+          String language = rec.get(doc.OCR_LANGUAGE);
           try {
-            LOG.info("build ocr for {}.", docId);
-            new ParseDocumentJob(docId).schedule().awaitDone();
+            LOG.info("build ocr for {} in language '{}'.", docId, language);
+            new ParseDocumentJob(docId, language).schedule().awaitDone();
           }
           catch (Exception e) {
             LOG.error(String.format("Cold not parse document with id '%s'.", docId), e);
           }
-        }
+        });
       }
     }, Jobs.newInput().withRunContext(
         ServerRunContexts.empty()

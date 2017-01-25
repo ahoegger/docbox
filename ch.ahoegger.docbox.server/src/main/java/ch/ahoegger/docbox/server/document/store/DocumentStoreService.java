@@ -83,7 +83,7 @@ public class DocumentStoreService implements IDocumentStoreService {
     StringBuilder pathBuilder = new StringBuilder();
     pathBuilder.append(dfYear.format(capturedDate)).append("/").append(df.format(capturedDate)).append("_").append(documentId).append(".").append(FileUtility.getFileExtension(resource.getFilename()));
     synchronized (IO_LOCK) {
-      Path file = getDocumentStore().resolve(pathBuilder.toString());
+      Path file = toAbsolutePath(pathBuilder.toString());
       if (Files.exists(file)) {
         throw new ProcessingException(new ProcessingStatus("document['" + file + "'] already exists serverside!", Status.ERROR));
       }
@@ -95,7 +95,7 @@ public class DocumentStoreService implements IDocumentStoreService {
           out = new BufferedOutputStream(Files.newOutputStream(file));
           out.write(resource.getContent());
           out.flush();
-          return file.toString();
+          return pathBuilder.toString();
         }
         catch (IOException ex) {
           throw new ProcessingException(new ProcessingStatus("could not write document ['" + file + "']!", ex, 0, Status.ERROR));
@@ -123,7 +123,7 @@ public class DocumentStoreService implements IDocumentStoreService {
     }
 
     synchronized (IO_LOCK) {
-      Path file = getDocumentStore().resolve(Paths.get(path));
+      Path file = toAbsolutePath(path);
       if (Files.exists(file)) {
         try {
           Files.delete(file);
@@ -147,20 +147,20 @@ public class DocumentStoreService implements IDocumentStoreService {
   @RemoteServiceAccessDenied
   public boolean exists(String path) {
     synchronized (IO_LOCK) {
-      Path file = getDocumentStore().resolve(Paths.get(path));
+      Path file = toAbsolutePath(path);
       return Files.exists(file);
     }
   }
 
   @RemoteServiceAccessDenied
   public BinaryResource get(String path) {
-    synchronized (IO_LOCK) {
-      Path file = getDocumentStore().resolve(Paths.get(path.substring(1)));
-      if (Files.exists(file) && Files.isReadable(file)) {
 
+    synchronized (IO_LOCK) {
+      Path file = toAbsolutePath(path);
+      if (Files.exists(file) && Files.isReadable(file)) {
         try {
           return BinaryResources.create().withFilename(file.getFileName().toString())
-              .withContentType(Files.probeContentType(file))
+              .withContentType(FileUtility.getMimeType(file))
               .withContent(Files.readAllBytes(file))
               .withLastModified(Files.getLastModifiedTime(file).toMillis())
               .withCachingAllowed(false).build();
@@ -173,6 +173,15 @@ public class DocumentStoreService implements IDocumentStoreService {
         throw new ProcessingException(new ProcessingStatus("document '" + file + "' does not exist serverside!", Status.ERROR));
       }
     }
+  }
+
+  protected Path toAbsolutePath(String documentPath) {
+    if (StringUtility.hasText(documentPath)) {
+      documentPath = documentPath.replaceAll("\\+", "/");
+      documentPath = documentPath.replaceAll("^/", "");
+    }
+    return getDocumentStore().resolve(Paths.get(documentPath));
+
   }
 
   public static class DocumentStoreLocationProperty extends AbstractStringConfigProperty {

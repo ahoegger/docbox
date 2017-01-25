@@ -1,6 +1,8 @@
 package ch.ahoegger.docbox.server.document;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +13,9 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -29,6 +33,7 @@ import ch.ahoegger.docbox.server.test.util.TestDocumentStoreService;
 import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
 import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
 import ch.ahoegger.docbox.shared.ocr.IDocumentOcrService;
+import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
@@ -53,7 +58,7 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
         new BeanMetaData(OcrParseService.class)
             .withOrder(-10).withInitialInstance(new OcrParseService() {
               @Override
-              public OcrParseResult parsePdf(BinaryResource pdfResource) {
+              public OcrParseResult parsePdf(InputStream pdfInputStream, String language, Path tessdataDirectory) {
                 return new OcrParseResult().withText("parsed").withOcrParsed(true);
               }
 
@@ -63,7 +68,10 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
             .withOrder(-10).withInitialInstance(new TestDocumentStoreService() {
               @Override
               public BinaryResource getDocument(BigDecimal documentId) {
-                return new BinaryResource("dummy", "dummy".getBytes());
+                return BinaryResources.create()
+                    .withFilename("dummy.pdf")
+                    .withContentType(FileUtility.getMimeType("dummy.pdf"))
+                    .withContent("dummpy".getBytes()).build();
               }
             })));
   }
@@ -87,22 +95,22 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
     BEANS.get(DocumentTableTask.class).insert(sqlService, documentId01, "Cats Document",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
-        null, "2016_03_08_124640.pdf", null, null, true);
+        null, "2016_03_08_124640.pdf", null, null, true, OcrLanguageCodeType.GermanCode.ID);
 
     BEANS.get(DocumentTableTask.class).insert(sqlService, documentId02, "Abstract Document",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
-        null, "2016_03_08_124640.pdf", null, null, true);
+        null, "2016_03_08_124640.pdf", null, null, true, OcrLanguageCodeType.GermanCode.ID);
 
     BEANS.get(DocumentTableTask.class).insert(sqlService, documentId03, "Dogs Document",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
-        null, "2016_03_08_124640.pdf", null, null, true);
+        null, "2016_03_08_124640.pdf", null, null, true, OcrLanguageCodeType.GermanCode.ID);
 
     BEANS.get(DocumentTableTask.class).insert(sqlService, documentId04, "All fish are wet",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
-        null, "2016_03_08_124640.pdf", null, null, false);
+        null, "2016_03_08_124640.pdf", null, null, false, null);
 
     BEANS.get(DocumentOcrTableTask.class).insert(sqlService, documentId01, "parsed01", true, 1, null);
 

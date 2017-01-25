@@ -100,6 +100,10 @@ public class DocumentFormData extends AbstractFormData {
     return getPropertyByClass(HasOcrTextProperty.class);
   }
 
+  public OcrLanguage getOcrLanguage() {
+    return getFieldByClass(OcrLanguage.class);
+  }
+
   public OriginalStorage getOriginalStorage() {
     return getFieldByClass(OriginalStorage.class);
   }
@@ -161,6 +165,11 @@ public class DocumentFormData extends AbstractFormData {
   }
 
   public static class HasOcrTextProperty extends AbstractPropertyData<Boolean> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class OcrLanguage extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
   }

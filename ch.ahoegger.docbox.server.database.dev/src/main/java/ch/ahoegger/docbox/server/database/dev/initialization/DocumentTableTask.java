@@ -44,7 +44,7 @@ public class DocumentTableTask extends DocumentTableStatement implements ITableT
   }
 
   public void insert(ISqlService sqlService, BigDecimal documentId, String abstractText, Date documentDate,
-      Date capturedDate, Date validDate, String docPath, String originalStorage, BigDecimal conversationId, boolean parseOcr) {
+      Date capturedDate, Date validDate, String docPath, String originalStorage, BigDecimal conversationId, boolean parseOcr, String ocrLanguage) {
     Document t = Document.DOCUMENT;
     DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
         .newRecord(t)
@@ -54,6 +54,7 @@ public class DocumentTableTask extends DocumentTableStatement implements ITableT
         .with(t.DOCUMENT_NR, documentId)
         .with(t.DOCUMENT_URL, docPath)
         .with(t.INSERT_DATE, capturedDate)
+        .with(t.OCR_LANGUAGE, ocrLanguage)
         .with(t.ORIGINAL_STORAGE, originalStorage)
         .with(t.PARSE_OCR, parseOcr)
         .with(t.VALID_DATE, validDate)

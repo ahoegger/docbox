@@ -26,9 +26,11 @@ import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
 public class ParseDocumentJob {
 
   private BigDecimal m_documentId;
+  private String m_language;
 
-  public ParseDocumentJob(BigDecimal documentId) {
+  public ParseDocumentJob(BigDecimal documentId, String language) {
     m_documentId = documentId;
+    m_language = language;
   }
 
   public BigDecimal getDocumentId() {
@@ -40,7 +42,7 @@ public class ParseDocumentJob {
       @Override
       public String call() throws Exception {
         BinaryResource resource = getBinaryResource(getDocumentId()).awaitDoneAndGet();
-        OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(resource);
+        OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(resource, m_language);
         if (parseResult != null) {
           persist(getDocumentId(), parseResult).awaitDone();
           return parseResult.getText();
@@ -49,7 +51,7 @@ public class ParseDocumentJob {
       }
     },
         Jobs.newInput()
-            .withExecutionTrigger(Jobs.newExecutionTrigger().withStartIn(30, TimeUnit.SECONDS))
+            .withExecutionTrigger(Jobs.newExecutionTrigger().withStartIn(20, TimeUnit.SECONDS))
             .withRunContext(RunContexts.empty().withSubject(Subject.getSubject(AccessController.getContext()))));
   }
 
