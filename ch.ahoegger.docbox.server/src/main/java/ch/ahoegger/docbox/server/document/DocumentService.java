@@ -22,10 +22,12 @@ import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPartner;
 import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPermission;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.DocumentRecord;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -52,6 +54,9 @@ import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.ocr.ParseDocumentJob;
 import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
+import ch.ahoegger.docbox.server.util.FieldValidator;
+import ch.ahoegger.docbox.server.util.FutureUtility;
+import ch.ahoegger.docbox.server.util.NullFuture;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Permissions.PermissionsRowData;
@@ -305,18 +310,46 @@ public class DocumentService implements IDocumentService {
 
   @Override
   public void store(DocumentFormData formData) {
-    DSLContext dsl = DSL.using(SQL.getConnection(), SQLDialect.DERBY);
-    Document doc = Document.DOCUMENT;
-    dsl.update(doc)
-        .set(doc.ABSTRACT, formData.getAbstract().getValue())
-        .set(doc.CONVERSATION_NR, formData.getConversation().getValue())
-        .set(doc.DOCUMENT_DATE, formData.getDocumentDate().getValue())
-        .set(doc.OCR_LANGUAGE, formData.getOcrLanguage().getValue())
-        .set(doc.ORIGINAL_STORAGE, formData.getOriginalStorage().getValue())
-        .set(doc.PARSE_OCR, formData.getParseOcr().getValue())
-        .set(doc.VALID_DATE, formData.getValidDate().getValue())
-        .where(doc.DOCUMENT_NR.eq(formData.getDocumentId()))
-        .execute();
+    storeInternal(formData);
+  }
+
+  protected IFuture<Void> storeInternal(DocumentFormData formData) {
+
+    Document table = Document.DOCUMENT;
+    DocumentRecord doc = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(table, table.DOCUMENT_NR.eq(formData.getDocumentId()));
+
+    if (doc == null) {
+      return new NullFuture<>();
+    }
+    // validate
+    FieldValidator validator = new FieldValidator();
+    validator.add(FieldValidator.unmodifiableValidator(table.DOCUMENT_URL, formData.getDocumentPath()));
+    validator.add(FieldValidator.unmodifiableValidator(table.INSERT_DATE, formData.getCapturedDate().getValue()));
+    IStatus validateStatus = validator.validate(doc);
+    if (!validateStatus.isOK()) {
+      throw new VetoException(new ProcessingStatus(validateStatus));
+    }
+
+    FieldValidator ocrRequiredValidator = new FieldValidator();
+    ocrRequiredValidator.add(FieldValidator.unmodifiableValidator(table.OCR_LANGUAGE, formData.getOcrLanguage().getValue()));
+    ocrRequiredValidator.add(FieldValidator.unmodifiableValidator(table.PARSE_OCR, formData.getParseOcr().getValue()));
+
+    boolean updateOcr = !ocrRequiredValidator.validate(doc).isOK();
+
+    int rowCount = doc
+        .with(table.ABSTRACT, formData.getAbstract().getValue())
+        .with(table.CONVERSATION_NR, formData.getConversation().getValue())
+        .with(table.DOCUMENT_DATE, formData.getDocumentDate().getValue())
+        .with(table.OCR_LANGUAGE, formData.getOcrLanguage().getValue())
+        .with(table.ORIGINAL_STORAGE, formData.getOriginalStorage().getValue())
+        .with(table.PARSE_OCR, formData.getParseOcr().getValue())
+        .with(table.VALID_DATE, formData.getValidDate().getValue())
+        .update();
+
+    if (rowCount < 1) {
+      return new NullFuture<>();
+    }
 
     // partner
     BEANS.get(DocumentPartnerService.class).updateDocumentPartner(formData.getDocumentId(),
@@ -336,20 +369,22 @@ public class DocumentService implements IDocumentService {
             (p1, p2) -> Math.max(p1, p2)));
     BEANS.get(DocumentPermissionService.class).updateDocumentPermissions(formData.getDocumentId(), permissions);
 
+    IFuture<Void> result = new NullFuture<>();
     // ocr
-    if (formData.getParseOcr().getValue()) {
-      if (!BEANS.get(DocumentOcrService.class).exists(formData.getDocumentId())) {
+    if (updateOcr) {
+      if (formData.getParseOcr().getValue()) {
         ParseDocumentJob job = new ParseDocumentJob(formData.getDocumentId(), formData.getOcrLanguage().getValue());
-        job.schedule();
+        result = FutureUtility.<String, Void> map(job.schedule(), (res) -> (Void) null);
       }
-    }
-    else {
-      DocumentOcrService service = BEANS.get(DocumentOcrService.class);
-      service.delete(formData.getDocumentId());
+      else {
+        DocumentOcrService service = BEANS.get(DocumentOcrService.class);
+        service.delete(formData.getDocumentId());
+      }
     }
 
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
+    return result;
   }
 
   @Override

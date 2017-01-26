@@ -19,4 +19,10 @@ public interface IDocumentOcrService extends IService {
    */
   DocumentOcrFormData load(DocumentOcrFormData formData);
 
+  /**
+   * @param formData
+   * @return
+   */
+  DocumentOcrFormData store(DocumentOcrFormData formData);
+
 }

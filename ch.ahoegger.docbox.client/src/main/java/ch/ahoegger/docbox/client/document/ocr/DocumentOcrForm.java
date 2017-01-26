@@ -203,7 +203,10 @@ public class DocumentOcrForm extends AbstractForm {
 
     @Override
     protected void execStore() {
-      // TODO
+      DocumentOcrFormData formData = new DocumentOcrFormData();
+      exportFormData(formData);
+      formData = BEANS.get(IDocumentOcrService.class).store(formData);
+      importFormData(formData);
     }
   }
 

@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
@@ -23,6 +24,7 @@ import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ch.ahoegger.docbox.server.database.dev.initialization.CategoryTableTask;
@@ -136,8 +138,8 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     assertEqualsDb(service, fd);
   }
 
-  @Test
-  public void testModifyCapturedDate() {
+  @Test(expected = VetoException.class)
+  public void testUnmodifyCapturedDate() {
     IDocumentService service = BEANS.get(IDocumentService.class);
 
     DocumentFormData fd = loadDocument(service, documentId);
@@ -248,7 +250,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
   }
 
-  @Test
+  @Test(expected = VetoException.class)
   public void testUnmodifiableDocumentPath() {
     IDocumentService service = BEANS.get(IDocumentService.class);
 
@@ -256,10 +258,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     // modify
     fd.setDocumentPath("modified/path");
     service.store(fd);
-
-    // compare to new loaded
-    DocumentFormData refFd = loadDocument(service, documentId);
-    Assert.assertFalse("modified/path".equals(refFd.getDocumentPath()));
+    // expect exception
   }
 
   @Test
@@ -277,13 +276,14 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
   }
 
   @Test
+  @Ignore
   public void testParseOcr() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
+    DocumentService service = BEANS.get(DocumentService.class);
 
     DocumentFormData fd = loadDocument(service, documentId);
     // modify
     fd.getParseOcr().setValue(true);
-    service.store(fd);
+    service.storeInternal(fd).awaitDone();
 
     // compare to new loaded
     DocumentFormData refFd = loadDocument(service, documentId);

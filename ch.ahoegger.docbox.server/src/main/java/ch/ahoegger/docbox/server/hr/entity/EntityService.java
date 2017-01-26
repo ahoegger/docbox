@@ -9,7 +9,9 @@ import java.util.stream.Collectors;
 import org.ch.ahoegger.docbox.server.or.app.tables.Entity;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.EntityRecord;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
@@ -20,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
+import ch.ahoegger.docbox.server.util.FieldValidator;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupCodeType.UnbilledCode;
 import ch.ahoegger.docbox.shared.hr.entity.EntityFormData;
@@ -100,6 +103,9 @@ public class EntityService implements IEntityService {
 
   @Override
   public EntityFormData create(EntityFormData formData) {
+    if (formData.getPostingGroupId() == null) {
+      throw new VetoException("Posting group id can not be null.");
+    }
     formData.setEntityId(new BigDecimal(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME)));
 
     Entity e = Entity.ENTITY.as("ENT");
@@ -127,9 +133,27 @@ public class EntityService implements IEntityService {
     if (ObjectUtility.notEquals(UnbilledCode.ID, formData.getPostingGroupId())) {
       throw new VetoException("Access denied.");
     }
-    Entity e = Entity.ENTITY.as("ENT");
-    int rowCount = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .fetchOne(e, e.ENTITY_NR.eq(formData.getEntityId()))
+    Entity e = Entity.ENTITY;
+    FieldValidator validator = new FieldValidator();
+    validator.add(FieldValidator.unmodifiableValidator(e.ENTITY_TYPE, formData.getEntityType()));
+    validator.add(FieldValidator.unmodifiableValidator(e.PARTNER_NR, formData.getPartnerId()));
+    validator.add(FieldValidator.unmodifiableValidator(e.POSTING_GROUP_NR, formData.getPostingGroupId()));
+    EntityRecord entity = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(e, e.ENTITY_NR.eq(formData.getEntityId()));
+
+    if (entity == null) {
+      return null;
+    }
+
+    IStatus validateStatus = validator.validate(entity);
+    if (!validateStatus.isOK()) {
+      throw new VetoException(new ProcessingStatus(validateStatus));
+    }
+
+    int rowCount = entity.with(e.DESCRIPTION, formData.getText().getValue())
+        .with(e.ENTITY_DATE, formData.getEntityDate().getValue())
+        .with(e.EXPENSE_AMOUNT, formData.getExpenseAmount().getValue())
+        .with(e.WORKING_HOURS, formData.getWorkHours().getValue())
         .update();
 
     if (rowCount == 1) {

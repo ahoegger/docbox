@@ -7,6 +7,9 @@ import org.ch.ahoegger.docbox.server.or.app.tables.DocumentOcr;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.DocumentOcrRecord;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
+import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.SQLDialect;
@@ -14,6 +17,7 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.ahoegger.docbox.server.util.FieldValidator;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
 import ch.ahoegger.docbox.shared.ocr.IDocumentOcrService;
@@ -29,32 +33,45 @@ public class DocumentOcrService implements IDocumentOcrService {
 
   @RemoteServiceAccessDenied
   public void updateOrCreate(BigDecimal documentId, OcrParseResult parseResult) {
+    boolean create = false;
+    DocumentOcrFormData fd = new DocumentOcrFormData();
+    fd.setDocumentId(documentId);
+    fd = load(fd);
+    if (fd == null) {
+      fd = new DocumentOcrFormData();
+      fd.setDocumentId(documentId);
+      create = true;
+    }
+    fd.getParseCount().setValue(Optional.ofNullable(fd.getParseCount().getValue()).map(c -> c + 1).orElse(1));
+    fd.getOcrParsed().setValue(parseResult.isOcrParsed());
+    fd.getText().setValue(parseResult.getText());
+    fd.getParseFailedReason().setValue(Optional.ofNullable(parseResult.getParseError()).map(r -> r.toString()).orElse(null));
 
+    if (create) {
+      create(fd);
+    }
+    else {
+      storeInternal(fd, new FieldValidator());
+    }
+  }
+
+  protected DocumentOcrFormData create(DocumentOcrFormData formData) {
     DocumentOcr docOcr = DocumentOcr.DOCUMENT_OCR.as("DOC_OCR");
 
-    DocumentOcrRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .fetchOne(docOcr, docOcr.DOCUMENT_NR.eq(documentId));
-
-    if (rec == null) {
-      rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY).newRecord(docOcr)
-          .with(docOcr.DOCUMENT_NR, documentId);
-
-    }
-    int rowCount = rec
-        .with(docOcr.PARSE_COUNT, Optional.ofNullable(rec.getParseCount())
-            .map(c -> c + 1)
-            .orElse(1))
-        .with(docOcr.FAILED_REASON, Optional.ofNullable(parseResult.getParseError())
-            .map(e -> e.toString())
-            .orElse(null))
-        .with(docOcr.OCR_SCANNED, parseResult.isOcrParsed())
-        .with(docOcr.TEXT, parseResult.getText())
-        .store();
-
+    int rowCount = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .newRecord(docOcr)
+        .with(docOcr.DOCUMENT_NR, formData.getDocumentId())
+        .with(docOcr.FAILED_REASON, formData.getParseFailedReason().getValue())
+        .with(docOcr.OCR_SCANNED, formData.getOcrParsed().getValue())
+        .with(docOcr.PARSE_COUNT, formData.getParseCount().getValue())
+        .with(docOcr.TEXT, formData.getText().getValue())
+        .insert();
     if (rowCount == 1) {
       // notify backup needed
       BEANS.get(IBackupService.class).notifyModification();
+      return formData;
     }
+    return null;
   }
 
   @Override
@@ -74,6 +91,47 @@ public class DocumentOcrService implements IDocumentOcrService {
         })
         .findFirst()
         .orElse(null);
+  }
+
+  @Override
+  public DocumentOcrFormData store(DocumentOcrFormData formData) {
+
+    DocumentOcr e = DocumentOcr.DOCUMENT_OCR;
+    // validations
+    FieldValidator validator = new FieldValidator();
+    validator.add(FieldValidator.unmodifiableValidator(e.FAILED_REASON, formData.getParseFailedReason().getValue()));
+    validator.add(FieldValidator.unmodifiableValidator(e.PARSE_COUNT, formData.getParseCount().getValue()));
+    validator.add(FieldValidator.unmodifiableValidator(e.OCR_SCANNED, formData.getOcrParsed().getValue()));
+    return storeInternal(formData, validator);
+
+  }
+
+  @RemoteServiceAccessDenied
+  protected DocumentOcrFormData storeInternal(DocumentOcrFormData formData, FieldValidator validator) {
+    DocumentOcr e = DocumentOcr.DOCUMENT_OCR;
+    DocumentOcrRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(e, e.DOCUMENT_NR.eq(formData.getDocumentId()));
+
+    if (rec == null) {
+      return null;
+    }
+    IStatus validateStatus = validator.validate(rec);
+    if (!validateStatus.isOK()) {
+      throw new VetoException(new ProcessingStatus(validateStatus));
+    }
+
+    int rowCount = rec.with(e.FAILED_REASON, formData.getParseFailedReason().getValue())
+        .with(e.OCR_SCANNED, formData.getOcrParsed().getValue())
+        .with(e.PARSE_COUNT, formData.getParseCount().getValue())
+        .with(e.TEXT, formData.getText().getValue())
+        .update();
+
+    if (rowCount == 1) {
+      // notify backup needed
+      BEANS.get(IBackupService.class).notifyModification();
+
+    }
+    return formData;
   }
 
   /**
