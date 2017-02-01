@@ -7,7 +7,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Test;
 
-import ch.ahoegger.docbox.server.database.dev.initialization.TaxGroupTableTask;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
@@ -24,7 +23,7 @@ public class TaxGroupServiceTest extends AbstractTestWithDatabase {
     super.setupDb();
     ISqlService sqlService = BEANS.get(ISqlService.class);
 
-    BEANS.get(TaxGroupTableTask.class).createRow(sqlService, taxGroupId, "abc", LocalDateUtility.today(), null);
+    BEANS.get(TaxGroupService.class).createRow(sqlService, taxGroupId, "abc", LocalDateUtility.today(), null);
 
   }
 

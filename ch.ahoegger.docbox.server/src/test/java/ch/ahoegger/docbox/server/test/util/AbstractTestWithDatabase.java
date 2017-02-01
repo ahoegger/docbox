@@ -1,19 +1,24 @@
 package ch.ahoegger.docbox.server.test.util;
 
+import java.math.BigDecimal;
+
+import org.ch.ahoegger.docbox.server.or.app.tables.PrimaryKeySeq;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
+import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 
 import ch.ahoegger.docbox.server.ServerSession;
-import ch.ahoegger.docbox.server.database.dev.initialization.ITableTask;
-import ch.ahoegger.docbox.server.database.dev.initialization.SequenceTask;
+import ch.ahoegger.docbox.server.or.generator.table.ITableStatement;
 import ch.ahoegger.docbox.server.security.SecurityService;
 
 /**
@@ -43,12 +48,15 @@ public abstract class AbstractTestWithDatabase {
     // delete document store
     BEANS.get(TestDocumentStoreService.class).clearStore();
     ISqlService sqlService = BEANS.get(ISqlService.class);
-    for (ITableTask task : BEANS.all(ITableTask.class)) {
-      task.deleteTable(sqlService);
+    for (ITableStatement task : BEANS.all(ITableStatement.class)) {
+      task.deleteTable(sqlService.getConnection());
 
     }
     // init index
-    BEANS.get(SequenceTask.class).insertInitialValue(sqlService, 1000);
+    DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .insertInto(PrimaryKeySeq.PRIMARY_KEY_SEQ)
+        .set(PrimaryKeySeq.PRIMARY_KEY_SEQ.LAST_VAL, BigDecimal.valueOf(1000))
+        .execute();
 
   }
 

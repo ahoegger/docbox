@@ -31,7 +31,6 @@
 		<module>../ch.ahoegger.docbox.server</module>
 		<module>../ch.ahoegger.docbox.or.definition</module>
 		<module>../ch.ahoegger.docbox.server.or</module>
-		<module>../ch.ahoegger.docbox.server.database.dev</module>
 		<module>../ch.ahoegger.docbox.client</module>
 		<module>../ch.ahoegger.docbox.server.app.war</module>
 		<module>../ch.ahoegger.docbox.ui.html</module>
@@ -87,11 +86,6 @@
 			<dependency>
 				<groupId>ch.ahoegger.docbox</groupId>
 				<artifactId>ch.ahoegger.docbox.server.or</artifactId>
-				<version>${ch.ahoegger.docbox.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>ch.ahoegger.docbox</groupId>
-				<artifactId>ch.ahoegger.docbox.server.database.dev</artifactId>
 				<version>${ch.ahoegger.docbox.version}</version>
 			</dependency>
 			<dependency>

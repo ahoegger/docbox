@@ -12,7 +12,6 @@ import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
-import ch.ahoegger.docbox.server.database.dev.initialization.CategoryTableTask;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.shared.category.CategorySearchFormData;
@@ -35,11 +34,11 @@ public class CategoryServiceSearchTest extends AbstractTestWithDatabase {
     super.setupDb();
     ISqlService sqlService = BEANS.get(ISqlService.class);
 
-    BEANS.get(CategoryTableTask.class).insert(sqlService, id01, "cat01", "desc01",
+    BEANS.get(CategoryService.class).insertRow(sqlService.getConnection(), id01, "cat01", "desc01",
         LocalDateUtility.toDate(LocalDate.now()), null);
-    BEANS.get(CategoryTableTask.class).insert(sqlService, id02, "cat02", "desc02",
+    BEANS.get(CategoryService.class).insertRow(sqlService.getConnection(), id02, "cat02", "desc02",
         LocalDateUtility.toDate(LocalDate.now()), LocalDateUtility.toDate(LocalDate.now()));
-    BEANS.get(CategoryTableTask.class).insert(sqlService, id03, "cat03", "desc03",
+    BEANS.get(CategoryService.class).insertRow(sqlService.getConnection(), id03, "cat03", "desc03",
         LocalDateUtility.toDate(LocalDate.now().minusDays(2)),
         LocalDateUtility.toDate(LocalDate.now().minusDays(1)));
 

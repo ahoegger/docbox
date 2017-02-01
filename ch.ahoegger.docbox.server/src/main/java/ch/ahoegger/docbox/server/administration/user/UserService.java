@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.server.administration.user;
 
+import java.util.Optional;
+
 import org.ch.ahoegger.docbox.server.or.app.tables.DefaultPermissionTable;
 import org.ch.ahoegger.docbox.server.or.app.tables.DocboxUser;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.DocboxUserRecord;
@@ -8,7 +10,9 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -191,6 +195,36 @@ public class UserService implements IUserService {
 
     BEANS.get(IBackupService.class).notifyModification();
     return true;
+
+  }
+
+  @RemoteServiceAccessDenied
+  public int insert(ISqlService sqlService, String name, String firstname, String username, String password,
+      boolean active, boolean administrator) {
+    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .executeInsert(mapToRecord(new DocboxUserRecord(), name, firstname, username, password, active, administrator));
+  }
+
+  protected DocboxUserRecord mapToRecord(DocboxUserRecord rec, UserFormData fd) {
+    if (fd == null) {
+      return null;
+    }
+    return mapToRecord(rec, fd.getName().getValue(), fd.getFirstname().getValue(), fd.getUsername().getValue(),
+        Optional.ofNullable(fd.getPassword().getValue())
+            .map(plain -> new String(BEANS.get(SecurityService.class).createPasswordHash(plain.toCharArray())))
+            .orElse(null),
+        fd.getActive().getValue(), fd.getAdministrator().getValue());
+  }
+
+  protected DocboxUserRecord mapToRecord(DocboxUserRecord rec, String name, String firstname, String username, String password,
+      boolean active, boolean administrator) {
+    return rec
+        .with(DocboxUser.DOCBOX_USER.ACTIVE, active)
+        .with(DocboxUser.DOCBOX_USER.ADMINISTRATOR, administrator)
+        .with(DocboxUser.DOCBOX_USER.FIRSTNAME, firstname)
+        .with(DocboxUser.DOCBOX_USER.NAME, name)
+        .with(DocboxUser.DOCBOX_USER.PASSWORD, password)
+        .with(DocboxUser.DOCBOX_USER.USERNAME, username);
 
   }
 

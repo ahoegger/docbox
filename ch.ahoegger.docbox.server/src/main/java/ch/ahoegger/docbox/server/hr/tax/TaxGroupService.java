@@ -3,13 +3,16 @@ package ch.ahoegger.docbox.server.hr.tax;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.TaxGroupRecord;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -80,9 +83,8 @@ public class TaxGroupService implements ITaxGroupService {
   public TaxGroupFormData create(TaxGroupFormData formData) {
     formData.setTaxGroupId(new BigDecimal(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME)));
 
-    TaxGroup t = TaxGroup.TAX_GROUP;
-    int rowCount = toRecord(formData, DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .newRecord(t)).insert();
+    int rowCount = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .executeInsert(mapToRecord(new TaxGroupRecord(), formData));
 
     if (rowCount == 1) {
       // notify backup needed
@@ -109,7 +111,7 @@ public class TaxGroupService implements ITaxGroupService {
       LOG.warn("Try to update not existing record with id '{}'!", formData.getTaxGroupId());
       return null;
     }
-    if (toRecord(formData, rec).update() != 1) {
+    if (mapToRecord(rec, formData).update() != 1) {
       LOG.error("Could not update record with id '{}'!", formData.getTaxGroupId());
       return null;
     }
@@ -119,16 +121,28 @@ public class TaxGroupService implements ITaxGroupService {
     return formData;
   }
 
-  protected TaxGroupRecord toRecord(TaxGroupFormData fd, TaxGroupRecord rec) {
+  @RemoteServiceAccessDenied
+  public int createRow(ISqlService sqlService, BigDecimal taxGroupId, String name, Date startDate, Date endDate) {
+    return DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+        .executeInsert(mapToRecord(new TaxGroupRecord(), taxGroupId, name, startDate, endDate));
+
+  }
+
+  protected TaxGroupRecord mapToRecord(TaxGroupRecord rec, TaxGroupFormData fd) {
     if (fd == null) {
       return null;
     }
+    return mapToRecord(rec, fd.getTaxGroupId(), fd.getName().getValue(), fd.getStartDate().getValue(), fd.getEndDate().getValue());
+
+  }
+
+  protected TaxGroupRecord mapToRecord(TaxGroupRecord rec, BigDecimal taxGroupId, String name, Date startDate, Date endDate) {
     TaxGroup t = TaxGroup.TAX_GROUP;
     return rec
-        .with(t.END_DATE, fd.getEndDate().getValue())
-        .with(t.NAME, fd.getName().getValue())
-        .with(t.START_DATE, fd.getStartDate().getValue())
-        .with(t.TAX_GROUP_NR, fd.getTaxGroupId());
+        .with(t.END_DATE, endDate)
+        .with(t.NAME, name)
+        .with(t.START_DATE, startDate)
+        .with(t.TAX_GROUP_NR, taxGroupId);
 
   }
 

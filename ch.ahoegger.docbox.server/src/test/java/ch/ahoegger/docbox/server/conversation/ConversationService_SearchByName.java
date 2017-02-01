@@ -11,7 +11,6 @@ import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
-import ch.ahoegger.docbox.server.database.dev.initialization.ConversationTableTask;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.shared.conversation.ConversationSearchFormData;
@@ -38,22 +37,22 @@ public class ConversationService_SearchByName extends AbstractTestWithDatabase {
     ISqlService sqlService = BEANS.get(ISqlService.class);
     LocalDate today = LocalDate.now();
 
-    BEANS.get(ConversationTableTask.class).insert(sqlService, conversationId01, "dook haagen", "some notes",
+    BEANS.get(ConversationService.class).insert(sqlService, conversationId01, "dook haagen", "some notes",
         LocalDateUtility.toDate(today.minusDays(20)),
         null);
 
     // till yesterday
-    BEANS.get(ConversationTableTask.class).insert(sqlService, conversationId02, "smill donat", "some notes",
+    BEANS.get(ConversationService.class).insert(sqlService, conversationId02, "smill donat", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         null);
 
     // till today
-    BEANS.get(ConversationTableTask.class).insert(sqlService, conversationId03, "bluk onack", "some notes",
+    BEANS.get(ConversationService.class).insert(sqlService, conversationId03, "bluk onack", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         null);
 
     // till tomorrow
-    BEANS.get(ConversationTableTask.class).insert(sqlService, conversationId04, "7 sense of moon", "some notes",
+    BEANS.get(ConversationService.class).insert(sqlService, conversationId04, "7 sense of moon", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         null);
   }

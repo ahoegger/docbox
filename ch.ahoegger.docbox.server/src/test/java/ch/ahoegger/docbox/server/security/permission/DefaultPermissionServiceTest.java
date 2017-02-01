@@ -1,6 +1,5 @@
 package ch.ahoegger.docbox.server.security.permission;
 
-import java.time.LocalDate;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -8,7 +7,6 @@ import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
-import ch.ahoegger.docbox.server.database.dev.initialization.DefaultPermissionTableTask;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType.OwnerCode;
 import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType.ReadCode;
@@ -30,11 +28,10 @@ public class DefaultPermissionServiceTest extends AbstractTestWithDatabase {
     super.setupDb();
 
     ISqlService sqlService = BEANS.get(ISqlService.class);
-    LocalDate today = LocalDate.now();
 
-    BEANS.get(DefaultPermissionTableTask.class).insert(sqlService, user01, ReadCode.ID);
-    BEANS.get(DefaultPermissionTableTask.class).insert(sqlService, user02, WriteCode.ID);
-    BEANS.get(DefaultPermissionTableTask.class).insert(sqlService, user03, OwnerCode.ID);
+    BEANS.get(DefaultPermissionService.class).insertRow(sqlService.getConnection(), user01, ReadCode.ID);
+    BEANS.get(DefaultPermissionService.class).insertRow(sqlService.getConnection(), user02, WriteCode.ID);
+    BEANS.get(DefaultPermissionService.class).insertRow(sqlService.getConnection(), user03, OwnerCode.ID);
   }
 
   @Test

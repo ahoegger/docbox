@@ -7,7 +7,6 @@ import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
-import ch.ahoegger.docbox.server.database.dev.initialization.DocumentOcrTableTask;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 
@@ -26,7 +25,7 @@ public class DocumentOcrServiceTest extends AbstractTestWithDatabase {
 
     ISqlService sqlService = BEANS.get(ISqlService.class);
 
-    BEANS.get(DocumentOcrTableTask.class).insert(sqlService, documentId, "sample", true, 1, null);
+    BEANS.get(DocumentOcrService.class).insert(sqlService, documentId, "sample", true, 1, null);
 
   }
 

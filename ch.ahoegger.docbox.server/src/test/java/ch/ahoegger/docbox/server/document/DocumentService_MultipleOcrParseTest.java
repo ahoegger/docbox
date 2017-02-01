@@ -19,7 +19,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import ch.ahoegger.docbox.server.database.dev.initialization.DocumentTableTask;
 import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
@@ -59,7 +58,7 @@ public class DocumentService_MultipleOcrParseTest extends AbstractTestWithDataba
     BinaryResource br = BinaryResources.create().withFilename(fileName).withContentType(FileUtility.getContentTypeForExtension(FileUtility.getFileExtension(fileName))).withContent(IOUtility.readFromUrl(resource))
         .withLastModified(System.currentTimeMillis()).build();
     String docPath = BEANS.get(DocumentStoreService.class).store(br, insertDate, documentId);
-    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId, "", insertDate, insertDate, null, docPath, null, null, true, OcrLanguageCodeType.GermanCode.ID);
+    BEANS.get(DocumentService.class).insert(sqlService, documentId, "", insertDate, insertDate, null, docPath, null, null, true, OcrLanguageCodeType.GermanCode.ID);
   }
 
   @Test

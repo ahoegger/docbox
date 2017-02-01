@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.server.security.permission;
 
+import java.sql.Connection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -53,14 +54,8 @@ public class DefaultPermissionService {
    */
   public void createDefaultPermission(String username, Integer permission) {
     Assertions.assertNotNull(username);
-    DefaultPermissionTable t = DefaultPermissionTable.DEFAULT_PERMISSION_TABLE;
-
-    int rowCount = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .newRecord(t)
-        .with(t.USERNAME, username)
-        .with(t.PERMISSION, permission)
-        .insert();
-    if (rowCount == 1) {
+    if (DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .executeInsert(toRecord(username, permission)) == 1) {
       // notify backup needed
       BEANS.get(IBackupService.class).notifyModification();
     }
@@ -84,6 +79,17 @@ public class DefaultPermissionService {
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
     return true;
+  }
+
+  public int insertRow(Connection connection, String username, int permission) {
+    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .executeInsert(toRecord(username, permission));
+  }
+
+  protected DefaultPermissionTableRecord toRecord(String username, int permission) {
+    return new DefaultPermissionTableRecord()
+        .with(DefaultPermissionTable.DEFAULT_PERMISSION_TABLE.PERMISSION, permission)
+        .with(DefaultPermissionTable.DEFAULT_PERMISSION_TABLE.USERNAME, username);
   }
 
 }

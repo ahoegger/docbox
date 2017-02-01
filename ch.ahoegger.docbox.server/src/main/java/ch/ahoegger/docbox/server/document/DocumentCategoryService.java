@@ -8,6 +8,7 @@ import org.ch.ahoegger.docbox.server.or.app.tables.DocumentCategory;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.DocumentCategoryRecord;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.InsertValuesStep2;
@@ -91,5 +92,17 @@ public class DocumentCategoryService implements IDocumentCategoryTable {
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
 
+  }
+
+  @RemoteServiceAccessDenied
+  public int insert(ISqlService sqlService, BigDecimal documentId, BigDecimal categoryId) {
+    return DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+        .executeInsert(toRecord(documentId, categoryId));
+  }
+
+  protected DocumentCategoryRecord toRecord(BigDecimal documentId, BigDecimal categoryId) {
+    return new DocumentCategoryRecord()
+        .with(DocumentCategory.DOCUMENT_CATEGORY.CATEGORY_NR, categoryId)
+        .with(DocumentCategory.DOCUMENT_CATEGORY.DOCUMENT_NR, documentId);
   }
 }

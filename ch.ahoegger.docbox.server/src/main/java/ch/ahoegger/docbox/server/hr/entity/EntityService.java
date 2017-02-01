@@ -2,6 +2,7 @@ package ch.ahoegger.docbox.server.hr.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,7 +15,9 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -109,8 +112,8 @@ public class EntityService implements IEntityService {
     formData.setEntityId(new BigDecimal(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME)));
 
     Entity e = Entity.ENTITY.as("ENT");
-    int rowCount = toRecord(formData, DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .newRecord(e)).insert();
+    int rowCount = mapToRecord(DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .newRecord(e), formData).insert();
 
     if (rowCount == 1) {
       // notify backup needed
@@ -150,11 +153,7 @@ public class EntityService implements IEntityService {
       throw new VetoException(new ProcessingStatus(validateStatus));
     }
 
-    int rowCount = entity.with(e.DESCRIPTION, formData.getText().getValue())
-        .with(e.ENTITY_DATE, formData.getEntityDate().getValue())
-        .with(e.EXPENSE_AMOUNT, formData.getExpenseAmount().getValue())
-        .with(e.WORKING_HOURS, formData.getWorkHours().getValue())
-        .update();
+    int rowCount = mapToRecord(entity, formData).update();
 
     if (rowCount == 1) {
       // notify backup needed
@@ -204,21 +203,39 @@ public class EntityService implements IEntityService {
     BEANS.get(IBackupService.class).notifyModification();
   }
 
-  protected EntityRecord toRecord(EntityFormData fd, EntityRecord rec) {
+  @RemoteServiceAccessDenied
+  public int insert(ISqlService sqlService, BigDecimal entityId, BigDecimal partnerId, BigDecimal postingGroupId, BigDecimal entityType, Date entityDate, BigDecimal hours, BigDecimal amount, String desc) {
+
+    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .executeInsert(mapToRecord(new EntityRecord(), entityId, partnerId, postingGroupId, entityType, entityDate, hours, amount, desc));
+  }
+
+  protected EntityRecord toRecord(EntityFormData fd) {
     if (fd == null) {
       return null;
     }
+    return mapToRecord(new EntityRecord(), fd);
+  }
+
+  protected EntityRecord mapToRecord(EntityRecord rec, EntityFormData fd) {
+    if (fd == null) {
+      return null;
+    }
+    return mapToRecord(rec, fd.getEntityId(), fd.getPartnerId(), fd.getPostingGroupId(), fd.getEntityType(), fd.getEntityDate().getValue(), fd.getWorkHours().getValue(), fd.getExpenseAmount().getValue(), fd.getText().getValue());
+
+  }
+
+  protected EntityRecord mapToRecord(EntityRecord rec, BigDecimal entityId, BigDecimal partnerId, BigDecimal postingGroupId, BigDecimal entityType, Date entityDate, BigDecimal hours, BigDecimal amount, String desc) {
     Entity e = Entity.ENTITY;
     return rec
-        .with(e.EXPENSE_AMOUNT, fd.getExpenseAmount().getValue())
-        .with(e.DESCRIPTION, fd.getText().getValue())
-        .with(e.ENTITY_DATE, fd.getEntityDate().getValue())
-        .with(e.ENTITY_NR, fd.getEntityId())
-        .with(e.ENTITY_TYPE, fd.getEntityType())
-        .with(e.WORKING_HOURS, fd.getWorkHours().getValue())
-        .with(e.PARTNER_NR, fd.getPartnerId())
-        .with(e.POSTING_GROUP_NR, fd.getPostingGroupId());
-
+        .with(e.EXPENSE_AMOUNT, amount)
+        .with(e.DESCRIPTION, desc)
+        .with(e.ENTITY_DATE, entityDate)
+        .with(e.ENTITY_NR, entityId)
+        .with(e.ENTITY_TYPE, entityType)
+        .with(e.WORKING_HOURS, hours)
+        .with(e.PARTNER_NR, partnerId)
+        .with(e.POSTING_GROUP_NR, postingGroupId);
   }
 
   protected EntityFormData toFormData(EntityRecord rec) {
@@ -236,4 +253,5 @@ public class EntityService implements IEntityService {
     fd.setPostingGroupId(rec.getPostingGroupNr());
     return fd;
   }
+
 }

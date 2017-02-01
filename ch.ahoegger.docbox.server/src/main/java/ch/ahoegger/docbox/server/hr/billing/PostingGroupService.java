@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.jooq.Condition;
@@ -335,6 +336,27 @@ public class PostingGroupService implements IPostingGroupService {
     result.setVacationExtra(vacationExtra);
     return result;
 
+  }
+
+  public int insert(ISqlService sqlService, BigDecimal postingGroupId, BigDecimal partnerId, BigDecimal taxGroupId, BigDecimal documentId, String name,
+      Date statementDate, BigDecimal workingHours, BigDecimal bruttoWage, BigDecimal nettoWage, BigDecimal sourceTax, BigDecimal socialSecurityTax, BigDecimal vacationExtra) {
+
+    PostingGroup t = PostingGroup.POSTING_GROUP;
+    return DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+        .newRecord(t)
+        .with(t.BRUTTO_WAGE, bruttoWage)
+        .with(t.DOCUMENT_NR, documentId)
+        .with(t.NAME, name)
+        .with(t.NETTO_WAGE, nettoWage)
+        .with(t.PARTNER_NR, partnerId)
+        .with(t.POSTING_GROUP_NR, postingGroupId)
+        .with(t.SOCIAL_SECURITY_TAX, socialSecurityTax)
+        .with(t.SOURCE_TAX, sourceTax)
+        .with(t.STATEMENT_DATE, statementDate)
+        .with(t.TAX_GROUP_NR, taxGroupId)
+        .with(t.VACATION_EXTRA, vacationExtra)
+        .with(t.WORKING_HOURS, workingHours)
+        .insert();
   }
 
   protected PostingGroupFormData toFormData(PostingGroupRecord rec) {

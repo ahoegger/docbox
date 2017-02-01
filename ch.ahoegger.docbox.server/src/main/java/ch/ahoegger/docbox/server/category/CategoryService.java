@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.category;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.Date;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.Category;
@@ -8,6 +9,7 @@ import org.ch.ahoegger.docbox.server.or.app.tables.records.CategoryRecord;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -80,59 +82,30 @@ public class CategoryService implements ICategoryService {
   @Override
   public CategoryFormData create(CategoryFormData formData) {
     formData.setCategoryId(new BigDecimal(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME)));
-    CategoryRecord category = DSL.using(SQL.getConnection(), SQLDialect.DERBY).newRecord(Category.CATEGORY);
-    category.setCategoryNr(formData.getCategoryId());
-    category.setName(formData.getName().getValue());
-    category.setDescription(formData.getDescription().getValue());
-    if (formData.getStartDate().getValue() != null) {
-      category.setStartDate(new java.sql.Date(formData.getStartDate().getValue().getTime()));
+    if (insertRow(SQL.getConnection(), formData.getCategoryId(), formData.getName().getValue(), formData.getDescription().getValue(), formData.getStartDate().getValue(), formData.getEndDate().getValue()) > 0) {
+      // notify backup needed
+      BEANS.get(IBackupService.class).notifyModification();
+      return formData;
     }
-    if (formData.getEndDate().getValue() != null) {
-      category.setEndDate(new java.sql.Date(formData.getEndDate().getValue().getTime()));
-    }
-    category.store();
-
-    // notify backup needed
-    BEANS.get(IBackupService.class).notifyModification();
-
-    return formData;
+    return null;
   }
 
   @Override
   public CategoryFormData load(CategoryFormData formData) {
-    Category category = Category.CATEGORY.as("cat");
-
-    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(category.NAME, category.DESCRIPTION, category.START_DATE, category.END_DATE)
-        .from(category)
-        .where(category.CATEGORY_NR.eq(formData.getCategoryId()))
-        .fetch()
-        .stream()
-        .map(rec -> {
-          CategoryFormData res = (CategoryFormData) formData.deepCopy();
-          res.getName().setValue(rec.get(category.NAME));
-          res.getDescription().setValue(rec.get(category.DESCRIPTION));
-          res.getStartDate().setValue(rec.get(category.START_DATE));
-          res.getEndDate().setValue(rec.get(category.END_DATE));
-          return res;
-        }).findFirst().orElse(null);
-
+    Category table = Category.CATEGORY.as("cat");
+    return toFormData(DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(table, table.CATEGORY_NR.eq(formData.getCategoryId())));
   }
 
   @Override
   public CategoryFormData store(CategoryFormData formData) {
-    Category category = Category.CATEGORY.as("cat");
+    CategoryRecord rec = toRecord(formData);
 
-    DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .update(category)
-        .set(category.NAME, formData.getName().getValue())
-        .set(category.DESCRIPTION, formData.getDescription().getValue())
-        .set(category.START_DATE, formData.getStartDate().getValue())
-        .set(category.END_DATE, formData.getEndDate().getValue())
-        .where(category.CATEGORY_NR.eq(formData.getCategoryId())).execute();
-
-    // notify backup needed
-    BEANS.get(IBackupService.class).notifyModification();
+    if (DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .executeUpdate(rec) > 0) {
+      // notify backup needed
+      BEANS.get(IBackupService.class).notifyModification();
+    }
 
     return formData;
   }
@@ -157,5 +130,39 @@ public class CategoryService implements ICategoryService {
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
     return true;
+  }
+
+  @RemoteServiceAccessDenied
+  public int insertRow(Connection connection, BigDecimal categoryId, String name, String description,
+      Date startDate, Date endDate) {
+    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .executeInsert(toRecord(categoryId, name, description, startDate, endDate));
+  }
+
+  protected CategoryRecord toRecord(CategoryFormData formData) {
+    return toRecord(formData.getCategoryId(), formData.getName().getValue(), formData.getDescription().getValue(), formData.getStartDate().getValue(), formData.getEndDate().getValue());
+  }
+
+  protected CategoryRecord toRecord(BigDecimal categoryId, String name, String description,
+      Date startDate, Date endDate) {
+    return new CategoryRecord()
+        .with(Category.CATEGORY.CATEGORY_NR, categoryId)
+        .with(Category.CATEGORY.DESCRIPTION, description)
+        .with(Category.CATEGORY.END_DATE, endDate)
+        .with(Category.CATEGORY.NAME, name)
+        .with(Category.CATEGORY.START_DATE, startDate);
+  }
+
+  protected CategoryFormData toFormData(CategoryRecord rec) {
+    if (rec == null) {
+      return null;
+    }
+    CategoryFormData fd = new CategoryFormData();
+    fd.setCategoryId(rec.getCategoryNr());
+    fd.getName().setValue(rec.getName());
+    fd.getDescription().setValue(rec.getDescription());
+    fd.getStartDate().setValue(rec.getStartDate());
+    fd.getEndDate().setValue(rec.getEndDate());
+    return fd;
   }
 }

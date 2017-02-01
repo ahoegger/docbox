@@ -12,9 +12,7 @@ import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import ch.ahoegger.docbox.server.database.dev.initialization.DocumentPermissionTableTask;
-import ch.ahoegger.docbox.server.database.dev.initialization.DocumentTableTask;
-import ch.ahoegger.docbox.server.database.dev.initialization.UserTableTask;
+import ch.ahoegger.docbox.server.administration.user.UserService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
@@ -44,23 +42,23 @@ public class DocumentService_WithNoPermission extends AbstractTestWithDatabase {
 
     ISqlService sqlService = BEANS.get(ISqlService.class);
 
-    BEANS.get(UserTableTask.class).insert(sqlService, "admin", "manager", username01, "secret", true, true);
-    BEANS.get(UserTableTask.class).insert(sqlService, "name02", "firstname02", username02, "secret", true, false);
-    BEANS.get(UserTableTask.class).insert(sqlService, "name03", "firstname03", username03, "secret", true, false);
-    BEANS.get(UserTableTask.class).insert(sqlService, "name04", "firstname04", username04, "secret", true, false);
+    BEANS.get(UserService.class).insert(sqlService, "admin", "manager", username01, "secret", true, true);
+    BEANS.get(UserService.class).insert(sqlService, "name02", "firstname02", username02, "secret", true, false);
+    BEANS.get(UserService.class).insert(sqlService, "name03", "firstname03", username03, "secret", true, false);
+    BEANS.get(UserService.class).insert(sqlService, "name04", "firstname04", username04, "secret", true, false);
 
     Calendar cal = Calendar.getInstance();
     cal.set(1983, 04, 20);
-    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId01, "Cats Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(sqlService, documentId01, "Cats Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false, null);
     cal.set(1983, 04, 21);
-    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId02, "Abstract Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(sqlService, documentId02, "Abstract Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false, null);
     cal.set(1983, 04, 22);
-    BEANS.get(DocumentTableTask.class).insert(sqlService, documentId03, "Dogs Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(sqlService, documentId03, "Dogs Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false, null);
 
     // permissions
-    BEANS.get(DocumentPermissionTableTask.class).insert(sqlService, username03, documentId03, PermissionCodeType.WriteCode.ID);
-    BEANS.get(DocumentPermissionTableTask.class).insert(sqlService, username04, documentId02, PermissionCodeType.ReadCode.ID);
-    BEANS.get(DocumentPermissionTableTask.class).insert(sqlService, username04, documentId03, PermissionCodeType.WriteCode.ID);
+    BEANS.get(DocumentPermissionService.class).insert(sqlService, username03, documentId03, PermissionCodeType.WriteCode.ID);
+    BEANS.get(DocumentPermissionService.class).insert(sqlService, username04, documentId02, PermissionCodeType.ReadCode.ID);
+    BEANS.get(DocumentPermissionService.class).insert(sqlService, username04, documentId03, PermissionCodeType.WriteCode.ID);
   }
 
   @Test

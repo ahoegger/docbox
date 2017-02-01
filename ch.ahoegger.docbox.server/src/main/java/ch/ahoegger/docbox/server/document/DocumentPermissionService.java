@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPermission;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.SQLDialect;
@@ -93,5 +94,16 @@ public class DocumentPermissionService implements IPermissionService {
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
 
+  }
+
+  @RemoteServiceAccessDenied
+  public int insert(ISqlService sqlService, String userId, BigDecimal documentId, int permission) {
+    DocumentPermission t = DocumentPermission.DOCUMENT_PERMISSION;
+    return DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+        .newRecord(t)
+        .with(t.DOCUMENT_NR, documentId)
+        .with(t.PERMISSION, permission)
+        .with(t.USERNAME, userId)
+        .insert();
   }
 }

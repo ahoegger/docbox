@@ -10,8 +10,7 @@ import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
-import ch.ahoegger.docbox.server.database.dev.initialization.EmployeeTableTask;
-import ch.ahoegger.docbox.server.database.dev.initialization.PartnerTableTask;
+import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
@@ -33,11 +32,11 @@ public class EmployeeServiceTest extends AbstractTestWithDatabase {
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.set(1999, 04, 29);
-    BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId01, "patnerName01", "desc01", cal.getTime(), null);
+    BEANS.get(PartnerService.class).insert(sqlService, partnerId01, "patnerName01", "desc01", cal.getTime(), null);
 
-    BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId02_employee, "employee02", "desc02", LocalDateUtility.toDate(LocalDate.now().minusDays(5)), null);
+    BEANS.get(PartnerService.class).insert(sqlService, partnerId02_employee, "employee02", "desc02", LocalDateUtility.toDate(LocalDate.now().minusDays(5)), null);
 
-    BEANS.get(EmployeeTableTask.class).insert(sqlService, partnerId02_employee, "Homer", "Simpson", "Nashvill Street 12a", "Santa Barbara CA-90051", "ahv123564789", "iban987654321", BigDecimal.valueOf(26.30),
+    BEANS.get(EmployeeService.class).insert(sqlService, partnerId02_employee, "Homer", "Simpson", "Nashvill Street 12a", "Santa Barbara CA-90051", "ahv123564789", "iban987654321", BigDecimal.valueOf(26.30),
         "Master Bob & Minor Molar", "Mountainview 12", "CA-90153 Santa Tropee", "master.bob@blu.com", "5445621236");
   }
 

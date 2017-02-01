@@ -11,7 +11,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 import ch.ahoegger.docbox.server.SuperUserRunContextProducer;
 import ch.ahoegger.docbox.server.database.DerbySqlService;
-import ch.ahoegger.docbox.server.database.dev.initialization.ITableTask;
+import ch.ahoegger.docbox.server.or.generator.table.ITableStatement;
 
 /**
  * <h3>{@link DerbyTestSqlService}</h3>
@@ -48,8 +48,8 @@ public class DerbyTestSqlService extends DerbySqlService {
 
   private void initializeDatabase() {
 
-    for (ITableTask task : BEANS.all(ITableTask.class)) {
-      task.createTable(this);
+    for (ITableStatement task : BEANS.all(ITableStatement.class)) {
+      task.createTable(getConnection());
 
     }
   }

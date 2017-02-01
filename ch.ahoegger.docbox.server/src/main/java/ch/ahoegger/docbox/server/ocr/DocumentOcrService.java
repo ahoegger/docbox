@@ -10,6 +10,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.SQLDialect;
@@ -166,6 +167,21 @@ public class DocumentOcrService implements IDocumentOcrService {
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
     return true;
+  }
+
+  @RemoteServiceAccessDenied
+  public int insert(ISqlService sqlService, BigDecimal documentId, String text, boolean parsed, int parseCount, String parseFailedReason) {
+    return DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+        .executeInsert(toRecord(documentId, text, parsed, parseCount, parseFailedReason));
+  }
+
+  protected DocumentOcrRecord toRecord(BigDecimal documentId, String text, boolean parsed, int parseCount, String parseFailedReason) {
+    return new DocumentOcrRecord()
+        .with(DocumentOcr.DOCUMENT_OCR.DOCUMENT_NR, documentId)
+        .with(DocumentOcr.DOCUMENT_OCR.OCR_SCANNED, parsed)
+        .with(DocumentOcr.DOCUMENT_OCR.PARSE_COUNT, parseCount)
+        .with(DocumentOcr.DOCUMENT_OCR.FAILED_REASON, parseFailedReason)
+        .with(DocumentOcr.DOCUMENT_OCR.TEXT, text);
   }
 
 }

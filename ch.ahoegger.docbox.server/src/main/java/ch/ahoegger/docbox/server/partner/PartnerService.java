@@ -10,6 +10,7 @@ import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.PartnerRecord;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.jooq.Condition;
 import org.jooq.SQLDialect;
@@ -99,11 +100,8 @@ public class PartnerService implements IPartnerService {
 
     formData.setPartnerId(new BigDecimal(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME)));
 
-    Partner p = Partner.PARTNER;
     if (DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .insertInto(p)
-        .set(toRecord(formData))
-        .execute() == 1) {
+        .executeInsert(toRecord(formData)) == 1) {
       // notify backup needed
       BEANS.get(IBackupService.class).notifyModification();
       return formData;
@@ -120,14 +118,8 @@ public class PartnerService implements IPartnerService {
 
   @Override
   public PartnerFormData store(PartnerFormData formData) {
-    Partner p = Partner.PARTNER;
     if (DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .fetchOne(p, p.PARTNER_NR.eq(formData.getPartnerId()))
-        .with(p.NAME, formData.getPartnerBox().getName().getValue())
-        .with(p.DESCRIPTION, formData.getPartnerBox().getDescription().getValue())
-        .with(p.START_DATE, formData.getPartnerBox().getStartDate().getValue())
-        .with(p.END_DATE, formData.getPartnerBox().getEndDate().getValue())
-        .update() == 1) {
+        .executeUpdate(toRecord(formData)) == 1) {
       // notify backup needed
       BEANS.get(IBackupService.class).notifyModification();
       return formData;
@@ -156,6 +148,28 @@ public class PartnerService implements IPartnerService {
 
   }
 
+  public int insert(ISqlService sqlService, BigDecimal patnerId, String name, String description, Date startDate, Date endDate) {
+    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .executeInsert(mapToRecord(new PartnerRecord(), patnerId, name, description, startDate, endDate));
+  }
+
+  protected PartnerRecord toRecord(PartnerFormData fd) {
+    return mapToRecord(new PartnerRecord(), fd);
+  }
+
+  protected PartnerRecord mapToRecord(PartnerRecord rec, PartnerFormData fd) {
+    return mapToRecord(rec, fd.getPartnerId(), fd.getPartnerBox().getName().getValue(), fd.getPartnerBox().getDescription().getValue(), fd.getPartnerBox().getStartDate().getValue(), fd.getPartnerBox().getEndDate().getValue());
+  }
+
+  protected PartnerRecord mapToRecord(PartnerRecord rec, BigDecimal patnerId, String name, String description, Date startDate, Date endDate) {
+    return rec
+        .with(Partner.PARTNER.DESCRIPTION, description)
+        .with(Partner.PARTNER.END_DATE, endDate)
+        .with(Partner.PARTNER.NAME, name)
+        .with(Partner.PARTNER.PARTNER_NR, patnerId)
+        .with(Partner.PARTNER.START_DATE, startDate);
+  }
+
   protected PartnerFormData toFormData(PartnerRecord rec) {
     if (rec == null) {
       return null;
@@ -169,14 +183,4 @@ public class PartnerService implements IPartnerService {
     return fd;
   }
 
-  protected PartnerRecord toRecord(PartnerFormData fd) {
-    PartnerRecord rec = new PartnerRecord();
-    rec.setPartnerNr(fd.getPartnerId());
-    rec.setName(fd.getPartnerBox().getName().getValue());
-    rec.setDescription(fd.getPartnerBox().getDescription().getValue());
-    rec.setStartDate(fd.getPartnerBox().getStartDate().getValue());
-    rec.setEndDate(fd.getPartnerBox().getEndDate().getValue());
-    return rec;
-
-  }
 }

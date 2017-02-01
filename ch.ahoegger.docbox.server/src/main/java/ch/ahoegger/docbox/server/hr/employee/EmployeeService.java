@@ -7,9 +7,12 @@ import java.util.stream.Collectors;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.Employee;
 import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
+import org.ch.ahoegger.docbox.server.or.app.tables.records.EmployeeRecord;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
@@ -116,30 +119,17 @@ public class EmployeeService implements IEmployeeService {
       partnerData.getPartnerBox().getDescription().setValue(formData.getPartnerGroupBox().getDescription().getValue());
       partnerData.getPartnerBox().getStartDate().setValue(formData.getPartnerGroupBox().getStartDate().getValue());
       partnerData.getPartnerBox().getEndDate().setValue(formData.getPartnerGroupBox().getEndDate().getValue());
-      partnerService.create(partnerData);
+      partnerData = partnerService.create(partnerData);
+      if (partnerData == null) {
+        return null;
+      }
       partnerId = partnerData.getPartnerId();
     }
 
     formData.setPartnerId(partnerId);
 
-    Employee emp = Employee.EMPLOYEE.as("EMP");
-
     int rowCount = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .newRecord(emp)
-        .with(emp.PARTNER_NR, formData.getPartnerId())
-        .with(emp.FIRST_NAME, formData.getEmployeeBox().getFirstName().getValue())
-        .with(emp.LAST_NAME, formData.getEmployeeBox().getLastName().getValue())
-        .with(emp.ADDRESS_LINE1, formData.getEmployeeBox().getAddressLine1().getValue())
-        .with(emp.ADDRESS_LINE2, formData.getEmployeeBox().getAddressLine2().getValue())
-        .with(emp.AHV_NUMBER, formData.getEmployeeBox().getAhvNumber().getValue())
-        .with(emp.ACCOUNT_NUMBER, formData.getEmployeeBox().getAccountNumber().getValue())
-        .with(emp.HOURLY_WAGE, formData.getEmployeeBox().getHourlyWage().getValue())
-        .with(emp.EMPLOYER_ADDRESS_LINE1, formData.getEmployerBox().getAddressLine1().getValue())
-        .with(emp.EMPLOYER_ADDRESS_LINE2, formData.getEmployerBox().getAddressLine2().getValue())
-        .with(emp.EMPLOYER_ADDRESS_LINE3, formData.getEmployerBox().getAddressLine3().getValue())
-        .with(emp.EMPLOYER_EMAIL, formData.getEmployerBox().getEmail().getValue())
-        .with(emp.EMPLOYER_PHONE, formData.getEmployerBox().getPhone().getValue())
-        .insert();
+        .executeInsert(toRecord(formData));
 
     if (rowCount == 1) {
       // notify backup needed
@@ -205,25 +195,12 @@ public class EmployeeService implements IEmployeeService {
     partnerData.getPartnerBox().getDescription().setValue(formData.getPartnerGroupBox().getDescription().getValue());
     partnerData.getPartnerBox().getStartDate().setValue(formData.getPartnerGroupBox().getStartDate().getValue());
     partnerData.getPartnerBox().getEndDate().setValue(formData.getPartnerGroupBox().getEndDate().getValue());
-    BEANS.get(IPartnerService.class).store(partnerData);
+    if (BEANS.get(IPartnerService.class).store(partnerData) == null) {
+      return null;
+    }
 
-    Employee emp = Employee.EMPLOYEE.as("EMP");
     int rowCount = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .update(emp)
-        .set(emp.FIRST_NAME, formData.getEmployeeBox().getFirstName().getValue())
-        .set(emp.LAST_NAME, formData.getEmployeeBox().getLastName().getValue())
-        .set(emp.ADDRESS_LINE1, formData.getEmployeeBox().getAddressLine1().getValue())
-        .set(emp.ADDRESS_LINE2, formData.getEmployeeBox().getAddressLine2().getValue())
-        .set(emp.AHV_NUMBER, formData.getEmployeeBox().getAhvNumber().getValue())
-        .set(emp.ACCOUNT_NUMBER, formData.getEmployeeBox().getAccountNumber().getValue())
-        .set(emp.HOURLY_WAGE, formData.getEmployeeBox().getHourlyWage().getValue())
-        .set(emp.EMPLOYER_ADDRESS_LINE1, formData.getEmployerBox().getAddressLine1().getValue())
-        .set(emp.EMPLOYER_ADDRESS_LINE2, formData.getEmployerBox().getAddressLine2().getValue())
-        .set(emp.EMPLOYER_ADDRESS_LINE3, formData.getEmployerBox().getAddressLine3().getValue())
-        .set(emp.EMPLOYER_EMAIL, formData.getEmployerBox().getEmail().getValue())
-        .set(emp.EMPLOYER_PHONE, formData.getEmployerBox().getPhone().getValue())
-        .where(emp.PARTNER_NR.eq(formData.getPartnerId()))
-        .execute();
+        .executeUpdate(toRecord(formData));
 
     if (rowCount == 1) {
       // notify backup needed
@@ -233,4 +210,44 @@ public class EmployeeService implements IEmployeeService {
     }
     return null;
   }
+
+  @RemoteServiceAccessDenied
+  public int insert(ISqlService sqlService, BigDecimal partnerId, String firstName, String lastName, String addressLine1, String addressLine2, String ahvNumber, String accountNumber, BigDecimal hourlyWage,
+      String employerAddressLine1, String employerAddressLine2, String employerAddressLine3, String employerEmail, String employerPhone) {
+    return DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+        .executeInsert(toRecord(partnerId, firstName, lastName, addressLine1, addressLine2, ahvNumber, accountNumber, hourlyWage, employerAddressLine1, employerAddressLine2, employerAddressLine3, employerEmail, employerPhone));
+
+  }
+
+  protected EmployeeRecord toRecord(EmployeeFormData fd) {
+    return toRecord(fd.getPartnerId(), fd.getEmployeeBox().getFirstName().getValue(), fd.getEmployeeBox().getLastName().getValue(), fd.getEmployeeBox().getAddressLine1().getValue(), fd.getEmployeeBox().getAddressLine2().getValue(),
+        fd.getEmployeeBox().getAhvNumber().getValue(), fd.getEmployeeBox().getAccountNumber().getValue(), fd.getEmployeeBox().getHourlyWage().getValue(), fd.getEmployerBox().getAddressLine1().getValue(),
+        fd.getEmployerBox().getAddressLine2().getValue(), fd.getEmployerBox().getAddressLine3().getValue(), fd.getEmployerBox().getEmail().getValue(),
+        fd.getEmployerBox().getPhone().getValue());
+  }
+
+  protected EmployeeRecord toRecord(BigDecimal partnerId, String firstName, String lastName, String addressLine1, String addressLine2, String ahvNumber, String accountNumber, BigDecimal hourlyWage,
+      String employerAddressLine1, String employerAddressLine2, String employerAddressLine3, String employerEmail, String employerPhone) {
+    return mapToRecord(new EmployeeRecord(), partnerId, firstName, lastName, addressLine1, addressLine2, ahvNumber, accountNumber, hourlyWage, employerAddressLine1, employerAddressLine2, employerAddressLine3, employerEmail, employerPhone);
+  }
+
+  protected EmployeeRecord mapToRecord(EmployeeRecord rec, BigDecimal partnerId, String firstName, String lastName, String addressLine1, String addressLine2, String ahvNumber, String accountNumber, BigDecimal hourlyWage,
+      String employerAddressLine1, String employerAddressLine2, String employerAddressLine3, String employerEmail, String employerPhone) {
+    Employee t = Employee.EMPLOYEE;
+    return rec
+        .with(t.ACCOUNT_NUMBER, accountNumber)
+        .with(t.ADDRESS_LINE1, addressLine1)
+        .with(t.ADDRESS_LINE2, addressLine2)
+        .with(t.AHV_NUMBER, ahvNumber)
+        .with(t.EMPLOYER_ADDRESS_LINE1, employerAddressLine1)
+        .with(t.EMPLOYER_ADDRESS_LINE2, employerAddressLine2)
+        .with(t.EMPLOYER_ADDRESS_LINE3, employerAddressLine3)
+        .with(t.EMPLOYER_EMAIL, employerEmail)
+        .with(t.EMPLOYER_PHONE, employerPhone)
+        .with(t.FIRST_NAME, firstName)
+        .with(t.HOURLY_WAGE, hourlyWage)
+        .with(t.LAST_NAME, lastName)
+        .with(t.PARTNER_NR, partnerId);
+  }
+
 }

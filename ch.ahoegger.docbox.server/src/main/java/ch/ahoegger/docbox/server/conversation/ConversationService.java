@@ -9,7 +9,9 @@ import org.ch.ahoegger.docbox.server.or.app.tables.Conversation;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.ConversationRecord;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -137,14 +139,27 @@ public class ConversationService implements IConversationService {
     return true;
   }
 
+  @RemoteServiceAccessDenied
+  public int insert(ISqlService sqlService, BigDecimal conversationId, String name, String description,
+      Date startDate, Date endDate) {
+    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .executeInsert(toRecord(conversationId, name, description, startDate, endDate));
+  }
+
   private ConversationRecord toRecord(ConversationFormData formData) {
-    ConversationRecord rec = new ConversationRecord();
-    rec.setConversationNr(formData.getConversationId());
-    rec.setName(formData.getName().getValue());
-    rec.setNotes(formData.getNotes().getValue());
-    rec.setStartDate(formData.getStartDate().getValue());
-    rec.setEndDate(formData.getEndDate().getValue());
-    return rec;
+    return toRecord(formData.getConversationId(), formData.getName().getValue(), formData.getNotes().getValue(), formData.getStartDate().getValue(), formData.getEndDate().getValue());
+  }
+
+  private ConversationRecord toRecord(BigDecimal conversationId, String name, String description,
+      Date startDate, Date endDate) {
+    Conversation t = Conversation.CONVERSATION;
+    return new ConversationRecord()
+        .with(t.CONVERSATION_NR, conversationId)
+        .with(t.END_DATE, endDate)
+        .with(t.NAME, name)
+        .with(t.NOTES, description)
+        .with(t.START_DATE, startDate);
+
   }
 
   /**

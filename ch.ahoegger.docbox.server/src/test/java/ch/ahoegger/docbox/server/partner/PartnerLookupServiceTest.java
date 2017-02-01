@@ -11,7 +11,6 @@ import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
-import ch.ahoegger.docbox.server.database.dev.initialization.PartnerTableTask;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
@@ -36,22 +35,22 @@ public class PartnerLookupServiceTest extends AbstractTestWithDatabase {
     ISqlService sqlService = BEANS.get(ISqlService.class);
     LocalDate today = LocalDate.now();
 
-    BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId01, "partner01", "some notes",
+    BEANS.get(PartnerService.class).insert(sqlService, partnerId01, "partner01", "some notes",
         LocalDateUtility.toDate(today.minusDays(20)),
         null);
 
     // till yesterday
-    BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId02, "partner02", "some notes",
+    BEANS.get(PartnerService.class).insert(sqlService, partnerId02, "partner02", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         LocalDateUtility.toDate(today.minusDays(1)));
 
     // till today
-    BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId03, "partner03", "some notes",
+    BEANS.get(PartnerService.class).insert(sqlService, partnerId03, "partner03", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         LocalDateUtility.toDate(today));
 
     // till tomorrow
-    BEANS.get(PartnerTableTask.class).insert(sqlService, partnerId04, "partner04", "some notes",
+    BEANS.get(PartnerService.class).insert(sqlService, partnerId04, "partner04", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         LocalDateUtility.toDate(today.plusDays(1)));
 

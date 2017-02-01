@@ -31,9 +31,11 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TuningUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
@@ -41,6 +43,7 @@ import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Record2;
+import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
@@ -202,8 +205,10 @@ public class DocumentService implements IDocumentService {
 
     DocumentTableData tableData = new DocumentTableData();
 
+    TuningUtility.startTimer();
+    Result<Record> fetchResult = query.fetch();
     tableData.setRows(
-        query.fetch()
+        fetchResult
             .stream()
             .map(rec -> {
               DocumentTableRowData row = new DocumentTableRowData();
@@ -228,6 +233,7 @@ public class DocumentService implements IDocumentService {
             .collect(Collectors.toList())
             .toArray(new DocumentTableRowData[]{}));
 
+    TuningUtility.stopTimer("Select Documents");
     return tableData;
   }
 
@@ -263,19 +269,12 @@ public class DocumentService implements IDocumentService {
     formData.getDocument().setValue(null);
 
     // create document
-    DSLContext dsl = DSL.using(SQL.getConnection(), SQLDialect.DERBY);
-    DocumentRecord newDoc = dsl.newRecord(Document.DOCUMENT);
-    newDoc.setDocumentNr(formData.getDocumentId());
-    newDoc.setAbstract(formData.getAbstract().getValue());
-    newDoc.setDocumentDate(formData.getDocumentDate().getValue());
-    newDoc.setInsertDate(formData.getCapturedDate().getValue());
-    newDoc.setValidDate(formData.getValidDate().getValue());
-    newDoc.setDocumentUrl(formData.getDocumentPath());
-    newDoc.setOriginalStorage(formData.getOriginalStorage().getValue());
-    newDoc.setOcrLanguage(formData.getOcrLanguage().getValue());
-    newDoc.setConversationNr(formData.getConversation().getValue());
-    newDoc.setParseOcr(formData.getParseOcr().getValue());
-    newDoc.insert();
+    int rowCount = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .executeInsert(toRecord(formData.getDocumentId(), formData.getAbstract().getValue(), formData.getDocumentDate().getValue(), formData.getCapturedDate().getValue(), formData.getValidDate().getValue(), formData.getDocumentPath(),
+            formData.getOriginalStorage().getValue(), formData.getConversation().getValue(), formData.getParseOcr().getValue(), formData.getOcrLanguage().getValue()));
+    if (rowCount < 1) {
+      return null;
+    }
 
     // partner
     BEANS.get(DocumentPartnerService.class).createDocumentPartners(documentId,
@@ -337,15 +336,9 @@ public class DocumentService implements IDocumentService {
 
     boolean updateOcr = !ocrRequiredValidator.validate(doc).isOK();
 
-    int rowCount = doc
-        .with(table.ABSTRACT, formData.getAbstract().getValue())
-        .with(table.CONVERSATION_NR, formData.getConversation().getValue())
-        .with(table.DOCUMENT_DATE, formData.getDocumentDate().getValue())
-        .with(table.OCR_LANGUAGE, formData.getOcrLanguage().getValue())
-        .with(table.ORIGINAL_STORAGE, formData.getOriginalStorage().getValue())
-        .with(table.PARSE_OCR, formData.getParseOcr().getValue())
-        .with(table.VALID_DATE, formData.getValidDate().getValue())
-        .update();
+    int rowCount = mapToRecord(doc, formData.getDocumentId(), formData.getAbstract().getValue(), formData.getDocumentDate().getValue(), formData.getCapturedDate().getValue(), formData.getValidDate().getValue(), formData.getDocumentPath(),
+        formData.getOriginalStorage().getValue(), formData.getConversation().getValue(), formData.getParseOcr().getValue(), formData.getOcrLanguage().getValue())
+            .update();
 
     if (rowCount < 1) {
       return new NullFuture<>();
@@ -399,27 +392,10 @@ public class DocumentService implements IDocumentService {
 
   @RemoteServiceAccessDenied
   public DocumentFormData loadTrusted(DocumentFormData formData) {
+
     Document doc = Document.DOCUMENT;
-    DocumentFormData result = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(doc.ABSTRACT, doc.DOCUMENT_DATE, doc.INSERT_DATE, doc.VALID_DATE, doc.DOCUMENT_URL, doc.ORIGINAL_STORAGE, doc.CONVERSATION_NR, doc.PARSE_OCR, doc.OCR_LANGUAGE)
-        .from(doc)
-        .where(doc.DOCUMENT_NR.eq(formData.getDocumentId()))
-        .fetch(rec -> {
-          DocumentFormData res = (DocumentFormData) formData.deepCopy();
-          res.getAbstract().setValue(rec.get(doc.ABSTRACT));
-          res.getDocumentDate().setValue(rec.get(doc.DOCUMENT_DATE));
-          res.getCapturedDate().setValue(rec.get(doc.INSERT_DATE));
-          res.getValidDate().setValue(rec.get(doc.VALID_DATE));
-          res.setDocumentPath(rec.get(doc.DOCUMENT_URL));
-          res.getOcrLanguage().setValue(rec.get(doc.OCR_LANGUAGE));
-          res.getOriginalStorage().setValue(rec.get(doc.ORIGINAL_STORAGE));
-          res.getConversation().setValue(rec.get(doc.CONVERSATION_NR));
-          res.getParseOcr().setValue(rec.get(doc.PARSE_OCR));
-          return res;
-        })
-        .stream()
-        .findFirst()
-        .orElse(null);
+    DocumentFormData result = toFormData(DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(doc, doc.DOCUMENT_NR.eq(formData.getDocumentId())));
 
     if (result == null) {
       return null;
@@ -554,5 +530,52 @@ public class DocumentService implements IDocumentService {
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
     return true;
+  }
+
+  @RemoteServiceAccessDenied
+  public int insert(ISqlService sqlService, BigDecimal documentId, String abstractText, Date documentDate,
+      Date capturedDate, Date validDate, String docPath, String originalStorage, BigDecimal conversationId, boolean parseOcr, String ocrLanguage) {
+    return DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+        .executeInsert(toRecord(documentId, abstractText, documentDate, capturedDate, validDate, docPath, originalStorage, conversationId, parseOcr, ocrLanguage));
+  }
+
+  protected DocumentRecord toRecord(BigDecimal documentId, String abstractText, Date documentDate,
+      Date capturedDate, Date validDate, String docPath, String originalStorage, BigDecimal conversationId, boolean parseOcr, String ocrLanguage) {
+    return mapToRecord(new DocumentRecord(), documentId, abstractText, documentDate, capturedDate, validDate, docPath, originalStorage, conversationId, parseOcr, ocrLanguage);
+  }
+
+  protected DocumentRecord mapToRecord(DocumentRecord rec, BigDecimal documentId, String abstractText, Date documentDate,
+      Date capturedDate, Date validDate, String docPath, String originalStorage, BigDecimal conversationId, boolean parseOcr, String ocrLanguage) {
+    Document t = Document.DOCUMENT;
+    return rec
+        .with(t.ABSTRACT, abstractText)
+        .with(t.CONVERSATION_NR, conversationId)
+        .with(t.DOCUMENT_DATE, documentDate)
+        .with(t.DOCUMENT_NR, documentId)
+        .with(t.DOCUMENT_URL, docPath)
+        .with(t.INSERT_DATE, capturedDate)
+        .with(t.OCR_LANGUAGE, ocrLanguage)
+        .with(t.ORIGINAL_STORAGE, originalStorage)
+        .with(t.PARSE_OCR, parseOcr)
+        .with(t.VALID_DATE, validDate);
+  }
+
+  protected DocumentFormData toFormData(DocumentRecord rec) {
+    if (rec == null) {
+      return null;
+    }
+    Document doc = Document.DOCUMENT;
+    DocumentFormData res = new DocumentFormData();
+    res.setDocumentId(rec.get(doc.DOCUMENT_NR));
+    res.getAbstract().setValue(rec.get(doc.ABSTRACT));
+    res.getDocumentDate().setValue(rec.get(doc.DOCUMENT_DATE));
+    res.getCapturedDate().setValue(rec.get(doc.INSERT_DATE));
+    res.getValidDate().setValue(rec.get(doc.VALID_DATE));
+    res.setDocumentPath(rec.get(doc.DOCUMENT_URL));
+    res.getOcrLanguage().setValue(rec.get(doc.OCR_LANGUAGE));
+    res.getOriginalStorage().setValue(rec.get(doc.ORIGINAL_STORAGE));
+    res.getConversation().setValue(rec.get(doc.CONVERSATION_NR));
+    res.getParseOcr().setValue(rec.get(doc.PARSE_OCR));
+    return res;
   }
 }
