@@ -40,17 +40,6 @@ public class PdfResourceLoader extends AbstractResourceLoader {
     return null;
   }
 
-//  @Override
-//  public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
-//
-//    String documentIdParameter = getRequest().getParameter(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class));
-//    if (StringUtility.hasText(documentIdParameter)) {
-//      BinaryResource resource = BEANS.get(IDocumentStoreService.class).getDocument(Long.parseLong(documentIdParameter));
-//      return new HttpCacheObject(cacheKey, resource);
-//    }
-//    return null;
-//  }
-
   protected HttpServletRequest getRequest() {
     return m_request;
   }

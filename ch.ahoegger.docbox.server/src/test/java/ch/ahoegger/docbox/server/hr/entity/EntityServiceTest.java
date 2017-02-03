@@ -39,20 +39,20 @@ public class EntityServiceTest extends AbstractTestWithDatabase {
     super.setupDb();
 
     ISqlService sqlService = BEANS.get(ISqlService.class);
-    BEANS.get(PartnerService.class).insert(sqlService, partnerId01, "patnerName01", "desc01", LocalDateUtility.today(), null);
+    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId01, "patnerName01", "desc01", LocalDateUtility.today(), null);
 
-    BEANS.get(DocumentService.class).insert(sqlService, documentId01, "All fish are wet", LocalDateUtility.toDate(LocalDate.now().minusDays(3)), LocalDateUtility.today(), null, "2016_03_08_124640.pdf", null, null, false,
+    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId01, "All fish are wet", LocalDateUtility.toDate(LocalDate.now().minusDays(3)), LocalDateUtility.today(), null, "2016_03_08_124640.pdf", null, null, false,
         OcrLanguageCodeType.GermanCode.ID);
 
-    BEANS.get(PostingGroupService.class).insert(sqlService, postingGroupId01, partnerId01, UnbilledCode.ID, documentId01, "August 2016", LocalDateUtility.today(), BigDecimal.valueOf(234.9), BigDecimal.valueOf(10.5),
+    BEANS.get(PostingGroupService.class).insert(sqlService.getConnection(), postingGroupId01, partnerId01, UnbilledCode.ID, documentId01, "August 2016", LocalDateUtility.today(), BigDecimal.valueOf(234.9), BigDecimal.valueOf(10.5),
         BigDecimal.valueOf(232.1),
         BigDecimal.valueOf(-10.0),
         BigDecimal.valueOf(-4.5), BigDecimal.valueOf(5.30));
 
-    BEANS.get(EntityService.class).insert(sqlService, entityId01, partnerId01, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.today(), BigDecimal.valueOf(3.25), null, "Work01");
+    BEANS.get(EntityService.class).insert(sqlService.getConnection(), entityId01, partnerId01, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.today(), BigDecimal.valueOf(3.25), null, "Work01");
 
-    BEANS.get(EntityService.class).insert(sqlService, entityId02, partnerId01, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.today(), BigDecimal.valueOf(3.25), null, "Work01");
-    BEANS.get(EntityService.class).insert(sqlService, entityId03, partnerId01, UnbilledCode.ID, EntityTypeCodeType.ExpenseCode.ID, LocalDateUtility.today(), null, BigDecimal.valueOf(3.25), "Expense01");
+    BEANS.get(EntityService.class).insert(sqlService.getConnection(), entityId02, partnerId01, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.today(), BigDecimal.valueOf(3.25), null, "Work01");
+    BEANS.get(EntityService.class).insert(sqlService.getConnection(), entityId03, partnerId01, UnbilledCode.ID, EntityTypeCodeType.ExpenseCode.ID, LocalDateUtility.today(), null, BigDecimal.valueOf(3.25), "Expense01");
   }
 
   @Test

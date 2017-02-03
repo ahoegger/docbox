@@ -58,7 +58,7 @@ public class DocumentService_MultipleOcrParseTest extends AbstractTestWithDataba
     BinaryResource br = BinaryResources.create().withFilename(fileName).withContentType(FileUtility.getContentTypeForExtension(FileUtility.getFileExtension(fileName))).withContent(IOUtility.readFromUrl(resource))
         .withLastModified(System.currentTimeMillis()).build();
     String docPath = BEANS.get(DocumentStoreService.class).store(br, insertDate, documentId);
-    BEANS.get(DocumentService.class).insert(sqlService, documentId, "", insertDate, insertDate, null, docPath, null, null, true, OcrLanguageCodeType.GermanCode.ID);
+    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId, "", insertDate, insertDate, null, docPath, null, null, true, OcrLanguageCodeType.GermanCode.ID);
   }
 
   @Test

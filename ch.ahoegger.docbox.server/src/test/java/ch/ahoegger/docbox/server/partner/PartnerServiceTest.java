@@ -34,9 +34,9 @@ public class PartnerServiceTest extends AbstractTestWithDatabase {
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.set(1999, 04, 29);
-    BEANS.get(PartnerService.class).insert(sqlService, partnerId01, "patnerName01", "desc01", cal.getTime(), null);
+    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId01, "patnerName01", "desc01", cal.getTime(), null);
     cal.set(1999, 04, 30);
-    BEANS.get(PartnerService.class).insert(sqlService, partnerId02, "patnerName02", "desc02", cal.getTime(), null);
+    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId02, "patnerName02", "desc02", cal.getTime(), null);
   }
 
   @Test

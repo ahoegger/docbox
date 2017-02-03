@@ -2,6 +2,7 @@ package ch.ahoegger.docbox.server.hr.billing;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -22,9 +23,9 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -338,11 +339,12 @@ public class PostingGroupService implements IPostingGroupService {
 
   }
 
-  public int insert(ISqlService sqlService, BigDecimal postingGroupId, BigDecimal partnerId, BigDecimal taxGroupId, BigDecimal documentId, String name,
+  @RemoteServiceAccessDenied
+  public int insert(Connection connection, BigDecimal postingGroupId, BigDecimal partnerId, BigDecimal taxGroupId, BigDecimal documentId, String name,
       Date statementDate, BigDecimal workingHours, BigDecimal bruttoWage, BigDecimal nettoWage, BigDecimal sourceTax, BigDecimal socialSecurityTax, BigDecimal vacationExtra) {
 
     PostingGroup t = PostingGroup.POSTING_GROUP;
-    return DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+    return DSL.using(connection, SQLDialect.DERBY)
         .newRecord(t)
         .with(t.BRUTTO_WAGE, bruttoWage)
         .with(t.DOCUMENT_NR, documentId)

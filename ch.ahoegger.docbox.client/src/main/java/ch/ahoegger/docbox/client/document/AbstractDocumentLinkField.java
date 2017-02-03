@@ -19,10 +19,21 @@ import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI
 @FormData(defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.IGNORE)
 public abstract class AbstractDocumentLinkField extends AbstractHtmlField {
 
+  /**
+   * Dimension name for the visible flag
+   */
+  String VISIBLE_DOC_ID = "VISIBLE_DOC_ID";
+
   private BigDecimal m_documentId;
+
+  @Override
+  protected boolean getConfiguredLabelVisible() {
+    return false;
+  }
 
   public void setDocumentId(BigDecimal documentId) {
     m_documentId = documentId;
+    createContent();
 
   }
 
@@ -31,10 +42,17 @@ public abstract class AbstractDocumentLinkField extends AbstractHtmlField {
   }
 
   protected void createContent() {
-    StringBuilder linkBuilder = new StringBuilder();
-    linkBuilder.append(CONFIG.getPropertyValue(DocumentLinkURI.class));
-    linkBuilder.append("?").append(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class)).append("=").append(getDocumentId());
-    String encodedHtml = HTML.link(linkBuilder.toString(), TEXTS.get("Open")).addAttribute("target", "_blank").toHtml();
-    setValue(encodedHtml);
+    if (getDocumentId() == null) {
+      setValue(null);
+      setVisible(false, VISIBLE_DOC_ID);
+    }
+    else {
+      setVisible(true, VISIBLE_DOC_ID);
+      StringBuilder linkBuilder = new StringBuilder();
+      linkBuilder.append(CONFIG.getPropertyValue(DocumentLinkURI.class));
+      linkBuilder.append("?").append(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class)).append("=").append(getDocumentId());
+      String encodedHtml = HTML.link(linkBuilder.toString(), TEXTS.get("Open")).addAttribute("target", "_blank").toHtml();
+      setValue(encodedHtml);
+    }
   }
 }

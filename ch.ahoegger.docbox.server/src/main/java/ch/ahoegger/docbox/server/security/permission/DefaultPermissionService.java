@@ -82,7 +82,7 @@ public class DefaultPermissionService {
   }
 
   public int insertRow(Connection connection, String username, int permission) {
-    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+    return DSL.using(connection, SQLDialect.DERBY)
         .executeInsert(toRecord(username, permission));
   }
 

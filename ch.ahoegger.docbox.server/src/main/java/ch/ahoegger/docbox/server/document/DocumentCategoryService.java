@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.document;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -8,7 +9,6 @@ import org.ch.ahoegger.docbox.server.or.app.tables.DocumentCategory;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.DocumentCategoryRecord;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.InsertValuesStep2;
@@ -95,8 +95,8 @@ public class DocumentCategoryService implements IDocumentCategoryTable {
   }
 
   @RemoteServiceAccessDenied
-  public int insert(ISqlService sqlService, BigDecimal documentId, BigDecimal categoryId) {
-    return DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+  public int insert(Connection connection, BigDecimal documentId, BigDecimal categoryId) {
+    return DSL.using(connection, SQLDialect.DERBY)
         .executeInsert(toRecord(documentId, categoryId));
   }
 

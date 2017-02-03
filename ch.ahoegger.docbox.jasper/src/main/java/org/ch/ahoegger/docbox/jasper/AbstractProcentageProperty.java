@@ -10,7 +10,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  *
  * @author Andreas Hoegger
  */
-public abstract class AbstractProcentageProperty extends AbstractConfigProperty<BigDecimal> {
+public abstract class AbstractProcentageProperty extends AbstractConfigProperty<BigDecimal, String> {
 
   @Override
   protected BigDecimal parse(String value) {

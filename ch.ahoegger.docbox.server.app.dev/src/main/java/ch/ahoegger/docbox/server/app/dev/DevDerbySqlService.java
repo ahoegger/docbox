@@ -3,6 +3,7 @@ package ch.ahoegger.docbox.server.app.dev;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -165,10 +166,11 @@ public class DevDerbySqlService extends DerbySqlService {
 
   protected void createUsers(ISqlService sqlService) {
     UserService userService = BEANS.get(UserService.class);
-    userService.insert(sqlService, String.format("Dev.user[%s]", SYSTEM_USER), "development", SYSTEM_USER, new String(BEANS.get(SecurityService.class).createPasswordHash("".toCharArray())), true, true);
-    userService.insert(sqlService, "Cuttis", "Bolion", "cuttis", new String(BEANS.get(SecurityService.class).createPasswordHash("pwd".toCharArray())), true, false);
-    userService.insert(sqlService, "Bob", "Miller", "bob", new String(BEANS.get(SecurityService.class).createPasswordHash("pwd".toCharArray())), true, false);
-    userService.insert(sqlService, "Admin", "Manager", "admin", new String(BEANS.get(SecurityService.class).createPasswordHash("manager".toCharArray())), true, true);
+    userService.insert(sqlService.getConnection(), String.format("Dev.user[%s]", SYSTEM_USER), "development", SYSTEM_USER, new String(BEANS.get(SecurityService.class).createPasswordHash("".toCharArray())), true, true);
+    userService.insert(sqlService.getConnection(), "Cuttis", "Bolion", "cuttis", new String(BEANS.get(SecurityService.class).createPasswordHash("pwd".toCharArray())), true, false);
+    userService.insert(sqlService.getConnection(), "Bob", "Miller", "bob", new String(BEANS.get(SecurityService.class).createPasswordHash("pwd".toCharArray())), true, false);
+    userService.insert(sqlService.getConnection(), "Admin", "Manager", "admin", new String(BEANS.get(SecurityService.class).createPasswordHash("manager".toCharArray())), true, true);
+    userService.insert(sqlService.getConnection(), "Inactive", "Name", "inactive-user", new String(BEANS.get(SecurityService.class).createPasswordHash("pwd".toCharArray())), false, false);
   }
 
   protected void insertCategories(ISqlService sqlService) {
@@ -195,9 +197,9 @@ public class DevDerbySqlService extends DerbySqlService {
     conversationId03 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
 
     ConversationService conversationService = BEANS.get(ConversationService.class);
-    conversationService.insert(sqlService, conversationId01, "House selling", "everything related with house selling.", LocalDateUtility.today(), null);
-    conversationService.insert(sqlService, conversationId02, "Ponny order", "all documents to get a ponny.", LocalDateUtility.today(), null);
-    conversationService.insert(sqlService, conversationId03, "Without partner rel", "all documents to get a ponny.", LocalDateUtility.today(), null);
+    conversationService.insert(sqlService.getConnection(), conversationId01, "House selling", "everything related with house selling.", LocalDateUtility.today(), null);
+    conversationService.insert(sqlService.getConnection(), conversationId02, "Ponny order", "all documents to get a ponny.", LocalDateUtility.today(), null);
+    conversationService.insert(sqlService.getConnection(), conversationId03, "Without partner rel", "all documents to get a ponny.", LocalDateUtility.today(), null);
   }
 
   protected void insertDefaultPermissions(ISqlService sqlService) {
@@ -214,9 +216,9 @@ public class DevDerbySqlService extends DerbySqlService {
     partnerId02 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
     partnerId03_employee = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
 
-    BEANS.get(PartnerService.class).insert(sqlService, partnerId01, "Gorak Inc", "A special company", LocalDateUtility.today(), null);
-    BEANS.get(PartnerService.class).insert(sqlService, partnerId02, "Solan Org", "Some other comapny", LocalDateUtility.today(), null);
-    BEANS.get(PartnerService.class).insert(sqlService, partnerId03_employee, "Hans Muster", "An employee", LocalDateUtility.today(), null);
+    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId01, "Gorak Inc", "A special company", LocalDateUtility.today(), null);
+    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId02, "Solan Org", "Some other comapny", LocalDateUtility.today(), null);
+    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId03_employee, "Hans Muster", "An employee", LocalDateUtility.today(), null);
   }
 
   protected void insertDocuments(ISqlService sqlService) {
@@ -225,27 +227,27 @@ public class DevDerbySqlService extends DerbySqlService {
     DocumentService documentService = BEANS.get(DocumentService.class);
     try {
       documentId01 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
-      insertDocument(sqlService, documentService, documentId01, "A sample document",
+      insertDocument(sqlService.getConnection(), documentService, documentId01, "A sample document",
           LocalDateUtility.today(),
           LocalDateUtility.today(),
           LocalDateUtility.today(),
           "2016_03_08_124640.pdf", null, null);
 
       documentId02 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
-      insertDocument(sqlService, documentService, documentId02, "Bobs document",
+      insertDocument(sqlService.getConnection(), documentService, documentId02, "Bobs document",
           LocalDateUtility.toDate(TODAY.minusYears(1)),
           LocalDateUtility.today(),
           null,
           "2016_03_08_124640.pdf", null, null);
       documentId03 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
-      insertDocument(sqlService, documentService, documentId03, "Multiple partner document",
+      insertDocument(sqlService.getConnection(), documentService, documentId03, "Multiple partner document",
           LocalDateUtility.toDate(TODAY.minusYears(3)),
           LocalDateUtility.today(),
           null,
           "2016_03_08_124640.pdf", null, null);
 
       documentId04 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
-      insertDocument(sqlService, documentService, documentId04, "Txt document",
+      insertDocument(sqlService.getConnection(), documentService, documentId04, "Txt document",
           LocalDateUtility.today(),
           LocalDateUtility.today(),
           null,
@@ -257,7 +259,7 @@ public class DevDerbySqlService extends DerbySqlService {
     }
   }
 
-  protected void insertDocument(ISqlService sqlService, DocumentService documentService, BigDecimal documentId, String abstractText, Date documentDate,
+  protected void insertDocument(Connection connection, DocumentService documentService, BigDecimal documentId, String abstractText, Date documentDate,
       Date insertDate, Date validDate, String fileName, String originalStorage, BigDecimal conversationId)
       throws IOException {
 
@@ -270,48 +272,48 @@ public class DevDerbySqlService extends DerbySqlService {
 //        System.currentTimeMillis());
     String docPath = BEANS.get(DocumentStoreService.class).store(br, insertDate, documentId);
 
-    documentService.insert(sqlService, documentId, abstractText, documentDate, insertDate, validDate, docPath, originalStorage, conversationId, true, OcrLanguageCodeType.GermanCode.ID);
+    documentService.insert(connection, documentId, abstractText, documentDate, insertDate, validDate, docPath, originalStorage, conversationId, true, OcrLanguageCodeType.GermanCode.ID);
   }
 
   protected void insertDocumentCategory(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", DocumentCategory.DOCUMENT_CATEGORY.getName());
     DocumentCategoryService documentCategoryTableTask = BEANS.get(DocumentCategoryService.class);
-    documentCategoryTableTask.insert(sqlService, documentId01, categoryId01);
-    documentCategoryTableTask.insert(sqlService, documentId02, categoryId02);
-    documentCategoryTableTask.insert(sqlService, documentId02, categoryId03);
-    documentCategoryTableTask.insert(sqlService, documentId03, categoryId01);
-    documentCategoryTableTask.insert(sqlService, documentId03, categoryId02);
+    documentCategoryTableTask.insert(sqlService.getConnection(), documentId01, categoryId01);
+    documentCategoryTableTask.insert(sqlService.getConnection(), documentId02, categoryId02);
+    documentCategoryTableTask.insert(sqlService.getConnection(), documentId02, categoryId03);
+    documentCategoryTableTask.insert(sqlService.getConnection(), documentId03, categoryId01);
+    documentCategoryTableTask.insert(sqlService.getConnection(), documentId03, categoryId02);
   }
 
   protected void insertDocumentPartner(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", DocumentPartner.DOCUMENT_PARTNER.getName());
     DocumentPartnerService documentPartnerTableTask = BEANS.get(DocumentPartnerService.class);
-    documentPartnerTableTask.insert(sqlService, documentId01, partnerId01);
-    documentPartnerTableTask.insert(sqlService, documentId03, partnerId01);
-    documentPartnerTableTask.insert(sqlService, documentId03, partnerId02);
+    documentPartnerTableTask.insert(sqlService.getConnection(), documentId01, partnerId01);
+    documentPartnerTableTask.insert(sqlService.getConnection(), documentId03, partnerId01);
+    documentPartnerTableTask.insert(sqlService.getConnection(), documentId03, partnerId02);
   }
 
   protected void insertDocumentPermission(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", DocumentPermission.DOCUMENT_PERMISSION.getName());
     DocumentPermissionService documentPermissionTableTask = BEANS.get(DocumentPermissionService.class);
-    documentPermissionTableTask.insert(sqlService, "admin", documentId01, PermissionCodeType.WriteCode.ID);
-    documentPermissionTableTask.insert(sqlService, "admin", documentId02, PermissionCodeType.WriteCode.ID);
-    documentPermissionTableTask.insert(sqlService, "admin", documentId03, PermissionCodeType.WriteCode.ID);
-    documentPermissionTableTask.insert(sqlService, "cuttis", documentId02, PermissionCodeType.ReadCode.ID);
-    documentPermissionTableTask.insert(sqlService, "bob", documentId02, PermissionCodeType.WriteCode.ID);
+    documentPermissionTableTask.insert(sqlService.getConnection(), "admin", documentId01, PermissionCodeType.WriteCode.ID);
+    documentPermissionTableTask.insert(sqlService.getConnection(), "admin", documentId02, PermissionCodeType.WriteCode.ID);
+    documentPermissionTableTask.insert(sqlService.getConnection(), "admin", documentId03, PermissionCodeType.WriteCode.ID);
+    documentPermissionTableTask.insert(sqlService.getConnection(), "cuttis", documentId02, PermissionCodeType.ReadCode.ID);
+    documentPermissionTableTask.insert(sqlService.getConnection(), "bob", documentId02, PermissionCodeType.WriteCode.ID);
   }
 
   protected void insertDocumentOcr(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", DocumentOcr.DOCUMENT_OCR.getName());
     DocumentOcrService task = BEANS.get(DocumentOcrService.class);
-    task.insert(sqlService, documentId01, "parsed ocr test", true, 1, null);
-    task.insert(sqlService, documentId02, null, true, 2, "Failure");
+    task.insert(sqlService.getConnection(), documentId01, "parsed ocr test", true, 1, null);
+    task.insert(sqlService.getConnection(), documentId02, null, true, 2, "Failure");
   }
 
   protected void insertEmployers(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", IEmployeeTable.TABLE_NAME);
 
-    BEANS.get(EmployeeService.class).insert(sqlService, partnerId03_employee, "Hans", "Muster", "Mountainview 01 e", "CA-90501 Santa Barbara e", "12.2568.2154.69", "PC 50-101-89-7", BigDecimal.valueOf(26.50),
+    BEANS.get(EmployeeService.class).insert(sqlService.getConnection(), partnerId03_employee, "Hans", "Muster", "Mountainview 01 e", "CA-90501 Santa Barbara e", "12.2568.2154.69", "PC 50-101-89-7", BigDecimal.valueOf(26.50),
         "Bart Simpson & Marth Simpson er", "742 Evergreen Terrace er", "Springfield er", "bart@simpson.spring", "+1 (0)7510 2152");
   }
 
@@ -321,12 +323,12 @@ public class DevDerbySqlService extends DerbySqlService {
     postingGroupId01 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
     postingGroupId02 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
 
-    BEANS.get(PostingGroupService.class).insert(sqlService, postingGroupId01, partnerId03_employee, null, documentId02, "September 2016", LocalDateUtility.toDate(LocalDate.of(2016, 10, 02)), BigDecimal.valueOf(9.25),
+    BEANS.get(PostingGroupService.class).insert(sqlService.getConnection(), postingGroupId01, partnerId03_employee, null, documentId02, "September 2016", LocalDateUtility.toDate(LocalDate.of(2016, 10, 02)), BigDecimal.valueOf(9.25),
         BigDecimal.valueOf(256.5),
         BigDecimal.valueOf(230.50), BigDecimal.valueOf(-10.55),
         BigDecimal.valueOf(-5.55),
         BigDecimal.valueOf(9.87));
-    BEANS.get(PostingGroupService.class).insert(sqlService, postingGroupId02, partnerId03_employee, null, documentId02, "Oktober 2016", LocalDateUtility.toDate(LocalDate.of(2016, 11, 02)), BigDecimal.valueOf(10.5),
+    BEANS.get(PostingGroupService.class).insert(sqlService.getConnection(), postingGroupId02, partnerId03_employee, null, documentId02, "Oktober 2016", LocalDateUtility.toDate(LocalDate.of(2016, 11, 02)), BigDecimal.valueOf(10.5),
         BigDecimal.valueOf(256.5),
         BigDecimal.valueOf(230.50), BigDecimal.valueOf(-10.55),
         BigDecimal.valueOf(-5.55),
@@ -342,10 +344,10 @@ public class DevDerbySqlService extends DerbySqlService {
     entityId04 = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
 
     EntityService entityService = BEANS.get(EntityService.class);
-    entityService.insert(sqlService, entityId01, partnerId03_employee, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 9, 04)), BigDecimal.valueOf(3.5), null, "Sept work 1");
-    entityService.insert(sqlService, entityId02, partnerId03_employee, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 9, 11)), BigDecimal.valueOf(4.25), null, "Sept work 2");
-    entityService.insert(sqlService, entityId03, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(10)), BigDecimal.valueOf(5.5), null, "First work");
-    entityService.insert(sqlService, entityId04, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(1)), BigDecimal.valueOf(2.25), null, "Second work");
+    entityService.insert(sqlService.getConnection(), entityId01, partnerId03_employee, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 9, 04)), BigDecimal.valueOf(3.5), null, "Sept work 1");
+    entityService.insert(sqlService.getConnection(), entityId02, partnerId03_employee, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 9, 11)), BigDecimal.valueOf(4.25), null, "Sept work 2");
+    entityService.insert(sqlService.getConnection(), entityId03, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(10)), BigDecimal.valueOf(5.5), null, "First work");
+    entityService.insert(sqlService.getConnection(), entityId04, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(1)), BigDecimal.valueOf(2.25), null, "Second work");
     for (int i = 0; i < 5; i++) {
       createEntity(sqlService, i);
     }
@@ -354,7 +356,7 @@ public class DevDerbySqlService extends DerbySqlService {
   protected void createEntity(ISqlService sqlService, int counter) {
     BigDecimal entityId = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
 
-    BEANS.get(EntityService.class).insert(sqlService, entityId, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID,
+    BEANS.get(EntityService.class).insert(sqlService.getConnection(), entityId, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID,
         LocalDateUtility.toDate(LocalDate.of(2016, 12, 04).plusDays(counter)), BigDecimal.valueOf(2.5), null, "Dez work " + counter);
   }
 

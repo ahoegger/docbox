@@ -2,6 +2,7 @@ package ch.ahoegger.docbox.server.document;
 
 import java.math.BigDecimal;
 import java.security.AccessController;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +36,6 @@ import org.eclipse.scout.rt.platform.util.TuningUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
@@ -533,9 +533,9 @@ public class DocumentService implements IDocumentService {
   }
 
   @RemoteServiceAccessDenied
-  public int insert(ISqlService sqlService, BigDecimal documentId, String abstractText, Date documentDate,
+  public int insert(Connection connection, BigDecimal documentId, String abstractText, Date documentDate,
       Date capturedDate, Date validDate, String docPath, String originalStorage, BigDecimal conversationId, boolean parseOcr, String ocrLanguage) {
-    return DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+    return DSL.using(connection, SQLDialect.DERBY)
         .executeInsert(toRecord(documentId, abstractText, documentDate, capturedDate, validDate, docPath, originalStorage, conversationId, parseOcr, ocrLanguage));
   }
 

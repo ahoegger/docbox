@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.document;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -8,7 +9,6 @@ import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPartner;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.SQLDialect;
@@ -94,9 +94,9 @@ public class DocumentPartnerService {
   }
 
   @RemoteServiceAccessDenied
-  public int insert(ISqlService sqlService, BigDecimal documentId, BigDecimal partnerId) {
+  public int insert(Connection connection, BigDecimal documentId, BigDecimal partnerId) {
     DocumentPartner t = DocumentPartner.DOCUMENT_PARTNER;
-    return DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+    return DSL.using(connection, SQLDialect.DERBY)
         .newRecord(t)
         .with(t.DOCUMENT_NR, documentId)
         .with(t.PARTNER_NR, partnerId)

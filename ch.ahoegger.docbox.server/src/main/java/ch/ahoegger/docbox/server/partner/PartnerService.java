@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.partner;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,7 +11,6 @@ import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.PartnerRecord;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.jooq.Condition;
 import org.jooq.SQLDialect;
@@ -148,8 +148,8 @@ public class PartnerService implements IPartnerService {
 
   }
 
-  public int insert(ISqlService sqlService, BigDecimal patnerId, String name, String description, Date startDate, Date endDate) {
-    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+  public int insert(Connection connection, BigDecimal patnerId, String name, String description, Date startDate, Date endDate) {
+    return DSL.using(connection, SQLDialect.DERBY)
         .executeInsert(mapToRecord(new PartnerRecord(), patnerId, name, description, startDate, endDate));
   }
 

@@ -87,31 +87,31 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
 
     ISqlService sqlService = BEANS.get(ISqlService.class);
 
-    BEANS.get(UserService.class).insert(sqlService, "name01", "firstname01", username01, "secret", true, true);
+    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name01", "firstname01", username01, "secret", true, true);
     // categories
     LocalDate today = LocalDate.now();
 
-    BEANS.get(DocumentService.class).insert(sqlService, documentId01, "Cats Document",
+    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId01, "Cats Document",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, true, OcrLanguageCodeType.GermanCode.ID);
 
-    BEANS.get(DocumentService.class).insert(sqlService, documentId02, "Abstract Document",
+    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId02, "Abstract Document",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, true, OcrLanguageCodeType.GermanCode.ID);
 
-    BEANS.get(DocumentService.class).insert(sqlService, documentId03, "Dogs Document",
+    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId03, "Dogs Document",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, true, OcrLanguageCodeType.GermanCode.ID);
 
-    BEANS.get(DocumentService.class).insert(sqlService, documentId04, "All fish are wet",
+    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId04, "All fish are wet",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, false, null);
 
-    BEANS.get(DocumentOcrService.class).insert(sqlService, documentId01, "parsed01", true, 1, null);
+    BEANS.get(DocumentOcrService.class).insert(sqlService.getConnection(), documentId01, "parsed01", true, 1, null);
 
   }
 

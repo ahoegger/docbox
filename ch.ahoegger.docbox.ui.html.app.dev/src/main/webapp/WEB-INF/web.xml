@@ -13,9 +13,14 @@
   </listener>
 
   <listener>
-    <listener-class>org.eclipse.scout.rt.ui.html.UiHttpSessionListener</listener-class>
+    <listener-class>org.eclipse.scout.rt.server.commons.HttpSessionMutex</listener-class>
   </listener>
 
+  <filter>
+    <filter-name>GzipServletFilter</filter-name>
+    <filter-class>org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter</filter-class>
+  </filter>
+  
   <filter>
     <filter-name>AuthFilter</filter-name>
     <filter-class>ch.ahoegger.docbox.ui.html.UiServletFilter</filter-class>
@@ -31,6 +36,10 @@
 
   <filter-mapping>
     <filter-name>AuthFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+   <filter-mapping>
+    <filter-name>GzipServletFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 

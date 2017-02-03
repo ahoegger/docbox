@@ -75,29 +75,29 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
     m_today = cal.getTime();
     // create user
-    BEANS.get(UserService.class).insert(sqlService, "name01", "firstname01", userId01, "secret", true, true);
-    BEANS.get(UserService.class).insert(sqlService, "name02", "firstname02", userId02, "secret", true, false);
+    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name01", "firstname01", userId01, "secret", true, true);
+    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name02", "firstname02", userId02, "secret", true, false);
 
     // create category
     BEANS.get(CategoryService.class).insertRow(sqlService.getConnection(), categoryId01, "category01", "dec01", m_today, null);
     BEANS.get(CategoryService.class).insertRow(sqlService.getConnection(), categoryId02, "category02", "dec02", m_today, null);
 
     // create conversation
-    BEANS.get(ConversationService.class).insert(sqlService, conversationId01, "con01", "dec01", m_today, null);
-    BEANS.get(ConversationService.class).insert(sqlService, conversationId02, "con02", "dec02", m_today, null);
+    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId01, "con01", "dec01", m_today, null);
+    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId02, "con02", "dec02", m_today, null);
 
     // create partner
-    BEANS.get(PartnerService.class).insert(sqlService, partnerId01, "partner01", "desc01", m_today, null);
-    BEANS.get(PartnerService.class).insert(sqlService, partnerId02, "partner02", "desc02", m_today, null);
+    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId01, "partner01", "desc01", m_today, null);
+    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId02, "partner02", "desc02", m_today, null);
 
     // create document
     Date docData = cal.getTime();
     Date insertDate = m_today;
-    BEANS.get(DocumentService.class).insert(sqlService, documentId, "doc 01", docData, insertDate, null, "2016_03_08_124640.pdf", "origStorage", conversationId01, false, null);
+    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId, "doc 01", docData, insertDate, null, "2016_03_08_124640.pdf", "origStorage", conversationId01, false, null);
     // links
-    BEANS.get(DocumentPartnerService.class).insert(sqlService, documentId, partnerId01);
-    BEANS.get(DocumentCategoryService.class).insert(sqlService, documentId, categoryId01);
-    BEANS.get(DocumentPermissionService.class).insert(sqlService, userId01, documentId, PermissionCodeType.ReadCode.ID);
+    BEANS.get(DocumentPartnerService.class).insert(sqlService.getConnection(), documentId, partnerId01);
+    BEANS.get(DocumentCategoryService.class).insert(sqlService.getConnection(), documentId, categoryId01);
+    BEANS.get(DocumentPermissionService.class).insert(sqlService.getConnection(), userId01, documentId, PermissionCodeType.ReadCode.ID);
 
   }
 

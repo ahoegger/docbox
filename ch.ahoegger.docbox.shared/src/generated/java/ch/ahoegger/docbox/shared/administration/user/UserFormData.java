@@ -4,6 +4,7 @@ import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
 /**
  * <b>NOTE:</b><br>
@@ -28,6 +29,24 @@ public class UserFormData extends AbstractFormData {
 
   public DefaultPermission getDefaultPermission() {
     return getFieldByClass(DefaultPermission.class);
+  }
+
+  /**
+   * access method for property DisplayName.
+   */
+  public String getDisplayName() {
+    return getDisplayNameProperty().getValue();
+  }
+
+  /**
+   * access method for property DisplayName.
+   */
+  public void setDisplayName(String displayName) {
+    getDisplayNameProperty().setValue(displayName);
+  }
+
+  public DisplayNameProperty getDisplayNameProperty() {
+    return getPropertyByClass(DisplayNameProperty.class);
   }
 
   public Firstname getFirstname() {
@@ -62,6 +81,11 @@ public class UserFormData extends AbstractFormData {
   }
 
   public static class DefaultPermission extends AbstractValueFieldData<Integer> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class DisplayNameProperty extends AbstractPropertyData<String> {
 
     private static final long serialVersionUID = 1L;
   }

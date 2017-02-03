@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.hr.entity;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -15,7 +16,6 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
@@ -204,9 +204,8 @@ public class EntityService implements IEntityService {
   }
 
   @RemoteServiceAccessDenied
-  public int insert(ISqlService sqlService, BigDecimal entityId, BigDecimal partnerId, BigDecimal postingGroupId, BigDecimal entityType, Date entityDate, BigDecimal hours, BigDecimal amount, String desc) {
-
-    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+  public int insert(Connection connection, BigDecimal entityId, BigDecimal partnerId, BigDecimal postingGroupId, BigDecimal entityType, Date entityDate, BigDecimal hours, BigDecimal amount, String desc) {
+    return DSL.using(connection, SQLDialect.DERBY)
         .executeInsert(mapToRecord(new EntityRecord(), entityId, partnerId, postingGroupId, entityType, entityDate, hours, amount, desc));
   }
 

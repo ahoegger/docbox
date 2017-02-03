@@ -21,7 +21,7 @@
 	<properties>
 		<ch.ahoegger.docbox.version>${project.version}</ch.ahoegger.docbox.version>
 		<jdk.source.version>1.8</jdk.source.version>
-		<org.eclipse.scout.rt_version>6.1.0.B002</org.eclipse.scout.rt_version>
+		<org.eclipse.scout.rt_version>6.1.0.M5</org.eclipse.scout.rt_version>
 		<aspose-pdf.version>11.2.0</aspose-pdf.version>
 		<sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
 	</properties>

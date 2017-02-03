@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.server.administration.user;
 
+import java.sql.Connection;
 import java.util.Optional;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.DefaultPermissionTable;
@@ -10,10 +11,10 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
  *
  * @author Andreas Hoegger
  */
-public class UserService implements IUserService {
+public class UserService implements IUserService, IUser {
   private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
   @Override
@@ -63,8 +64,9 @@ public class UserService implements IUserService {
     DocboxUser user = DocboxUser.DOCBOX_USER.as("U");
     DefaultPermissionTable defaultPermission = DefaultPermissionTable.DEFAULT_PERMISSION_TABLE.as("DEF_PER");
 
+    Field<String> displayNameField = IUser.createDisplayNameForAlias(user);
     return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(user.FIRSTNAME, user.NAME, user.USERNAME, user.ACTIVE, user.ADMINISTRATOR)
+        .select(user.FIRSTNAME, user.NAME, user.USERNAME, user.ACTIVE, user.ADMINISTRATOR, displayNameField)
         .select(defaultPermission.PERMISSION)
         .from(user)
         .leftOuterJoin(defaultPermission)
@@ -76,6 +78,7 @@ public class UserService implements IUserService {
           res.getFirstname().setValue(rec.get(user.FIRSTNAME));
           res.getName().setValue(rec.get(user.NAME));
           res.getUsername().setValue(rec.get(user.USERNAME));
+          res.setDisplayName(rec.get(displayNameField));
           res.getActive().setValue(rec.get(user.ACTIVE));
           res.getAdministrator().setValue(rec.get(user.ADMINISTRATOR));
           res.getDefaultPermission().setValue(rec.get(defaultPermission.PERMISSION));
@@ -199,9 +202,9 @@ public class UserService implements IUserService {
   }
 
   @RemoteServiceAccessDenied
-  public int insert(ISqlService sqlService, String name, String firstname, String username, String password,
+  public int insert(Connection connection, String name, String firstname, String username, String password,
       boolean active, boolean administrator) {
-    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+    return DSL.using(connection, SQLDialect.DERBY)
         .executeInsert(mapToRecord(new DocboxUserRecord(), name, firstname, username, password, active, administrator));
   }
 

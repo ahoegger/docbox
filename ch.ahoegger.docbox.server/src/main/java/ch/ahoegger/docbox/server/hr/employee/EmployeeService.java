@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.hr.employee;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,7 +11,6 @@ import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.EmployeeRecord;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
@@ -212,9 +212,9 @@ public class EmployeeService implements IEmployeeService {
   }
 
   @RemoteServiceAccessDenied
-  public int insert(ISqlService sqlService, BigDecimal partnerId, String firstName, String lastName, String addressLine1, String addressLine2, String ahvNumber, String accountNumber, BigDecimal hourlyWage,
+  public int insert(Connection connection, BigDecimal partnerId, String firstName, String lastName, String addressLine1, String addressLine2, String ahvNumber, String accountNumber, BigDecimal hourlyWage,
       String employerAddressLine1, String employerAddressLine2, String employerAddressLine3, String employerEmail, String employerPhone) {
-    return DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+    return DSL.using(connection, SQLDialect.DERBY)
         .executeInsert(toRecord(partnerId, firstName, lastName, addressLine1, addressLine2, ahvNumber, accountNumber, hourlyWage, employerAddressLine1, employerAddressLine2, employerAddressLine3, employerEmail, employerPhone));
 
   }

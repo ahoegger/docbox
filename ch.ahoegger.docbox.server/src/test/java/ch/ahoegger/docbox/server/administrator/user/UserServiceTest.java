@@ -33,12 +33,12 @@ public class UserServiceTest extends AbstractTestWithDatabase {
   public void setupDb() throws Exception {
     super.setupDb();
     ISqlService sqlService = BEANS.get(ISqlService.class);
-    BEANS.get(UserService.class).insert(sqlService, "first.myself", "last.myself", userId01, "secret", true, false);
-    BEANS.get(UserService.class).insert(sqlService, "name02", "firstname02", userId02, passwordHash("secret02"), true, false);
-    BEANS.get(UserService.class).insert(sqlService, "name03", "firstname03", userId03, passwordHash("secret03"), false, false);
-    BEANS.get(UserService.class).insert(sqlService, "name04", "firstname04", userId04, passwordHash("secret04"), true, false);
-    BEANS.get(UserService.class).insert(sqlService, "name05", "firstname05", userId05, passwordHash("secret05"), true, false);
-    BEANS.get(UserService.class).insert(sqlService, "admin01", "first.admin01", userIdAdmin01, passwordHash("secret05"), true, true);
+    BEANS.get(UserService.class).insert(sqlService.getConnection(), "first.myself", "last.myself", userId01, "secret", true, false);
+    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name02", "firstname02", userId02, passwordHash("secret02"), true, false);
+    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name03", "firstname03", userId03, passwordHash("secret03"), false, false);
+    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name04", "firstname04", userId04, passwordHash("secret04"), true, false);
+    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name05", "firstname05", userId05, passwordHash("secret05"), true, false);
+    BEANS.get(UserService.class).insert(sqlService.getConnection(), "admin01", "first.admin01", userIdAdmin01, passwordHash("secret05"), true, true);
   }
 
   @Test
@@ -126,7 +126,7 @@ public class UserServiceTest extends AbstractTestWithDatabase {
   public void testDeleteAdministrator() {
     String adminId01 = "adminId01";
     ISqlService sqlService = BEANS.get(ISqlService.class);
-    BEANS.get(UserService.class).insert(sqlService, "last.admin", "first.admin", adminId01, "secret", true, true);
+    BEANS.get(UserService.class).insert(sqlService.getConnection(), "last.admin", "first.admin", adminId01, "secret", true, true);
 
     IUserService service = BEANS.get(IUserService.class);
     Assert.assertTrue(service.delete(adminId01));

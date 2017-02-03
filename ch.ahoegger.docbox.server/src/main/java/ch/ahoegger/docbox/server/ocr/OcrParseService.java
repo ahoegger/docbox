@@ -265,7 +265,7 @@ public class OcrParseService {
 
   }
 
-  public static class TessdataDirectoryProperty extends AbstractConfigProperty<Path> {
+  public static class TessdataDirectoryProperty extends AbstractConfigProperty<Path, String> {
 
     public static final String BUILD_REPLACEMENT_VAR = "${docbox.tesserarct.tessdata}";
 

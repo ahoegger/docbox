@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.conversation;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,7 +10,6 @@ import org.ch.ahoegger.docbox.server.or.app.tables.Conversation;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.ConversationRecord;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
@@ -140,9 +140,9 @@ public class ConversationService implements IConversationService {
   }
 
   @RemoteServiceAccessDenied
-  public int insert(ISqlService sqlService, BigDecimal conversationId, String name, String description,
+  public int insert(Connection connection, BigDecimal conversationId, String name, String description,
       Date startDate, Date endDate) {
-    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+    return DSL.using(connection, SQLDialect.DERBY)
         .executeInsert(toRecord(conversationId, name, description, startDate, endDate));
   }
 

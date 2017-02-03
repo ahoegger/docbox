@@ -1,12 +1,12 @@
 package ch.ahoegger.docbox.server.document;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPermission;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.SQLDialect;
@@ -97,9 +97,9 @@ public class DocumentPermissionService implements IPermissionService {
   }
 
   @RemoteServiceAccessDenied
-  public int insert(ISqlService sqlService, String userId, BigDecimal documentId, int permission) {
+  public int insert(Connection connection, String userId, BigDecimal documentId, int permission) {
     DocumentPermission t = DocumentPermission.DOCUMENT_PERMISSION;
-    return DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+    return DSL.using(connection, SQLDialect.DERBY)
         .newRecord(t)
         .with(t.DOCUMENT_NR, documentId)
         .with(t.PERMISSION, permission)

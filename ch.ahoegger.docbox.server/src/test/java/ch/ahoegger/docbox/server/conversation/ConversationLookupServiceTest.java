@@ -35,21 +35,21 @@ public class ConversationLookupServiceTest extends AbstractTestWithDatabase {
     ISqlService sqlService = BEANS.get(ISqlService.class);
     LocalDate today = LocalDate.now();
 
-    BEANS.get(ConversationService.class).insert(sqlService, conversationId01, "sample conversation 01", "some notes",
+    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId01, "sample conversation 01", "some notes",
         LocalDateUtility.toDate(today.minusDays(20)), null);
 
     // till yesterday
-    BEANS.get(ConversationService.class).insert(sqlService, conversationId02, "sample conversation 02", "some notes",
+    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId02, "sample conversation 02", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         LocalDateUtility.toDate(today.minusDays(1)));
 
     // till today
-    BEANS.get(ConversationService.class).insert(sqlService, conversationId03, "sample conversation 03", "some notes",
+    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId03, "sample conversation 03", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         LocalDateUtility.toDate(today));
 
     // till tomorrow
-    BEANS.get(ConversationService.class).insert(sqlService, conversationId04, "sample conversation 04", "some notes",
+    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId04, "sample conversation 04", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         LocalDateUtility.toDate(today.plusDays(1)));
 

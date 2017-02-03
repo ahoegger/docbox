@@ -9,6 +9,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.jooq.Condition;
+import org.jooq.Field;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
@@ -19,9 +20,7 @@ import ch.ahoegger.docbox.server.service.lookup.AbstractDocboxLookupService;
  *
  * @author aho
  */
-public class AbstractUserLookupService extends AbstractDocboxLookupService<String> {
-
-  private static final String COLUMN_DISPLAY_NAME = "DISPLAY_NAME";
+public class AbstractUserLookupService extends AbstractDocboxLookupService<String> implements IUser {
 
   @Override
   public List<? extends ILookupRow<String>> getDataByKeyInternal(ILookupCall<String> call) {
@@ -30,7 +29,7 @@ public class AbstractUserLookupService extends AbstractDocboxLookupService<Strin
 
   @Override
   public List<? extends ILookupRow<String>> getDataByTextInternal(ILookupCall<String> call) {
-    return getData(DocboxUser.DOCBOX_USER.field(COLUMN_DISPLAY_NAME).likeIgnoreCase(call.getText()), call);
+    return getData(IUser.createDisplayNameForAlias(DocboxUser.DOCBOX_USER).likeIgnoreCase(call.getText()), call);
   }
 
   @Override
@@ -49,15 +48,16 @@ public class AbstractUserLookupService extends AbstractDocboxLookupService<Strin
 
   protected List<? extends ILookupRow<String>> getData(Condition conditions, ILookupCall<String> call) {
     DocboxUser userTable = DocboxUser.DOCBOX_USER;
+    Field<String> displayNameField = IUser.createDisplayNameForAlias(DocboxUser.DOCBOX_USER);
     return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(userTable.USERNAME, DSL.concat(userTable.FIRSTNAME, DSL.val(" "), userTable.NAME, DSL.val(" ("), userTable.USERNAME, DSL.val(")")).as(COLUMN_DISPLAY_NAME), userTable.ACTIVE)
+        .select(userTable.USERNAME, displayNameField, userTable.ACTIVE)
         .from(userTable)
         .where(conditions)
         .and(getConfiguredCondition())
         .fetch()
         .stream()
         .map(rec -> {
-          LookupRow<String> row = new LookupRow<String>(rec.get(userTable.USERNAME), rec.get(COLUMN_DISPLAY_NAME, String.class));
+          LookupRow<String> row = new LookupRow<String>(rec.get(userTable.USERNAME), rec.get(displayNameField));
           row.withActive(rec.get(userTable.ACTIVE));
           return row;
 

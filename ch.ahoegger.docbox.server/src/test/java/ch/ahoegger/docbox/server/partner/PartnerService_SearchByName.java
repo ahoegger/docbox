@@ -37,22 +37,22 @@ public class PartnerService_SearchByName extends AbstractTestWithDatabase {
     ISqlService sqlService = BEANS.get(ISqlService.class);
     LocalDate today = LocalDate.now();
 
-    BEANS.get(PartnerService.class).insert(sqlService, partnerId01, "dook haagen", "some notes",
+    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId01, "dook haagen", "some notes",
         LocalDateUtility.toDate(today.minusDays(20)),
         null);
 
     // till yesterday
-    BEANS.get(PartnerService.class).insert(sqlService, partnerId02, "smill donat", "some notes",
+    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId02, "smill donat", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         null);
 
     // till today
-    BEANS.get(PartnerService.class).insert(sqlService, partnerId03, "bluk onack", "some notes",
+    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId03, "bluk onack", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         null);
 
     // till tomorrow
-    BEANS.get(PartnerService.class).insert(sqlService, partnerId04, "7 sense of moon", "some notes",
+    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId04, "7 sense of moon", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         null);
   }

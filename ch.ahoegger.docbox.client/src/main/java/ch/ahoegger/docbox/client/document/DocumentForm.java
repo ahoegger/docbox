@@ -86,6 +86,12 @@ public class DocumentForm extends AbstractForm {
   }
 
   @Override
+  protected String getConfiguredIconId() {
+
+    return "font:icomoon \uf15c";
+  }
+
+  @Override
   protected int getConfiguredDisplayHint() {
     return DISPLAY_HINT_VIEW;
   }
@@ -675,15 +681,12 @@ public class DocumentForm extends AbstractForm {
       getForm().getOpenHtmlField().setDocumentId(formData.getDocumentId());
 
       System.out.println("hasOcrText: " + getForm().getHasOcrText());
-      getForm().setEnabledGranted(false);
-      getForm().getShowOcrButton().setEnabledGranted(true);
-      getForm().getShowOcrButton().setEnabled(getForm().getHasOcrText());
+      getForm().setAllEnabled(false);
+      getForm().getShowOcrButton().setEnabled(true, true);
+      getForm().getShowOcrButton().setEnabled(getForm().getHasOcrText(), true);
       getForm().getShowOcrButton().setVisible(getForm().getHasOcrText());
     }
 
-    @Override
-    protected void execStore() {
-    }
   }
 
 }

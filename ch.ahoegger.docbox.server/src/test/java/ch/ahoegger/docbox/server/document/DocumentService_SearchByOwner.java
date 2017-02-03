@@ -42,30 +42,30 @@ public class DocumentService_SearchByOwner extends AbstractTestWithDatabase {
 
     ISqlService sqlService = BEANS.get(ISqlService.class);
 
-    BEANS.get(UserService.class).insert(sqlService, "name01", "firstname01", username01, "secret", true, true);
-    BEANS.get(UserService.class).insert(sqlService, "name02", "firstname02", username02, "secret", true, true);
+    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name01", "firstname01", username01, "secret", true, true);
+    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name02", "firstname02", username02, "secret", true, true);
 
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.add(Calendar.DAY_OF_MONTH, -110);
-    BEANS.get(DocumentService.class).insert(sqlService, documentId01, "doc 01", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId01, "doc 01", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
     cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
-    BEANS.get(DocumentService.class).insert(sqlService, documentId02, "doc 02", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId02, "doc 02", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
     cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.add(Calendar.DAY_OF_WEEK, -1);
-    BEANS.get(DocumentService.class).insert(sqlService, documentId03, "doc 03", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId03, "doc 03", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
     cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.add(Calendar.DAY_OF_WEEK, -20);
-    BEANS.get(DocumentService.class).insert(sqlService, documentId04, "doc 04", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
-    BEANS.get(DocumentService.class).insert(sqlService, documentId05, "doc 05", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId04, "doc 04", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId05, "doc 05", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
 
     // permissions
-    BEANS.get(DocumentPermissionService.class).insert(sqlService, username01, documentId01, PermissionCodeType.OwnerCode.ID);
-    BEANS.get(DocumentPermissionService.class).insert(sqlService, username02, documentId02, PermissionCodeType.OwnerCode.ID);
-    BEANS.get(DocumentPermissionService.class).insert(sqlService, username02, documentId05, PermissionCodeType.OwnerCode.ID);
+    BEANS.get(DocumentPermissionService.class).insert(sqlService.getConnection(), username01, documentId01, PermissionCodeType.OwnerCode.ID);
+    BEANS.get(DocumentPermissionService.class).insert(sqlService.getConnection(), username02, documentId02, PermissionCodeType.OwnerCode.ID);
+    BEANS.get(DocumentPermissionService.class).insert(sqlService.getConnection(), username02, documentId05, PermissionCodeType.OwnerCode.ID);
   }
 
   @Test

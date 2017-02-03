@@ -135,7 +135,7 @@ public class CategoryService implements ICategoryService {
   @RemoteServiceAccessDenied
   public int insertRow(Connection connection, BigDecimal categoryId, String name, String description,
       Date startDate, Date endDate) {
-    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+    return DSL.using(connection, SQLDialect.DERBY)
         .executeInsert(toRecord(categoryId, name, description, startDate, endDate));
   }
 

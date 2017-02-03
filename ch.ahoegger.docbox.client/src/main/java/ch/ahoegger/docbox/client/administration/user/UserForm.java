@@ -42,6 +42,7 @@ import ch.ahoegger.docbox.shared.security.permission.PermissionLookupCall;
  */
 @FormData(value = UserFormData.class, sdkCommand = SdkCommand.CREATE)
 public class UserForm extends AbstractForm {
+
   public static enum FORM_MODE {
     NEW,
     PAGE,
@@ -49,18 +50,25 @@ public class UserForm extends AbstractForm {
   }
 
   private final FORM_MODE m_formMode;
+  private String m_displayName;
 
   public UserForm(FORM_MODE mode) {
     m_formMode = mode;
   }
 
-  public FORM_MODE getFormMode() {
-    return m_formMode;
+  @Override
+  protected String getConfiguredTitle() {
+    return TEXTS.get("NewUser");
+  }
+
+  @Override
+  protected String getConfiguredIconId() {
+    return "font:icomoon \uf007";
   }
 
   @Override
   protected int getConfiguredDisplayHint() {
-    return DISPLAY_HINT_VIEW;
+    return DISPLAY_HINT_DIALOG;
   }
 
   @Override
@@ -91,6 +99,20 @@ public class UserForm extends AbstractForm {
   @Override
   protected void execStored() {
     getDesktop().dataChanged(IUserEntity.ENTITY_KEY);
+  }
+
+  public FORM_MODE getFormMode() {
+    return m_formMode;
+  }
+
+  @FormData
+  public String getDisplayName() {
+    return m_displayName;
+  }
+
+  @FormData
+  public void setDisplayName(String displayName) {
+    m_displayName = displayName;
   }
 
   public FieldBox getFieldBox() {
@@ -271,9 +293,14 @@ public class UserForm extends AbstractForm {
 
         @Override
         protected Boolean execValidateValue(Boolean rawValue) {
+          if (isFormLoading()) {
+            return rawValue;
+          }
+          System.out.println("Blubbi: " + getUsernameField().getValue());
           removeErrorStatus(UserValidationStatus.AdministratorAtLeastOne.class);
           if (!rawValue) {
             AdministratorLookupCall call = new AdministratorLookupCall();
+            call.getDataByAll().stream().forEach(r -> System.out.println(r.getKey()));
             if (call.getDataByAll().stream()
                 .filter(row -> !row.getKey().equals(getUsernameField().getValue())).count() < 1) {
               // only one admin left
@@ -329,6 +356,7 @@ public class UserForm extends AbstractForm {
       formData = BEANS.get(IUserService.class).load(formData);
       importFormData(formData);
 
+      setTitle(formData.getDisplayName());
       setEnabledGranted(false);
     }
 
@@ -366,6 +394,7 @@ public class UserForm extends AbstractForm {
       exportFormData(formData);
       formData = BEANS.get(IUserService.class).load(formData);
       importFormData(formData);
+      setTitle(TEXTS.get("EditWithArg", formData.getDisplayName()));
     }
 
     @Override

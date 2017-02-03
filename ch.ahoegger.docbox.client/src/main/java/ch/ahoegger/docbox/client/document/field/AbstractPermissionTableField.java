@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -152,6 +153,12 @@ public abstract class AbstractPermissionTableField extends AbstractTableField<Ab
         @Override
         protected Class<? extends ILookupCall<String>> getConfiguredLookupCall() {
           return UserLookupCall.class;
+        }
+
+        @Override
+        protected void execPrepareLookup(ILookupCall<String> call) {
+          call.setActive(TriState.UNDEFINED);
+          super.execPrepareLookup(call);
         }
 
         @Override
