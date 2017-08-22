@@ -11,6 +11,7 @@ import java.util.List;
 public class WageCalculation {
 
   private BigDecimal m_hoursTotal;
+  private BigDecimal m_wage;
   private BigDecimal m_bruttoWage;
   private BigDecimal m_nettoWage;
   private BigDecimal m_socialSecuityTaxRelative;
@@ -30,6 +31,14 @@ public class WageCalculation {
 
   public void setHoursTotal(BigDecimal hoursTotal) {
     m_hoursTotal = hoursTotal;
+  }
+
+  public void setWage(BigDecimal wage) {
+    m_wage = wage;
+  }
+
+  public BigDecimal getWage() {
+    return m_wage;
   }
 
   public BigDecimal getBruttoWage() {

@@ -63,6 +63,7 @@ public class CategoryService implements ICategoryService {
         .select(category.CATEGORY_NR, category.NAME, category.START_DATE, category.END_DATE)
         .from(category)
         .where(condition)
+        .orderBy(category.NAME)
         .fetch().forEach(rec -> {
           CategoryTableRowData row = tableData.addRow();
           row.setCategoryId(rec.get(category.CATEGORY_NR));

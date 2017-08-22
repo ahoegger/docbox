@@ -52,6 +52,7 @@ public class CategoryLookupService extends AbstractDocboxLookupService<BigDecima
         .select(cat.CATEGORY_NR, cat.NAME, cat.START_DATE, cat.END_DATE)
         .from(cat)
         .where(conditions)
+        .orderBy(cat.NAME)
         .fetch()
         .stream()
         .map(rec -> {

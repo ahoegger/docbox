@@ -1,7 +1,5 @@
 package ch.ahoegger.docbox.shared.hr.employee;
 
-import java.math.BigDecimal;
-
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
@@ -36,10 +34,6 @@ public abstract class AbstractEmployeeBoxData extends AbstractFormFieldData {
     return getFieldByClass(FirstName.class);
   }
 
-  public HourlyWage getHourlyWage() {
-    return getFieldByClass(HourlyWage.class);
-  }
-
   public LastName getLastName() {
     return getFieldByClass(LastName.class);
   }
@@ -65,11 +59,6 @@ public abstract class AbstractEmployeeBoxData extends AbstractFormFieldData {
   }
 
   public static class FirstName extends AbstractValueFieldData<String> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class HourlyWage extends AbstractValueFieldData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

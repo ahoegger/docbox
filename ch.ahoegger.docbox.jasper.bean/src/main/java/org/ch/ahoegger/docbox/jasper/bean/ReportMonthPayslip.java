@@ -19,6 +19,7 @@ public class ReportMonthPayslip {
   private String m_hoursInPeriod;
   private String m_hourWage;
   private String m_bruttoWage;
+  private String m_wage;
   private String m_nettoWage;
   private String m_nettoWageRounded;
   private String m_expenseTotal;
@@ -102,6 +103,14 @@ public class ReportMonthPayslip {
 
   public void setHourWage(String hourWage) {
     m_hourWage = hourWage;
+  }
+
+  public void setWage(String wage) {
+    m_wage = wage;
+  }
+
+  public String getWage() {
+    return m_wage;
   }
 
   public String getBruttoWage() {

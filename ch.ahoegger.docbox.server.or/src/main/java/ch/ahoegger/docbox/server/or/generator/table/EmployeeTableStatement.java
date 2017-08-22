@@ -36,7 +36,10 @@ public class EmployeeTableStatement implements ITableStatement, IEmployeeTable {
     statementBuilder.append(EMPLOYER_ADDRESS_LINE3).append(" VARCHAR(").append(ADDRESS_LINE_LENGTH).append("), ");
     statementBuilder.append(EMPLOYER_EMAIL).append(" VARCHAR(").append(EMPLOYER_EMAIL_LENGTH).append("), ");
     statementBuilder.append(EMPLOYER_PHONE).append(" VARCHAR(").append(EMPLOYER_PHONE_LENGTH).append("), ");
-    statementBuilder.append(HOURLY_WAGE).append(" DECIMAL(5, 2), ");
+    statementBuilder.append(HOURLY_WAGE).append(" DECIMAL(5, 2), ")
+        .append(SOCIAL_INSURANCE_RATE).append(" DECIMAL(5, 3), ")
+        .append(SOURCE_TAX_RATE).append(" DECIMAL(5, 3), ")
+        .append(VACATION_EXTRA_RATE).append(" DECIMAL(5, 3), ");
 
     statementBuilder.append("PRIMARY KEY (").append(PARTNER_NR).append(")");
     statementBuilder.append(")");

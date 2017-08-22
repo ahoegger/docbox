@@ -9,9 +9,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.ch.ahoegger.docbox.jasper.PayslipProperties;
 import org.ch.ahoegger.docbox.jasper.WageReportService;
 import org.ch.ahoegger.docbox.jasper.bean.Expense;
 import org.ch.ahoegger.docbox.jasper.bean.WageCalculation;
@@ -19,7 +19,6 @@ import org.ch.ahoegger.docbox.jasper.bean.Work;
 import org.ch.ahoegger.docbox.server.or.app.tables.PostingGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.PostingGroupRecord;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
@@ -159,10 +158,11 @@ public class PostingGroupService implements IPostingGroupService {
 
     List<EntityTableRowData> unbilledEntities = getUnbilledEntities(formData.getFrom().getValue(), formData.getTo().getValue(), formData.getPartner().getValue());
 
-    WageCalculation wageData = calculateWage(unbilledEntities, employeeData.getEmployeeBox().getHourlyWage().getValue());
+    WageCalculation wageData = calculateWage(unbilledEntities, employeeData.getEmploymentBox().getHourlyWage().getValue(),
+        employeeData.getEmploymentBox().getSocialInsuranceRate().getValue(), employeeData.getEmploymentBox().getSourceTaxRate().getValue(), employeeData.getEmploymentBox().getVacationExtraRate().getValue());
     byte[] docContent = BEANS.get(WageReportService.class).createMonthlyReport(formData.getTitle().getValue(), employeeData.getEmployeeBox().getFirstName().getValue() + " " + employeeData.getEmployeeBox().getLastName().getValue(),
         employeeData.getEmployeeBox().getAddressLine1().getValue(), employeeData.getEmployeeBox().getAddressLine2().getValue(), formData.getDate().getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
-        employeeData.getEmployeeBox().getAccountNumber().getValue(), employeeData.getEmployeeBox().getHourlyWage().getValue(), wageData,
+        employeeData.getEmployeeBox().getAccountNumber().getValue(), employeeData.getEmploymentBox().getHourlyWage().getValue(), wageData,
         employeeData.getEmployerBox().getAddressLine1().getValue(), employeeData.getEmployerBox().getAddressLine2().getValue(), employeeData.getEmployerBox().getAddressLine3().getValue(), employeeData.getEmployerBox().getEmail().getValue(),
         employeeData.getEmployerBox().getPhone().getValue());
 
@@ -218,7 +218,9 @@ public class PostingGroupService implements IPostingGroupService {
     employeeData = BEANS.get(IEmployeeService.class).load(employeeData);
 
     List<EntityTableRowData> unbilledEntities = getUnbilledEntities(formData.getFrom().getValue(), formData.getTo().getValue(), formData.getPartner().getValue());
-    WageCalculation wageCalc = calculateWage(unbilledEntities, employeeData.getEmployeeBox().getHourlyWage().getValue());
+    WageCalculation wageCalc = calculateWage(unbilledEntities,
+        employeeData.getEmploymentBox().getHourlyWage().getValue(), employeeData.getEmploymentBox().getSocialInsuranceRate().getValue(), employeeData.getEmploymentBox().getSourceTaxRate().getValue(),
+        employeeData.getEmploymentBox().getVacationExtraRate().getValue());
 
     PostingCalculationBoxData result = new PostingCalculationBoxData();
     List<EntitiesRowData> entityRows = unbilledEntities.stream().map(row -> {
@@ -292,12 +294,12 @@ public class PostingGroupService implements IPostingGroupService {
     return CollectionUtility.arrayList(entityTableData.getRows());
   }
 
-  protected WageCalculation calculateWage(List<EntityTableRowData> rows, BigDecimal hourlyWage) {
+  protected WageCalculation calculateWage(List<EntityTableRowData> rows, BigDecimal hourlyWage, BigDecimal socialInsuranceRate, BigDecimal sourceTaxRate, BigDecimal vacationExtraRate) {
     List<Work> workItems = rows.stream().filter(row -> WorkCode.isEqual(row.getEntityType()))
         .map(row -> new Work().widthHours(row.getHours()).withDate(LocalDateUtility.toLocalDate(row.getDate())).withText(row.getText()))
         .collect(Collectors.toList());
     List<Expense> expenses = rows.stream().filter(row -> ExpenseCode.isEqual(row.getEntityType()))
-        .map(row -> new Expense().withAmount(row.getAmount()).withDate(LocalDateUtility.toLocalDate(row.getDate())).withText(row.getText()))
+        .map(row -> new Expense().withAmount(row.getAmount()).withDate(LocalDateUtility.toLocalDate(row.getDate())).withText(Optional.ofNullable(row.getText()).orElse("")))
         .collect(Collectors.toList());
 
     BigDecimal hoursWorked = workItems.stream()
@@ -312,29 +314,31 @@ public class PostingGroupService implements IPostingGroupService {
         .orElse(BigDecimal.ZERO)
         .setScale(2, RoundingMode.HALF_UP);
 
-    BigDecimal bruttoWage = hoursWorked.multiply(hourlyWage).setScale(2, RoundingMode.HALF_UP);
+    BigDecimal wage = hoursWorked.multiply(hourlyWage);
+    BigDecimal vacationExtraRelative = vacationExtraRate.divide(BigDecimal.valueOf(100.0));
+    BigDecimal vacationExtra = vacationExtraRelative.multiply(wage);
+    BigDecimal bruttoWage = wage.add(vacationExtra);
 
-    BigDecimal socialSecurityInsuranceRelative = CONFIG.getPropertyValue(PayslipProperties.SocialInsurancePercentageProperty.class).divide(BigDecimal.valueOf(-100.0));
-    BigDecimal socialSecurityTax = socialSecurityInsuranceRelative.multiply(bruttoWage).setScale(2, RoundingMode.HALF_UP);
-    BigDecimal sourceTaxRelative = CONFIG.getPropertyValue(PayslipProperties.SourceTaxPercentageProperty.class).divide(BigDecimal.valueOf(-100.0));
-    BigDecimal sourceTax = sourceTaxRelative.multiply(bruttoWage).setScale(2, RoundingMode.HALF_UP);
-    BigDecimal vacationExtraRelative = CONFIG.getPropertyValue(PayslipProperties.VacationExtraPercentageProperty.class).divide(BigDecimal.valueOf(100.0));
-    BigDecimal vacationExtra = vacationExtraRelative.multiply(bruttoWage).setScale(2, RoundingMode.HALF_UP);
-    BigDecimal nettoWage = bruttoWage.add(expensesTotal).add(socialSecurityTax).add(sourceTax).add(vacationExtra);
+    BigDecimal socialSecurityInsuranceRelative = socialInsuranceRate.divide(BigDecimal.valueOf(-100.0));
+    BigDecimal socialSecurityTax = socialSecurityInsuranceRelative.multiply(bruttoWage);
+    BigDecimal sourceTaxRelative = sourceTaxRate.divide(BigDecimal.valueOf(-100.0));
+    BigDecimal sourceTax = sourceTaxRelative.multiply(bruttoWage);
+    BigDecimal nettoWage = bruttoWage.add(expensesTotal).add(socialSecurityTax).add(sourceTax);
 
     WageCalculation result = new WageCalculation();
     result.setWorkItems(workItems);
     result.setExpenses(expenses);
-    result.setBruttoWage(bruttoWage);
-    result.setNettoWage(nettoWage);
-    result.setExpencesTotal(expensesTotal);
-    result.setHoursTotal(hoursWorked);
+    result.setWage(wage.setScale(2, RoundingMode.HALF_UP));
+    result.setBruttoWage(bruttoWage.setScale(2, RoundingMode.HALF_UP));
+    result.setNettoWage(nettoWage.setScale(2, RoundingMode.HALF_UP));
+    result.setExpencesTotal(expensesTotal.setScale(2, RoundingMode.HALF_UP));
+    result.setHoursTotal(hoursWorked.setScale(2, RoundingMode.HALF_UP));
     result.setSocialSecuityTaxRelative(socialSecurityInsuranceRelative);
-    result.setSocialSecuityTax(socialSecurityTax);
+    result.setSocialSecuityTax(socialSecurityTax.setScale(2, RoundingMode.HALF_UP));
     result.setSourceTaxRelative(sourceTaxRelative);
-    result.setSourceTax(sourceTax);
+    result.setSourceTax(sourceTax.setScale(2, RoundingMode.HALF_UP));
     result.setVacationExtraRelative(vacationExtraRelative);
-    result.setVacationExtra(vacationExtra);
+    result.setVacationExtra(vacationExtra.setScale(2, RoundingMode.HALF_UP));
     return result;
 
   }

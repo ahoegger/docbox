@@ -1,9 +1,6 @@
 package ch.ahoegger.docbox.client.hr.employee;
 
-import java.math.BigDecimal;
-
 import org.eclipse.scout.rt.client.dto.FormData;
-import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.Order;
@@ -44,10 +41,6 @@ public abstract class AbstractEmployeeBox extends AbstractGroupBox {
 
   public AhvNumberField getAhvNumberField() {
     return getFieldByClass(AhvNumberField.class);
-  }
-
-  public HourlyWageField getHourlyWageField() {
-    return getFieldByClass(HourlyWageField.class);
   }
 
   public LastNameField getLastNameField() {
@@ -131,25 +124,6 @@ public abstract class AbstractEmployeeBox extends AbstractGroupBox {
     protected int getConfiguredMaxLength() {
       return IEmployeeTable.AHV_NUMBER_LENGTH;
     }
-  }
-
-  @Order(6000)
-  public class HourlyWageField extends AbstractBigDecimalField {
-    @Override
-    protected String getConfiguredLabel() {
-      return TEXTS.get("HourlyWage");
-    }
-
-    @Override
-    protected BigDecimal getConfiguredMinValue() {
-      return IEmployeeTable.HOURLY_WAGE_MIN;
-    }
-
-    @Override
-    protected BigDecimal getConfiguredMaxValue() {
-      return IEmployeeTable.HOURLY_WAGE_MAX;
-    }
-
   }
 
   @Order(10000)

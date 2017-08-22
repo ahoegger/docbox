@@ -35,6 +35,7 @@ import ch.ahoegger.docbox.client.hr.billing.PostingGroupForm.MainBox.EntityDateB
 import ch.ahoegger.docbox.client.hr.billing.PostingGroupForm.MainBox.OkButton;
 import ch.ahoegger.docbox.client.hr.billing.PostingGroupForm.MainBox.PartnerField;
 import ch.ahoegger.docbox.client.hr.billing.PostingGroupForm.MainBox.PostingCalculationBox;
+import ch.ahoegger.docbox.client.hr.billing.PostingGroupForm.MainBox.TaxGroupField;
 import ch.ahoegger.docbox.client.hr.billing.PostingGroupForm.MainBox.TitleField;
 import ch.ahoegger.docbox.client.hr.entity.IWorkItemEntity;
 import ch.ahoegger.docbox.client.partner.AbstractPartnerSmartField;
@@ -44,7 +45,6 @@ import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupService;
 import ch.ahoegger.docbox.shared.hr.billing.PostingCalculationBoxData;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupFormData;
 import ch.ahoegger.docbox.shared.hr.tax.TaxGroupLookupCall;
-import ch.ahoegger.docbox.client.hr.billing.PostingGroupForm.MainBox.TaxGroupField;
 
 @FormData(value = PostingGroupFormData.class, sdkCommand = FormData.SdkCommand.CREATE)
 public class PostingGroupForm extends AbstractForm {
@@ -99,6 +99,7 @@ public class PostingGroupForm extends AbstractForm {
     if (getEntityDateFromField().getValue() == null || getEntityDateToField().getValue() == null) {
       return;
     }
+    getWageBox().clearErrorStatus();
     PostingGroupFormData formData = new PostingGroupFormData();
     PostingGroupForm.this.exportFormData(formData);
     PostingCalculationBoxData calculationData = BEANS.get(IPostingGroupService.class).calculateWage(formData);

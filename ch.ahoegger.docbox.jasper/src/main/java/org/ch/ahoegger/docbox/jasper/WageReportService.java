@@ -37,6 +37,7 @@ public class WageReportService {
   private DateTimeFormatter m_dateFormatter;
   private DateTimeFormatter m_dateFormatterLong;
   private NumberFormat m_formatFloat2FractionDigits;
+  private NumberFormat m_formatFloat3FractionDigits;
 
   @PostConstruct
   protected void initFormatters() {
@@ -46,6 +47,10 @@ public class WageReportService {
     m_formatFloat2FractionDigits = NumberFormat.getInstance(DE_CH);
     m_formatFloat2FractionDigits.setMaximumFractionDigits(2);
     m_formatFloat2FractionDigits.setMinimumFractionDigits(2);
+
+    m_formatFloat3FractionDigits = NumberFormat.getInstance(DE_CH);
+    m_formatFloat3FractionDigits.setMaximumFractionDigits(3);
+    m_formatFloat3FractionDigits.setMinimumFractionDigits(3);
 
   }
 
@@ -81,18 +86,19 @@ public class WageReportService {
 
     account.setIban(iban);
     // calculations
-    account.setBruttoWage(m_formatFloat2FractionDigits.format(wageCalculation.getBruttoWage()));
+    account.setWage(m_formatFloat2FractionDigits.format(wageCalculation.getWage()));
     account.setHoursInPeriod(m_formatFloat2FractionDigits.format(wageCalculation.getHoursTotal()));
     account.setExpenseTotal(m_formatFloat2FractionDigits.format(financeRound(wageCalculation.getExpencesTotal(), BigDecimal.valueOf(0.05), RoundingMode.UP)));
     account.setHourWage(m_formatFloat2FractionDigits.format(hourWage));
     account.setNettoWage(m_formatFloat2FractionDigits.format(wageCalculation.getNettoWage()));
     account.setNettoWageRounded(m_formatFloat2FractionDigits.format(financeRound(wageCalculation.getNettoWage(), BigDecimal.valueOf(0.05), RoundingMode.UP)));
     account.setSocialInsuracneAbsolute(m_formatFloat2FractionDigits.format(wageCalculation.getSocialSecuityTax()));
-    account.setSocialInsuracnePercentage(m_formatFloat2FractionDigits.format(wageCalculation.getSocialSecuityTaxRelative().multiply(BigDecimal.valueOf(100.0))));
+    account.setSocialInsuracnePercentage(m_formatFloat3FractionDigits.format(wageCalculation.getSocialSecuityTaxRelative().multiply(BigDecimal.valueOf(100.0))));
     account.setSourceTaxAbsolute(m_formatFloat2FractionDigits.format(wageCalculation.getSourceTax()));
-    account.setSourceTaxProcentage(m_formatFloat2FractionDigits.format(wageCalculation.getSourceTaxRelative().multiply(BigDecimal.valueOf(100.0))));
+    account.setSourceTaxProcentage(m_formatFloat3FractionDigits.format(wageCalculation.getSourceTaxRelative().multiply(BigDecimal.valueOf(100.0))));
     account.setVacationExtraAbsolute(m_formatFloat2FractionDigits.format(wageCalculation.getVacationExtra()));
-    account.setVacationExtraPercentage(m_formatFloat2FractionDigits.format(wageCalculation.getVacationExtraRelative().multiply(BigDecimal.valueOf(100.0))));
+    account.setVacationExtraPercentage(m_formatFloat3FractionDigits.format(wageCalculation.getVacationExtraRelative().multiply(BigDecimal.valueOf(100.0))));
+    account.setBruttoWage(m_formatFloat2FractionDigits.format(wageCalculation.getBruttoWage()));
     // employer
     account.setEmployerAddressLine1(employerAddressLine1);
     account.setEmployerAddressLine2(employerAddressLine2);

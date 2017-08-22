@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Employee extends TableImpl<EmployeeRecord> {
 
-    private static final long serialVersionUID = -1055944954;
+    private static final long serialVersionUID = -1738122290;
 
     /**
      * The reference instance of <code>APP.EMPLOYEE</code>
@@ -117,6 +117,21 @@ public class Employee extends TableImpl<EmployeeRecord> {
     public final TableField<EmployeeRecord, BigDecimal> HOURLY_WAGE = createField("HOURLY_WAGE", org.jooq.impl.SQLDataType.DECIMAL.precision(5, 2), this, "");
 
     /**
+     * The column <code>APP.EMPLOYEE.SOCIAL_INSURANCE_RATE</code>.
+     */
+    public final TableField<EmployeeRecord, BigDecimal> SOCIAL_INSURANCE_RATE = createField("SOCIAL_INSURANCE_RATE", org.jooq.impl.SQLDataType.DECIMAL.precision(5, 3), this, "");
+
+    /**
+     * The column <code>APP.EMPLOYEE.SOURCE_TAX_RATE</code>.
+     */
+    public final TableField<EmployeeRecord, BigDecimal> SOURCE_TAX_RATE = createField("SOURCE_TAX_RATE", org.jooq.impl.SQLDataType.DECIMAL.precision(5, 3), this, "");
+
+    /**
+     * The column <code>APP.EMPLOYEE.VACATION_EXTRA_RATE</code>.
+     */
+    public final TableField<EmployeeRecord, BigDecimal> VACATION_EXTRA_RATE = createField("VACATION_EXTRA_RATE", org.jooq.impl.SQLDataType.DECIMAL.precision(5, 3), this, "");
+
+    /**
      * Create a <code>APP.EMPLOYEE</code> table reference
      */
     public Employee() {
@@ -151,7 +166,7 @@ public class Employee extends TableImpl<EmployeeRecord> {
      */
     @Override
     public UniqueKey<EmployeeRecord> getPrimaryKey() {
-        return Keys.SQL170125202441970;
+        return Keys.SQL170822110755200;
     }
 
     /**
@@ -159,7 +174,7 @@ public class Employee extends TableImpl<EmployeeRecord> {
      */
     @Override
     public List<UniqueKey<EmployeeRecord>> getKeys() {
-        return Arrays.<UniqueKey<EmployeeRecord>>asList(Keys.SQL170125202441970);
+        return Arrays.<UniqueKey<EmployeeRecord>>asList(Keys.SQL170822110755200);
     }
 
     /**

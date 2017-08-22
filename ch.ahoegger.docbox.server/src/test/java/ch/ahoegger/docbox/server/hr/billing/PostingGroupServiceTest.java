@@ -52,6 +52,7 @@ public class PostingGroupServiceTest extends AbstractTestWithDatabase {
 
     BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId, "employee01", "desc01", docCaptureDate, null);
     BEANS.get(EmployeeService.class).insert(sqlService.getConnection(), partnerId, "Homer", "Simpson", "Nashvill Street 12a", "Santa Barbara CA-90051", "ahv123564789", "iban987654321", BigDecimal.valueOf(26.30),
+        BigDecimal.valueOf(6.225), BigDecimal.valueOf(5.0), BigDecimal.valueOf(8.33),
         "Master Bob & Minor Molar", "Mountainview 12", "CA-90153 Santa Tropee", "master.bob@blu.com", "5445621236");
 
     BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId, "Abstract", docCaptureDate, LocalDateUtility.toDate(LocalDate.now().minusDays(4)), null, documentPath, null, null, true, OcrLanguageCodeType.GermanCode.ID);

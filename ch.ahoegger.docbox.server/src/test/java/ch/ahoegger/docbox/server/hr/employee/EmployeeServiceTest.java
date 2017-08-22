@@ -37,6 +37,7 @@ public class EmployeeServiceTest extends AbstractTestWithDatabase {
     BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId02_employee, "employee02", "desc02", LocalDateUtility.toDate(LocalDate.now().minusDays(5)), null);
 
     BEANS.get(EmployeeService.class).insert(sqlService.getConnection(), partnerId02_employee, "Homer", "Simpson", "Nashvill Street 12a", "Santa Barbara CA-90051", "ahv123564789", "iban987654321", BigDecimal.valueOf(26.30),
+        BigDecimal.valueOf(6.225), BigDecimal.valueOf(5.0), BigDecimal.valueOf(8.33),
         "Master Bob & Minor Molar", "Mountainview 12", "CA-90153 Santa Tropee", "master.bob@blu.com", "5445621236");
   }
 
@@ -68,7 +69,7 @@ public class EmployeeServiceTest extends AbstractTestWithDatabase {
     fd1.getEmployeeBox().getAccountNumber().setValue("PC 50-1589-242-2");
     fd1.getEmployeeBox().getAhvNumber().setValue("50-4544 656");
     fd1.getEmployeeBox().getFirstName().setValue("Max");
-    fd1.getEmployeeBox().getHourlyWage().setValue(BigDecimal.valueOf(26.75));
+    fd1.getEmploymentBox().getHourlyWage().setValue(BigDecimal.valueOf(26.75));
     fd1.getEmployeeBox().getLastName().setValue("Beeloq");
     fd1.getEmployerBox().getAddressLine1().setValue("ad line 1");
     fd1.getEmployerBox().getAddressLine2().setValue("ad line 2");
@@ -104,7 +105,7 @@ public class EmployeeServiceTest extends AbstractTestWithDatabase {
     fd1.getEmployeeBox().getAccountNumber().setValue("PC 50-1589-242-2");
     fd1.getEmployeeBox().getAhvNumber().setValue("50-4544 656");
     fd1.getEmployeeBox().getFirstName().setValue("Max");
-    fd1.getEmployeeBox().getHourlyWage().setValue(BigDecimal.valueOf(26.75));
+    fd1.getEmploymentBox().getHourlyWage().setValue(BigDecimal.valueOf(26.75));
     fd1.getEmployeeBox().getLastName().setValue("Beeloq");
     fd1.getEmployerBox().getAddressLine1().setValue("ad line 1");
     fd1.getEmployerBox().getAddressLine2().setValue("ad line 2");
@@ -133,7 +134,7 @@ public class EmployeeServiceTest extends AbstractTestWithDatabase {
     fd1.getEmployeeBox().getAccountNumber().setValue("Acc mod");
     fd1.getEmployeeBox().getAhvNumber().setValue("50-4544 229");
     fd1.getEmployeeBox().getFirstName().setValue("Albert");
-    fd1.getEmployeeBox().getHourlyWage().setValue(BigDecimal.valueOf(25.25));
+    fd1.getEmploymentBox().getHourlyWage().setValue(BigDecimal.valueOf(25.25));
     fd1.getEmployeeBox().getLastName().setValue("Berok");
     fd1.getEmployerBox().getAddressLine1().setValue("ad line 1 mod");
     fd1.getEmployerBox().getAddressLine2().setValue("ad line 2 mod");

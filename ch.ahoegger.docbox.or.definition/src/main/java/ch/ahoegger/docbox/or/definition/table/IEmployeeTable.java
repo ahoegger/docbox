@@ -34,6 +34,18 @@ public interface IEmployeeTable {
   public static BigDecimal HOURLY_WAGE_MIN = BigDecimal.valueOf(0d);
   public static BigDecimal HOURLY_WAGE_MAX = BigDecimal.valueOf(200d);
 
+  public static String SOCIAL_INSURANCE_RATE = "SOCIAL_INSURANCE_RATE";
+  public static BigDecimal SOCIAL_INSURANCE_RATE_MIN = BigDecimal.valueOf(0d);
+  public static BigDecimal SOCIAL_INSURANCE_RATE_MAX = BigDecimal.valueOf(100d);
+
+  public static String SOURCE_TAX_RATE = "SOURCE_TAX_RATE";
+  public static BigDecimal SOURCE_TAX_RATE_MIN = BigDecimal.valueOf(0d);
+  public static BigDecimal SOURCE_TAX_RATE_MAX = BigDecimal.valueOf(100d);
+
+  public static String VACATION_EXTRA_RATE = "VACATION_EXTRA_RATE";
+  public static BigDecimal VACATION_EXTRA_RATE_MIN = BigDecimal.valueOf(0d);
+  public static BigDecimal VACATION_EXTRA_RATE_MAX = BigDecimal.valueOf(100d);
+
   public static String EMPLOYER_ADDRESS_LINE1 = "EMPLOYER_ADDRESS_LINE1";
   public static String EMPLOYER_ADDRESS_LINE2 = "EMPLOYER_ADDRESS_LINE2";
   public static String EMPLOYER_ADDRESS_LINE3 = "EMPLOYER_ADDRESS_LINE3";

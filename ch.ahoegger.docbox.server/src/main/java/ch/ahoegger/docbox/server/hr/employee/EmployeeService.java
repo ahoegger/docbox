@@ -148,8 +148,8 @@ public class EmployeeService implements IEmployeeService {
     Partner p = Partner.PARTNER.as("P");
 
     Record empRec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(emp.PARTNER_NR, emp.FIRST_NAME, emp.LAST_NAME, emp.ADDRESS_LINE1, emp.ADDRESS_LINE2, emp.AHV_NUMBER, emp.ACCOUNT_NUMBER, emp.HOURLY_WAGE, emp.EMPLOYER_ADDRESS_LINE1,
-            emp.EMPLOYER_ADDRESS_LINE2, emp.EMPLOYER_ADDRESS_LINE3, emp.EMPLOYER_EMAIL, emp.EMPLOYER_PHONE)
+        .select(emp.PARTNER_NR, emp.FIRST_NAME, emp.LAST_NAME, emp.ADDRESS_LINE1, emp.ADDRESS_LINE2, emp.AHV_NUMBER, emp.ACCOUNT_NUMBER, emp.HOURLY_WAGE, emp.SOCIAL_INSURANCE_RATE, emp.SOURCE_TAX_RATE, emp.VACATION_EXTRA_RATE,
+            emp.EMPLOYER_ADDRESS_LINE1, emp.EMPLOYER_ADDRESS_LINE2, emp.EMPLOYER_ADDRESS_LINE3, emp.EMPLOYER_EMAIL, emp.EMPLOYER_PHONE)
         .select(p.NAME, p.DESCRIPTION, p.START_DATE, p.END_DATE)
         .from(emp)
         .leftOuterJoin(p)
@@ -169,7 +169,11 @@ public class EmployeeService implements IEmployeeService {
           fd.getEmployeeBox().getAddressLine2().setValue(rec.get(emp.ADDRESS_LINE2));
           fd.getEmployeeBox().getAhvNumber().setValue(rec.get(emp.AHV_NUMBER));
           fd.getEmployeeBox().getAccountNumber().setValue(rec.get(emp.ACCOUNT_NUMBER));
-          fd.getEmployeeBox().getHourlyWage().setValue(rec.get(emp.HOURLY_WAGE));
+          fd.getEmploymentBox().getHourlyWage().setValue(rec.get(emp.HOURLY_WAGE));
+          fd.getEmploymentBox().getSocialInsuranceRate().setValue(rec.get(emp.SOCIAL_INSURANCE_RATE));
+          fd.getEmploymentBox().getSourceTaxRate().setValue(rec.get(emp.SOURCE_TAX_RATE));
+          fd.getEmploymentBox().getVacationExtraRate().setValue(rec.get(emp.VACATION_EXTRA_RATE));
+
           fd.getEmployerBox().getAddressLine1().setValue(rec.get(emp.EMPLOYER_ADDRESS_LINE1));
           fd.getEmployerBox().getAddressLine2().setValue(rec.get(emp.EMPLOYER_ADDRESS_LINE2));
           fd.getEmployerBox().getAddressLine3().setValue(rec.get(emp.EMPLOYER_ADDRESS_LINE3));
@@ -213,25 +217,32 @@ public class EmployeeService implements IEmployeeService {
 
   @RemoteServiceAccessDenied
   public int insert(Connection connection, BigDecimal partnerId, String firstName, String lastName, String addressLine1, String addressLine2, String ahvNumber, String accountNumber, BigDecimal hourlyWage,
+      BigDecimal socialInsuranceRate, BigDecimal sourceTaxRate, BigDecimal vacationExtraRate,
       String employerAddressLine1, String employerAddressLine2, String employerAddressLine3, String employerEmail, String employerPhone) {
     return DSL.using(connection, SQLDialect.DERBY)
-        .executeInsert(toRecord(partnerId, firstName, lastName, addressLine1, addressLine2, ahvNumber, accountNumber, hourlyWage, employerAddressLine1, employerAddressLine2, employerAddressLine3, employerEmail, employerPhone));
+        .executeInsert(toRecord(partnerId, firstName, lastName, addressLine1, addressLine2, ahvNumber, accountNumber, hourlyWage, socialInsuranceRate, sourceTaxRate, vacationExtraRate, employerAddressLine1, employerAddressLine2,
+            employerAddressLine3, employerEmail, employerPhone));
 
   }
 
   protected EmployeeRecord toRecord(EmployeeFormData fd) {
     return toRecord(fd.getPartnerId(), fd.getEmployeeBox().getFirstName().getValue(), fd.getEmployeeBox().getLastName().getValue(), fd.getEmployeeBox().getAddressLine1().getValue(), fd.getEmployeeBox().getAddressLine2().getValue(),
-        fd.getEmployeeBox().getAhvNumber().getValue(), fd.getEmployeeBox().getAccountNumber().getValue(), fd.getEmployeeBox().getHourlyWage().getValue(), fd.getEmployerBox().getAddressLine1().getValue(),
+        fd.getEmployeeBox().getAhvNumber().getValue(), fd.getEmployeeBox().getAccountNumber().getValue(), fd.getEmploymentBox().getHourlyWage().getValue(),
+        fd.getEmploymentBox().getSocialInsuranceRate().getValue(), fd.getEmploymentBox().getSourceTaxRate().getValue(), fd.getEmploymentBox().getVacationExtraRate().getValue(),
+        fd.getEmployerBox().getAddressLine1().getValue(),
         fd.getEmployerBox().getAddressLine2().getValue(), fd.getEmployerBox().getAddressLine3().getValue(), fd.getEmployerBox().getEmail().getValue(),
         fd.getEmployerBox().getPhone().getValue());
   }
 
   protected EmployeeRecord toRecord(BigDecimal partnerId, String firstName, String lastName, String addressLine1, String addressLine2, String ahvNumber, String accountNumber, BigDecimal hourlyWage,
+      BigDecimal socialInsuranceRate, BigDecimal sourceTaxRate, BigDecimal vacationExtraRate,
       String employerAddressLine1, String employerAddressLine2, String employerAddressLine3, String employerEmail, String employerPhone) {
-    return mapToRecord(new EmployeeRecord(), partnerId, firstName, lastName, addressLine1, addressLine2, ahvNumber, accountNumber, hourlyWage, employerAddressLine1, employerAddressLine2, employerAddressLine3, employerEmail, employerPhone);
+    return mapToRecord(new EmployeeRecord(), partnerId, firstName, lastName, addressLine1, addressLine2, ahvNumber, accountNumber, hourlyWage, socialInsuranceRate, sourceTaxRate, vacationExtraRate, employerAddressLine1,
+        employerAddressLine2, employerAddressLine3, employerEmail, employerPhone);
   }
 
   protected EmployeeRecord mapToRecord(EmployeeRecord rec, BigDecimal partnerId, String firstName, String lastName, String addressLine1, String addressLine2, String ahvNumber, String accountNumber, BigDecimal hourlyWage,
+      BigDecimal socialInsuranceRate, BigDecimal sourceTaxRate, BigDecimal vacationExtraRate,
       String employerAddressLine1, String employerAddressLine2, String employerAddressLine3, String employerEmail, String employerPhone) {
     Employee t = Employee.EMPLOYEE;
     return rec
@@ -246,6 +257,9 @@ public class EmployeeService implements IEmployeeService {
         .with(t.EMPLOYER_PHONE, employerPhone)
         .with(t.FIRST_NAME, firstName)
         .with(t.HOURLY_WAGE, hourlyWage)
+        .with(t.SOCIAL_INSURANCE_RATE, socialInsuranceRate)
+        .with(t.SOURCE_TAX_RATE, sourceTaxRate)
+        .with(t.VACATION_EXTRA_RATE, vacationExtraRate)
         .with(t.LAST_NAME, lastName)
         .with(t.PARTNER_NR, partnerId);
   }

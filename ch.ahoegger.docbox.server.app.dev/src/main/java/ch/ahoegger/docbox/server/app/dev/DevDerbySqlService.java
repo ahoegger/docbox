@@ -314,6 +314,7 @@ public class DevDerbySqlService extends DerbySqlService {
     LOG.info("SQL-DEV create rows for: {}", IEmployeeTable.TABLE_NAME);
 
     BEANS.get(EmployeeService.class).insert(sqlService.getConnection(), partnerId03_employee, "Hans", "Muster", "Mountainview 01 e", "CA-90501 Santa Barbara e", "12.2568.2154.69", "PC 50-101-89-7", BigDecimal.valueOf(26.50),
+        BigDecimal.valueOf(6.225), BigDecimal.valueOf(5.0), BigDecimal.valueOf(8.33),
         "Bart Simpson & Marth Simpson er", "742 Evergreen Terrace er", "Springfield er", "bart@simpson.spring", "+1 (0)7510 2152");
   }
 
@@ -348,7 +349,7 @@ public class DevDerbySqlService extends DerbySqlService {
     entityService.insert(sqlService.getConnection(), entityId02, partnerId03_employee, postingGroupId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 9, 11)), BigDecimal.valueOf(4.25), null, "Sept work 2");
     entityService.insert(sqlService.getConnection(), entityId03, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(10)), BigDecimal.valueOf(5.5), null, "First work");
     entityService.insert(sqlService.getConnection(), entityId04, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusDays(1)), BigDecimal.valueOf(2.25), null, "Second work");
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 30; i++) {
       createEntity(sqlService, i);
     }
   }
@@ -357,7 +358,11 @@ public class DevDerbySqlService extends DerbySqlService {
     BigDecimal entityId = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
 
     BEANS.get(EntityService.class).insert(sqlService.getConnection(), entityId, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID,
-        LocalDateUtility.toDate(LocalDate.of(2016, 12, 04).plusDays(counter)), BigDecimal.valueOf(2.5), null, "Dez work " + counter);
+        LocalDateUtility.toDate(LocalDate.of(2016, 12, 01).plusDays(counter)), BigDecimal.valueOf(2.5), null, "Dez work " + counter);
+
+    entityId = BigDecimal.valueOf(getSequenceNextval(ISequenceTable.TABLE_NAME));
+    BEANS.get(EntityService.class).insert(sqlService.getConnection(), entityId, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.ExpenseCode.ID,
+        LocalDateUtility.toDate(LocalDate.of(2016, 12, 01).plusDays(counter)), null, BigDecimal.valueOf(12.35), "Dez expense " + counter);
   }
 
 }

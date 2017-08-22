@@ -26,6 +26,10 @@ public class EmployeeFormData extends AbstractFormData {
     return getFieldByClass(EmployerBox.class);
   }
 
+  public EmploymentBox getEmploymentBox() {
+    return getFieldByClass(EmploymentBox.class);
+  }
+
   public PartnerGroupBox getPartnerGroupBox() {
     return getFieldByClass(PartnerGroupBox.class);
   }
@@ -54,6 +58,11 @@ public class EmployeeFormData extends AbstractFormData {
   }
 
   public static class EmployerBox extends AbstractEmployerBoxData {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class EmploymentBox extends AbstractEmploymentBoxData {
 
     private static final long serialVersionUID = 1L;
   }
