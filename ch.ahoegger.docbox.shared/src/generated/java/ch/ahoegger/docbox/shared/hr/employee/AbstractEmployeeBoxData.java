@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.shared.hr.employee;
 
+import java.util.Date;
+
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
@@ -30,6 +32,10 @@ public abstract class AbstractEmployeeBoxData extends AbstractFormFieldData {
     return getFieldByClass(AhvNumber.class);
   }
 
+  public Birthday getBirthday() {
+    return getFieldByClass(Birthday.class);
+  }
+
   public FirstName getFirstName() {
     return getFieldByClass(FirstName.class);
   }
@@ -54,6 +60,11 @@ public abstract class AbstractEmployeeBoxData extends AbstractFormFieldData {
   }
 
   public static class AhvNumber extends AbstractValueFieldData<String> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class Birthday extends AbstractValueFieldData<Date> {
 
     private static final long serialVersionUID = 1L;
   }

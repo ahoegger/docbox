@@ -313,7 +313,8 @@ public class DevDerbySqlService extends DerbySqlService {
   protected void insertEmployers(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", IEmployeeTable.TABLE_NAME);
 
-    BEANS.get(EmployeeService.class).insert(sqlService.getConnection(), partnerId03_employee, "Hans", "Muster", "Mountainview 01 e", "CA-90501 Santa Barbara e", "12.2568.2154.69", "PC 50-101-89-7", BigDecimal.valueOf(26.50),
+    BEANS.get(EmployeeService.class).insert(sqlService.getConnection(), partnerId03_employee, "Hans", "Muster", "Mountainview 01 e", "CA-90501 Santa Barbara e", "12.2568.2154.69", "PC 50-101-89-7",
+        LocalDateUtility.toDate(LocalDate.of(1968, 10, 02)), BigDecimal.valueOf(26.50),
         BigDecimal.valueOf(6.225), BigDecimal.valueOf(5.0), BigDecimal.valueOf(8.33),
         "Bart Simpson & Marth Simpson er", "742 Evergreen Terrace er", "Springfield er", "bart@simpson.spring", "+1 (0)7510 2152");
   }

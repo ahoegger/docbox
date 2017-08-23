@@ -4,10 +4,12 @@
 package org.ch.ahoegger.docbox.server.or.app.tables;
 
 
+import ch.ahoegger.docbox.server.or.generator.converter.DateConverter;
 import ch.ahoegger.docbox.server.or.generator.converter.LongConverter;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Generated;
@@ -36,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Employee extends TableImpl<EmployeeRecord> {
 
-    private static final long serialVersionUID = -1738122290;
+    private static final long serialVersionUID = 123067546;
 
     /**
      * The reference instance of <code>APP.EMPLOYEE</code>
@@ -80,6 +82,11 @@ public class Employee extends TableImpl<EmployeeRecord> {
      * The column <code>APP.EMPLOYEE.AHV_NUMBER</code>.
      */
     public final TableField<EmployeeRecord, String> AHV_NUMBER = createField("AHV_NUMBER", org.jooq.impl.SQLDataType.VARCHAR.length(16), this, "");
+
+    /**
+     * The column <code>APP.EMPLOYEE.BIRTHDAY</code>.
+     */
+    public final TableField<EmployeeRecord, Date> BIRTHDAY = createField("BIRTHDAY", org.jooq.impl.SQLDataType.DATE, this, "", new DateConverter());
 
     /**
      * The column <code>APP.EMPLOYEE.ACCOUNT_NUMBER</code>.
@@ -166,7 +173,7 @@ public class Employee extends TableImpl<EmployeeRecord> {
      */
     @Override
     public UniqueKey<EmployeeRecord> getPrimaryKey() {
-        return Keys.SQL170822110755200;
+        return Keys.SQL170823125047300;
     }
 
     /**
@@ -174,7 +181,7 @@ public class Employee extends TableImpl<EmployeeRecord> {
      */
     @Override
     public List<UniqueKey<EmployeeRecord>> getKeys() {
-        return Arrays.<UniqueKey<EmployeeRecord>>asList(Keys.SQL170822110755200);
+        return Arrays.<UniqueKey<EmployeeRecord>>asList(Keys.SQL170823125047300);
     }
 
     /**

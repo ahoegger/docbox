@@ -103,11 +103,15 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       return getColumnSet().getColumnByClass(AccountNumberColumn.class);
     }
 
+    public BirthdayColumn getBirthdayColumn() {
+      return getColumnSet().getColumnByClass(BirthdayColumn.class);
+    }
+
     public PartnerIdColumn getPartnerIdColumn() {
       return getColumnSet().getColumnByClass(PartnerIdColumn.class);
     }
 
-    @Order(10)
+    @Order(100)
     public class PartnerIdColumn extends AbstractBigDecimalColumn {
 
       @Override
@@ -117,7 +121,7 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
 
     }
 
-    @Order(15)
+    @Order(200)
     public class DisplayNameColumn extends AbstractStringColumn {
       @Override
       protected String getConfiguredHeaderText() {
@@ -135,7 +139,7 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       }
     }
 
-    @Order(20)
+    @Order(300)
     public class FirstNameColumn extends AbstractStringColumn {
       @Override
       protected String getConfiguredHeaderText() {
@@ -153,7 +157,7 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       }
     }
 
-    @Order(30)
+    @Order(400)
     public class LastNameColumn extends AbstractStringColumn {
       @Override
       protected String getConfiguredHeaderText() {
@@ -171,7 +175,7 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       }
     }
 
-    @Order(35)
+    @Order(500)
     public class AddressLine1Column extends AbstractStringColumn {
       @Override
       protected String getConfiguredHeaderText() {
@@ -184,7 +188,7 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       }
     }
 
-    @Order(37)
+    @Order(600)
     public class AddressLine2Column extends AbstractStringColumn {
       @Override
       protected String getConfiguredHeaderText() {
@@ -197,7 +201,7 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       }
     }
 
-    @Order(38)
+    @Order(700)
     public class AHVNumberColumn extends AbstractStringColumn {
       @Override
       protected String getConfiguredHeaderText() {
@@ -215,7 +219,7 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       }
     }
 
-    @Order(38.5)
+    @Order(800)
     public class AccountNumberColumn extends AbstractStringColumn {
       @Override
       protected String getConfiguredHeaderText() {
@@ -228,7 +232,15 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       }
     }
 
-    @Order(39)
+    @Order(900)
+    public class BirthdayColumn extends AbstractDateColumn {
+      @Override
+      protected String getConfiguredHeaderText() {
+        return TEXTS.get("Birthday");
+      }
+    }
+
+    @Order(1000)
     public class HourlyWageColumn extends AbstractBigDecimalColumn {
       @Override
       protected String getConfiguredHeaderText() {
@@ -251,7 +263,7 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       }
     }
 
-    @Order(40)
+    @Order(1100)
     public class StartDateColumn extends AbstractDateColumn {
       @Override
       protected String getConfiguredHeaderText() {
@@ -264,7 +276,7 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       }
     }
 
-    @Order(50)
+    @Order(1200)
     public class EndDateColumn extends AbstractDateColumn {
       @Override
       protected String getConfiguredHeaderText() {
@@ -277,7 +289,7 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       }
     }
 
-    @Order(1000)
+    @Order(10000)
     public class EditMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -297,7 +309,7 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       }
     }
 
-    @Order(2000)
+    @Order(10100)
     public class NewMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {

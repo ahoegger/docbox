@@ -62,6 +62,7 @@ public class EmployeeTableData extends AbstractTablePageData {
     public static final String addressLine2 = "addressLine2";
     public static final String aHVNumber = "aHVNumber";
     public static final String accountNumber = "accountNumber";
+    public static final String birthday = "birthday";
     public static final String hourlyWage = "hourlyWage";
     public static final String startDate = "startDate";
     public static final String endDate = "endDate";
@@ -73,6 +74,7 @@ public class EmployeeTableData extends AbstractTablePageData {
     private String m_addressLine2;
     private String m_aHVNumber;
     private String m_accountNumber;
+    private Date m_birthday;
     private BigDecimal m_hourlyWage;
     private Date m_startDate;
     private Date m_endDate;
@@ -139,6 +141,14 @@ public class EmployeeTableData extends AbstractTablePageData {
 
     public void setAccountNumber(String newAccountNumber) {
       m_accountNumber = newAccountNumber;
+    }
+
+    public Date getBirthday() {
+      return m_birthday;
+    }
+
+    public void setBirthday(Date newBirthday) {
+      m_birthday = newBirthday;
     }
 
     public BigDecimal getHourlyWage() {

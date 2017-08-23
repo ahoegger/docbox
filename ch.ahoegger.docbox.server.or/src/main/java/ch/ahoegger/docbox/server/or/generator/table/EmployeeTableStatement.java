@@ -30,6 +30,7 @@ public class EmployeeTableStatement implements ITableStatement, IEmployeeTable {
     statementBuilder.append(ADDRESS_LINE1).append(" VARCHAR(").append(ADDRESS_LINE_LENGTH).append("), ");
     statementBuilder.append(ADDRESS_LINE2).append(" VARCHAR(").append(ADDRESS_LINE_LENGTH).append("), ");
     statementBuilder.append(AHV_NUMBER).append(" VARCHAR(").append(AHV_NUMBER_LENGTH).append("), ");
+    statementBuilder.append(BIRTHDAY).append(" DATE, ");
     statementBuilder.append(ACCOUNT_NUMBER).append(" VARCHAR(").append(ACCOUNT_NUMBER_LENGTH).append("), ");
     statementBuilder.append(EMPLOYER_ADDRESS_LINE1).append(" VARCHAR(").append(ADDRESS_LINE_LENGTH).append("), ");
     statementBuilder.append(EMPLOYER_ADDRESS_LINE2).append(" VARCHAR(").append(ADDRESS_LINE_LENGTH).append("), ");

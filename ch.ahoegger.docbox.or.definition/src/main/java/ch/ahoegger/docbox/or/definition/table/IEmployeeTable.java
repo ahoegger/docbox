@@ -27,6 +27,8 @@ public interface IEmployeeTable {
   public static String AHV_NUMBER = "AHV_NUMBER";
   public static int AHV_NUMBER_LENGTH = 16;
 
+  public static String BIRTHDAY = "BIRTHDAY";
+
   public static String ACCOUNT_NUMBER = "ACCOUNT_NUMBER";
   public static int ACCOUNT_NUMBER_LENGTH = 128;
 

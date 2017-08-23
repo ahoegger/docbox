@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.client.hr.employee;
 
 import org.eclipse.scout.rt.client.dto.FormData;
+import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.Order;
@@ -41,6 +42,10 @@ public abstract class AbstractEmployeeBox extends AbstractGroupBox {
 
   public AhvNumberField getAhvNumberField() {
     return getFieldByClass(AhvNumberField.class);
+  }
+
+  public BirthdayField getBirthdayField() {
+    return getFieldByClass(BirthdayField.class);
   }
 
   public LastNameField getLastNameField() {
@@ -138,4 +143,13 @@ public abstract class AbstractEmployeeBox extends AbstractGroupBox {
       return IEmployeeTable.ACCOUNT_NUMBER_LENGTH;
     }
   }
+
+  @Order(11000)
+  public class BirthdayField extends AbstractDateField {
+    @Override
+    protected String getConfiguredLabel() {
+      return TEXTS.get("Birthday");
+    }
+  }
+
 }
