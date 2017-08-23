@@ -150,6 +150,11 @@ public abstract class AbstractEmployeeBox extends AbstractGroupBox {
     protected String getConfiguredLabel() {
       return TEXTS.get("Birthday");
     }
+
+    @Override
+    protected int getConfiguredWidthInPixel() {
+      return 100;
+    }
   }
 
 }

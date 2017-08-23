@@ -69,6 +69,15 @@ public class EmployeeService implements IEmployeeService {
       }
     }
 
+    // birthday from
+    if (formData.getBirtheayFrom().getValue() != null) {
+      condition = condition.and(emp.BIRTHDAY.ge(formData.getBirtheayFrom().getValue()));
+    }
+    // birthday to
+    if (formData.getBirthdayTo().getValue() != null) {
+      condition = condition.and(emp.BIRTHDAY.le(formData.getBirthdayTo().getValue()));
+    }
+
     SelectConditionStep<Record> statement = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .select(emp.PARTNER_NR, emp.FIRST_NAME, emp.LAST_NAME, emp.ADDRESS_LINE1, emp.ADDRESS_LINE2, emp.AHV_NUMBER, emp.ACCOUNT_NUMBER, emp.BIRTHDAY, emp.HOURLY_WAGE)
         .select(ptr.NAME, ptr.START_DATE, ptr.END_DATE)

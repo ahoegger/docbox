@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.shared.hr.employer;
 
+import java.util.Date;
+
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.platform.util.TriState;
@@ -19,6 +21,14 @@ public class EmployeeSearchFormData extends AbstractFormData {
     return getFieldByClass(ActiveBox.class);
   }
 
+  public BirthdayTo getBirthdayTo() {
+    return getFieldByClass(BirthdayTo.class);
+  }
+
+  public BirtheayFrom getBirtheayFrom() {
+    return getFieldByClass(BirtheayFrom.class);
+  }
+
   public FirstName getFirstName() {
     return getFieldByClass(FirstName.class);
   }
@@ -28,6 +38,16 @@ public class EmployeeSearchFormData extends AbstractFormData {
   }
 
   public static class ActiveBox extends AbstractValueFieldData<TriState> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class BirthdayTo extends AbstractValueFieldData<Date> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class BirtheayFrom extends AbstractValueFieldData<Date> {
 
     private static final long serialVersionUID = 1L;
   }

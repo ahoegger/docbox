@@ -9,8 +9,10 @@ import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractResetButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractSearchButton;
+import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
+import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.platform.Order;
@@ -22,6 +24,9 @@ import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchBu
 import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox.ActiveBox;
+import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox.BirthdayBox;
+import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox.BirthdayBox.BirthdayToField;
+import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox.BirthdayBox.BirtheayFromField;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox.FirstNameField;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox.LastNameField;
 import ch.ahoegger.docbox.or.definition.table.IEmployeeTable;
@@ -62,6 +67,18 @@ public class EmployeeSearchForm extends AbstractSearchForm {
 
   public SearchButton getSearchButton() {
     return getFieldByClass(SearchButton.class);
+  }
+
+  public BirthdayBox getBirthdayBox() {
+    return getFieldByClass(BirthdayBox.class);
+  }
+
+  public BirtheayFromField getBirtheayFromField() {
+    return getFieldByClass(BirtheayFromField.class);
+  }
+
+  public BirthdayToField getBirthdayToField() {
+    return getFieldByClass(BirthdayToField.class);
   }
 
   public ResetButton getResetButton() {
@@ -148,6 +165,37 @@ public class EmployeeSearchForm extends AbstractSearchForm {
             }
           }
         }
+
+        @Order(3000)
+        public class BirthdayBox extends AbstractSequenceBox {
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("Birthday");
+          }
+
+          @Override
+          protected boolean getConfiguredAutoCheckFromTo() {
+            return true;
+          }
+
+          @Order(1000)
+          public class BirtheayFromField extends AbstractDateField {
+            @Override
+            protected String getConfiguredLabel() {
+              return TEXTS.get("from");
+            }
+          }
+
+          @Order(2000)
+          public class BirthdayToField extends AbstractDateField {
+            @Override
+            protected String getConfiguredLabel() {
+              return TEXTS.get("to");
+            }
+          }
+
+        }
+
       }
     }
 

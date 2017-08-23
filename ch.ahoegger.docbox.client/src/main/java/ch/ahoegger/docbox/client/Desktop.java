@@ -1,5 +1,8 @@
 package ch.ahoegger.docbox.client;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -9,13 +12,17 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.notification.DesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
@@ -27,7 +34,10 @@ import ch.ahoegger.docbox.client.settings.SettingsOutline;
 import ch.ahoegger.docbox.client.work.WorkOutline;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
+import ch.ahoegger.docbox.shared.hr.employee.IEmployeeService;
+import ch.ahoegger.docbox.shared.hr.employer.EmployeeSearchFormData;
 import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
+import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
  * <h3>{@link Desktop}</h3>
@@ -51,6 +61,26 @@ public class Desktop extends AbstractDesktop {
     super.execGuiAttached();
     selectFirstVisibleOutline();
     activateFirstPage();
+    checkBirthdayOfEmployees();
+  }
+
+  protected void checkBirthdayOfEmployees() {
+    final LocalDate today = LocalDateUtility.toLocalDate(LocalDateUtility.today());
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
+    EmployeeSearchFormData sfd = new EmployeeSearchFormData();
+    sfd.getActiveBox().setValue(TriState.TRUE);
+    Arrays.stream(BEANS.get(IEmployeeService.class).getTableData(sfd).getRows())
+        .filter(row -> {
+          if (row.getBirthday() == null) {
+            return false;
+          }
+          int diffDays = LocalDateUtility.toLocalDate(row.getBirthday()).getDayOfYear() - today.getDayOfYear();
+          System.out.println(diffDays);
+          return diffDays > 0 && diffDays < 60;
+        })
+        .sorted((r1, r2) -> LocalDateUtility.toLocalDate(r1.getBirthday()).getDayOfYear() - LocalDateUtility.toLocalDate(r2.getBirthday()).getDayOfYear())
+        .map(row -> row.getDisplayName() + " has birthday on\n " + dateFormatter.format(LocalDateUtility.toLocalDate(row.getBirthday())))
+        .forEach(not -> addNotification(new DesktopNotification(new Status(not, IStatus.INFO), -1l, true)));
   }
 
   protected void selectFirstVisibleOutline() {
