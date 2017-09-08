@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 import ch.ahoegger.docbox.shared.administration.user.IUserLookupService;
@@ -55,7 +55,7 @@ public class DocumentFormTest {
   public void setup() {
     result.getAbstract().setValue(MESSAGE_VALUE);
 
-    Mockito.when(m_mockSvc.load(Matchers.any())).thenReturn(result);
+    Mockito.when(m_mockSvc.load(ArgumentMatchers.any())).thenReturn(result);
   }
 
   /**

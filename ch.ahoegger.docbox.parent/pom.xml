@@ -7,10 +7,10 @@
 	<parent>
 		<groupId>org.eclipse.scout</groupId>
 		<artifactId>maven_rt_plugin_config-master</artifactId>
-		<version>2.0.1</version>
-		<relativePath/>
+		<version>2.0.13</version>
+		<relativePath></relativePath>
 	</parent>
-
+	
 	<groupId>ch.ahoegger.docbox</groupId>
 	<artifactId>ch.ahoegger.docbox.parent</artifactId>
 	<version>1.0.4-SNAPSHOT</version>
@@ -21,7 +21,7 @@
 	<properties>
 		<ch.ahoegger.docbox.version>${project.version}</ch.ahoegger.docbox.version>
 		<jdk.source.version>1.8</jdk.source.version>
-		<org.eclipse.scout.rt_version>6.1.0.M5</org.eclipse.scout.rt_version>
+		<org.eclipse.scout.rt.version>7.0.100.016_RC3</org.eclipse.scout.rt.version>
 		<aspose-pdf.version>11.2.0</aspose-pdf.version>
 		<sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
 	</properties>
@@ -37,18 +37,7 @@
 		<module>../ch.ahoegger.docbox.ui.html.app.war</module>
 		<module>../ch.ahoegger.docbox.jasper</module>
 		<module>../ch.ahoegger.docbox.jasper.bean</module>
-  </modules>
-
-	<!-- <repositories> -->
-	<!-- <repository> -->
-	<!-- <id>bintray-jai-imageio</id> -->
-	<!-- <name>jai-imageio at bintray</name> -->
-	<!-- <url>https://dl.bintray.com/jai-imageio/maven/</url> -->
-	<!-- <snapshots> -->
-	<!-- <enabled>false</enabled> -->
-	<!-- </snapshots> -->
-	<!-- </repository> -->
-	<!-- </repositories> -->
+	</modules>
 
 	<dependencyManagement>
 
@@ -57,7 +46,7 @@
 			<dependency>
 				<groupId>org.eclipse.scout.rt</groupId>
 				<artifactId>org.eclipse.scout.rt</artifactId>
-				<version>${org.eclipse.scout.rt_version}</version>
+				<version>${org.eclipse.scout.rt.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -108,16 +97,16 @@
 				<artifactId>ch.ahoegger.docbox.jasper.bean</artifactId>
 				<version>${ch.ahoegger.docbox.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.jboss</groupId>
-				<artifactId>jandex</artifactId>
-				<version>1.2.2.Final</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss.jandex</groupId>
-				<artifactId>jandex-maven-plugin</artifactId>
-				<version>1.0.4</version>
-			</dependency>
+			<!-- <dependency> -->
+			<!-- <groupId>org.jboss</groupId> -->
+			<!-- <artifactId>jandex</artifactId> -->
+			<!-- <version>1.2.2.Final</version> -->
+			<!-- </dependency> -->
+			<!-- <dependency> -->
+			<!-- <groupId>org.jboss.jandex</groupId> -->
+			<!-- <artifactId>jandex-maven-plugin</artifactId> -->
+			<!-- <version>1.0.4</version> -->
+			<!-- </dependency> -->
 		</dependencies>
 
 
@@ -126,11 +115,11 @@
 	<build>
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<groupId>org.jboss.jandex</groupId>
-					<artifactId>jandex-maven-plugin</artifactId>
-					<version>1.0.3</version>
-				</plugin>
+				<!-- <plugin> -->
+				<!-- <groupId>org.jboss.jandex</groupId> -->
+				<!-- <artifactId>jandex-maven-plugin</artifactId> -->
+				<!-- <version>1.0.3</version> -->
+				<!-- </plugin> -->
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>jaxws-maven-plugin</artifactId>
