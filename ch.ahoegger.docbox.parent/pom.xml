@@ -102,11 +102,11 @@
 			<artifactId>jandex</artifactId>
 			<version>2.0.3.Final</version>
 			</dependency>
-			<!-- <dependency> -->
-			<!-- <groupId>org.jboss.jandex</groupId> -->
-			<!-- <artifactId>jandex-maven-plugin</artifactId> -->
-			<!-- <version>1.0.4</version> -->
-			<!-- </dependency> -->
+			<dependency>
+			<groupId>org.jboss.jandex</groupId>
+			<artifactId>jandex-maven-plugin</artifactId>
+			<version>1.0.5</version>
+			</dependency>
 		</dependencies>
 
 
@@ -115,11 +115,11 @@
 	<build>
 		<pluginManagement>
 			<plugins>
-				<!-- <plugin> -->
-				<!-- <groupId>org.jboss.jandex</groupId> -->
-				<!-- <artifactId>jandex-maven-plugin</artifactId> -->
-				<!-- <version>1.0.3</version> -->
-				<!-- </plugin> -->
+				<plugin>
+				<groupId>org.jboss.jandex</groupId>
+				<artifactId>jandex-maven-plugin</artifactId>
+				<version>1.0.5</version>
+				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>jaxws-maven-plugin</artifactId>
