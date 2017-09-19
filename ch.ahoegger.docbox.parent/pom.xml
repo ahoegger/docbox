@@ -155,6 +155,25 @@
 						<skip>true</skip>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.basepom.maven</groupId>
+					<artifactId>duplicate-finder-maven-plugin</artifactId>
+					<version>1.2.1</version>
+					<configuration>
+						<ignoredDependencies>
+							<dependency>
+								<groupId>commons-logging</groupId>
+								<artifactId>commons-logging</artifactId>
+								<version>1.2</version>
+							</dependency>
+							<dependency>
+								<groupId>org.slf4j</groupId>
+								<artifactId>jcl-over-slf4j</artifactId>
+								<version>[1.7.0,1.7.99]</version>
+							</dependency>
+						</ignoredDependencies>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
