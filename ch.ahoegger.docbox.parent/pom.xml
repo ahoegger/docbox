@@ -10,7 +10,7 @@
 		<version>2.0.13</version>
 		<relativePath></relativePath>
 	</parent>
-	
+
 	<groupId>ch.ahoegger.docbox</groupId>
 	<artifactId>ch.ahoegger.docbox.parent</artifactId>
 	<version>1.0.4-SNAPSHOT</version>
@@ -33,8 +33,10 @@
 		<module>../ch.ahoegger.docbox.server.or</module>
 		<module>../ch.ahoegger.docbox.client</module>
 		<module>../ch.ahoegger.docbox.server.app.war</module>
+		<module>../ch.ahoegger.docbox.server.app.dev</module>
 		<module>../ch.ahoegger.docbox.ui.html</module>
 		<module>../ch.ahoegger.docbox.ui.html.app.war</module>
+		<module>../ch.ahoegger.docbox.ui.html.app.dev</module>
 		<module>../ch.ahoegger.docbox.jasper</module>
 		<module>../ch.ahoegger.docbox.jasper.bean</module>
 	</modules>
@@ -98,14 +100,14 @@
 				<version>${ch.ahoegger.docbox.version}</version>
 			</dependency>
 			<dependency>
-			<groupId>org.jboss</groupId>
-			<artifactId>jandex</artifactId>
-			<version>2.0.3.Final</version>
+				<groupId>org.jboss</groupId>
+				<artifactId>jandex</artifactId>
+				<version>2.0.3.Final</version>
 			</dependency>
 			<dependency>
-			<groupId>org.jboss.jandex</groupId>
-			<artifactId>jandex-maven-plugin</artifactId>
-			<version>1.0.5</version>
+				<groupId>org.jboss.jandex</groupId>
+				<artifactId>jandex-maven-plugin</artifactId>
+				<version>1.0.5</version>
 			</dependency>
 		</dependencies>
 
@@ -116,9 +118,9 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-				<groupId>org.jboss.jandex</groupId>
-				<artifactId>jandex-maven-plugin</artifactId>
-				<version>1.0.5</version>
+					<groupId>org.jboss.jandex</groupId>
+					<artifactId>jandex-maven-plugin</artifactId>
+					<version>1.0.5</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
