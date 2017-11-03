@@ -91,7 +91,10 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
   @Override
   protected void execInitSearchForm() {
     super.execInitSearchForm();
-    getSearchFormInternal().setPartnerId(getPartnerId());
+    if (getPartnerId() != null) {
+      getSearchFormInternal().getPartnerSmartField().setValue(getPartnerId());
+      getSearchFormInternal().getPartnerSmartField().setEnabled(false);
+    }
     getSearchFormInternal().setTaxGroupId(getTaxGroupId());
   }
 
@@ -162,6 +165,14 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
       return getColumnSet().getColumnByClass(TaxGroupColumn.class);
     }
 
+    public StartDateColumn getStartDateColumn() {
+      return getColumnSet().getColumnByClass(StartDateColumn.class);
+    }
+
+    public EndDateColumn getEndDateColumn() {
+      return getColumnSet().getColumnByClass(EndDateColumn.class);
+    }
+
     public NameColumn getNameColumn() {
       return getColumnSet().getColumnByClass(NameColumn.class);
     }
@@ -207,6 +218,32 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
       @Override
       protected int getConfiguredWidth() {
         return 200;
+      }
+    }
+
+    @Order(3500)
+    public class StartDateColumn extends AbstractDateColumn {
+      @Override
+      protected String getConfiguredHeaderText() {
+        return TEXTS.get("StartDate");
+      }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 120;
+      }
+    }
+
+    @Order(3750)
+    public class EndDateColumn extends AbstractDateColumn {
+      @Override
+      protected String getConfiguredHeaderText() {
+        return TEXTS.get("EndDate");
+      }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 120;
       }
     }
 
@@ -410,6 +447,36 @@ public class PostingGroupTablePage extends AbstractDocboxPageWithTable<PostingGr
         form.setPostingGroupId(postingGroupId);
         form.getPartnerField().setEnabled(false);
         form.startNew();
+      }
+    }
+
+    @Order(50500)
+    public class EditPostingGroupMenu extends AbstractMenu {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("Edit");
+      }
+
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+      }
+
+      @Override
+      protected void execOwnerValueChanged(Object newOwnerValue) {
+
+        setVisible(ObjectUtility.notEquals(getIdColumn().getValue(getTable().getSelectedRow()), UnbilledCode.ID), "unbilled");
+      }
+
+      @Override
+      protected void execAction() {
+        BigDecimal partnerId = getPartnerIdColumn().getValue(getSelectedRow());
+        BigDecimal postingGroupId = getIdColumn().getValue(getTable().getSelectedRow());
+        PostingGroupForm form = new PostingGroupForm();
+        form.getPartnerField().setValue(partnerId);
+        form.setPostingGroupId(postingGroupId);
+        form.getPartnerField().setEnabled(false);
+        form.startModify();
       }
     }
 

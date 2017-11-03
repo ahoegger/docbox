@@ -57,6 +57,8 @@ public class PostingGroupTableData extends AbstractTablePageData {
     public static final String sortGroup = "sortGroup";
     public static final String id = "id";
     public static final String name = "name";
+    public static final String startDate = "startDate";
+    public static final String endDate = "endDate";
     public static final String date = "date";
     public static final String workingHours = "workingHours";
     public static final String bruttoWage = "bruttoWage";
@@ -71,6 +73,8 @@ public class PostingGroupTableData extends AbstractTablePageData {
     private BigDecimal m_sortGroup;
     private BigDecimal m_id;
     private String m_name;
+    private Date m_startDate;
+    private Date m_endDate;
     private Date m_date;
     private BigDecimal m_workingHours;
     private BigDecimal m_bruttoWage;
@@ -105,6 +109,22 @@ public class PostingGroupTableData extends AbstractTablePageData {
 
     public void setName(String newName) {
       m_name = newName;
+    }
+
+    public Date getStartDate() {
+      return m_startDate;
+    }
+
+    public void setStartDate(Date newStartDate) {
+      m_startDate = newStartDate;
+    }
+
+    public Date getEndDate() {
+      return m_endDate;
+    }
+
+    public void setEndDate(Date newEndDate) {
+      m_endDate = newEndDate;
     }
 
     public Date getDate() {

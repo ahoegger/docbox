@@ -33,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultPermissionTable extends TableImpl<DefaultPermissionTableRecord> {
 
-    private static final long serialVersionUID = 1252822105;
+    private static final long serialVersionUID = -912914405;
 
     /**
      * The reference instance of <code>APP.DEFAULT_PERMISSION_TABLE</code>
@@ -93,7 +93,7 @@ public class DefaultPermissionTable extends TableImpl<DefaultPermissionTableReco
      */
     @Override
     public UniqueKey<DefaultPermissionTableRecord> getPrimaryKey() {
-        return Keys.SQL170823125047180;
+        return Keys.SQL171103130308990;
     }
 
     /**
@@ -101,7 +101,7 @@ public class DefaultPermissionTable extends TableImpl<DefaultPermissionTableReco
      */
     @Override
     public List<UniqueKey<DefaultPermissionTableRecord>> getKeys() {
-        return Arrays.<UniqueKey<DefaultPermissionTableRecord>>asList(Keys.SQL170823125047180);
+        return Arrays.<UniqueKey<DefaultPermissionTableRecord>>asList(Keys.SQL171103130308990);
     }
 
     /**

@@ -51,6 +51,10 @@ public class PostingGroupFormData extends AbstractFormData {
     return getFieldByClass(Partner.class);
   }
 
+  public PostingCalculationBox getPostingCalculationBox() {
+    return getFieldByClass(PostingCalculationBox.class);
+  }
+
   /**
    * access method for property PostingGroupId.
    */
@@ -102,6 +106,11 @@ public class PostingGroupFormData extends AbstractFormData {
   }
 
   public static class Partner extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class PostingCalculationBox extends AbstractPostingCalculationBoxData {
 
     private static final long serialVersionUID = 1L;
   }

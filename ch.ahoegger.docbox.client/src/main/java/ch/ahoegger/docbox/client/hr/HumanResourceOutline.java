@@ -7,6 +7,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 import ch.ahoegger.docbox.client.hr.employee.EmployeeTablePage;
+import ch.ahoegger.docbox.client.hr.tax.TaxGroupTablePage;
 import ch.ahoegger.docbox.shared.Icons;
 
 /**
@@ -29,6 +30,7 @@ public class HumanResourceOutline extends AbstractOutline {
   @Override
   protected void execCreateChildPages(List<IPage<?>> pageList) {
     pageList.add(new EmployeeTablePage());
+    pageList.add(new TaxGroupTablePage());
   }
 
 }

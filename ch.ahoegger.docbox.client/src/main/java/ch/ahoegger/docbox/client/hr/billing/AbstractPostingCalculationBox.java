@@ -11,15 +11,15 @@ import org.eclipse.scout.rt.shared.TEXTS;
 
 import ch.ahoegger.docbox.client.hr.entity.AbstractEntityTable;
 import ch.ahoegger.docbox.or.definition.table.IPostingGroupTable;
-import ch.ahoegger.docbox.shared.hr.billing.PostingCalculationBoxData;
+import ch.ahoegger.docbox.shared.hr.billing.AbstractPostingCalculationBoxData;
 
 /**
  * <h3>{@link AbstractPostingCalculationBox}</h3>
  *
  * @author aho
  */
-@FormData(value = PostingCalculationBoxData.class, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE, sdkCommand = FormData.SdkCommand.CREATE)
-public class AbstractPostingCalculationBox extends AbstractGroupBox {
+@FormData(value = AbstractPostingCalculationBoxData.class, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE, sdkCommand = FormData.SdkCommand.CREATE)
+public abstract class AbstractPostingCalculationBox extends AbstractGroupBox {
 
   @Override
   protected String getConfiguredLabel() {

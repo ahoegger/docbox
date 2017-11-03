@@ -1,10 +1,11 @@
 package ch.ahoegger.docbox.shared.hr.tax;
 
+import java.util.Date;
+
 import javax.annotation.Generated;
 
-import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
-import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 
 /**
  * <b>NOTE:</b><br>
@@ -15,25 +16,38 @@ public class TaxGroupSearchFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * access method for property HasEndDate.
-   */
-  public TriState getHasEndDate() {
-    return getHasEndDateProperty().getValue();
+  public EndDateFrom getEndDateFrom() {
+    return getFieldByClass(EndDateFrom.class);
   }
 
-  /**
-   * access method for property HasEndDate.
-   */
-  public void setHasEndDate(TriState hasEndDate) {
-    getHasEndDateProperty().setValue(hasEndDate);
+  public EndDateTo getEndDateTo() {
+    return getFieldByClass(EndDateTo.class);
   }
 
-  public HasEndDateProperty getHasEndDateProperty() {
-    return getPropertyByClass(HasEndDateProperty.class);
+  public StartDateFrom getStartDateFrom() {
+    return getFieldByClass(StartDateFrom.class);
   }
 
-  public static class HasEndDateProperty extends AbstractPropertyData<TriState> {
+  public StartDateTo getStartDateTo() {
+    return getFieldByClass(StartDateTo.class);
+  }
+
+  public static class EndDateFrom extends AbstractValueFieldData<Date> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class EndDateTo extends AbstractValueFieldData<Date> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class StartDateFrom extends AbstractValueFieldData<Date> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class StartDateTo extends AbstractValueFieldData<Date> {
 
     private static final long serialVersionUID = 1L;
   }

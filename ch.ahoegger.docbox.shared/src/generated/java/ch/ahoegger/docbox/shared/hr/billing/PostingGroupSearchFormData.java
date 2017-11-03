@@ -1,10 +1,12 @@
 package ch.ahoegger.docbox.shared.hr.billing;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
 /**
@@ -15,6 +17,14 @@ import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 public class PostingGroupSearchFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
+
+  public EndDateFrom getEndDateFrom() {
+    return getFieldByClass(EndDateFrom.class);
+  }
+
+  public EndDateTo getEndDateTo() {
+    return getFieldByClass(EndDateTo.class);
+  }
 
   /**
    * access method for property IncludeUnbilled.
@@ -34,22 +44,16 @@ public class PostingGroupSearchFormData extends AbstractFormData {
     return getPropertyByClass(IncludeUnbilledProperty.class);
   }
 
-  /**
-   * access method for property PartnerId.
-   */
-  public BigDecimal getPartnerId() {
-    return getPartnerIdProperty().getValue();
+  public PartnerSmart getPartnerSmart() {
+    return getFieldByClass(PartnerSmart.class);
   }
 
-  /**
-   * access method for property PartnerId.
-   */
-  public void setPartnerId(BigDecimal partnerId) {
-    getPartnerIdProperty().setValue(partnerId);
+  public StartDateFrom getStartDateFrom() {
+    return getFieldByClass(StartDateFrom.class);
   }
 
-  public PartnerIdProperty getPartnerIdProperty() {
-    return getPropertyByClass(PartnerIdProperty.class);
+  public StartDateTo getStartDateTo() {
+    return getFieldByClass(StartDateTo.class);
   }
 
   /**
@@ -70,12 +74,32 @@ public class PostingGroupSearchFormData extends AbstractFormData {
     return getPropertyByClass(TaxGroupIdProperty.class);
   }
 
+  public static class EndDateFrom extends AbstractValueFieldData<Date> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class EndDateTo extends AbstractValueFieldData<Date> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
   public static class IncludeUnbilledProperty extends AbstractPropertyData<Boolean> {
 
     private static final long serialVersionUID = 1L;
   }
 
-  public static class PartnerIdProperty extends AbstractPropertyData<BigDecimal> {
+  public static class PartnerSmart extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class StartDateFrom extends AbstractValueFieldData<Date> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class StartDateTo extends AbstractValueFieldData<Date> {
 
     private static final long serialVersionUID = 1L;
   }

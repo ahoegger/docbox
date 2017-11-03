@@ -214,6 +214,7 @@ public class EntityService implements IEntityService {
       return null;
     }
     return mapToRecord(new EntityRecord(), fd);
+
   }
 
   protected EntityRecord mapToRecord(EntityRecord rec, EntityFormData fd) {

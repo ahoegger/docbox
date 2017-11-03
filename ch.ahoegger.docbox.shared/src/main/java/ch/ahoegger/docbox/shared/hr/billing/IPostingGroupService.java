@@ -23,6 +23,12 @@ public interface IPostingGroupService extends IService {
    * @param formData
    * @return
    */
+  PostingGroupFormData load(PostingGroupFormData formData);
+
+  /**
+   * @param formData
+   * @return
+   */
   PostingGroupFormData prepareCreate(PostingGroupFormData formData);
 
   /**
@@ -34,7 +40,7 @@ public interface IPostingGroupService extends IService {
    * @param formData
    * @return
    */
-  PostingCalculationBoxData calculateWage(PostingGroupFormData formData);
+  PostingGroupFormData store(PostingGroupFormData formData);
 
   /**
    * @param selectedValue
@@ -42,9 +48,9 @@ public interface IPostingGroupService extends IService {
   boolean delete(BigDecimal selectedValue);
 
   /**
-   * @param formData
+   * @param fd
    * @return
    */
-  PostingGroupFormData load(PostingGroupFormData formData);
+  PostingGroupFormData calculateWage(PostingGroupFormData fd);
 
 }

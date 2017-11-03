@@ -5,7 +5,6 @@ import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.client.dto.FormData;
-import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -42,7 +41,6 @@ import ch.ahoegger.docbox.client.partner.AbstractPartnerSmartField;
 import ch.ahoegger.docbox.or.definition.table.IDocumentTable;
 import ch.ahoegger.docbox.or.definition.table.IPostingGroupTable;
 import ch.ahoegger.docbox.shared.hr.billing.IPostingGroupService;
-import ch.ahoegger.docbox.shared.hr.billing.PostingCalculationBoxData;
 import ch.ahoegger.docbox.shared.hr.billing.PostingGroupFormData;
 import ch.ahoegger.docbox.shared.hr.tax.TaxGroupLookupCall;
 
@@ -67,12 +65,12 @@ public class PostingGroupForm extends AbstractForm {
     getDesktop().dataChanged(IDocumentEntity.ENTITY_KEY, IWorkItemEntity.WORK_ITEM_KEY, IPostingGroupEntity.ENTITY_KEY);
   }
 
-  public void startModify() {
-    startInternalExclusive(new ModifyHandler());
-  }
-
   public void startNew() {
     startInternal(new NewHandler());
+  }
+
+  public void startModify() {
+    startInternal(new ModifyHandler());
   }
 
   @FormData
@@ -95,22 +93,16 @@ public class PostingGroupForm extends AbstractForm {
     m_postingGroupId = postingGroupId;
   }
 
-  private void recalculateWage() {
+  private void calculateWage() {
     if (getEntityDateFromField().getValue() == null || getEntityDateToField().getValue() == null) {
       return;
     }
     getWageBox().clearErrorStatus();
-    PostingGroupFormData formData = new PostingGroupFormData();
-    PostingGroupForm.this.exportFormData(formData);
-    PostingCalculationBoxData calculationData = BEANS.get(IPostingGroupService.class).calculateWage(formData);
-    getWageBox().getBruttoWageField().importFormFieldData(calculationData.getBruttoWage(), false);
-    getWageBox().getEntitiesField().importFormFieldData(calculationData.getEntities(), false);
-    getWageBox().getNettoWageField().importFormFieldData(calculationData.getNettoWage(), false);
-    getWageBox().getSocialSecurityTaxField().importFormFieldData(calculationData.getSocialSecurityTax(), false);
-    getWageBox().getSourceTaxField().importFormFieldData(calculationData.getSourceTax(), false);
-    getWageBox().getVacationExtraField().importFormFieldData(calculationData.getVacationExtra(), false);
-    getWageBox().getWorkingHoursField().importFormFieldData(calculationData.getWorkingHours(), false);
-    if (calculationData.getEntities().getRowCount() < 1) {
+    PostingGroupFormData fd = new PostingGroupFormData();
+    exportFormData(fd);
+    fd = BEANS.get(IPostingGroupService.class).calculateWage(fd);
+    importFormData(fd);
+    if (fd.getPostingCalculationBox().getEntities().getRowCount() < 1) {
       getWageBox().addErrorStatus(new Status(TEXTS.get("Error_payslipNoEntities"), IStatus.ERROR));
     }
   }
@@ -266,7 +258,6 @@ public class PostingGroupForm extends AbstractForm {
     }
 
     @Order(5000)
-    @FormData(sdkCommand = SdkCommand.IGNORE)
     public class PostingCalculationBox extends AbstractPostingCalculationBox {
 
       @Override
@@ -279,14 +270,14 @@ public class PostingGroupForm extends AbstractForm {
         P_FromToProptertyListener listener = new P_FromToProptertyListener();
         getEntityDateFromField().addPropertyChangeListener(listener);
         getEntityDateToField().addPropertyChangeListener(listener);
-        recalculateWage();
+
       }
 
       private class P_FromToProptertyListener implements PropertyChangeListener {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
           if (IValueField.PROP_VALUE.equals(evt.getPropertyName())) {
-            recalculateWage();
+            calculateWage();
           }
         }
       }
@@ -302,17 +293,6 @@ public class PostingGroupForm extends AbstractForm {
     }
   }
 
-  public class ModifyHandler extends AbstractFormHandler {
-
-    @Override
-    protected void execLoad() {
-    }
-
-    @Override
-    protected void execStore() {
-    }
-  }
-
   public class NewHandler extends AbstractFormHandler {
 
     @Override
@@ -322,8 +302,6 @@ public class PostingGroupForm extends AbstractForm {
       exportFormData(formData);
       formData = service.prepareCreate(formData);
       importFormData(formData);
-      recalculateWage();
-
     }
 
     @Override
@@ -345,7 +323,7 @@ public class PostingGroupForm extends AbstractForm {
     }
   }
 
-  public class ViewHandler extends AbstractFormHandler {
+  public class ModifyHandler extends AbstractFormHandler {
     @Override
     protected void execLoad() {
       IPostingGroupService service = BEANS.get(IPostingGroupService.class);
@@ -353,10 +331,23 @@ public class PostingGroupForm extends AbstractForm {
       exportFormData(formData);
       formData = service.load(formData);
       importFormData(formData);
+      getDocumentLinkField().setDocumentId(formData.getDocumentId());
+
+      getPartnerField().setEnabled(false);
+      getDocumentLinkField().setVisible(true);
+      getTitleField().setEnabled(false);
+      getDateField().setEnabled(false);
+      getEntityDateBox().setEnabled(false);
+      getDocumentAbstractField().setEnabled(false);
+
     }
 
     @Override
     protected void execStore() {
+      IPostingGroupService service = BEANS.get(IPostingGroupService.class);
+      PostingGroupFormData formData = new PostingGroupFormData();
+      exportFormData(formData);
+      service.store(formData);
     }
   }
 

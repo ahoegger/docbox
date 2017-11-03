@@ -179,6 +179,7 @@ public class TaxGroupTablePage extends AbstractPageWithTable<Table> {
       @Override
       protected void execAction() {
         TaxGroupForm form = new TaxGroupForm();
+        form.setPartnerId(getPartnerId());
         form.setTaxGroupId(getTaxGroupIdColumn().getSelectedValue());
         form.startModify();
       }

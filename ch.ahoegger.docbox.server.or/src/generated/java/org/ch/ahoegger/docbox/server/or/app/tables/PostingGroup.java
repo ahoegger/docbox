@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PostingGroup extends TableImpl<PostingGroupRecord> {
 
-    private static final long serialVersionUID = -723907014;
+    private static final long serialVersionUID = -204113953;
 
     /**
      * The reference instance of <code>APP.POSTING_GROUP</code>
@@ -77,6 +77,16 @@ public class PostingGroup extends TableImpl<PostingGroupRecord> {
      * The column <code>APP.POSTING_GROUP.NAME</code>.
      */
     public final TableField<PostingGroupRecord, String> NAME = createField("NAME", org.jooq.impl.SQLDataType.VARCHAR.length(200), this, "");
+
+    /**
+     * The column <code>APP.POSTING_GROUP.START_DATE</code>.
+     */
+    public final TableField<PostingGroupRecord, Date> START_DATE = createField("START_DATE", org.jooq.impl.SQLDataType.DATE, this, "", new DateConverter());
+
+    /**
+     * The column <code>APP.POSTING_GROUP.END_DATE</code>.
+     */
+    public final TableField<PostingGroupRecord, Date> END_DATE = createField("END_DATE", org.jooq.impl.SQLDataType.DATE, this, "", new DateConverter());
 
     /**
      * The column <code>APP.POSTING_GROUP.STATEMENT_DATE</code>.
@@ -148,7 +158,7 @@ public class PostingGroup extends TableImpl<PostingGroupRecord> {
      */
     @Override
     public UniqueKey<PostingGroupRecord> getPrimaryKey() {
-        return Keys.SQL170823125047350;
+        return Keys.SQL171103130309210;
     }
 
     /**
@@ -156,7 +166,7 @@ public class PostingGroup extends TableImpl<PostingGroupRecord> {
      */
     @Override
     public List<UniqueKey<PostingGroupRecord>> getKeys() {
-        return Arrays.<UniqueKey<PostingGroupRecord>>asList(Keys.SQL170823125047350);
+        return Arrays.<UniqueKey<PostingGroupRecord>>asList(Keys.SQL171103130309210);
     }
 
     /**

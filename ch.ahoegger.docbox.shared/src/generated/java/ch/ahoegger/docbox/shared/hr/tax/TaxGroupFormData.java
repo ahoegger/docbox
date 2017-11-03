@@ -18,12 +18,46 @@ public class TaxGroupFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
+  public BruttoWage getBruttoWage() {
+    return getFieldByClass(BruttoWage.class);
+  }
+
   public EndDate getEndDate() {
     return getFieldByClass(EndDate.class);
   }
 
   public Name getName() {
     return getFieldByClass(Name.class);
+  }
+
+  public NettoWage getNettoWage() {
+    return getFieldByClass(NettoWage.class);
+  }
+
+  /**
+   * access method for property PartnerId.
+   */
+  public BigDecimal getPartnerId() {
+    return getPartnerIdProperty().getValue();
+  }
+
+  /**
+   * access method for property PartnerId.
+   */
+  public void setPartnerId(BigDecimal partnerId) {
+    getPartnerIdProperty().setValue(partnerId);
+  }
+
+  public PartnerIdProperty getPartnerIdProperty() {
+    return getPropertyByClass(PartnerIdProperty.class);
+  }
+
+  public SocualInsurance getSocualInsurance() {
+    return getFieldByClass(SocualInsurance.class);
+  }
+
+  public SourceTax getSourceTax() {
+    return getFieldByClass(SourceTax.class);
   }
 
   public StartDate getStartDate() {
@@ -48,6 +82,19 @@ public class TaxGroupFormData extends AbstractFormData {
     return getPropertyByClass(TaxGroupIdProperty.class);
   }
 
+  public VacationExtra getVacationExtra() {
+    return getFieldByClass(VacationExtra.class);
+  }
+
+  public WorkHours getWorkHours() {
+    return getFieldByClass(WorkHours.class);
+  }
+
+  public static class BruttoWage extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
   public static class EndDate extends AbstractValueFieldData<Date> {
 
     private static final long serialVersionUID = 1L;
@@ -58,12 +105,42 @@ public class TaxGroupFormData extends AbstractFormData {
     private static final long serialVersionUID = 1L;
   }
 
+  public static class NettoWage extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class PartnerIdProperty extends AbstractPropertyData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class SocualInsurance extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class SourceTax extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
   public static class StartDate extends AbstractValueFieldData<Date> {
 
     private static final long serialVersionUID = 1L;
   }
 
   public static class TaxGroupIdProperty extends AbstractPropertyData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class VacationExtra extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class WorkHours extends AbstractValueFieldData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

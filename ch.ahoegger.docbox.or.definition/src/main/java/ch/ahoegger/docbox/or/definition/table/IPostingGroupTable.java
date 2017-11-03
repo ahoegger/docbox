@@ -24,6 +24,10 @@ public interface IPostingGroupTable {
   public static String NAME = "NAME";
   public static int NAME_LENGTH = 200;
 
+  public static String START_DATE = "START_DATE";
+
+  public static String END_DATE = "END_DATE";
+
   public static String STATEMENT_DATE = "STATEMENT_DATE";
 
   public static String WORKING_HOURS = "WORKING_HOURS";

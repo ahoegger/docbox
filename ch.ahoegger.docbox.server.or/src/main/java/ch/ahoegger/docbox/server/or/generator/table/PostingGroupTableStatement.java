@@ -29,6 +29,8 @@ public class PostingGroupTableStatement implements ITableStatement, IPostingGrou
     statementBuilder.append(TAX_GROUP_NR).append(" BIGINT, ");
     statementBuilder.append(DOCUMENT_NR).append(" BIGINT NOT NULL, ");
     statementBuilder.append(NAME).append(" VARCHAR(").append(NAME_LENGTH).append("), ");
+    statementBuilder.append(START_DATE).append(" DATE, ");
+    statementBuilder.append(END_DATE).append(" DATE, ");
     statementBuilder.append(STATEMENT_DATE).append(" DATE, ");
     statementBuilder.append(WORKING_HOURS).append(" DECIMAL(6, 2), ");
     statementBuilder.append(BRUTTO_WAGE).append(" DECIMAL(6, 2), ");
