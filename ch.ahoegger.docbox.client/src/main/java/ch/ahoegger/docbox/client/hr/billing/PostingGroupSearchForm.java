@@ -214,15 +214,7 @@ public class PostingGroupSearchForm extends AbstractSearchForm {
     @Override
     protected void execLoad() {
       super.execLoad();
-      LocalDate date = LocalDate.now();
-      if (date.getMonthValue() > 1) {
-        // take this year
-      }
-      else {
-        // take last year
-        date = date.minusYears(1);
-      }
-      date = date.withDayOfYear(1);
+      LocalDate date = LocalDate.now().withDayOfMonth(1).minusMonths(6);
       m_form.getStartDateFromField().setValue(LocalDateUtility.toDate(date));
     }
 
