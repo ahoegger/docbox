@@ -158,10 +158,6 @@ public class PostingGroupService implements IPostingGroupService {
 
     TaxGroupSearchFormData taxGroupData = new TaxGroupSearchFormData();
     BigDecimal taxGroupId = Arrays.stream(BEANS.get(ITaxGroupService.class).getTaxGroupTableData(taxGroupData).getRows())
-        .map(row -> {
-          System.out.println("Has row: " + row.getTaxGroupId() + " - " + row.getStartDate());
-          return row;
-        })
         .filter(row -> Optional.ofNullable(row.getStartDate()).filter(sd -> sd.before(formData.getFrom().getValue())).isPresent())
         .filter(row -> Optional.ofNullable(row.getEndDate()).filter(ed -> ed.after(formData.getTo().getValue())).isPresent())
         .map(row -> row.getTaxGroupId())

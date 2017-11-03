@@ -75,7 +75,6 @@ public class Desktop extends AbstractDesktop {
             return false;
           }
           int diffDays = LocalDateUtility.toLocalDate(row.getBirthday()).getDayOfYear() - today.getDayOfYear();
-          System.out.println(diffDays);
           return diffDays > 0 && diffDays < 60;
         })
         .sorted((r1, r2) -> LocalDateUtility.toLocalDate(r1.getBirthday()).getDayOfYear() - LocalDateUtility.toLocalDate(r2.getBirthday()).getDayOfYear())

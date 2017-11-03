@@ -2,7 +2,7 @@ package ch.ahoegger.docbox.client.partner;
 
 import java.math.BigDecimal;
 
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField2;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
@@ -13,7 +13,7 @@ import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
  *
  * @author Andreas Hoegger
  */
-public class AbstractPartnerSmartField extends AbstractSmartField<BigDecimal> {
+public class AbstractPartnerSmartField extends AbstractSmartField2<BigDecimal> {
   @Override
   protected String getConfiguredLabel() {
     return TEXTS.get("Partner");

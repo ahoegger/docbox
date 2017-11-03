@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.shared.hr.tax;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
@@ -13,18 +14,27 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 public class TaxGroupLookupCall extends LookupCall<BigDecimal> {
 
   private static final long serialVersionUID = 1L;
-  private boolean m_noMasterShowAll = false;
+  private Date m_startDate;
+  private Date m_endDate;
 
   @Override
   protected Class<? extends ILookupService<BigDecimal>> getConfiguredService() {
     return ITaxGroupLookupService.class;
   }
 
-  public void setNoMasterShowAll(boolean noMasterShowAll) {
-    m_noMasterShowAll = noMasterShowAll;
+  public Date getStartDate() {
+    return m_startDate;
   }
 
-  public boolean isNoMasterShowAll() {
-    return m_noMasterShowAll;
+  public void setStartDate(Date startDate) {
+    m_startDate = startDate;
+  }
+
+  public Date getEndDate() {
+    return m_endDate;
+  }
+
+  public void setEndDate(Date endDate) {
+    m_endDate = endDate;
   }
 }

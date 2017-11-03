@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import ch.ahoegger.docbox.client.hr.billing.PostingGroupSearchForm.MainBox.SearchTabBox.SearchBox.EndDateBox;
 import ch.ahoegger.docbox.client.hr.billing.PostingGroupSearchForm.MainBox.SearchTabBox.SearchBox.EndDateBox.EndDateFromField;
 import ch.ahoegger.docbox.client.hr.billing.PostingGroupSearchForm.MainBox.SearchTabBox.SearchBox.EndDateBox.EndDateToField;
-import ch.ahoegger.docbox.client.hr.billing.PostingGroupSearchForm.MainBox.SearchTabBox.SearchBox.PlaceholderField;
 import ch.ahoegger.docbox.client.hr.billing.PostingGroupSearchForm.MainBox.SearchTabBox.SearchBox.PartnerSmartField;
 import ch.ahoegger.docbox.client.hr.billing.PostingGroupSearchForm.MainBox.SearchTabBox.SearchBox.StartDateBox;
 import ch.ahoegger.docbox.client.hr.billing.PostingGroupSearchForm.MainBox.SearchTabBox.SearchBox.StartDateBox.StartDateFromField;
@@ -95,7 +94,6 @@ public class PostingGroupSearchForm extends AbstractSearchForm {
   public EndDateToField getEndDateToField() {
     return getFieldByClass(EndDateToField.class);
   }
-
 
   public PartnerSmartField getPartnerSmartField() {
     return getFieldByClass(PartnerSmartField.class);

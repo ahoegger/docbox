@@ -1,7 +1,6 @@
 package ch.ahoegger.docbox.server.hr.tax;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,6 +16,7 @@ import org.jooq.impl.DSL;
 
 import ch.ahoegger.docbox.server.service.lookup.AbstractDocboxLookupService;
 import ch.ahoegger.docbox.shared.hr.tax.ITaxGroupLookupService;
+import ch.ahoegger.docbox.shared.hr.tax.TaxGroupLookupCall;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
@@ -47,6 +47,7 @@ public class TaxGroupLookupService extends AbstractDocboxLookupService<BigDecima
   }
 
   protected List<? extends ILookupRow<BigDecimal>> getData(Condition conditions, ILookupCall<BigDecimal> call) {
+    final TaxGroupLookupCall taxGroupCall = (TaxGroupLookupCall) call;
     TaxGroup t = TaxGroup.TAX_GROUP;
     return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .select(t.TAX_GROUP_NR, t.NAME, t.START_DATE, t.END_DATE)
@@ -56,7 +57,15 @@ public class TaxGroupLookupService extends AbstractDocboxLookupService<BigDecima
         .stream()
         .map(rec -> {
           LookupRow<BigDecimal> row = new LookupRow<BigDecimal>(rec.get(t.TAX_GROUP_NR), rec.get(t.NAME));
-          row.withActive(Optional.ofNullable(rec.get(t.END_DATE)).map(d -> LocalDateUtility.toLocalDate(d).plusDays(1)).orElse(LocalDate.now().plusDays(1)).isAfter(LocalDate.now()));
+          row.withActive(
+              Optional.ofNullable(rec.get(t.START_DATE))
+                  .filter(d -> taxGroupCall.getStartDate() != null)
+                  .map(d -> LocalDateUtility.toLocalDate(d).minusDays(1).isBefore(LocalDateUtility.toLocalDate(taxGroupCall.getStartDate())))
+                  .orElse(Boolean.TRUE) &&
+                  Optional.ofNullable(rec.get(t.END_DATE))
+                      .filter(d -> taxGroupCall.getEndDate() != null)
+                      .map(d -> LocalDateUtility.toLocalDate(d).plusDays(1).isAfter(LocalDateUtility.toLocalDate(taxGroupCall.getEndDate())))
+                      .orElse(Boolean.TRUE));
           return row;
 
         })

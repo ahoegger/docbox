@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanFi
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField2;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -296,7 +296,6 @@ public class UserForm extends AbstractForm {
           if (isFormLoading()) {
             return rawValue;
           }
-          System.out.println("Blubbi: " + getUsernameField().getValue());
           removeErrorStatus(UserValidationStatus.AdministratorAtLeastOne.class);
           if (!rawValue) {
             AdministratorLookupCall call = new AdministratorLookupCall();
@@ -313,7 +312,7 @@ public class UserForm extends AbstractForm {
       }
 
       @Order(4000)
-      public class DefaultPermissionField extends AbstractSmartField<Integer> {
+      public class DefaultPermissionField extends AbstractSmartField2<Integer> {
         @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("DefaultPermission");

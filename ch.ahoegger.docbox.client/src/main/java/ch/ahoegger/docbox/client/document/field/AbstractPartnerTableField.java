@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField2;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -126,7 +126,7 @@ public abstract class AbstractPartnerTableField extends AbstractTableField<Abstr
         return new P_PartnerSmarField(row);
       }
 
-      public class P_PartnerSmarField extends AbstractSmartField<BigDecimal> {
+      public class P_PartnerSmarField extends AbstractSmartField2<BigDecimal> {
         private ITableRow m_row;
 
         public P_PartnerSmarField(ITableRow row) {

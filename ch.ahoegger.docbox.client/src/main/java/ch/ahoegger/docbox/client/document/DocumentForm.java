@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmartGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField2;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -388,7 +388,7 @@ public class DocumentForm extends AbstractForm {
       }
 
       @Order(70)
-      public class ConversationField extends AbstractSmartField<BigDecimal> {
+      public class ConversationField extends AbstractSmartField2<BigDecimal> {
         @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("Conversation");
@@ -500,7 +500,7 @@ public class DocumentForm extends AbstractForm {
         }
 
         @Order(200)
-        public class OcrLanguageField extends AbstractSmartField<String> {
+        public class OcrLanguageField extends AbstractSmartField2<String> {
           @Override
           protected String getConfiguredLabel() {
             return TEXTS.get("Language");
@@ -680,7 +680,6 @@ public class DocumentForm extends AbstractForm {
 
       getForm().getOpenHtmlField().setDocumentId(formData.getDocumentId());
 
-      System.out.println("hasOcrText: " + getForm().getHasOcrText());
       getForm().setAllEnabled(false);
       getForm().getShowOcrButton().setEnabled(true, true);
       getForm().getShowOcrButton().setEnabled(getForm().getHasOcrText(), true);

@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField2;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.platform.Order;
@@ -174,7 +174,7 @@ public class DocumentSearchForm extends AbstractSearchForm {
         }
 
         @Order(3000)
-        public class ConversationField extends AbstractSmartField<BigDecimal> {
+        public class ConversationField extends AbstractSmartField2<BigDecimal> {
           @Override
           protected String getConfiguredLabel() {
             return TEXTS.get("Conversation");
@@ -272,7 +272,7 @@ public class DocumentSearchForm extends AbstractSearchForm {
         }
 
         @Order(6000)
-        public class OwnerField extends AbstractSmartField<String> {
+        public class OwnerField extends AbstractSmartField2<String> {
           @Override
           protected String getConfiguredLabel() {
             return TEXTS.get("Owner");

@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField2;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -198,7 +198,7 @@ public class PostingGroupForm extends AbstractForm {
     }
 
     @Order(4250)
-    public class TaxGroupField extends AbstractSmartField<BigDecimal> {
+    public class TaxGroupField extends AbstractSmartField2<BigDecimal> {
       @Override
       protected String getConfiguredLabel() {
         return TEXTS.get("TaxGroup");
@@ -208,6 +208,14 @@ public class PostingGroupForm extends AbstractForm {
       protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
         return TaxGroupLookupCall.class;
       }
+
+      @Override
+      protected void execPrepareBrowseLookup(ILookupCall<BigDecimal> call, String browseHint) {
+        ((TaxGroupLookupCall) call).setStartDate(getEntityDateFromField().getValue());
+        ((TaxGroupLookupCall) call).setEndDate(getEntityDateToField().getValue());
+        super.execPrepareBrowseLookup(call, browseHint);
+      }
+
     }
 
     @Order(4500)
