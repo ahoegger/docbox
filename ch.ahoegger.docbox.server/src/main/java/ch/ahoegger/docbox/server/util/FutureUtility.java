@@ -2,12 +2,14 @@ package ch.ahoegger.docbox.server.util;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -16,8 +18,6 @@ import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
-import org.eclipse.scout.rt.platform.util.concurrent.IBiConsumer;
-import org.eclipse.scout.rt.platform.util.concurrent.IBiFunction;
 
 /**
  * <h3>{@link FutureUtility}</h3>
@@ -110,12 +110,12 @@ public class FutureUtility {
       }
 
       @Override
-      public <FUNCTION_RESULT> IFuture<FUNCTION_RESULT> whenDoneSchedule(IBiFunction<RESULT, Throwable, FUNCTION_RESULT> function, JobInput input) {
+      public <FUNCTION_RESULT> IFuture<FUNCTION_RESULT> whenDoneSchedule(BiFunction<RESULT, Throwable, FUNCTION_RESULT> function, JobInput input) {
         throw new PlatformException("Not implemented");
       }
 
       @Override
-      public IFuture<Void> whenDoneSchedule(IBiConsumer<RESULT, Throwable> function, JobInput input) {
+      public IFuture<Void> whenDoneSchedule(BiConsumer<RESULT, Throwable> function, JobInput input) {
         throw new PlatformException("Not implemented");
       }
 
@@ -125,7 +125,7 @@ public class FutureUtility {
       }
 
       @Override
-      public IRegistrationHandle addListener(IFilter<JobEvent> filter, IJobListener listener) {
+      public IRegistrationHandle addListener(Predicate<JobEvent> filter, IJobListener listener) {
         return future.addListener(filter, listener);
       }
 
@@ -143,6 +143,7 @@ public class FutureUtility {
       public boolean containsExecutionHint(String hint) {
         return future.containsExecutionHint(hint);
       }
+
     };
   }
 }

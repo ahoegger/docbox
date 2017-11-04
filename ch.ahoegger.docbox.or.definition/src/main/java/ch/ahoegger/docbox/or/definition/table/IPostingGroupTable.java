@@ -43,11 +43,11 @@ public interface IPostingGroupTable {
   public static BigDecimal NETTO_WAGE_MAX = BigDecimal.valueOf(20000d);
 
   public static String SOURCE_TAX = "SOURCE_TAX";
-  public static BigDecimal SOURCE_TAX_MIN = BigDecimal.valueOf(-2000d);
+  public static BigDecimal SOURCE_TAX_MIN = BigDecimal.valueOf(-99999d);
   public static BigDecimal SOURCE_TAX_MAX = BigDecimal.valueOf(0d);
 
   public static String SOCIAL_SECURITY_TAX = "SOCIAL_SECURITY_TAX";
-  public static BigDecimal SOCIAL_SECURITY_TAX_MIN = BigDecimal.valueOf(-2000d);
+  public static BigDecimal SOCIAL_SECURITY_TAX_MIN = BigDecimal.valueOf(-99999d);
   public static BigDecimal SOCIAL_SECURITY_TAX_MAX = BigDecimal.valueOf(0d);
 
   public static String VACATION_EXTRA = "VACATION_EXTRA";

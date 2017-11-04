@@ -1,10 +1,12 @@
 package ch.ahoegger.docbox.server.util;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -13,8 +15,6 @@ import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
-import org.eclipse.scout.rt.platform.util.concurrent.IBiConsumer;
-import org.eclipse.scout.rt.platform.util.concurrent.IBiFunction;
 
 /**
  * <h3>{@link NullFuture}</h3>
@@ -112,12 +112,12 @@ public class NullFuture<RESULT> implements IFuture<RESULT> {
   }
 
   @Override
-  public <FUNCTION_RESULT> IFuture<FUNCTION_RESULT> whenDoneSchedule(IBiFunction<RESULT, Throwable, FUNCTION_RESULT> function, JobInput input) {
+  public <FUNCTION_RESULT> IFuture<FUNCTION_RESULT> whenDoneSchedule(BiFunction<RESULT, Throwable, FUNCTION_RESULT> function, JobInput input) {
     return null;
   }
 
   @Override
-  public IFuture<Void> whenDoneSchedule(IBiConsumer<RESULT, Throwable> function, JobInput input) {
+  public IFuture<Void> whenDoneSchedule(BiConsumer<RESULT, Throwable> function, JobInput input) {
     return null;
   }
 
@@ -127,7 +127,7 @@ public class NullFuture<RESULT> implements IFuture<RESULT> {
   }
 
   @Override
-  public IRegistrationHandle addListener(IFilter<JobEvent> filter, IJobListener listener) {
+  public IRegistrationHandle addListener(Predicate<JobEvent> filter, IJobListener listener) {
     return null;
   }
 

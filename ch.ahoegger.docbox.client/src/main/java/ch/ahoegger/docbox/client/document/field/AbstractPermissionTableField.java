@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField2;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -142,7 +142,7 @@ public abstract class AbstractPermissionTableField extends AbstractTableField<Ab
         return new P_UserSmarField(row);
       }
 
-      public class P_UserSmarField extends AbstractSmartField2<String> {
+      public class P_UserSmarField extends AbstractSmartField<String> {
         private ITableRow m_row;
 
         public P_UserSmarField(ITableRow row) {

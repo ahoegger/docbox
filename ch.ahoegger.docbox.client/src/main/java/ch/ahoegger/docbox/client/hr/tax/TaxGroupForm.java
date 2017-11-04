@@ -279,7 +279,7 @@ public class TaxGroupForm extends AbstractForm {
 
         @Override
         protected BigDecimal getConfiguredMinValue() {
-          return new BigDecimal(-200d);
+          return new BigDecimal(-99999d);
         }
 
         @Override
@@ -307,7 +307,7 @@ public class TaxGroupForm extends AbstractForm {
 
         @Override
         protected BigDecimal getConfiguredMinValue() {
-          return new BigDecimal(-200d);
+          return new BigDecimal(-99999d);
         }
 
         @Override
