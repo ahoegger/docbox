@@ -133,8 +133,8 @@ public class TaxGroupService implements ITaxGroupService {
         .select(t.TAX_GROUP_NR, t.NAME, t.START_DATE, t.END_DATE, workingHours, bruttoWage, nettoWage, sourceTax, socialSecurtiyTax, vacationExtra)
         .from(t)
         .leftJoin(pg).on(t.TAX_GROUP_NR.eq(pg.TAX_GROUP_NR))
+        .where(condition)
         .groupBy(t.TAX_GROUP_NR, t.NAME, t.START_DATE, t.END_DATE)
-        .having(condition)
         .fetchOne(), workingHours, bruttoWage, nettoWage, sourceTax, socialSecurtiyTax, vacationExtra);
 
     return formData;
