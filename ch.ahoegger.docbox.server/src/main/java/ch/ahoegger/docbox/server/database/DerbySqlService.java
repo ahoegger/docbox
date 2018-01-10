@@ -107,6 +107,12 @@ public class DerbySqlService extends AbstractDerbySqlService {
     public String getKey() {
       return KEY;
     }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
+    }
   }
 
 }

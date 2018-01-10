@@ -275,7 +275,7 @@ public class OcrParseService {
     }
 
     @Override
-    protected Path getDefaultValue() {
+    public Path getDefaultValue() {
       if (OS.isWindows()) {
         return Paths.get("C:/tesseract/tessdata-3.04.00/tessdata");
       }
@@ -291,6 +291,12 @@ public class OcrParseService {
         return Paths.get(value);
       }
     }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
+    }
   }
 
   public static class TesseractLanguageProperty extends AbstractStringConfigProperty {
@@ -301,8 +307,14 @@ public class OcrParseService {
     }
 
     @Override
-    protected String getDefaultValue() {
+    public String getDefaultValue() {
       return "deu";
+    }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
     }
 
   }

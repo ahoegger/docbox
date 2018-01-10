@@ -192,6 +192,12 @@ public class DocumentStoreService implements IDocumentStoreService {
     public String getKey() {
       return KEY;
     }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
+    }
   }
 
 }

@@ -118,6 +118,7 @@ public class FtpBackupService implements IBackupService {
 
   @RemoteServiceAccessDenied
   protected void backupInternal() throws ProcessingException {
+    File zipFile = null;
     try {
       if (Status.Backup.equals(m_status)) {
         throw new ProcessingException(new ProcessingStatus("It is a backup running - try later...", IStatus.ERROR));
@@ -125,7 +126,7 @@ public class FtpBackupService implements IBackupService {
       m_status = Status.Backup;
       // create zip file
 
-      File zipFile = createBackupFile();
+      zipFile = createBackupFile();
       store(zipFile);
       m_lastBackupDate = new Date();
     }
@@ -134,7 +135,16 @@ public class FtpBackupService implements IBackupService {
       throw new ProcessingException(new ProcessingStatus("Could not create backup file.", e, 0, IStatus.ERROR));
     }
     finally {
+      if (zipFile != null) {
+        try {
+          zipFile.delete();
+        }
+        catch (Exception e) {
+          LOG.warn("Could not delete zipFile '" + zipFile + "'.", e);
+        }
+      }
       m_status = Status.Idle;
+
     }
   }
 
@@ -297,8 +307,14 @@ public class FtpBackupService implements IBackupService {
     }
 
     @Override
-    protected Boolean getDefaultValue() {
+    public Boolean getDefaultValue() {
       return false;
+    }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
     }
   }
 
@@ -308,6 +324,12 @@ public class FtpBackupService implements IBackupService {
     @Override
     public String getKey() {
       return KEY;
+    }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
     }
   }
 
@@ -320,8 +342,14 @@ public class FtpBackupService implements IBackupService {
     }
 
     @Override
-    protected Integer getDefaultValue() {
+    public Integer getDefaultValue() {
       return 21;
+    }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
     }
   }
 
@@ -332,6 +360,12 @@ public class FtpBackupService implements IBackupService {
     public String getKey() {
       return KEY;
     }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
+    }
   }
 
   public static class FtpPasswordProperty extends AbstractStringConfigProperty {
@@ -341,6 +375,12 @@ public class FtpBackupService implements IBackupService {
     public String getKey() {
       return KEY;
     }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
+    }
   }
 
   public static class FtpRemoteBackupPathProperty extends AbstractStringConfigProperty {
@@ -349,6 +389,12 @@ public class FtpBackupService implements IBackupService {
     @Override
     public String getKey() {
       return KEY;
+    }
+
+    @Override
+    public String description() {
+      // TODO
+      return "TODO";
     }
   }
 
@@ -362,8 +408,14 @@ public class FtpBackupService implements IBackupService {
     }
 
     @Override
-    protected String getDefaultValue() {
+    public String getDefaultValue() {
       return DEFAULT_FILE_NAME;
+    }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
     }
   }
 

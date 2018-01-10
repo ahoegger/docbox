@@ -82,7 +82,7 @@ public class UserCredentialVerifierProxy implements ICredentialVerifier {
     public static final String KEY = "docbox.security.remote-auth-url";
 
     @Override
-    protected String getDefaultValue() {
+    public String getDefaultValue() {
       String base = CONFIG.getPropertyValue(BackendUrlProperty.class);
       if (base == null) {
         return null;
@@ -93,6 +93,12 @@ public class UserCredentialVerifierProxy implements ICredentialVerifier {
     @Override
     public String getKey() {
       return KEY;
+    }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
     }
   }
 }

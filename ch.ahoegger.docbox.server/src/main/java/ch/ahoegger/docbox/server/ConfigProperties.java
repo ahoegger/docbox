@@ -23,7 +23,7 @@ public final class ConfigProperties {
   public static class DatabaseAutoCreateProperty extends AbstractBooleanConfigProperty {
 
     @Override
-    protected Boolean getDefaultValue() {
+    public Boolean getDefaultValue() {
       return Boolean.TRUE;
     }
 
@@ -31,12 +31,18 @@ public final class ConfigProperties {
     public String getKey() {
       return "contacts.database.schema.autocreate";
     }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
+    }
   }
 
   public static class DatabaseAutoPopulateProperty extends AbstractBooleanConfigProperty {
 
     @Override
-    protected Boolean getDefaultValue() {
+    public Boolean getDefaultValue() {
       return Boolean.TRUE;
     }
 
@@ -44,18 +50,30 @@ public final class ConfigProperties {
     public String getKey() {
       return "contacts.database.data.autopopulate";
     }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
+    }
   }
 
   public static class SuperUserSubjectProperty extends AbstractSubjectConfigProperty {
 
     @Override
-    protected Subject getDefaultValue() {
+    public Subject getDefaultValue() {
       return convertToSubject("system");
     }
 
     @Override
     public String getKey() {
       return "contacts.superuser";
+    }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
     }
   }
 

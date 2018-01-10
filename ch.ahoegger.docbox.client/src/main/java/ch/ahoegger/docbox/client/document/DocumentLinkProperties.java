@@ -16,8 +16,14 @@ public class DocumentLinkProperties {
     }
 
     @Override
-    protected String getDefaultValue() {
+    public String getDefaultValue() {
       return "pdf";
+    }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
     }
   }
 
@@ -28,8 +34,14 @@ public class DocumentLinkProperties {
     }
 
     @Override
-    protected String getDefaultValue() {
+    public String getDefaultValue() {
       return "documentId";
+    }
+
+    @Override
+    public String description() {
+      // TODO
+      return null;
     }
   }
 }
