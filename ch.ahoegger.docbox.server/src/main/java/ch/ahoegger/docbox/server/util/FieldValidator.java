@@ -7,6 +7,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.MultiStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.jfree.util.Log;
 import org.jooq.Field;
 import org.jooq.Record;
 
@@ -46,6 +47,7 @@ public class FieldValidator {
 
         VALUE dbValue = rec.get(field);
         if (ObjectUtility.notEquals(dbValue, value)) {
+          Log.error(String.format("Unmodifiable field %s not equals [%s, %s].", field.getName(), dbValue, value));
           return new Status(String.format("Unmodifiable field %s not equals [%s, %s].", field.getName(), dbValue, value), IStatus.ERROR);
         }
         return Status.OK_STATUS;

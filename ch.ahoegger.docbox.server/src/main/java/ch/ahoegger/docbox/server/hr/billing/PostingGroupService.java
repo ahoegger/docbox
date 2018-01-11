@@ -157,9 +157,11 @@ public class PostingGroupService implements IPostingGroupService {
     }
 
     TaxGroupSearchFormData taxGroupData = new TaxGroupSearchFormData();
+    Date fromDate = formData.getFrom().getValue();
+    Date toDate = formData.getTo().getValue();
     BigDecimal taxGroupId = Arrays.stream(BEANS.get(ITaxGroupService.class).getTaxGroupTableData(taxGroupData).getRows())
-        .filter(row -> Optional.ofNullable(row.getStartDate()).filter(sd -> sd.before(formData.getFrom().getValue())).isPresent())
-        .filter(row -> Optional.ofNullable(row.getEndDate()).filter(ed -> ed.after(formData.getTo().getValue())).isPresent())
+        .filter(row -> Optional.ofNullable(row.getStartDate()).filter(sd -> sd.before(fromDate) || sd.equals(fromDate)).isPresent())
+        .filter(row -> Optional.ofNullable(row.getEndDate()).filter(ed -> ed.after(toDate) || ed.equals(toDate)).isPresent())
         .map(row -> row.getTaxGroupId())
         .findFirst().orElse(null);
 
@@ -373,6 +375,7 @@ public class PostingGroupService implements IPostingGroupService {
     PostingGroupFormData fd = new PostingGroupFormData();
     fd.getPostingCalculationBox().getBruttoWage().setValue(rec.getBruttoWage());
     fd.setDocumentId(rec.getDocumentNr());
+    fd.getFrom().setValue(rec.getStartDate());
     fd.getTitle().setValue(rec.getName());
     fd.getPostingCalculationBox().getNettoWage().setValue(rec.getNettoWage());
     fd.getPartner().setValue(rec.getPartnerNr());
@@ -381,6 +384,7 @@ public class PostingGroupService implements IPostingGroupService {
     fd.getPostingCalculationBox().getSourceTax().setValue(rec.getSourceTax());
     fd.getDate().setValue(rec.getStatementDate());
     fd.getTaxGroup().setValue(rec.getTaxGroupNr());
+    fd.getTo().setValue(rec.getEndDate());
     fd.getPostingCalculationBox().getVacationExtra().setValue(rec.getVacationExtra());
     fd.getPostingCalculationBox().getWorkingHours().setValue(rec.getWorkingHours());
     return fd;

@@ -130,6 +130,12 @@ public class TaxGroupTablePage extends AbstractPageWithTable<Table> {
       protected int getConfiguredWidth() {
         return 120;
       }
+
+      @Override
+      protected int getConfiguredSortIndex() {
+        return 0;
+      }
+
     }
 
     @Order(4000)

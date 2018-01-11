@@ -272,24 +272,6 @@ public class PostingGroupForm extends AbstractForm {
       protected boolean getConfiguredEnabled() {
         return false;
       }
-
-      @Override
-      protected void execInitField() {
-        P_FromToProptertyListener listener = new P_FromToProptertyListener();
-        getEntityDateFromField().addPropertyChangeListener(listener);
-        getEntityDateToField().addPropertyChangeListener(listener);
-
-      }
-
-      private class P_FromToProptertyListener implements PropertyChangeListener {
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-          if (IValueField.PROP_VALUE.equals(evt.getPropertyName())) {
-            calculateWage();
-          }
-        }
-      }
-
     }
 
     @Order(100000)
@@ -298,6 +280,15 @@ public class PostingGroupForm extends AbstractForm {
 
     @Order(101000)
     public class CancelButton extends AbstractCancelButton {
+    }
+  }
+
+  private class P_FromToProptertyListener implements PropertyChangeListener {
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      if (IValueField.PROP_VALUE.equals(evt.getPropertyName())) {
+        calculateWage();
+      }
     }
   }
 
@@ -310,6 +301,10 @@ public class PostingGroupForm extends AbstractForm {
       exportFormData(formData);
       formData = service.prepareCreate(formData);
       importFormData(formData);
+      P_FromToProptertyListener listener = new P_FromToProptertyListener();
+      getEntityDateFromField().addPropertyChangeListener(listener);
+      getEntityDateToField().addPropertyChangeListener(listener);
+
     }
 
     @Override
