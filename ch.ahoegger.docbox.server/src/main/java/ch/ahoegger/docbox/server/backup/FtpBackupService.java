@@ -313,8 +313,7 @@ public class FtpBackupService implements IBackupService {
 
     @Override
     public String description() {
-      // TODO
-      return null;
+      return "Whether or not the FTP backup is enabled. If false no backup files will be generated nor uploaded to anywhere. Default value is ‘false’.";
     }
   }
 
@@ -328,8 +327,7 @@ public class FtpBackupService implements IBackupService {
 
     @Override
     public String description() {
-      // TODO
-      return null;
+      return "The URL of the ftp backup location where the backup files are stored to.";
     }
   }
 
@@ -348,8 +346,7 @@ public class FtpBackupService implements IBackupService {
 
     @Override
     public String description() {
-      // TODO
-      return null;
+      return "The port of the FTP backup. Default value is ‘21’.";
     }
   }
 
@@ -363,8 +360,7 @@ public class FtpBackupService implements IBackupService {
 
     @Override
     public String description() {
-      // TODO
-      return null;
+      return "The FTP username for the FTP backup.";
     }
   }
 
@@ -378,8 +374,7 @@ public class FtpBackupService implements IBackupService {
 
     @Override
     public String description() {
-      // TODO
-      return null;
+      return "The FTP password for the FTP backup.";
     }
   }
 
@@ -393,8 +388,7 @@ public class FtpBackupService implements IBackupService {
 
     @Override
     public String description() {
-      // TODO
-      return "TODO";
+      return "The remote path where the FTP backups are located on the FTP server.";
     }
   }
 
@@ -414,8 +408,7 @@ public class FtpBackupService implements IBackupService {
 
     @Override
     public String description() {
-      // TODO
-      return null;
+      return "The filename of the backup file. Witch will be stored to the FTP backup location. Default is 'docboxBackup'";
     }
   }
 

@@ -195,8 +195,7 @@ public class DocumentStoreService implements IDocumentStoreService {
 
     @Override
     public String description() {
-      // TODO
-      return null;
+      return "The location of the document store. All documents are expected under the specified location and will be stored there.";
     }
   }
 

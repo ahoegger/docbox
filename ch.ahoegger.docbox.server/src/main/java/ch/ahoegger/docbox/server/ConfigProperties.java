@@ -34,27 +34,7 @@ public final class ConfigProperties {
 
     @Override
     public String description() {
-      // TODO
-      return null;
-    }
-  }
-
-  public static class DatabaseAutoPopulateProperty extends AbstractBooleanConfigProperty {
-
-    @Override
-    public Boolean getDefaultValue() {
-      return Boolean.TRUE;
-    }
-
-    @Override
-    public String getKey() {
-      return "contacts.database.data.autopopulate";
-    }
-
-    @Override
-    public String description() {
-      // TODO
-      return null;
+      return "Whether or not the database schema should be created on startup. Default value is 'true'.";
     }
   }
 
@@ -72,8 +52,7 @@ public final class ConfigProperties {
 
     @Override
     public String description() {
-      // TODO
-      return null;
+      return "Superuser name. Used for the super user subject. Default value is ‘superuser’.";
     }
   }
 

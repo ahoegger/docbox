@@ -97,8 +97,7 @@ public class UserCredentialVerifierProxy implements ICredentialVerifier {
 
     @Override
     public String description() {
-      // TODO
-      return null;
+      return "The remote authentication url path.  Default is ‘/auth’.";
     }
   }
 }

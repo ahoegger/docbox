@@ -110,8 +110,7 @@ public class DerbySqlService extends AbstractDerbySqlService {
 
     @Override
     public String description() {
-      // TODO
-      return null;
+      return "The physical location of the database.";
     }
   }
 

@@ -22,8 +22,7 @@ public class DocumentLinkProperties {
 
     @Override
     public String description() {
-      // TODO
-      return null;
+      return "The resource location under which the documents are available. Default value is ‘pdf’, the URL looks like ‘pdf?documentId=XXX’. ";
     }
   }
 
@@ -40,8 +39,7 @@ public class DocumentLinkProperties {
 
     @Override
     public String description() {
-      // TODO
-      return null;
+      return "The value property of the document URI. Default value is ‘documentId’, the URI looks like ‘pdf?documentId=xxx’.";
     }
   }
 }

@@ -30,7 +30,6 @@ import org.bytedeco.javacpp.lept.PIX;
 import org.bytedeco.javacpp.tesseract.TessBaseAPI;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
-import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
@@ -294,28 +293,8 @@ public class OcrParseService {
 
     @Override
     public String description() {
-      // TODO
-      return null;
+      return "The system path to the tessdata files.";
     }
   }
 
-  public static class TesseractLanguageProperty extends AbstractStringConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "docbox.tesserarct.language";
-    }
-
-    @Override
-    public String getDefaultValue() {
-      return "deu";
-    }
-
-    @Override
-    public String description() {
-      // TODO
-      return null;
-    }
-
-  }
 }
