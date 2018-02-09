@@ -4,12 +4,6 @@ import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.TEXTS;
-
-import ch.ahoegger.docbox.shared.document.DocumentFormData;
-import ch.ahoegger.docbox.shared.document.IDocumentService;
 
 /**
  * <h3>{@link DocumentDetailPage}</h3>
@@ -22,29 +16,10 @@ public class DocumentDetailPage extends AbstractPageWithNodes {
 
   public DocumentDetailPage(BigDecimal documentId) {
     m_documentId = documentId;
-
   }
 
   public BigDecimal getDocumentId() {
     return m_documentId;
-  }
-
-  @Override
-  protected void execInitPage() {
-    DocumentFormData formData = new DocumentFormData();
-    formData.setDocumentId(getDocumentId());
-
-    formData = BEANS.get(IDocumentService.class).load(formData);
-    String title = formData.getAbstract().getValue();
-    if (StringUtility.isNullOrEmpty(title)) {
-      title = TEXTS.get("Document");
-    }
-    else {
-      if (title.length() > 16) {
-        title = title.subSequence(0, 12) + "...";
-      }
-    }
-    getCellForUpdate().setText(title);
   }
 
   @Override

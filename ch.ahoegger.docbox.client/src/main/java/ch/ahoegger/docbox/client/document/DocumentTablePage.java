@@ -2,6 +2,7 @@ package ch.ahoegger.docbox.client.document;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.dto.PageData;
@@ -9,6 +10,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
@@ -103,6 +105,20 @@ public class DocumentTablePage extends AbstractDocboxPageWithTable<DocumentTable
   @Override
   protected IPage<?> execCreateChildPage(ITableRow row) {
     return new DocumentDetailPage(getTable().getDocumentIdColumn().getValue(row));
+  }
+
+  @Override
+  protected void updateCellFromTableCell(Cell pageCell, ICell summaryCell) {
+    super.updateCellFromTableCell(pageCell, summaryCell);
+    if (summaryCell != null) {
+      pageCell.setText(Optional.ofNullable(summaryCell.getText())
+          .map(t -> {
+            if (t.length() > 200) {
+              return t.subSequence(0, 200) + "...";
+            }
+            return t;
+          }).orElse(TEXTS.get("Document")));
+    }
   }
 
   public void setConversationId(BigDecimal value) {
