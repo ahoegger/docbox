@@ -541,13 +541,16 @@ public class DocumentService implements IDocumentService {
     docData = loadTrusted(docData);
 
     // delete old
-    BEANS.get(DocumentStoreService.class).delete(docData.getDocumentPath());
+    DocumentStoreService documentStoreService = BEANS.get(DocumentStoreService.class);
+    if (!documentStoreService.delete(docData.getDocumentPath())) {
+      LOG.warn(String.format("Cold not delete document for replacement '%s'.", docData.getDocumentPath()));
+    }
     // ocr
     deletePasedConent(CollectionUtility.arrayList(formData.getDocumentId()));
 
     // store new
     final BinaryResource binaryResource = formData.getDocument().getValue();
-    BEANS.get(DocumentStoreService.class).store(binaryResource, docData.getCapturedDate().getValue(), formData.getDocumentId());
+    documentStoreService.store(binaryResource, docData.getCapturedDate().getValue(), formData.getDocumentId());
 
     // ocr
     if (docData.getParseOcr().getValue()) {
