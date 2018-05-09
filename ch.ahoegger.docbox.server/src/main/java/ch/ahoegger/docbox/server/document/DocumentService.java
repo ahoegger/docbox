@@ -552,13 +552,20 @@ public class DocumentService implements IDocumentService {
     final BinaryResource binaryResource = formData.getDocument().getValue();
     String docPath = documentStoreService.store(binaryResource, docData.getCapturedDate().getValue(), formData.getDocumentId());
     docData.setDocumentPath(docPath);
-    store(docData);
+    // update document path
+    Document table = Document.DOCUMENT;
+    DocumentRecord doc = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(table, table.DOCUMENT_NR.eq(formData.getDocumentId()));
+    doc.with(table.DOCUMENT_URL, docPath).update();
 
     // ocr
     if (docData.getParseOcr().getValue()) {
       ParseDocumentJob job = new ParseDocumentJob(formData.getDocumentId(), OcrLanguageCodeType.GermanCode.ID);
       job.schedule();
     }
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
   }
 
   @RemoteServiceAccessDenied
