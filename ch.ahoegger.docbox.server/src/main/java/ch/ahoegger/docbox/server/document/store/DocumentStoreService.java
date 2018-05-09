@@ -85,7 +85,8 @@ public class DocumentStoreService implements IDocumentStoreService {
     synchronized (IO_LOCK) {
       Path file = toAbsolutePath(pathBuilder.toString());
       if (Files.exists(file)) {
-        throw new ProcessingException(new ProcessingStatus("document['" + file + "'] already exists serverside!", Status.ERROR));
+        LOG.warn(String.format("document['%s'] already exists serverside!", file));
+        return pathBuilder.toString();
       }
       else {
         java.io.OutputStream out = null;

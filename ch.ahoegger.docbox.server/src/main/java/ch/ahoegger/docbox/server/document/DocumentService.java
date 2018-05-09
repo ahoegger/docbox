@@ -550,7 +550,9 @@ public class DocumentService implements IDocumentService {
 
     // store new
     final BinaryResource binaryResource = formData.getDocument().getValue();
-    documentStoreService.store(binaryResource, docData.getCapturedDate().getValue(), formData.getDocumentId());
+    String docPath = documentStoreService.store(binaryResource, docData.getCapturedDate().getValue(), formData.getDocumentId());
+    docData.setDocumentPath(docPath);
+    store(docData);
 
     // ocr
     if (docData.getParseOcr().getValue()) {
