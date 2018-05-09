@@ -1,13 +1,13 @@
 package ch.ahoegger.docbox.server.conversation;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,28 +31,25 @@ public class ConversationService_SearchByName extends AbstractTestWithDatabase {
   private static final BigDecimal conversationId04 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
-
-    ISqlService sqlService = BEANS.get(ISqlService.class);
+  protected void execSetupDb(Connection connection) throws Exception {
     LocalDate today = LocalDate.now();
 
-    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId01, "dook haagen", "some notes",
+    BEANS.get(ConversationService.class).insert(connection, conversationId01, "dook haagen", "some notes",
         LocalDateUtility.toDate(today.minusDays(20)),
         null);
 
     // till yesterday
-    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId02, "smill donat", "some notes",
+    BEANS.get(ConversationService.class).insert(connection, conversationId02, "smill donat", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         null);
 
     // till today
-    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId03, "bluk onack", "some notes",
+    BEANS.get(ConversationService.class).insert(connection, conversationId03, "bluk onack", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         null);
 
     // till tomorrow
-    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId04, "7 sense of moon", "some notes",
+    BEANS.get(ConversationService.class).insert(connection, conversationId04, "7 sense of moon", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         null);
   }

@@ -1,13 +1,13 @@
 package ch.ahoegger.docbox.server.hr.billing;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,15 +33,13 @@ public class PostingGroupServiceTest_FindUnbilld extends AbstractTestWithDatabas
   private BigDecimal entityId05 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  public void setupDb() throws Exception {
-
-    ISqlService sqlService = BEANS.get(ISqlService.class);
+  protected void execSetupDb(Connection connection) throws Exception {
     // create entities
-    BEANS.get(EntityService.class).insert(sqlService.getConnection(), entityId01, BigDecimal.valueOf(5), UnbilledCode.ID, WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 3, 31)), BigDecimal.valueOf(2), null, "desc");
-    BEANS.get(EntityService.class).insert(sqlService.getConnection(), entityId02, BigDecimal.valueOf(5), UnbilledCode.ID, WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 4, 1)), BigDecimal.valueOf(2), null, "desc");
-    BEANS.get(EntityService.class).insert(sqlService.getConnection(), entityId03, BigDecimal.valueOf(5), UnbilledCode.ID, WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 4, 13)), BigDecimal.valueOf(2), null, "desc");
-    BEANS.get(EntityService.class).insert(sqlService.getConnection(), entityId04, BigDecimal.valueOf(5), UnbilledCode.ID, WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 4, 30)), BigDecimal.valueOf(2), null, "desc");
-    BEANS.get(EntityService.class).insert(sqlService.getConnection(), entityId05, BigDecimal.valueOf(5), UnbilledCode.ID, WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 5, 1)), BigDecimal.valueOf(2), null, "desc");
+    BEANS.get(EntityService.class).insert(connection, entityId01, BigDecimal.valueOf(5), UnbilledCode.ID, WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 3, 31)), BigDecimal.valueOf(2), null, "desc");
+    BEANS.get(EntityService.class).insert(connection, entityId02, BigDecimal.valueOf(5), UnbilledCode.ID, WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 4, 1)), BigDecimal.valueOf(2), null, "desc");
+    BEANS.get(EntityService.class).insert(connection, entityId03, BigDecimal.valueOf(5), UnbilledCode.ID, WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 4, 13)), BigDecimal.valueOf(2), null, "desc");
+    BEANS.get(EntityService.class).insert(connection, entityId04, BigDecimal.valueOf(5), UnbilledCode.ID, WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 4, 30)), BigDecimal.valueOf(2), null, "desc");
+    BEANS.get(EntityService.class).insert(connection, entityId05, BigDecimal.valueOf(5), UnbilledCode.ID, WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 5, 1)), BigDecimal.valueOf(2), null, "desc");
 
   }
 

@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.document;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -9,15 +10,14 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.junit.Assert;
 import org.junit.Test;
 
-import ch.ahoegger.docbox.server.administration.user.UserService;
 import ch.ahoegger.docbox.server.conversation.ConversationService;
 import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
+import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
@@ -32,7 +32,6 @@ import ch.ahoegger.docbox.shared.document.IDocumentService;
  * @author Andreas Hoegger
  */
 public class DocumentServiceTest extends AbstractTestWithDatabase {
-  private static final String username01 = SUBJECT_NAME;
 
   private static final BigDecimal categoryId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
@@ -48,41 +47,41 @@ public class DocumentServiceTest extends AbstractTestWithDatabase {
   private static final BigDecimal documentId04 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
+  protected void execSetupDb(Connection connection) throws Exception {
 
-    ISqlService sqlService = BEANS.get(ISqlService.class);
-
-    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name01", "firstname01", username01, "secret", true, true);
     // categories
     Calendar cal = Calendar.getInstance();
     cal.add(Calendar.DAY_OF_MONTH, 5);
     DateUtility.truncCalendar(cal);
     Date documentDate = cal.getTime();
     Category categoryTable = Category.CATEGORY;
-    DSL.using(sqlService.getConnection(), SQLDialect.DERBY).newRecord(categoryTable)
+    DSL.using(connection, SQLDialect.DERBY).newRecord(categoryTable)
         .with(categoryTable.CATEGORY_NR, categoryId01)
         .with(categoryTable.NAME, "sampleCatetory")
         .with(categoryTable.START_DATE, documentDate)
         .insert();
 
     // partner
-    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId01, "partner01", null, cal.getTime(), null);
-    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId02, "partner02", null, cal.getTime(), null);
+    BEANS.get(PartnerService.class).insert(connection, partnerId01, "partner01", null, cal.getTime(), null);
+    BEANS.get(PartnerService.class).insert(connection, partnerId02, "partner02", null, cal.getTime(), null);
 
     // conversation
-    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId01, "con01", null, cal.getTime(), null);
-    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId02, "con02", null, cal.getTime(), null);
+    BEANS.get(ConversationService.class).insert(connection, conversationId01, "con01", null, cal.getTime(), null);
+    BEANS.get(ConversationService.class).insert(connection, conversationId02, "con02", null, cal.getTime(), null);
 
     cal = Calendar.getInstance();
     cal.set(1982, 04, 20);
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId01, "Cats Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(connection, documentId01, "Cats Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false, null);
     cal.set(1982, 04, 21);
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId02, "Abstract Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(connection, documentId02, "Abstract Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false, null);
     cal.set(1982, 04, 22);
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId03, "Dogs Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(connection, documentId03, "Dogs Document", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false, null);
     cal.set(1982, 04, 23);
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId04, "All fish are wet", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(connection, documentId04, "All fish are wet", cal.getTime(), cal.getTime(), cal.getTime(), "2016_03_08_124640.pdf", null, null, false, null);
+
+    // ocr
+    BEANS.get(DocumentOcrService.class).insert(connection, documentId04, "All fish are wet", true, 1, null);
+
   }
 
   @Test
@@ -110,6 +109,18 @@ public class DocumentServiceTest extends AbstractTestWithDatabase {
 
     Assert.assertTrue(BEANS.get(DocumentStoreService.class).get(fd1.getDocumentPath()).getContentLength() > 0);
     DocboxAssert.assertEquals(fd1, fd2);
+  }
+
+  @Test
+  public void testDelete() {
+    IDocumentService service = BEANS.get(IDocumentService.class);
+    service.delete(documentId04);
+
+    DocumentFormData fd = new DocumentFormData();
+    fd.setDocumentId(documentId04);
+    Assert.assertNull(service.load(fd));
+
+    Assert.assertFalse(BEANS.get(DocumentOcrService.class).exists(documentId04));
   }
 
   @Test

@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.TuningUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -67,6 +66,7 @@ import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData.DocumentTableRowData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
+import ch.ahoegger.docbox.shared.document.ReplaceDocumentFormData;
 import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.partner.PartnerSearchFormData;
 import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
@@ -205,7 +205,6 @@ public class DocumentService implements IDocumentService {
 
     DocumentTableData tableData = new DocumentTableData();
 
-    TuningUtility.startTimer();
     Result<Record> fetchResult = query.fetch();
     tableData.setRows(
         fetchResult
@@ -233,7 +232,6 @@ public class DocumentService implements IDocumentService {
             .collect(Collectors.toList())
             .toArray(new DocumentTableRowData[]{}));
 
-    TuningUtility.stopTimer("Select Documents");
     return tableData;
   }
 
@@ -493,6 +491,7 @@ public class DocumentService implements IDocumentService {
 
   }
 
+  @Override
   public boolean delete(BigDecimal documentId) {
     if (!ACCESS.check(new AdministratorPermission())) {
       throw new VetoException("Access denied");
@@ -530,6 +529,31 @@ public class DocumentService implements IDocumentService {
     // notify backup needed
     BEANS.get(IBackupService.class).notifyModification();
     return true;
+  }
+
+  @Override
+  public void replaceDocument(ReplaceDocumentFormData formData) {
+    if (!ACCESS.check(new AdministratorPermission())) {
+      throw new VetoException("Access denied");
+    }
+    DocumentFormData docData = new DocumentFormData();
+    docData.setDocumentId(formData.getDocumentId());
+    docData = loadTrusted(docData);
+
+    // delete old
+    BEANS.get(DocumentStoreService.class).delete(docData.getDocumentPath());
+    // ocr
+    deletePasedConent(CollectionUtility.arrayList(formData.getDocumentId()));
+
+    // store new
+    final BinaryResource binaryResource = formData.getDocument().getValue();
+    BEANS.get(DocumentStoreService.class).store(binaryResource, docData.getCapturedDate().getValue(), formData.getDocumentId());
+
+    // ocr
+    if (docData.getParseOcr().getValue()) {
+      ParseDocumentJob job = new ParseDocumentJob(formData.getDocumentId(), OcrLanguageCodeType.GermanCode.ID);
+      job.schedule();
+    }
   }
 
   @RemoteServiceAccessDenied

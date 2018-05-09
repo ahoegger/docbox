@@ -12,7 +12,6 @@ import org.ch.ahoegger.docbox.server.or.app.tables.PostingGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.TaxGroupRecord;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
@@ -161,8 +160,8 @@ public class TaxGroupService implements ITaxGroupService {
   }
 
   @RemoteServiceAccessDenied
-  public int createRow(ISqlService sqlService, BigDecimal taxGroupId, String name, Date startDate, Date endDate) {
-    return DSL.using(sqlService.getConnection(), SQLDialect.DERBY)
+  public int createRow(Connection connection, BigDecimal taxGroupId, String name, Date startDate, Date endDate) {
+    return DSL.using(connection, SQLDialect.DERBY)
         .executeInsert(mapToRecord(new TaxGroupRecord(), taxGroupId, name, startDate, endDate));
 
   }

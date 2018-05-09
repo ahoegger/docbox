@@ -1,11 +1,11 @@
 package ch.ahoegger.docbox.server.conversation;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.Calendar;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,16 +27,13 @@ public class ConversationServiceTest extends AbstractTestWithDatabase {
   private static final BigDecimal conversationId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
-
-    ISqlService sqlService = BEANS.get(ISqlService.class);
+  protected void execSetupDb(Connection connection) throws Exception {
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.set(1999, 04, 29);
-    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId01, "sample conversation 01", "some notes", cal.getTime(), null);
+    BEANS.get(ConversationService.class).insert(connection, conversationId01, "sample conversation 01", "some notes", cal.getTime(), null);
     cal.set(1999, 04, 30);
-    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId02, "sample conversation 02", "some notes", cal.getTime(), null);
+    BEANS.get(ConversationService.class).insert(connection, conversationId02, "sample conversation 02", "some notes", cal.getTime(), null);
   }
 
   @Test

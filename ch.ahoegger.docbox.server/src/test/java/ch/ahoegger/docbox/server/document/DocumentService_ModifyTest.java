@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.document;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -20,14 +21,12 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import ch.ahoegger.docbox.server.administration.user.UserService;
 import ch.ahoegger.docbox.server.category.CategoryService;
 import ch.ahoegger.docbox.server.conversation.ConversationService;
 import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
@@ -49,9 +48,6 @@ import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
  */
 public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
-  private final String userId01 = SUBJECT_NAME;
-  private final String userId02 = "username02";
-
   private final BigDecimal documentId = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
   private final BigDecimal categoryId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
   private final BigDecimal categoryId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
@@ -65,39 +61,33 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
   private static List<IBean<?>> s_mockBeans = new ArrayList<IBean<?>>();
 
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
-
-    ISqlService sqlService = BEANS.get(ISqlService.class);
+  protected void execSetupDb(Connection connection) throws Exception {
 
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
 
     m_today = cal.getTime();
-    // create user
-    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name01", "firstname01", userId01, "secret", true, true);
-    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name02", "firstname02", userId02, "secret", true, false);
 
     // create category
-    BEANS.get(CategoryService.class).insertRow(sqlService.getConnection(), categoryId01, "category01", "dec01", m_today, null);
-    BEANS.get(CategoryService.class).insertRow(sqlService.getConnection(), categoryId02, "category02", "dec02", m_today, null);
+    BEANS.get(CategoryService.class).insertRow(connection, categoryId01, "category01", "dec01", m_today, null);
+    BEANS.get(CategoryService.class).insertRow(connection, categoryId02, "category02", "dec02", m_today, null);
 
     // create conversation
-    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId01, "con01", "dec01", m_today, null);
-    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId02, "con02", "dec02", m_today, null);
+    BEANS.get(ConversationService.class).insert(connection, conversationId01, "con01", "dec01", m_today, null);
+    BEANS.get(ConversationService.class).insert(connection, conversationId02, "con02", "dec02", m_today, null);
 
     // create partner
-    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId01, "partner01", "desc01", m_today, null);
-    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId02, "partner02", "desc02", m_today, null);
+    BEANS.get(PartnerService.class).insert(connection, partnerId01, "partner01", "desc01", m_today, null);
+    BEANS.get(PartnerService.class).insert(connection, partnerId02, "partner02", "desc02", m_today, null);
 
     // create document
     Date docData = cal.getTime();
     Date insertDate = m_today;
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId, "doc 01", docData, insertDate, null, "2016_03_08_124640.pdf", "origStorage", conversationId01, false, null);
+    BEANS.get(DocumentService.class).insert(connection, documentId, "doc 01", docData, insertDate, null, "2016_03_08_124640.pdf", "origStorage", conversationId01, false, null);
     // links
-    BEANS.get(DocumentPartnerService.class).insert(sqlService.getConnection(), documentId, partnerId01);
-    BEANS.get(DocumentCategoryService.class).insert(sqlService.getConnection(), documentId, categoryId01);
-    BEANS.get(DocumentPermissionService.class).insert(sqlService.getConnection(), userId01, documentId, PermissionCodeType.ReadCode.ID);
+    BEANS.get(DocumentPartnerService.class).insert(connection, documentId, partnerId01);
+    BEANS.get(DocumentCategoryService.class).insert(connection, documentId, categoryId01);
+    BEANS.get(DocumentPermissionService.class).insert(connection, USER, documentId, PermissionCodeType.ReadCode.ID);
 
   }
 
@@ -374,7 +364,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
     DocumentFormData fd = loadDocument(service, documentId);
     // modify
-    PermissionsRowData rd = Arrays.stream(fd.getPermissions().getRows()).filter(row -> userId01.equals(row.getUser())).findFirst().get();
+    PermissionsRowData rd = Arrays.stream(fd.getPermissions().getRows()).filter(row -> USER.equals(row.getUser())).findFirst().get();
     rd.setPermission(PermissionCodeType.WriteCode.ID);
 
     service.store(fd);
@@ -388,7 +378,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
                 .compareTo(p2.getUser()))
             .collect(Collectors.toList());
 
-    Assert.assertEquals(CollectionUtility.arrayList(userId01),
+    Assert.assertEquals(CollectionUtility.arrayList(USER),
         sortedValidPermissions.stream().map(row -> row.getUser()).collect(Collectors.toList()));
     Assert.assertEquals(CollectionUtility.arrayList(PermissionCodeType.WriteCode.ID),
         sortedValidPermissions.stream().map(row -> row.getPermission()).collect(Collectors.toList()));
@@ -402,7 +392,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     DocumentFormData fd = loadDocument(service, documentId);
     // modify
     PermissionsRowData newRow = fd.getPermissions().addRow();
-    newRow.setUser(userId02);
+    newRow.setUser(USER_INACTIVE);
     newRow.setPermission(PermissionCodeType.WriteCode.ID);
     service.store(fd);
 
@@ -414,7 +404,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
             .sorted((p1, p2) -> p1.getUser().compareTo(p2.getUser()))
             .collect(Collectors.toList());
 
-    Assert.assertEquals(CollectionUtility.arrayList(userId01, userId02),
+    Assert.assertEquals(CollectionUtility.arrayList(USER, USER_INACTIVE),
         sortedValidPermissions.stream().map(row -> row.getUser()).collect(Collectors.toList()));
     Assert.assertEquals(CollectionUtility.arrayList(PermissionCodeType.ReadCode.ID, PermissionCodeType.WriteCode.ID),
         sortedValidPermissions.stream().map(row -> row.getPermission()).collect(Collectors.toList()));
@@ -429,7 +419,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     // modify
 
     for (PermissionsRowData rd : fd.getPermissions().getRows()) {
-      if (userId01.equals(rd.getUser())) {
+      if (USER.equals(rd.getUser())) {
         fd.getPermissions().removeRow(rd);
       }
     }
@@ -459,7 +449,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     // modify
     fd.getPermissions().clearRows();
     PermissionsRowData newRow = fd.getPermissions().addRow();
-    newRow.setUser(userId02);
+    newRow.setUser(USER_INACTIVE);
     newRow.setPermission(PermissionCodeType.WriteCode.ID);
 
     service.store(fd);
@@ -472,7 +462,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
             .sorted((p1, p2) -> p1.getUser().compareTo(p2.getUser()))
             .collect(Collectors.toList());
 
-    Assert.assertEquals(CollectionUtility.arrayList(userId02),
+    Assert.assertEquals(CollectionUtility.arrayList(USER_INACTIVE),
         sortedValidPermissions.stream().map(row -> row.getUser()).collect(Collectors.toList()));
 
     Assert.assertEquals(CollectionUtility.arrayList(PermissionCodeType.WriteCode.ID),

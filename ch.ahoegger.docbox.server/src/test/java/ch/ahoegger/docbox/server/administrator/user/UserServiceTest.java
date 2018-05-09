@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.server.administrator.user;
 
+import java.sql.Connection;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
@@ -21,24 +23,17 @@ import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
  */
 
 public class UserServiceTest extends AbstractTestWithDatabase {
-  private final String userId01 = SUBJECT_NAME;
   private final String userId02 = "username02";
   private final String userId03 = "username03";
   private final String userId04 = "username04";
   private final String userId05 = "username05";
 
-  private final String userIdAdmin01 = "admin01";
-
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
-    ISqlService sqlService = BEANS.get(ISqlService.class);
-    BEANS.get(UserService.class).insert(sqlService.getConnection(), "first.myself", "last.myself", userId01, "secret", true, false);
-    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name02", "firstname02", userId02, passwordHash("secret02"), true, false);
-    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name03", "firstname03", userId03, passwordHash("secret03"), false, false);
-    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name04", "firstname04", userId04, passwordHash("secret04"), true, false);
-    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name05", "firstname05", userId05, passwordHash("secret05"), true, false);
-    BEANS.get(UserService.class).insert(sqlService.getConnection(), "admin01", "first.admin01", userIdAdmin01, passwordHash("secret05"), true, true);
+  protected void execSetupDb(Connection connection) throws Exception {
+    BEANS.get(UserService.class).insert(connection, "name02", "firstname02", userId02, passwordHash("secret02"), true, false);
+    BEANS.get(UserService.class).insert(connection, "name03", "firstname03", userId03, passwordHash("secret03"), false, false);
+    BEANS.get(UserService.class).insert(connection, "name04", "firstname04", userId04, passwordHash("secret04"), true, false);
+    BEANS.get(UserService.class).insert(connection, "name05", "firstname05", userId05, passwordHash("secret05"), true, false);
   }
 
   @Test
@@ -138,7 +133,7 @@ public class UserServiceTest extends AbstractTestWithDatabase {
   @Test(expected = ProcessingException.class)
   public void testDeleteLastAdmin() {
     IUserService userService = BEANS.get(IUserService.class);
-    userService.delete(userIdAdmin01);
+    userService.delete(ADMIN);
   }
 
   @Test

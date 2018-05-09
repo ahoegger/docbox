@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.dto.PageData;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -18,11 +19,14 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -409,22 +413,67 @@ public class DocumentTablePage extends AbstractDocboxPageWithTable<DocumentTable
         DocumentForm form = new DocumentForm();
         DocumentForm.DocumentFormEditHandler handler = new DocumentForm.DocumentFormEditHandler(form, getDocumentIdColumn().getSelectedValue());
         form.setHandler(handler);
-
         form.start();
       }
-
     }
 
     @Order(2500)
-    public class AdministrationMenu extends AbstractMenu {
+    public class AdvancedMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return TEXTS.get("Administration");
+        return TEXTS.get("Advanced");
       }
 
       @Override
-      protected boolean getConfiguredVisible() {
-        return ACCESS.check(new AdministratorPermission());
+      protected void execInitAction() {
+        super.execInitAction();
+        setVisibleGranted(ACCESS.check(new AdministratorPermission()));
+      }
+
+      @Order(100)
+      public class DeleteMenu extends AbstractMenu {
+        @Override
+        protected String getConfiguredText() {
+          return TEXTS.get("Delete");
+        }
+
+        @Override
+        protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+          return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+        }
+
+        @Override
+        protected void execAction() {
+          if (MessageBoxes.createYesNo().withBody(TEXTS.get("DeleteConfirmationTextX", getAbstractColumn().getSelectedDisplayText())).show() == MessageBox.YES_OPTION) {
+            BEANS.get(IDocumentService.class).delete(getDocumentIdColumn().getSelectedValue());
+            IDesktop.CURRENT.get().dataChanged(IDocumentEntity.ENTITY_KEY);
+
+          }
+        }
+      }
+
+      @Order(1000)
+      public class RepalceDocumentMenuMenu extends AbstractMenu {
+        @Override
+        protected String getConfiguredText() {
+          return TEXTS.get("ReplaceDocument");
+        }
+
+        @Override
+        protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+          return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+        }
+
+        @Override
+        protected void execAction() {
+          ReplaceDocumentForm form = new ReplaceDocumentForm();
+          form.setDocumentId(getDocumentIdColumn().getSelectedValue());
+          form.start();
+        }
+      }
+
+      @Order(2000)
+      public class SeparatorMenu extends AbstractMenuSeparator {
       }
 
       @Order(3000)

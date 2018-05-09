@@ -1,12 +1,12 @@
 package ch.ahoegger.docbox.server.category;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.Calendar;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Test;
 
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
@@ -25,11 +25,9 @@ public class CategoryServiceTest extends AbstractTestWithDatabase {
   private static final BigDecimal m_categoryId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
-    ISqlService sqlService = BEANS.get(ISqlService.class);
+  protected void execSetupDb(Connection connection) throws Exception {
     LocalDate today = LocalDate.now();
-    BEANS.get(CategoryService.class).insertRow(sqlService.getConnection(), m_categoryId01, "Sample category", "A desc", LocalDateUtility.toDate(today), null);
+    BEANS.get(CategoryService.class).insertRow(connection, m_categoryId01, "Sample category", "A desc", LocalDateUtility.toDate(today), null);
   }
 
   @Test

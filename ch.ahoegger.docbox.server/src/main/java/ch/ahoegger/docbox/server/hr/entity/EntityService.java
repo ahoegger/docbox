@@ -75,6 +75,7 @@ public class EntityService implements IEntityService {
         .select(e.ENTITY_NR, e.PARTNER_NR, e.POSTING_GROUP_NR, e.ENTITY_TYPE, e.ENTITY_DATE, e.WORKING_HOURS, e.EXPENSE_AMOUNT, e.DESCRIPTION)
         .from(e)
         .where(condition)
+        .orderBy(e.ENTITY_DATE)
         .fetch()
         .stream()
         .map(rec -> {

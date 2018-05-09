@@ -42,6 +42,11 @@ public interface IDocumentService extends IService {
   DocumentFormData create(DocumentFormData formData);
 
   /**
+   * @param selectedValue
+   */
+  boolean delete(BigDecimal selectedValue);
+
+  /**
    *
    */
   void buildOcrOfMissingDocuments();
@@ -55,5 +60,10 @@ public interface IDocumentService extends IService {
    * @param selectedValues
    */
   void deletePasedConent(List<BigDecimal> documentIds);
+
+  /**
+   * @param fd
+   */
+  void replaceDocument(ReplaceDocumentFormData formData);
 
 }

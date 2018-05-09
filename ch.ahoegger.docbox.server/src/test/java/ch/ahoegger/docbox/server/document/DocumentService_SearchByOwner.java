@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.document;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.stream.Collectors;
@@ -8,7 +9,6 @@ import java.util.stream.Collectors;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,8 +27,8 @@ import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
  */
 public class DocumentService_SearchByOwner extends AbstractTestWithDatabase {
 
-  private static final String username01 = SUBJECT_NAME;
-  private static final String username02 = "username02";
+//  private static final String username01 = SUBJECT_NAME;
+  private static final String admin02 = "admin02";
 
   private static final BigDecimal documentId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
   private static final BigDecimal documentId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
@@ -37,42 +37,39 @@ public class DocumentService_SearchByOwner extends AbstractTestWithDatabase {
   private static final BigDecimal documentId05 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
+  protected void execSetupDb(Connection connection) throws Exception {
 
-    ISqlService sqlService = BEANS.get(ISqlService.class);
-
-    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name01", "firstname01", username01, "secret", true, true);
-    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name02", "firstname02", username02, "secret", true, true);
+//    BEANS.get(UserService.class).insert(connection, "name01", "firstname01", username01, "secret", true, true);
+    BEANS.get(UserService.class).insert(connection, "name02", "firstname02", admin02, "secret", true, true);
 
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.add(Calendar.DAY_OF_MONTH, -110);
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId01, "doc 01", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(connection, documentId01, "doc 01", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
     cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId02, "doc 02", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(connection, documentId02, "doc 02", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
     cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.add(Calendar.DAY_OF_WEEK, -1);
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId03, "doc 03", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(connection, documentId03, "doc 03", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
     cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.add(Calendar.DAY_OF_WEEK, -20);
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId04, "doc 04", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId05, "doc 05", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(connection, documentId04, "doc 04", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
+    BEANS.get(DocumentService.class).insert(connection, documentId05, "doc 05", cal.getTime(), cal.getTime(), null, "2016_03_08_124640.pdf", null, null, false, null);
 
     // permissions
-    BEANS.get(DocumentPermissionService.class).insert(sqlService.getConnection(), username01, documentId01, PermissionCodeType.OwnerCode.ID);
-    BEANS.get(DocumentPermissionService.class).insert(sqlService.getConnection(), username02, documentId02, PermissionCodeType.OwnerCode.ID);
-    BEANS.get(DocumentPermissionService.class).insert(sqlService.getConnection(), username02, documentId05, PermissionCodeType.OwnerCode.ID);
+    BEANS.get(DocumentPermissionService.class).insert(connection, ADMIN, documentId01, PermissionCodeType.OwnerCode.ID);
+    BEANS.get(DocumentPermissionService.class).insert(connection, admin02, documentId02, PermissionCodeType.OwnerCode.ID);
+    BEANS.get(DocumentPermissionService.class).insert(connection, admin02, documentId05, PermissionCodeType.OwnerCode.ID);
   }
 
   @Test
   public void testFindByOwnerAdmin() {
     IDocumentService service = BEANS.get(IDocumentService.class);
     DocumentSearchFormData sd = new DocumentSearchFormData();
-    sd.getOwner().setValue(username01);
+    sd.getOwner().setValue(ADMIN);
     DocumentTableData tableData = service.getTableData(sd);
 
     Assert.assertEquals(CollectionUtility.arrayList(documentId01),
@@ -86,7 +83,7 @@ public class DocumentService_SearchByOwner extends AbstractTestWithDatabase {
   public void testFindByOwnerUser02() {
     IDocumentService service = BEANS.get(IDocumentService.class);
     DocumentSearchFormData sd = new DocumentSearchFormData();
-    sd.getOwner().setValue(username02);
+    sd.getOwner().setValue(admin02);
     DocumentTableData tableData = service.getTableData(sd);
 
     Assert.assertEquals(CollectionUtility.arrayList(documentId02, documentId05),

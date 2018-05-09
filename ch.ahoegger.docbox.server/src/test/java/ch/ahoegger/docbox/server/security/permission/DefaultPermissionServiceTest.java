@@ -1,9 +1,9 @@
 package ch.ahoegger.docbox.server.security.permission;
 
+import java.sql.Connection;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -24,14 +24,11 @@ public class DefaultPermissionServiceTest extends AbstractTestWithDatabase {
   private static final String user03 = "user03";
 
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
+  protected void execSetupDb(Connection connection) throws Exception {
 
-    ISqlService sqlService = BEANS.get(ISqlService.class);
-
-    BEANS.get(DefaultPermissionService.class).insertRow(sqlService.getConnection(), user01, ReadCode.ID);
-    BEANS.get(DefaultPermissionService.class).insertRow(sqlService.getConnection(), user02, WriteCode.ID);
-    BEANS.get(DefaultPermissionService.class).insertRow(sqlService.getConnection(), user03, OwnerCode.ID);
+    BEANS.get(DefaultPermissionService.class).insertRow(connection, user01, ReadCode.ID);
+    BEANS.get(DefaultPermissionService.class).insertRow(connection, user02, WriteCode.ID);
+    BEANS.get(DefaultPermissionService.class).insertRow(connection, user03, OwnerCode.ID);
   }
 
   @Test

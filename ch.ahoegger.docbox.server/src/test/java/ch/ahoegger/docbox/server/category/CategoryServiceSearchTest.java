@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.category;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -8,7 +9,6 @@ import java.util.stream.Collectors;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,15 +30,13 @@ public class CategoryServiceSearchTest extends AbstractTestWithDatabase {
   private static final BigDecimal id03 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
-    ISqlService sqlService = BEANS.get(ISqlService.class);
+  protected void execSetupDb(Connection connection) throws Exception {
 
-    BEANS.get(CategoryService.class).insertRow(sqlService.getConnection(), id01, "cat01", "desc01",
+    BEANS.get(CategoryService.class).insertRow(connection, id01, "cat01", "desc01",
         LocalDateUtility.toDate(LocalDate.now()), null);
-    BEANS.get(CategoryService.class).insertRow(sqlService.getConnection(), id02, "cat02", "desc02",
+    BEANS.get(CategoryService.class).insertRow(connection, id02, "cat02", "desc02",
         LocalDateUtility.toDate(LocalDate.now()), LocalDateUtility.toDate(LocalDate.now()));
-    BEANS.get(CategoryService.class).insertRow(sqlService.getConnection(), id03, "cat03", "desc03",
+    BEANS.get(CategoryService.class).insertRow(connection, id03, "cat03", "desc03",
         LocalDateUtility.toDate(LocalDate.now().minusDays(2)),
         LocalDateUtility.toDate(LocalDate.now().minusDays(1)));
 

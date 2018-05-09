@@ -1,9 +1,9 @@
 package ch.ahoegger.docbox.server.ocr;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -20,12 +20,9 @@ public class DocumentOcrServiceTest extends AbstractTestWithDatabase {
   private BigDecimal documentId = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
+  protected void execSetupDb(Connection connection) throws Exception {
 
-    ISqlService sqlService = BEANS.get(ISqlService.class);
-
-    BEANS.get(DocumentOcrService.class).insert(sqlService.getConnection(), documentId, "sample", true, 1, null);
+    BEANS.get(DocumentOcrService.class).insert(connection, documentId, "sample", true, 1, null);
 
   }
 

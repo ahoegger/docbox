@@ -1,12 +1,12 @@
 package ch.ahoegger.docbox.server.hr.billing;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.Date;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,33 +42,31 @@ public class PostingGroupServiceTest extends AbstractTestWithDatabase {
   private BigDecimal workId = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
+  protected void execSetupDb(Connection connection) throws Exception {
 
     // create document
     Date docCaptureDate = LocalDateUtility.toDate(LocalDate.now().minusDays(5));
     String documentPath = BEANS.get(DocumentStoreService.class).store(new BinaryResource("payslip.pdf", "content".getBytes()), docCaptureDate, documentId);
-    ISqlService sqlService = BEANS.get(ISqlService.class);
 
-    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId, "employee01", "desc01", docCaptureDate, null);
-    BEANS.get(EmployeeService.class).insert(sqlService.getConnection(), partnerId, "Homer", "Simpson", "Nashvill Street 12a", "Santa Barbara CA-90051", "ahv123564789", "iban987654321", LocalDateUtility.toDate(LocalDate.of(1993, 02, 15)),
+    BEANS.get(PartnerService.class).insert(connection, partnerId, "employee01", "desc01", docCaptureDate, null);
+    BEANS.get(EmployeeService.class).insert(connection, partnerId, "Homer", "Simpson", "Nashvill Street 12a", "Santa Barbara CA-90051", "ahv123564789", "iban987654321", LocalDateUtility.toDate(LocalDate.of(1993, 02, 15)),
         BigDecimal.valueOf(26.30),
         BigDecimal.valueOf(6.225), BigDecimal.valueOf(5.0), BigDecimal.valueOf(8.33),
         "Master Bob & Minor Molar", "Mountainview 12", "CA-90153 Santa Tropee", "master.bob@blu.com", "5445621236");
 
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId, "Abstract", docCaptureDate, LocalDateUtility.toDate(LocalDate.now().minusDays(4)), null, documentPath, null, null, true, OcrLanguageCodeType.GermanCode.ID);
+    BEANS.get(DocumentService.class).insert(connection, documentId, "Abstract", docCaptureDate, LocalDateUtility.toDate(LocalDate.now().minusDays(4)), null, documentPath, null, null, true, OcrLanguageCodeType.GermanCode.ID);
 
-    BEANS.get(DocumentPartnerService.class).insert(sqlService.getConnection(), documentId, partnerId);
+    BEANS.get(DocumentPartnerService.class).insert(connection, documentId, partnerId);
 
-    BEANS.get(PostingGroupService.class).insert(sqlService.getConnection(), postingGroupId, partnerId, null, documentId, "Dezember ",
+    BEANS.get(PostingGroupService.class).insert(connection, postingGroupId, partnerId, null, documentId, "Dezember ",
         LocalDateUtility.toDate(LocalDate.of(2016, 12, 1)),
         LocalDateUtility.toDate(LocalDate.of(2016, 12, 31)),
         LocalDateUtility.toDate(LocalDate.of(2017, 1, 5)),
         BigDecimal.valueOf(5.0), BigDecimal.valueOf(200.3),
         BigDecimal.valueOf(197.3),
         BigDecimal.valueOf(10.3), BigDecimal.valueOf(1.3), BigDecimal.valueOf(2.3));
-    BEANS.get(EntityService.class).insert(sqlService.getConnection(), expenceId, partnerId, postingGroupId, ExpenseCode.ID, LocalDateUtility.toDate(LocalDate.now().minusDays(2)), null, BigDecimal.valueOf(23), "desc");
-    BEANS.get(EntityService.class).insert(sqlService.getConnection(), workId, partnerId, postingGroupId, WorkCode.ID, LocalDateUtility.toDate(LocalDate.now().minusDays(2)), BigDecimal.valueOf(3), null, "desc");
+    BEANS.get(EntityService.class).insert(connection, expenceId, partnerId, postingGroupId, ExpenseCode.ID, LocalDateUtility.toDate(LocalDate.now().minusDays(2)), null, BigDecimal.valueOf(23), "desc");
+    BEANS.get(EntityService.class).insert(connection, workId, partnerId, postingGroupId, WorkCode.ID, LocalDateUtility.toDate(LocalDate.now().minusDays(2)), BigDecimal.valueOf(3), null, "desc");
 
   }
 

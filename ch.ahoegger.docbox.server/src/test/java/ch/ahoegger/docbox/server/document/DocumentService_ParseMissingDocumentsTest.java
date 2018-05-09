@@ -3,6 +3,7 @@ package ch.ahoegger.docbox.server.document;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +17,11 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FileUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ch.ahoegger.docbox.server.administration.user.UserService;
 import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.ocr.OcrParseResult;
 import ch.ahoegger.docbox.server.ocr.OcrParseService;
@@ -41,7 +40,6 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
  * @author Andreas Hoegger
  */
 public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithDatabase {
-  private static final String username01 = SUBJECT_NAME;
 
   private static final BigDecimal documentId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
   private static final BigDecimal documentId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
@@ -82,36 +80,32 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
   }
 
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
+  protected void execSetupDb(Connection connection) throws Exception {
 
-    ISqlService sqlService = BEANS.get(ISqlService.class);
-
-    BEANS.get(UserService.class).insert(sqlService.getConnection(), "name01", "firstname01", username01, "secret", true, true);
     // categories
     LocalDate today = LocalDate.now();
 
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId01, "Cats Document",
+    BEANS.get(DocumentService.class).insert(connection, documentId01, "Cats Document",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, true, OcrLanguageCodeType.GermanCode.ID);
 
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId02, "Abstract Document",
+    BEANS.get(DocumentService.class).insert(connection, documentId02, "Abstract Document",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, true, OcrLanguageCodeType.GermanCode.ID);
 
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId03, "Dogs Document",
+    BEANS.get(DocumentService.class).insert(connection, documentId03, "Dogs Document",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, true, OcrLanguageCodeType.GermanCode.ID);
 
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId04, "All fish are wet",
+    BEANS.get(DocumentService.class).insert(connection, documentId04, "All fish are wet",
         LocalDateUtility.toDate(today.minusDays(20)),
         LocalDateUtility.toDate(today),
         null, "2016_03_08_124640.pdf", null, null, false, null);
 
-    BEANS.get(DocumentOcrService.class).insert(sqlService.getConnection(), documentId01, "parsed01", true, 1, null);
+    BEANS.get(DocumentOcrService.class).insert(connection, documentId01, "parsed01", true, 1, null);
 
   }
 

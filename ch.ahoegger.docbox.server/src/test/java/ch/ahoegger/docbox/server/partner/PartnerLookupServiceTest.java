@@ -1,13 +1,13 @@
 package ch.ahoegger.docbox.server.partner;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -29,28 +29,25 @@ public class PartnerLookupServiceTest extends AbstractTestWithDatabase {
   private static final BigDecimal partnerId04 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
-
-    ISqlService sqlService = BEANS.get(ISqlService.class);
+  protected void execSetupDb(Connection connection) throws Exception {
     LocalDate today = LocalDate.now();
 
-    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId01, "partner01", "some notes",
+    BEANS.get(PartnerService.class).insert(connection, partnerId01, "partner01", "some notes",
         LocalDateUtility.toDate(today.minusDays(20)),
         null);
 
     // till yesterday
-    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId02, "partner02", "some notes",
+    BEANS.get(PartnerService.class).insert(connection, partnerId02, "partner02", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         LocalDateUtility.toDate(today.minusDays(1)));
 
     // till today
-    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId03, "partner03", "some notes",
+    BEANS.get(PartnerService.class).insert(connection, partnerId03, "partner03", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         LocalDateUtility.toDate(today));
 
     // till tomorrow
-    BEANS.get(PartnerService.class).insert(sqlService.getConnection(), partnerId04, "partner04", "some notes",
+    BEANS.get(PartnerService.class).insert(connection, partnerId04, "partner04", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         LocalDateUtility.toDate(today.plusDays(1)));
 

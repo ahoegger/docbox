@@ -1,13 +1,13 @@
 package ch.ahoegger.docbox.server.conversation;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -29,27 +29,24 @@ public class ConversationLookupServiceTest extends AbstractTestWithDatabase {
   private static final BigDecimal conversationId04 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
-
-    ISqlService sqlService = BEANS.get(ISqlService.class);
+  protected void execSetupDb(Connection connection) throws Exception {
     LocalDate today = LocalDate.now();
 
-    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId01, "sample conversation 01", "some notes",
+    BEANS.get(ConversationService.class).insert(connection, conversationId01, "sample conversation 01", "some notes",
         LocalDateUtility.toDate(today.minusDays(20)), null);
 
     // till yesterday
-    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId02, "sample conversation 02", "some notes",
+    BEANS.get(ConversationService.class).insert(connection, conversationId02, "sample conversation 02", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         LocalDateUtility.toDate(today.minusDays(1)));
 
     // till today
-    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId03, "sample conversation 03", "some notes",
+    BEANS.get(ConversationService.class).insert(connection, conversationId03, "sample conversation 03", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         LocalDateUtility.toDate(today));
 
     // till tomorrow
-    BEANS.get(ConversationService.class).insert(sqlService.getConnection(), conversationId04, "sample conversation 04", "some notes",
+    BEANS.get(ConversationService.class).insert(connection, conversationId04, "sample conversation 04", "some notes",
         LocalDateUtility.toDate(today.minusDays(10)),
         LocalDateUtility.toDate(today.plusDays(1)));
 

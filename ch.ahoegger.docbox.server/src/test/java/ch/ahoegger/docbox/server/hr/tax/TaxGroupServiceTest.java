@@ -1,10 +1,10 @@
 package ch.ahoegger.docbox.server.hr.tax;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.time.LocalDate;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Test;
 
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
@@ -19,11 +19,9 @@ public class TaxGroupServiceTest extends AbstractTestWithDatabase {
   private BigDecimal taxGroupId = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
-    ISqlService sqlService = BEANS.get(ISqlService.class);
+  protected void execSetupDb(Connection connection) throws Exception {
 
-    BEANS.get(TaxGroupService.class).createRow(sqlService, taxGroupId, "abc", LocalDateUtility.today(), null);
+    BEANS.get(TaxGroupService.class).createRow(connection, taxGroupId, "abc", LocalDateUtility.today(), null);
 
   }
 

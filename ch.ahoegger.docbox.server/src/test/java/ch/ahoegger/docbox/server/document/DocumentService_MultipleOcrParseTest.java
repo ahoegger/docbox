@@ -3,6 +3,7 @@ package ch.ahoegger.docbox.server.document;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,7 +15,6 @@ import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -40,25 +40,22 @@ public class DocumentService_MultipleOcrParseTest extends AbstractTestWithDataba
 //  private static final String FILE_NAME = "withoutTextInfo.pdf";
 
   @Override
-  public void setupDb() throws Exception {
-    super.setupDb();
-
-    ISqlService sqlService = BEANS.get(ISqlService.class);
+  protected void execSetupDb(Connection connection) throws Exception {
 
     for (int i = 0; i < 4; i++) {
       BigDecimal docId = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
       m_documentIds.add(docId);
-      createDocument(sqlService, docId, LocalDateUtility.toDate(LocalDate.now().plusDays(10 - i)), FILE_NAME);
+      createDocument(connection, docId, LocalDateUtility.toDate(LocalDate.now().plusDays(10 - i)), FILE_NAME);
     }
 
   }
 
-  private void createDocument(ISqlService sqlService, BigDecimal documentId, Date insertDate, String fileName) throws IOException {
+  private void createDocument(Connection connection, BigDecimal documentId, Date insertDate, String fileName) throws IOException {
     URL resource = getClass().getClassLoader().getResource("devDocuments/" + fileName);
     BinaryResource br = BinaryResources.create().withFilename(fileName).withContentType(FileUtility.getContentTypeForExtension(FileUtility.getFileExtension(fileName))).withContent(IOUtility.readFromUrl(resource))
         .withLastModified(System.currentTimeMillis()).build();
     String docPath = BEANS.get(DocumentStoreService.class).store(br, insertDate, documentId);
-    BEANS.get(DocumentService.class).insert(sqlService.getConnection(), documentId, "", insertDate, insertDate, null, docPath, null, null, true, OcrLanguageCodeType.GermanCode.ID);
+    BEANS.get(DocumentService.class).insert(connection, documentId, "", insertDate, insertDate, null, docPath, null, null, true, OcrLanguageCodeType.GermanCode.ID);
   }
 
   @Test
