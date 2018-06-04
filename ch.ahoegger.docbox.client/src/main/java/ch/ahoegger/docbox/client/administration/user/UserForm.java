@@ -28,6 +28,7 @@ import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.P
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.FieldBox.UsernameField;
 import ch.ahoegger.docbox.client.administration.user.UserForm.MainBox.OkButton;
 import ch.ahoegger.docbox.or.definition.table.IUserTable;
+import ch.ahoegger.docbox.shared.Icons;
 import ch.ahoegger.docbox.shared.administration.user.AdministratorLookupCall;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
 import ch.ahoegger.docbox.shared.administration.user.UserFormData;
@@ -63,7 +64,7 @@ public class UserForm extends AbstractForm {
 
   @Override
   protected String getConfiguredIconId() {
-    return "font:icomoon \uf007";
+    return Icons.User2;
   }
 
   @Override

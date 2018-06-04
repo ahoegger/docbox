@@ -10,6 +10,7 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.notification.DesktopNotification;
@@ -32,6 +33,7 @@ import ch.ahoegger.docbox.client.hr.HumanResourceOutline;
 import ch.ahoegger.docbox.client.search.SearchOutline;
 import ch.ahoegger.docbox.client.settings.SettingsOutline;
 import ch.ahoegger.docbox.client.work.WorkOutline;
+import ch.ahoegger.docbox.shared.Icons;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
 import ch.ahoegger.docbox.shared.hr.employee.IEmployeeService;
@@ -91,15 +93,19 @@ public class Desktop extends AbstractDesktop {
     }
   }
 
-  @Order(1000)
-  public class FileMenu extends AbstractMenu {
-
+  @Order(1500)
+  public class ToolsMenu extends AbstractMenu {
     @Override
-    protected String getConfiguredText() {
-      return TEXTS.get("File");
+    protected String getConfiguredTooltipText() {
+      return TEXTS.get("Tools");
     }
 
-    @Order(0)
+    @Override
+    protected String getConfiguredIconId() {
+      return Icons.Wrench;
+    }
+
+    @Order(1000)
     public class ManualBackupMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -122,7 +128,7 @@ public class Desktop extends AbstractDesktop {
       }
     }
 
-    @Order(500)
+    @Order(2000)
     public class DbDumpMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -141,7 +147,7 @@ public class Desktop extends AbstractDesktop {
       }
     }
 
-    @Order(750)
+    @Order(3000)
     public class ForceOcrScanMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -159,30 +165,11 @@ public class Desktop extends AbstractDesktop {
       }
     }
 
-    @Order(1000)
-    public class ExitMenu extends AbstractMenu {
-
-      @Override
-      protected String getConfiguredText() {
-        return TEXTS.get("Exit");
-      }
-
-      @Override
-      protected void execAction() {
-        ClientSessionProvider.currentSession(ClientSession.class).stop();
-      }
-    }
-  }
-
-  @Order(3000)
-  public class HelpMenu extends AbstractMenu {
-
-    @Override
-    protected String getConfiguredText() {
-      return TEXTS.get("Help");
+    @Order(4000)
+    public class SeparatorMenu extends AbstractMenuSeparator {
     }
 
-    @Order(1000)
+    @Order(5000)
     public class AboutMenu extends AbstractMenu {
 
       @Override
@@ -195,6 +182,26 @@ public class Desktop extends AbstractDesktop {
         ScoutInfoForm form = new ScoutInfoForm();
         form.startModify();
       }
+    }
+
+  }
+
+  @Order(2000)
+  public class LogoffMenu extends AbstractMenu {
+
+    @Override
+    protected String getConfiguredIconId() {
+      return Icons.Switch;
+    }
+
+    @Override
+    protected String getConfiguredTooltipText() {
+      return TEXTS.get("LogOff");
+    }
+
+    @Override
+    protected void execAction() {
+      ClientSessionProvider.currentSession(ClientSession.class).stop();
     }
   }
 
