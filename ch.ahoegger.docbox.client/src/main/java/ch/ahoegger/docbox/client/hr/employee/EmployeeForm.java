@@ -6,8 +6,6 @@ import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
@@ -18,7 +16,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 
 import ch.ahoegger.docbox.client.hr.employee.EmployeeForm.MainBox.CancelButton;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeForm.MainBox.OkButton;
@@ -143,17 +141,12 @@ public class EmployeeForm extends AbstractForm {
       @Override
       protected void execChangedMasterValue(Object newMasterValue) {
         if (newMasterValue == null) {
-          visitFields(new IFormFieldVisitor() {
-
-            @Override
-            public boolean visitField(IFormField field, int level, int fieldIndex) {
-              if (field instanceof IValueField<?>) {
-                ((IValueField) field).resetValue();
-                setEnabled(true);
-              }
-              return true;
+          visit(field -> {
+            if (field instanceof IValueField<?>) {
+              field.resetValue();
+              field.setEnabled(true);
             }
-          });
+          }, IValueField.class);
           setEnabled(true);
         }
         else {
@@ -165,16 +158,12 @@ public class EmployeeForm extends AbstractForm {
           getStartDateField().importFormFieldData(partnerFormData.getPartnerBox().getStartDate(), true);
           getEndDateField().importFormFieldData(partnerFormData.getPartnerBox().getEndDate(), true);
           getNameField().setValue(partnerFormData.getPartnerBox().getName().getValue());
-          visitFields(new IFormFieldVisitor() {
-
-            @Override
-            public boolean visitField(IFormField field, int level, int fieldIndex) {
-              if (field instanceof IValueField<?>) {
-                setEnabled(false);
-              }
-              return true;
+          visit(field -> {
+            if (field instanceof IValueField<?>) {
+              field.setEnabled(false);
             }
-          });
+          }, IValueField.class);
+
         }
       }
 

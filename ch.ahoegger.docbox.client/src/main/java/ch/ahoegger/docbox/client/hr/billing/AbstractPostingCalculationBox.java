@@ -7,7 +7,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDec
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 
 import ch.ahoegger.docbox.client.hr.entity.AbstractEntityTable;
 import ch.ahoegger.docbox.or.definition.table.IPostingGroupTable;

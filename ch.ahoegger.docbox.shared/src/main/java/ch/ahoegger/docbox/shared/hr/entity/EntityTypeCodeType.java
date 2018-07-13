@@ -3,8 +3,8 @@ package ch.ahoegger.docbox.shared.hr.entity;
 import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 

@@ -10,7 +10,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 
 import ch.ahoegger.docbox.client.hr.tax.TaxGroupSearchForm.MainBox.ResetButton;
 import ch.ahoegger.docbox.client.hr.tax.TaxGroupSearchForm.MainBox.SearchButton;

@@ -5,7 +5,7 @@ import java.time.ZoneId;
 import java.util.Date;
 
 import org.eclipse.scout.rt.platform.exception.VetoException;
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 
 /**
  * <h3>{@link DateValidation}</h3>

@@ -22,16 +22,14 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 import ch.ahoegger.docbox.client.administration.AdministrationOutline;
 import ch.ahoegger.docbox.client.administration.DbDumpForm;
 import ch.ahoegger.docbox.client.hr.HumanResourceOutline;
-import ch.ahoegger.docbox.client.search.SearchOutline;
-import ch.ahoegger.docbox.client.settings.SettingsOutline;
 import ch.ahoegger.docbox.client.work.WorkOutline;
 import ch.ahoegger.docbox.shared.Icons;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
@@ -54,8 +52,7 @@ public class Desktop extends AbstractDesktop {
 
   @Override
   protected List<Class<? extends IOutline>> getConfiguredOutlines() {
-    return CollectionUtility.<Class<? extends IOutline>> arrayList(WorkOutline.class, HumanResourceOutline.class, AdministrationOutline.class, SearchOutline.class,
-        SettingsOutline.class);
+    return CollectionUtility.<Class<? extends IOutline>> arrayList(WorkOutline.class, HumanResourceOutline.class, AdministrationOutline.class);
   }
 
   @Override
@@ -272,46 +269,6 @@ public class Desktop extends AbstractDesktop {
     @Override
     protected String getConfiguredKeyStroke() {
       return IKeyStroke.F4;
-    }
-  }
-
-  @Order(2000)
-  public class SearchOutlineViewButton extends AbstractOutlineViewButton {
-
-    public SearchOutlineViewButton() {
-      this(SearchOutline.class);
-    }
-
-    protected SearchOutlineViewButton(Class<? extends SearchOutline> outlineClass) {
-      super(Desktop.this, outlineClass);
-    }
-
-    @Override
-    protected DisplayStyle getConfiguredDisplayStyle() {
-      return DisplayStyle.TAB;
-    }
-
-  }
-
-  @Order(3000)
-  public class SettingsOutlineViewButton extends AbstractOutlineViewButton {
-
-    public SettingsOutlineViewButton() {
-      this(SettingsOutline.class);
-    }
-
-    protected SettingsOutlineViewButton(Class<? extends SettingsOutline> outlineClass) {
-      super(Desktop.this, outlineClass);
-    }
-
-    @Override
-    protected DisplayStyle getConfiguredDisplayStyle() {
-      return DisplayStyle.TAB;
-    }
-
-    @Override
-    protected String getConfiguredKeyStroke() {
-      return IKeyStroke.F10;
     }
   }
 }

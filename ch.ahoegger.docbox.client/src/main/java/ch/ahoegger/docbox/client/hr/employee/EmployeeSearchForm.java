@@ -16,8 +16,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBo
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.shared.TEXTS;
 
 import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.ResetButton;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchButton;

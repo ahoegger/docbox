@@ -13,8 +13,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.shared.TEXTS;
 
 import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.CancelButton;
 import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.EntityDateField;

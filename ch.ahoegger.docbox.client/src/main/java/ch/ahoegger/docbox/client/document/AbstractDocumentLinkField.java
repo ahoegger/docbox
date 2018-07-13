@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.html.HTML;
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI;

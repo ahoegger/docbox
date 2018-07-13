@@ -1,7 +1,7 @@
 package ch.ahoegger.docbox.shared.administration.user;
 
 import org.eclipse.scout.rt.platform.status.Status;
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 
 /**
  * <h3>{@link UserValidationStatus}</h3>

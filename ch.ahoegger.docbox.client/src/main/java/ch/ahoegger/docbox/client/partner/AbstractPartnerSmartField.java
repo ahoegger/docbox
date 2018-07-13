@@ -3,7 +3,7 @@ package ch.ahoegger.docbox.client.partner;
 import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;

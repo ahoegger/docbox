@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.placeholder.AbstractPlaceholde
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 
 import ch.ahoegger.docbox.client.hr.tax.TaxGroupForm.MainBox.CancelButton;
 import ch.ahoegger.docbox.client.hr.tax.TaxGroupForm.MainBox.EndDateField;

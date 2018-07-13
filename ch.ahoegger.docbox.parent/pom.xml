@@ -21,7 +21,8 @@
 	<properties>
 		<ch.ahoegger.docbox.version>${project.version}</ch.ahoegger.docbox.version>
 		<jdk.source.version>1.8</jdk.source.version>
-		<org.eclipse.scout.rt.version>7.1.0.004_Photon_M4</org.eclipse.scout.rt.version>
+		<org.eclipse.scout.rt.version>8.0.0.010_Photon</org.eclipse.scout.rt.version>
+<!-- 		<org.eclipse.scout.rt.version>7.1.0.004_Photon_M4</org.eclipse.scout.rt.version> -->
 		<aspose-pdf.version>11.2.0</aspose-pdf.version>
 		<sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
 	</properties>

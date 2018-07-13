@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.placeholder.AbstractPlaceholde
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 
 import ch.ahoegger.docbox.client.hr.billing.PostingGroupSearchForm.MainBox.SearchTabBox.SearchBox.EndDateBox;
 import ch.ahoegger.docbox.client.hr.billing.PostingGroupSearchForm.MainBox.SearchTabBox.SearchBox.EndDateBox.EndDateFromField;
