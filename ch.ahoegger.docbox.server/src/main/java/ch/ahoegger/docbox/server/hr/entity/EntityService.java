@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
+import org.jooq.Field;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -99,8 +100,20 @@ public class EntityService implements IEntityService {
 
   @Override
   public EntityFormData prepareCreate(EntityFormData formData) {
+    Entity e = Entity.ENTITY.as("ENT");
+    // alias
+    Field<Date> maxDate = DSL.max(e.ENTITY_DATE).as("MAX_DATE");
+
     LocalDate today = LocalDate.now();
-    formData.getEntityDate().setValue(LocalDateUtility.toDate(today));
+    Date date = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(maxDate)
+        .from(e)
+        .fetch()
+        .stream()
+        .findFirst()
+        .map(rec -> rec.get(maxDate))
+        .orElse(LocalDateUtility.toDate(today));
+    formData.getEntityDate().setValue(date);
     formData.setPostingGroupId(UnbilledCode.ID);
     return formData;
   }
