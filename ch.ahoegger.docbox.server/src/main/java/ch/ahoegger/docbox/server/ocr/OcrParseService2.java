@@ -125,7 +125,10 @@ public class OcrParseService2 {
   private boolean startAndWait(Path workingDir, String language) throws IOException, InterruptedException {
     LOG.debug("Start tesseract-pdfToText with working directory: {}", workingDir.toString());
     ProcessBuilder processBuilder = new ProcessBuilder("/opt/pdfToText/tesseract-pdfToText.sh", workingDir.toAbsolutePath().toString(), language);
+
     Process p = processBuilder.start();
+    LOG.info("tesseract errors: ", IOUtility.readStringUTF8(p.getErrorStream()));
+    LOG.info("tesseract stdOut: ", IOUtility.readStringUTF8(p.getInputStream()));
     return p.waitFor() == 0;
   }
 }
