@@ -2,7 +2,6 @@ package ch.ahoegger.docbox.server.document;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ import org.junit.Test;
 
 import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.ocr.OcrParseResult;
-import ch.ahoegger.docbox.server.ocr.OcrParseService;
+import ch.ahoegger.docbox.server.ocr.OcrParseService2;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.server.test.util.TestDocumentStoreService;
@@ -52,10 +51,11 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
   public static void beforeClass() {
     IBeanManager beanManager = Platform.get().getBeanManager();
     s_mockBeans.add(beanManager.registerBean(
-        new BeanMetaData(OcrParseService.class)
-            .withOrder(-10).withInitialInstance(new OcrParseService() {
+        new BeanMetaData(OcrParseService2.class)
+            .withOrder(-10).withInitialInstance(new OcrParseService2() {
+
               @Override
-              public OcrParseResult parsePdf(InputStream pdfInputStream, String language, Path tessdataDirectory) {
+              public OcrParseResult parsePdf(InputStream pdfInputStream, String filename, String language) {
                 return new OcrParseResult().withText("parsed").withOcrParsed(true);
               }
 
