@@ -27,4 +27,23 @@ public class ConversationLookupCall extends LookupCall<BigDecimal> {
   public boolean isNoMasterShowAll() {
     return m_noMasterShowAll;
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
+    }
+    if (obj == this) {
+      return true;
+    }
+    if (obj.getClass() != this.getClass()) {
+      return false;
+    }
+    ConversationLookupCall other = (ConversationLookupCall) obj;
+    if (m_noMasterShowAll != other.m_noMasterShowAll) {
+      return false;
+    }
+    return super.equals(obj);
+  }
+
 }
