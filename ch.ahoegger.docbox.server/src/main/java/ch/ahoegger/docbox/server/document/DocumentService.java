@@ -434,6 +434,8 @@ public class DocumentService implements IDocumentService {
     buildOcrOfMissingDocumentsInternal(documentIdsRaw);
   }
 
+  public static int MAX_PARSE_JOBS = 10;
+
   protected IFuture<Void> buildOcrOfMissingDocumentsInternal(List<BigDecimal> documentIdsRaw) {
     if (!ACCESS.check(new AdministratorPermission())) {
       throw new VetoException("Access denied");
@@ -458,6 +460,9 @@ public class DocumentService implements IDocumentService {
         .stream()
         .collect(Collectors.toList());
 
+    if (res.size() > MAX_PARSE_JOBS) {
+
+    }
     return Jobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {

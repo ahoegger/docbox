@@ -42,7 +42,7 @@ public class ParseDocumentJob {
       @Override
       public String call() throws Exception {
         BinaryResource resource = getBinaryResource(getDocumentId()).awaitDoneAndGet();
-        OcrParseResult parseResult = BEANS.get(OcrParseService2.class).parsePdf(resource, m_language);
+        OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(resource, m_language);
         if (parseResult != null) {
           persist(getDocumentId(), parseResult).awaitDone();
           return parseResult.getText();
@@ -51,7 +51,7 @@ public class ParseDocumentJob {
       }
     },
         Jobs.newInput()
-            .withExecutionTrigger(Jobs.newExecutionTrigger().withStartIn(20, TimeUnit.SECONDS))
+            .withExecutionTrigger(Jobs.newExecutionTrigger().withStartIn(5, TimeUnit.SECONDS))
             .withRunContext(RunContexts.empty().withSubject(Subject.getSubject(AccessController.getContext()))));
   }
 

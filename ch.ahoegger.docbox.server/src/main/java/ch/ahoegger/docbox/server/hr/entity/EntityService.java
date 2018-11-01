@@ -101,13 +101,20 @@ public class EntityService implements IEntityService {
   @Override
   public EntityFormData prepareCreate(EntityFormData formData) {
     Entity e = Entity.ENTITY.as("ENT");
+
+    Condition condition = DSL.trueCondition();
     // alias
     Field<Date> maxDate = DSL.max(e.ENTITY_DATE).as("MAX_DATE");
+    // search partnerId
+    if (formData.getPartnerId() != null) {
+      condition = condition.and(e.PARTNER_NR.eq(formData.getPartnerId()));
+    }
 
     LocalDate today = LocalDate.now();
     Date date = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .select(maxDate)
         .from(e)
+        .where(condition)
         .fetch()
         .stream()
         .findFirst()
