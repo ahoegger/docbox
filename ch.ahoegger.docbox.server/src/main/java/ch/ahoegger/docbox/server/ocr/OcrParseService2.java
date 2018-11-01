@@ -115,7 +115,7 @@ public class OcrParseService2 {
     }
     finally {
       if (tempDir != null) {
-        IOUtility.deleteDirectory(tempDir.toFile());
+//        IOUtility.deleteDirectory(tempDir.toFile());
       }
     }
     return result;
