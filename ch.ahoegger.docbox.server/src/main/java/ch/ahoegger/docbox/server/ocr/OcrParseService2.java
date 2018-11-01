@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -34,17 +33,14 @@ public class OcrParseService2 {
   }
 
   public OcrParseResult parsePdf(InputStream input, String filename, String language) {
-    OcrParseResult result = new OcrParseResult();
-    // try to read meta text of pdf
+    OcrParseResult result = null;
     try {
-      String content = readPdfMetaText(input);
-      if (StringUtility.hasText(content)) {
-        result.withText(content).withOcrParsed(false);
-        return result;
+      result = readPdfMetaText(input, filename);
+      if (result == null) {
+        // try to parse
+        result = parsePdfTesseract(input, filename, language);
       }
-    }
-    catch (Exception e) {
-      LOG.error("Could not read meta text of file '{}'.", e);
+      return result;
     }
     finally {
       if (input != null) {
@@ -56,6 +52,36 @@ public class OcrParseService2 {
         }
       }
     }
+
+  }
+
+  private OcrParseResult readPdfMetaText(InputStream in, String filename) {
+    OcrParseResult result = new OcrParseResult();
+    // try to read meta text of pdf
+    try {
+      PDDocument pddoc = PDDocument.load(in);
+      // try to get text straight
+      String content = getTextOfPdf(pddoc);
+      if (StringUtility.hasText(content)) {
+        result.withText(content).withOcrParsed(false);
+        return result;
+      }
+    }
+    catch (Exception e) {
+      LOG.error(String.format("Could not read meta text of file '%s'.", filename), e);
+    }
+
+    return null;
+  }
+
+  protected synchronized String getTextOfPdf(PDDocument doc) throws IOException {
+    PDFTextStripper textStripper = new PDFTextStripper();
+    String content = textStripper.getText(doc);
+    return content;
+  }
+
+  private OcrParseResult parsePdfTesseract(InputStream input, String filename, String language) {
+    OcrParseResult result = new OcrParseResult();
 
     // try to parse using tesseract
 
@@ -85,7 +111,8 @@ public class OcrParseService2 {
 
     }
     catch (Exception e) {
-      LOG.error("Could not parse file '{}'.", e);
+      result.withParseError(ParseError.CouldNotParseText);
+      LOG.error(String.format("Could not parse file '%s'.", filename), e);
     }
     finally {
       if (tempDir != null) {
@@ -93,20 +120,6 @@ public class OcrParseService2 {
       }
     }
     return result;
-
-  }
-
-  private String readPdfMetaText(InputStream in) throws InvalidPasswordException, IOException {
-    PDDocument pddoc = PDDocument.load(in);
-    // try to get text straight
-    String content = getTextOfPdf(pddoc);
-    return content;
-  }
-
-  protected synchronized String getTextOfPdf(PDDocument doc) throws IOException {
-    PDFTextStripper textStripper = new PDFTextStripper();
-    String content = textStripper.getText(doc);
-    return content;
   }
 
   private boolean startAndWait(Path workingDir, String language) throws IOException, InterruptedException {
