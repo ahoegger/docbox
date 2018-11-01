@@ -29,36 +29,20 @@ public class OcrParseService2 {
   private static final Logger LOG = LoggerFactory.getLogger(OcrParseService2.class);
 
   public OcrParseResult parsePdf(BinaryResource pdfResource, String language) {
-    return parsePdf(new ByteArrayInputStream(pdfResource.getContent()), pdfResource.getFilename(), language);
+    OcrParseResult result = readPdfMetaText(pdfResource);
+    if (result == null) {
+      // try to parse
+      result = parsePdfTesseract(pdfResource, language);
+    }
+    return result;
   }
 
-  public OcrParseResult parsePdf(InputStream input, String filename, String language) {
-    OcrParseResult result = null;
-    try {
-      result = readPdfMetaText(input, filename);
-      if (result == null) {
-        // try to parse
-        result = parsePdfTesseract(input, filename, language);
-      }
-      return result;
-    }
-    finally {
-      if (input != null) {
-        try {
-          input.close();
-        }
-        catch (IOException e) {
-          // void
-        }
-      }
-    }
-
-  }
-
-  private OcrParseResult readPdfMetaText(InputStream in, String filename) {
+  private OcrParseResult readPdfMetaText(BinaryResource pdfResource) {
     OcrParseResult result = new OcrParseResult();
+    InputStream in = null;
     // try to read meta text of pdf
     try {
+      in = new ByteArrayInputStream(pdfResource.getContent());
       PDDocument pddoc = PDDocument.load(in);
       // try to get text straight
       String content = getTextOfPdf(pddoc);
@@ -68,9 +52,18 @@ public class OcrParseService2 {
       }
     }
     catch (Exception e) {
-      LOG.error(String.format("Could not read meta text of file '%s'.", filename), e);
+      LOG.error(String.format("Could not read meta text of file '%s'.", pdfResource.getFilename()), e);
     }
-
+    finally {
+      if (in != null) {
+        try {
+          in.close();
+        }
+        catch (IOException e) {
+          // void
+        }
+      }
+    }
     return null;
   }
 
@@ -80,24 +73,26 @@ public class OcrParseService2 {
     return content;
   }
 
-  private OcrParseResult parsePdfTesseract(InputStream input, String filename, String language) {
+  private OcrParseResult parsePdfTesseract(BinaryResource pdfResource, String language) {
     OcrParseResult result = new OcrParseResult();
 
     // try to parse using tesseract
 
     Path tempDir = null;
+    InputStream in = null;
     try {
-      tempDir = Files.createTempDirectory("ocrWorkingDir");
+      tempDir = Files.createTempDirectory("ocrWorkingDir").toAbsolutePath();
       result.withWorkingDirectory(tempDir);
       Path inputPath = tempDir.resolve("input.pdf");
       inputPath = Files.createFile(inputPath);
+      in = new ByteArrayInputStream(pdfResource.getContent());
       Files.copy(
-          input,
+          in,
           inputPath,
           StandardCopyOption.REPLACE_EXISTING);
 
       if (startAndWait(tempDir, language)) {
-        LOG.debug("Successfully parsed file: {}", filename);
+        LOG.debug("Successfully parsed file: {}", pdfResource.getFilename());
         String content = new String(Files.readAllBytes(tempDir.resolve("output.txt")), Charset.forName("UTF-8"));
         if (LOG.isTraceEnabled()) {
           LOG.trace("Parsed text: {}", content);
@@ -111,11 +106,19 @@ public class OcrParseService2 {
     }
     catch (Exception e) {
       result.withParseError(ParseError.CouldNotParseText);
-      LOG.error(String.format("Could not parse file '%s'.", filename), e);
+      LOG.error(String.format("Could not parse file '%s'.", pdfResource.getFilename()), e);
     }
     finally {
       if (tempDir != null) {
 //        IOUtility.deleteDirectory(tempDir.toFile());
+      }
+      if (in != null) {
+        try {
+          in.close();
+        }
+        catch (IOException e) {
+          // void
+        }
       }
     }
     return result;

@@ -1,6 +1,5 @@
 package ch.ahoegger.docbox.server.document;
 
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.time.LocalDate;
@@ -55,7 +54,7 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
             .withOrder(-10).withInitialInstance(new OcrParseService2() {
 
               @Override
-              public OcrParseResult parsePdf(InputStream pdfInputStream, String filename, String language) {
+              public OcrParseResult parsePdf(BinaryResource pdfResource, String language) {
                 return new OcrParseResult().withText("parsed").withOcrParsed(true);
               }
 
