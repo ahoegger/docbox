@@ -56,7 +56,7 @@ public class SecurityService implements IUserTable {
         String pwHash = new String(createPasswordHash(passwordPlainText));
         final boolean authenicated = dbPass.equals(pwHash);
         if (LOG.isInfoEnabled()) {
-          LOG.warn("Authenicate user({}). Login successful:'{}'", username, authenicated);
+          LOG.info("Authenicate user({}). Login successful:'{}'", username, authenicated);
         }
         return authenicated;
       }

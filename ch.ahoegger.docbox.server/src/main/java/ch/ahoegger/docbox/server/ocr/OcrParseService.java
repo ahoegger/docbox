@@ -44,10 +44,11 @@ public class OcrParseService {
   private OcrParseResult readPdfMetaText(BinaryResource pdfResource) {
     OcrParseResult result = new OcrParseResult();
     InputStream in = null;
+    PDDocument pddoc = null;
     // try to read meta text of pdf
     try {
       in = new ByteArrayInputStream(pdfResource.getContent());
-      PDDocument pddoc = PDDocument.load(in);
+      pddoc = PDDocument.load(in);
       // try to get text straight
       String content = getTextOfPdf(pddoc);
       if (StringUtility.hasText(content)) {
@@ -59,6 +60,14 @@ public class OcrParseService {
       LOG.error(String.format("Could not read meta text of file '%s'.", pdfResource.getFilename()), e);
     }
     finally {
+      if (pddoc != null) {
+        try {
+          pddoc.close();
+        }
+        catch (IOException e) {
+          // void
+        }
+      }
       if (in != null) {
         try {
           in.close();
