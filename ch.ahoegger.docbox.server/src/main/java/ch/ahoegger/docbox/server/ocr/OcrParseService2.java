@@ -98,12 +98,11 @@ public class OcrParseService2 {
 
       if (startAndWait(tempDir, language)) {
         LOG.debug("Successfully parsed file: {}", filename);
+        String content = new String(Files.readAllBytes(tempDir.resolve("output.txt")), Charset.forName("UTF-8"));
         if (LOG.isTraceEnabled()) {
-          String content = new String(Files.readAllBytes(tempDir.resolve("output.txt")), Charset.forName("UTF-8"));
           LOG.trace("Parsed text: {}", content);
-          result.withOcrParsed(true).withText(content);
         }
-
+        result.withOcrParsed(true).withText(content);
       }
       else {
         result.withParseError(ParseError.CouldNotParseText);
