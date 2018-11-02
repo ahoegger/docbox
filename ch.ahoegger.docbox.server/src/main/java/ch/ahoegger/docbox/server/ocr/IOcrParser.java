@@ -1,6 +1,6 @@
 package ch.ahoegger.docbox.server.ocr;
 
-import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
 /**
@@ -8,8 +8,13 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
  *
  * @author aho
  */
-@Bean
+@ApplicationScoped
 public interface IOcrParser {
 
   OcrParseResult parsePdf(BinaryResource pdfResource, String language);
+
+  /**
+   * @return
+   */
+  boolean isActive();
 }

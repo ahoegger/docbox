@@ -12,31 +12,19 @@ import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.AbstractFileC
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmartGroupBoxBodyGrid;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.CancelButton;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.AbstractField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.CapturedDateField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.CategoriesBox;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.ConversationField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.DocumentDateField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.DocumentField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.LinksBox;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.LinksBox.OpenHtmlField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.LinksBox.ShowOcrButton;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OcrBox;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OcrBox.OcrLanguageField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OcrBox.ParseOcrField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OriginalStorageField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PartnersField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PermissionsField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.ValidDateField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.OkButton;
+import ch.ahoegger.docbox.client.document.ReplaceDocumentForm.MainBox.CancelButton;
+import ch.ahoegger.docbox.client.document.ReplaceDocumentForm.MainBox.FieldBox;
+import ch.ahoegger.docbox.client.document.ReplaceDocumentForm.MainBox.FieldBox.OcrLanguageField;
+import ch.ahoegger.docbox.client.document.ReplaceDocumentForm.MainBox.OkButton;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
 import ch.ahoegger.docbox.shared.document.ReplaceDocumentFormData;
+import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 
 /**
  * <h3>{@link ReplaceDocumentForm}</h3>
@@ -94,66 +82,6 @@ public class ReplaceDocumentForm extends AbstractForm {
     return getFieldByClass(FieldBox.class);
   }
 
-  public DocumentDateField getDocumentDateField() {
-    return getFieldByClass(DocumentDateField.class);
-  }
-
-  public CapturedDateField getCapturedDateField() {
-    return getFieldByClass(CapturedDateField.class);
-  }
-
-  public ValidDateField getValidDateField() {
-    return getFieldByClass(ValidDateField.class);
-  }
-
-  public OpenHtmlField getOpenHtmlField() {
-    return getFieldByClass(OpenHtmlField.class);
-  }
-
-  public OriginalStorageField getOriginalStorageField() {
-    return getFieldByClass(OriginalStorageField.class);
-  }
-
-  public DocumentField getDocumentField() {
-    return getFieldByClass(DocumentField.class);
-  }
-
-  public AbstractField getAbstractTextField() {
-    return getFieldByClass(AbstractField.class);
-  }
-
-  public CategoriesBox getCategoriesBox() {
-    return getFieldByClass(CategoriesBox.class);
-  }
-
-  public PartnersField getPartnersField() {
-    return getFieldByClass(PartnersField.class);
-  }
-
-  public PermissionsField getPermissionsField() {
-    return getFieldByClass(PermissionsField.class);
-  }
-
-  public ConversationField getConversationField() {
-    return getFieldByClass(ConversationField.class);
-  }
-
-  public ParseOcrField getParseOcrField() {
-    return getFieldByClass(ParseOcrField.class);
-  }
-
-  public LinksBox getLinksBox() {
-    return getFieldByClass(LinksBox.class);
-  }
-
-  public ShowOcrButton getShowOcrButton() {
-    return getFieldByClass(ShowOcrButton.class);
-  }
-
-  public OcrBox getOcrBox() {
-    return getFieldByClass(OcrBox.class);
-  }
-
   public OcrLanguageField getOcrLanguageField() {
     return getFieldByClass(OcrLanguageField.class);
   }
@@ -176,13 +104,30 @@ public class ReplaceDocumentForm extends AbstractForm {
         return VerticalSmartGroupBoxBodyGrid.class;
       }
 
-      @Order(10)
+      @Order(100)
       public class DocumentField extends AbstractFileChooserField {
         @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("Document");
         }
 
+        @Override
+        protected boolean getConfiguredMandatory() {
+          return true;
+        }
+      }
+
+      @Order(200)
+      public class OcrLanguageField extends AbstractSmartField<String> {
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("Language");
+        }
+
+        @Override
+        protected Class<? extends ICodeType<?, String>> getConfiguredCodeType() {
+          return OcrLanguageCodeType.class;
+        }
       }
 
     }

@@ -40,12 +40,21 @@ public class ReplaceDocumentFormData extends AbstractFormData {
     return getPropertyByClass(DocumentIdProperty.class);
   }
 
+  public OcrLanguage getOcrLanguage() {
+    return getFieldByClass(OcrLanguage.class);
+  }
+
   public static class Document extends AbstractValueFieldData<BinaryResource> {
 
     private static final long serialVersionUID = 1L;
   }
 
   public static class DocumentIdProperty extends AbstractPropertyData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class OcrLanguage extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
   }

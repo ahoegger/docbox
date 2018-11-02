@@ -1,7 +1,6 @@
 package ch.ahoegger.docbox.server.document;
 
 import java.math.BigDecimal;
-import java.security.AccessController;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -12,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-
-import javax.security.auth.Subject;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.DocboxUser;
 import org.ch.ahoegger.docbox.server.or.app.tables.Document;
@@ -26,15 +23,12 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
-import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
@@ -53,11 +47,11 @@ import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
 import ch.ahoegger.docbox.server.ServerSession;
 import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
-import ch.ahoegger.docbox.server.ocr.ParseDocumentJob;
+import ch.ahoegger.docbox.server.ocr.IOcrParseService;
+import ch.ahoegger.docbox.server.ocr.ParseDescription;
 import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
 import ch.ahoegger.docbox.server.util.FieldValidator;
-import ch.ahoegger.docbox.server.util.FutureUtility;
 import ch.ahoegger.docbox.server.util.NullFuture;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
@@ -293,9 +287,9 @@ public class DocumentService implements IDocumentService {
     BEANS.get(DocumentPermissionService.class).createDocumentPermissions(documentId, permissions);
 
     // ocr
+
     if (formData.getParseOcr().getValue()) {
-      ParseDocumentJob job = new ParseDocumentJob(formData.getDocumentId(), OcrLanguageCodeType.GermanCode.ID);
-      job.schedule();
+      BEANS.get(IOcrParseService.class).schedule(new ParseDescription().withDocumentId(formData.getDocumentId()).withLanguage(formData.getOcrLanguage().getValue()));
     }
 
     // notify backup needed
@@ -364,8 +358,7 @@ public class DocumentService implements IDocumentService {
     // ocr
     if (updateOcr) {
       if (formData.getParseOcr().getValue()) {
-        ParseDocumentJob job = new ParseDocumentJob(formData.getDocumentId(), formData.getOcrLanguage().getValue());
-        result = FutureUtility.<String, Void> map(job.schedule(), (res) -> (Void) null);
+        result = BEANS.get(IOcrParseService.class).schedule(new ParseDescription().withDocumentId(formData.getDocumentId()).withLanguage(formData.getOcrLanguage().getValue()));
       }
       else {
         DocumentOcrService service = BEANS.get(DocumentOcrService.class);
@@ -460,28 +453,10 @@ public class DocumentService implements IDocumentService {
         .stream()
         .collect(Collectors.toList());
 
-    if (res.size() > MAX_PARSE_JOBS) {
+    IOcrParseService parseService = BEANS.get(IOcrParseService.class);
+    res.forEach(rec -> parseService.schedule(new ParseDescription().withDocumentId(rec.get(doc.DOCUMENT_NR)).withLanguage(rec.get(doc.OCR_LANGUAGE))));
+    return parseService.getCurrentParsingFeature();
 
-    }
-    return Jobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-
-        res.forEach(rec -> {
-          BigDecimal docId = rec.get(doc.DOCUMENT_NR);
-          String language = rec.get(doc.OCR_LANGUAGE);
-          try {
-            LOG.info("build ocr for {} in language '{}'.", docId, language);
-            new ParseDocumentJob(docId, language).schedule().awaitDone();
-          }
-          catch (Exception e) {
-            LOG.error(String.format("Cold not parse document with id '%s'.", docId), e);
-          }
-        });
-      }
-    }, Jobs.newInput().withRunContext(
-        ServerRunContexts.empty()
-            .withSubject(Subject.getSubject(AccessController.getContext()))));
   }
 
   @Override
@@ -565,8 +540,7 @@ public class DocumentService implements IDocumentService {
 
     // ocr
     if (docData.getParseOcr().getValue()) {
-      ParseDocumentJob job = new ParseDocumentJob(formData.getDocumentId(), OcrLanguageCodeType.GermanCode.ID);
-      job.schedule();
+      BEANS.get(IOcrParseService.class).schedule(new ParseDescription().withDocumentId(formData.getDocumentId()).withLanguage(formData.getOcrLanguage().getValue()));
     }
 
     // notify backup needed

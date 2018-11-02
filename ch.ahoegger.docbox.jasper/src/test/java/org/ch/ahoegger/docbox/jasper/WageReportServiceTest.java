@@ -6,6 +6,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -21,6 +22,7 @@ public class WageReportServiceTest {
     formatFloat2FractionDigits.setMaximumFractionDigits(2);
     formatFloat2FractionDigits.setMinimumFractionDigits(2);
     BigDecimal financeRound = BEANS.get(WageReportService.class).financeRound(BigDecimal.valueOf(175.67), BigDecimal.valueOf(0.05), RoundingMode.UP);
+    Assert.assertEquals(financeRound.doubleValue(), 175.70, 0.0000000001);
 
   }
 

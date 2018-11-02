@@ -11,6 +11,8 @@ import java.nio.file.StandardCopyOption;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -22,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import ch.ahoegger.docbox.server.ocr.IOcrParser;
 import ch.ahoegger.docbox.server.ocr.OcrParseResult;
 import ch.ahoegger.docbox.server.ocr.OcrParseResult.ParseError;
-import ch.ahoegger.docbox.server.ocr.OcrParseService.OcrParserProperty;
+import ch.ahoegger.docbox.server.ocr.OcrParserProvider;
 import ch.ahoegger.docbox.server.util.OS;
 import ch.ahoegger.docbox.shared.validation.IStartupValidatableBean;
 
@@ -31,8 +33,14 @@ import ch.ahoegger.docbox.shared.validation.IStartupValidatableBean;
  *
  * @author aho
  */
+@Order(100)
 public class ShellScriptOcrParser implements IOcrParser {
   private static final Logger LOG = LoggerFactory.getLogger(ShellScriptOcrParser.class);
+
+  @Override
+  public boolean isActive() {
+    return OS.isUnix();
+  }
 
   @Override
   public OcrParseResult parsePdf(BinaryResource pdfResource, String language) {
@@ -182,7 +190,8 @@ public class ShellScriptOcrParser implements IOcrParser {
 
     @Override
     public boolean validate() {
-      if (CONFIG.getPropertyValue(OcrParserProperty.class) == ShellScriptOcrParser.class) {
+      if (BEANS.get(OcrParserProvider.class).getParser().getClass() == ShellScriptOcrParser.class) {
+//      if (CONFIG.getPropertyValue(OcrParserProperty.class) == ShellScriptOcrParser.class) {
         Path value = getValue();
         if (Files.notExists(value) || Files.isDirectory(value)) {
           LOG.error("ConfigProperty: '{}' with value '{}' does not exist.", getKey(), value.toString());

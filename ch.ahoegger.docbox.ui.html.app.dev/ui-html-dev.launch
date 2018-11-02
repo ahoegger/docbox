@@ -15,5 +15,5 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.eclipse.scout.dev.jetty.JettyServer"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="ch.ahoegger.docbox.ui.html.app.dev"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Duser.name=devUser&#13;&#10;-Dscout.jetty.port=8096&#13;&#10;-Djandex.rebuild=true"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Duser.name=devUser&#13;&#10;-Dscout.jetty.port=8096&#13;&#10;-Dscout.jandex.rebuild=true"/>
 </launchConfiguration>

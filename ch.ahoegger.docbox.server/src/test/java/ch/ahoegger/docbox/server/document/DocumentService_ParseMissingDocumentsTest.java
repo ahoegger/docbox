@@ -21,8 +21,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
-import ch.ahoegger.docbox.server.ocr.IOcrParseService;
-import ch.ahoegger.docbox.server.ocr.OcrParseResult;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.server.test.util.TestDocumentStoreService;
@@ -49,21 +47,22 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
   @BeforeClass
   public static void beforeClass() {
     IBeanManager beanManager = Platform.get().getBeanManager();
-    s_mockBeans.add(beanManager.registerBean(
-        new BeanMetaData(IOcrParseService.class)
-            .withOrder(-10).withInitialInstance(new IOcrParseService() {
 
-              @Override
-              public OcrParseResult parsePdf(BinaryResource pdfResource, String language) {
-                return new OcrParseResult().withText("parsed").withOcrParsed(true);
-              }
-
-              @Override
-              public void schedule(ParseDescription parseDescription) {
-                // void
-              }
-
-            })));
+//    s_mockBeans.add(beanManager.registerBean(
+//        new BeanMetaData(IOcrParseService.class)
+//            .withOrder(-10).withInitialInstance(new IOcrParseService() {
+//
+//              @Override
+//              public IFuture<Void> schedule(ParseDescription parseDescription) {
+//                return new NullFuture<Void>();
+//              }
+//
+//              @Override
+//              public IFuture<Void> getCurrentParsingFeature() {
+//                return new NullFuture<Void>();
+//              }
+//
+//            })));
     s_mockBeans.add(beanManager.registerBean(
         new BeanMetaData(IDocumentStoreService.class)
             .withOrder(-10).withInitialInstance(new TestDocumentStoreService() {
@@ -128,8 +127,9 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
   @Test
   public void testParseSome() {
     DocumentService service = BEANS.get(DocumentService.class);
+    System.out.println("parse missing start");
     service.buildOcrOfMissingDocumentsInternal(CollectionUtility.arrayList(documentId02)).awaitDone();
-
+    System.out.println("parse missing done");
     assertOcrData(documentId01, true);
     assertOcrData(documentId02, true);
     assertOcrData(documentId03, false);

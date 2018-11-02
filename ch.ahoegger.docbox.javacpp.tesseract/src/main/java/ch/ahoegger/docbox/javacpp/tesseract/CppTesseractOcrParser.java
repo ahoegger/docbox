@@ -26,6 +26,8 @@ import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.lept;
 import org.bytedeco.javacpp.lept.PIX;
 import org.bytedeco.javacpp.tesseract.TessBaseAPI;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -41,7 +43,7 @@ import org.slf4j.LoggerFactory;
 import ch.ahoegger.docbox.server.ocr.IOcrParser;
 import ch.ahoegger.docbox.server.ocr.OcrParseResult;
 import ch.ahoegger.docbox.server.ocr.OcrParseResult.ParseError;
-import ch.ahoegger.docbox.server.ocr.OcrParseService.OcrParserProperty;
+import ch.ahoegger.docbox.server.ocr.OcrParserProvider;
 import ch.ahoegger.docbox.server.util.OS;
 import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.validation.IStartupValidatableBean;
@@ -51,10 +53,16 @@ import ch.ahoegger.docbox.shared.validation.IStartupValidatableBean;
  *
  * @author aho
  */
+@Order(1000)
 public class CppTesseractOcrParser implements IOcrParser {
 
   private static final Logger LOG = LoggerFactory.getLogger(CppTesseractOcrParser.class);
   private static final Object LOCK = new Object();
+
+  @Override
+  public boolean isActive() {
+    return true;
+  }
 
   @Override
   public OcrParseResult parsePdf(BinaryResource pdfResource, String language) {
@@ -288,7 +296,8 @@ public class CppTesseractOcrParser implements IOcrParser {
 
     @Override
     public boolean validate() {
-      if (CONFIG.getPropertyValue(OcrParserProperty.class) == CppTesseractOcrParser.class) {
+      if (BEANS.get(OcrParserProvider.class).getParser().getClass() == CppTesseractOcrParser.class) {
+//      if (CONFIG.getPropertyValue(OcrParserProperty.class) == CppTesseractOcrParser.class) {
         Path value = CONFIG.getPropertyValue(CppTesseractDataDirectoryProperty.class);
         if (Files.notExists(value, LinkOption.NOFOLLOW_LINKS)) {
           LOG.error("ConfigProperty: '{}' with value '{}' does not exist.", getKey(), value.toString());
