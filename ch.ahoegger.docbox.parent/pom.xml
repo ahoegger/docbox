@@ -33,6 +33,7 @@
 		<module>../ch.ahoegger.docbox.or.definition</module>
 		<module>../ch.ahoegger.docbox.server.or</module>
 		<module>../ch.ahoegger.docbox.client</module>
+		<module>../ch.ahoegger.docbox.javacpp.tesseract</module>
 		<module>../ch.ahoegger.docbox.server.app.war</module>
 		<module>../ch.ahoegger.docbox.server.app.dev</module>
 		<module>../ch.ahoegger.docbox.ui.html</module>
@@ -63,6 +64,11 @@
 			<dependency>
 				<groupId>ch.ahoegger.docbox</groupId>
 				<artifactId>ch.ahoegger.docbox.shared</artifactId>
+				<version>${ch.ahoegger.docbox.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.ahoegger.docbox</groupId>
+				<artifactId>ch.ahoegger.docbox.javacpp.tesseract</artifactId>
 				<version>${ch.ahoegger.docbox.version}</version>
 			</dependency>
 			<dependency>

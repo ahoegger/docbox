@@ -21,8 +21,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
+import ch.ahoegger.docbox.server.ocr.IOcrParseService;
 import ch.ahoegger.docbox.server.ocr.OcrParseResult;
-import ch.ahoegger.docbox.server.ocr.OcrParseService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.server.test.util.TestDocumentStoreService;
@@ -50,12 +50,17 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
   public static void beforeClass() {
     IBeanManager beanManager = Platform.get().getBeanManager();
     s_mockBeans.add(beanManager.registerBean(
-        new BeanMetaData(OcrParseService.class)
-            .withOrder(-10).withInitialInstance(new OcrParseService() {
+        new BeanMetaData(IOcrParseService.class)
+            .withOrder(-10).withInitialInstance(new IOcrParseService() {
 
               @Override
               public OcrParseResult parsePdf(BinaryResource pdfResource, String language) {
                 return new OcrParseResult().withText("parsed").withOcrParsed(true);
+              }
+
+              @Override
+              public void schedule(ParseDescription parseDescription) {
+                // void
               }
 
             })));

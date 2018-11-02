@@ -42,7 +42,7 @@ public class ParseDocumentJob {
       @Override
       public String call() throws Exception {
         BinaryResource resource = getBinaryResource(getDocumentId()).awaitDoneAndGet();
-        OcrParseResult parseResult = BEANS.get(OcrParseService.class).parsePdf(resource, m_language);
+        OcrParseResult parseResult = BEANS.get(IOcrParseService.class).parsePdf(resource, m_language);
         if (parseResult != null) {
           persist(getDocumentId(), parseResult).awaitDone();
           return parseResult.getText();

@@ -1,178 +1,96 @@
 package ch.ahoegger.docbox.server.ocr;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.LinkedList;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
-import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.ahoegger.docbox.server.ocr.OcrParseResult.ParseError;
-import ch.ahoegger.docbox.server.util.OS;
+import ch.ahoegger.docbox.server.ocr.unix.ShellScriptOcrParser;
+import ch.ahoegger.docbox.shared.validation.IStartupValidatableBean;
 
 /**
  * <h3>{@link OcrParseService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
-@ApplicationScoped
-public class OcrParseService {
-  private static final Logger LOG = LoggerFactory.getLogger(OcrParseService.class);
+public class OcrParseService implements IOcrParseService {
 
+  private IOcrParser m_parser;
+  private LinkedList<ParseDescription> m_pendingDescriptions = new LinkedList<>();
+
+  public OcrParseService() {
+    m_parser = BEANS.get(CONFIG.getPropertyValue(OcrParserProperty.class));
+  }
+
+  /**
+   * delegate to parser
+   */
+  @Override
   public OcrParseResult parsePdf(BinaryResource pdfResource, String language) {
-    OcrParseResult result = readPdfMetaText(pdfResource);
-    if (result == null) {
-      // try to parse
-      result = parsePdfTesseract(pdfResource, language);
-    }
-    return result;
+    return m_parser.parsePdf(pdfResource, language);
   }
 
-  private OcrParseResult readPdfMetaText(BinaryResource pdfResource) {
-    OcrParseResult result = new OcrParseResult();
-    InputStream in = null;
-    PDDocument pddoc = null;
-    // try to read meta text of pdf
-    try {
-      in = new ByteArrayInputStream(pdfResource.getContent());
-      pddoc = PDDocument.load(in);
-      // try to get text straight
-      String content = getTextOfPdf(pddoc);
-      if (StringUtility.hasText(content)) {
-        result.withText(content).withOcrParsed(false);
-        return result;
-      }
+  @Override
+  public void schedule(ParseDescription parseDescription) {
+    synchronized (m_pendingDescriptions) {
+      m_pendingDescriptions.add(parseDescription);
     }
-    catch (Exception e) {
-      LOG.error(String.format("Could not read meta text of file '%s'.", pdfResource.getFilename()), e);
-    }
-    finally {
-      if (pddoc != null) {
-        try {
-          pddoc.close();
-        }
-        catch (IOException e) {
-          // void
-        }
-      }
-      if (in != null) {
-        try {
-          in.close();
-        }
-        catch (IOException e) {
-          // void
-        }
-      }
-    }
-    return null;
   }
 
-  protected synchronized String getTextOfPdf(PDDocument doc) throws IOException {
-    PDFTextStripper textStripper = new PDFTextStripper();
-    String content = textStripper.getText(doc);
-    return content;
+  public ParseDescription popNextDescription() {
+    synchronized (m_pendingDescriptions) {
+      return m_pendingDescriptions.poll();
+    }
   }
 
-  private OcrParseResult parsePdfTesseract(BinaryResource pdfResource, String language) {
-    OcrParseResult result = new OcrParseResult();
-    Path tempDir = null;
-    InputStream in = null;
-    try {
-      tempDir = Files.createTempDirectory("ocrWorkingDir").toAbsolutePath();
-      result.withWorkingDirectory(tempDir);
-      Path inputPath = tempDir.resolve("input.pdf");
-      inputPath = Files.createFile(inputPath);
-      in = new ByteArrayInputStream(pdfResource.getContent());
-      Files.copy(
-          in,
-          inputPath,
-          StandardCopyOption.REPLACE_EXISTING);
+  public static class OcrParserProperty extends AbstractConfigProperty<Class<? extends IOcrParser>, String> implements IStartupValidatableBean {
+    private static final Logger LOG = LoggerFactory.getLogger(OcrParserProperty.class);
 
-      if (startAndWait(tempDir, language)) {
-        LOG.debug("Successfully parsed file: {}", pdfResource.getFilename());
-        String content = new String(Files.readAllBytes(tempDir.resolve("output.txt")), Charset.forName("UTF-8"));
-        if (LOG.isTraceEnabled()) {
-          LOG.trace("Parsed text: {}", content);
-        }
-        result.withOcrParsed(true).withText(content);
-      }
-      else {
-        result.withParseError(ParseError.CouldNotParseText);
-      }
-
-    }
-    catch (Exception e) {
-      result.withParseError(ParseError.CouldNotParseText);
-      LOG.error(String.format("Could not parse file '%s'.", pdfResource.getFilename()), e);
-    }
-    finally {
-      if (tempDir != null) {
-        IOUtility.deleteDirectory(tempDir.toFile());
-      }
-      if (in != null) {
-        try {
-          in.close();
-        }
-        catch (IOException e) {
-          // void
-        }
-      }
-    }
-    return result;
-  }
-
-  private boolean startAndWait(Path workingDir, String language) throws IOException, InterruptedException {
-    LOG.debug("Start tesseract-pdfToText with working directory: {}", workingDir.toString());
-    ProcessBuilder processBuilder = new ProcessBuilder(CONFIG.getPropertyValue(TesseractPdfToTextProperty.class).toString(), workingDir.toAbsolutePath().toString(), language);
-    Process p = processBuilder.start();
-    LOG.info("tesseract errors: ", IOUtility.readStringUTF8(p.getErrorStream()));
-    LOG.info("tesseract stdOut: ", IOUtility.readStringUTF8(p.getInputStream()));
-    return p.waitFor() == 0;
-  }
-
-  public static class TesseractPdfToTextProperty extends AbstractConfigProperty<Path, String> {
-
-    public static final String BUILD_REPLACEMENT_VAR = "${docbox.tesserarct.tesseract-pdfToText}";
+    public static final String BUILD_REPLACEMENT_VAR = "${docbox.ocr.parser}";
 
     @Override
     public String getKey() {
-      return "docbox.tesserarct.tesseract-pdfToText";
+      return "docbox.ocr.parser";
     }
 
     @Override
-    public Path getDefaultValue() {
-      if (OS.isWindows()) {
-        return Paths.get("NOT SUPPORTED!");
-      }
-      return Paths.get("/opt/pdfToText/tesseract-pdfToText.sh");
+    public Class<? extends IOcrParser> getDefaultValue() {
+      return ShellScriptOcrParser.class;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected Path parse(String value) {
-      if (BUILD_REPLACEMENT_VAR.equals(value)) {
-        return getDefaultValue();
+    protected Class<? extends IOcrParser> parse(String value) {
+      try {
+        return (Class<? extends IOcrParser>) Class.forName(value);
       }
-      else {
-        return Paths.get(value);
+      catch (ClassNotFoundException e) {
+        throw new ProcessingException(new ProcessingStatus(String.format("Cold not parse '%s' property (see '%s' for details).", getKey(), OcrParserProperty.class.getName()), e, 0, IStatus.ERROR));
       }
     }
 
     @Override
     public String description() {
-      return "The path to the tesseract-pdfToText.sh script.";
+      return "The class of the OCR parser.";
+    }
+
+    @Override
+    public boolean validate() {
+      try {
+        getValue();
+      }
+      catch (Exception e) {
+        LOG.error("ConfigProperty: '{}' does not exist.", getKey(), e);
+        return false;
+      }
+      return true;
     }
   }
 }

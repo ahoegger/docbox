@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.ahoegger.docbox</groupId>
+		<artifactId>ch.ahoegger.docbox.parent</artifactId>
+		<version>1.0.4-SNAPSHOT</version>
+		<relativePath>../ch.ahoegger.docbox.parent/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>ch.ahoegger.docbox.javacpp.tesseract</artifactId>
+	<name>Adapter for JavaCpp tesseract</name>
+
+	<properties>
+		<tesseract-version>4.0.0-rc2-1.4.3</tesseract-version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>ch.ahoegger.docbox</groupId>
+			<artifactId>ch.ahoegger.docbox.server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jai-imageio</groupId>
+			<artifactId>jai-imageio-core</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bytedeco.javacpp-presets</groupId>
+			<artifactId>tesseract-platform</artifactId>
+			<version>${tesseract-version}</version>
+		</dependency>
+	</dependencies>
+</project>

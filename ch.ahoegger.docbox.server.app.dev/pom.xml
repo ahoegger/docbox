@@ -30,5 +30,9 @@
 			<groupId>ch.ahoegger.docbox</groupId>
 			<artifactId>ch.ahoegger.docbox.server.or</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>ch.ahoegger.docbox</groupId>
+			<artifactId>ch.ahoegger.docbox.javacpp.tesseract</artifactId>
+		</dependency>
 	</dependencies>
 </project>
