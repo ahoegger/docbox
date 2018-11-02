@@ -22,11 +22,14 @@ import ch.ahoegger.docbox.shared.validation.IStartupValidatableBean;
  */
 public class OcrParseService implements IOcrParseService {
 
+  private static final Logger LOG = LoggerFactory.getLogger(OcrParseService.class);
+
   private IOcrParser m_parser;
   private LinkedList<ParseDescription> m_pendingDescriptions = new LinkedList<>();
 
   public OcrParseService() {
     m_parser = BEANS.get(CONFIG.getPropertyValue(OcrParserProperty.class));
+    LOG.debug("Using '{}' as ocr parser");
   }
 
   /**
