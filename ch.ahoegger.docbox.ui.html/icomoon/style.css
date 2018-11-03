@@ -1,0 +1,96 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('fonts/icomoon.eot?3dglqw');
+  src:  url('fonts/icomoon.eot?3dglqw#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?3dglqw') format('truetype'),
+    url('fonts/icomoon.woff?3dglqw') format('woff'),
+    url('fonts/icomoon.svg?3dglqw#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  
+  /* Enable Ligatures ================ */
+  letter-spacing: 0;
+  -webkit-font-feature-settings: "liga";
+  -moz-font-feature-settings: "liga=1";
+  -moz-font-feature-settings: "liga";
+  -ms-font-feature-settings: "liga" 1;
+  font-feature-settings: "liga";
+  -webkit-font-variant-ligatures: discretionary-ligatures;
+  font-variant-ligatures: discretionary-ligatures;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-bin:before {
+  content: "\e902";
+}
+.icon-trashcan:before {
+  content: "\e902";
+}
+.icon-remove:before {
+  content: "\e902";
+}
+.icon-delete:before {
+  content: "\e902";
+}
+.icon-recycle:before {
+  content: "\e902";
+}
+.icon-dispose:before {
+  content: "\e902";
+}
+.icon-pencil:before {
+  content: "\e903";
+}
+.icon-file-pdf:before {
+  content: "\e901";
+}
+.icon-coin-euro:before {
+  content: "\e900";
+}
+.icon-wrench2:before {
+  content: "\e991";
+}
+.icon-switch:before {
+  content: "\e9b6";
+}
+.icon-plus:before {
+  content: "\f067";
+}
+.icon-minus:before {
+  content: "\f068";
+}
+.icon-user:before {
+  content: "\f007";
+}
+.icon-wrench:before {
+  content: "\f0ad";
+}
+.icon-group:before {
+  content: "\f0c0";
+}
+.icon-users:before {
+  content: "\f0c0";
+}
+.icon-file-text:before {
+  content: "\f15c";
+}
+.icon-user-plus:before {
+  content: "\f234";
+}
+.icon-user-times:before {
+  content: "\f235";
+}

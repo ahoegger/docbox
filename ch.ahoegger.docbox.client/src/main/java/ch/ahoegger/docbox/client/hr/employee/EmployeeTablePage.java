@@ -297,6 +297,11 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       }
 
       @Override
+      protected String getConfiguredIconId() {
+        return "font:icomoon \ue903";
+      }
+
+      @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
         return CollectionUtility.hashSet(TableMenuType.SingleSelection);
       }
@@ -314,6 +319,11 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       @Override
       protected String getConfiguredText() {
         return TEXTS.get("New");
+      }
+
+      @Override
+      protected String getConfiguredIconId() {
+        return "font:icomoon \uf234";
       }
 
       @Override

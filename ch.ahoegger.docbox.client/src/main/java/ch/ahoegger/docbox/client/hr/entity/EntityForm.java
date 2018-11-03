@@ -6,6 +6,7 @@ import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
@@ -20,6 +21,8 @@ import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.CancelButton;
 import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.EntityDateField;
 import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.ExpenseAmountField;
 import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.OkButton;
+import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.SaveAndNewExpenseButton;
+import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.SaveAndNewWorkButton;
 import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.TextField;
 import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.WorkHoursField;
 import ch.ahoegger.docbox.or.definition.table.IEntityTable;
@@ -43,21 +46,6 @@ public class EntityForm extends AbstractForm {
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("Entity");
-  }
-
-  @Override
-  protected void execInitForm() {
-    if (isWork()) {
-      setSubTitle(TEXTS.get("Work"));
-    }
-    else {
-      setSubTitle(TEXTS.get("Expense"));
-    }
-  }
-
-  @Override
-  protected void execStored() {
-    getDesktop().dataChanged(IWorkItemEntity.WORK_ITEM_KEY);
   }
 
   @FormData
@@ -138,6 +126,14 @@ public class EntityForm extends AbstractForm {
 
   public TextField getTextField() {
     return getFieldByClass(TextField.class);
+  }
+
+  public SaveAndNewWorkButton getSaveAndNewWorkButton() {
+    return getFieldByClass(SaveAndNewWorkButton.class);
+  }
+
+  public SaveAndNewExpenseButton getSaveAndNewExpenseButton() {
+    return getFieldByClass(SaveAndNewExpenseButton.class);
   }
 
   public OkButton getOkButton() {
@@ -228,11 +224,94 @@ public class EntityForm extends AbstractForm {
     @Order(101000)
     public class CancelButton extends AbstractCancelButton {
     }
+
+    @Order(102000)
+    public class SaveAndNewWorkButton extends AbstractButton {
+      @Override
+      protected String getConfiguredLabel() {
+        return TEXTS.get("SaveAndNewWork");
+      }
+
+      @Override
+      protected void execClickAction() {
+        if (getHandler() instanceof ModifyHandler) {
+          saveModify();
+        }
+        else if (getHandler() instanceof NewHandler) {
+          saveNew();
+        }
+        setEntityType(WorkCode.ID);
+        getWorkHoursField().setValue(null);
+        getExpenseAmountField().setValue(null);
+        getTextField().setValue(null);
+        loadNew();
+      }
+    }
+
+    @Order(103000)
+    public class SaveAndNewExpenseButton extends AbstractButton {
+      @Override
+      protected String getConfiguredLabel() {
+        return TEXTS.get("SaveAndNewExpense");
+      }
+
+      @Override
+      protected void execClickAction() {
+        if (getHandler() instanceof ModifyHandler) {
+          saveModify();
+        }
+        else if (getHandler() instanceof NewHandler) {
+          saveNew();
+        }
+        setEntityType(ExpenseCode.ID);
+        getWorkHoursField().setValue(null);
+        getExpenseAmountField().setValue(null);
+        getTextField().setValue(null);
+        loadNew();
+      }
+    }
+
+  }
+
+  protected void loadNew() {
+    IEntityService service = BEANS.get(IEntityService.class);
+    EntityFormData formData = new EntityFormData();
+    exportFormData(formData);
+    formData = service.prepareCreate(formData);
+    importFormData(formData);
+    handleEntityCodeUpdated();
+  }
+
+  protected void saveNew() {
+    IEntityService service = BEANS.get(IEntityService.class);
+    EntityFormData formData = new EntityFormData();
+    exportFormData(formData);
+    service.create(formData);
+    getDesktop().dataChanged(IWorkItemEntity.WORK_ITEM_KEY);
+  }
+
+  protected void saveModify() {
+    IEntityService service = BEANS.get(IEntityService.class);
+    EntityFormData formData = new EntityFormData();
+    exportFormData(formData);
+    service.store(formData);
+    getDesktop().dataChanged(IWorkItemEntity.WORK_ITEM_KEY);
   }
 
   protected void handleEntityCodeUpdated() {
-    getExpenseAmountField().setVisible(ObjectUtility.equals(ExpenseCode.ID, getEntityType()));
-    getWorkHoursField().setVisible(ObjectUtility.equals(WorkCode.ID, getEntityType()));
+    boolean isWork = isWork();
+    getWorkHoursField().setVisible(isWork);
+    getWorkHoursField().setMandatory(isWork);
+    getExpenseAmountField().setVisible(!isWork);
+    getExpenseAmountField().setMandatory(!isWork);
+    if (isWork) {
+      setSubTitle(TEXTS.get("Work"));
+      setIconId("font:icomoon \uf0ad");
+    }
+    else {
+      setSubTitle(TEXTS.get("Expense"));
+      setIconId("font:icomoon \ue900");
+    }
   }
 
   public class ModifyHandler extends AbstractFormHandler {
@@ -249,10 +328,7 @@ public class EntityForm extends AbstractForm {
 
     @Override
     protected void execStore() {
-      IEntityService service = BEANS.get(IEntityService.class);
-      EntityFormData formData = new EntityFormData();
-      exportFormData(formData);
-      service.store(formData);
+      saveModify();
     }
   }
 
@@ -260,20 +336,12 @@ public class EntityForm extends AbstractForm {
 
     @Override
     protected void execLoad() {
-      IEntityService service = BEANS.get(IEntityService.class);
-      EntityFormData formData = new EntityFormData();
-      exportFormData(formData);
-      formData = service.prepareCreate(formData);
-      importFormData(formData);
-      handleEntityCodeUpdated();
+      loadNew();
     }
 
     @Override
     protected void execStore() {
-      IEntityService service = BEANS.get(IEntityService.class);
-      EntityFormData formData = new EntityFormData();
-      exportFormData(formData);
-      service.create(formData);
+      saveNew();
     }
   }
 

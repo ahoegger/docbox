@@ -49,15 +49,17 @@ public class OcrParseService implements IOcrParseService {
       ParseDescription desc = m_pendingDescriptions.poll();
       if (desc == null) {
         m_ocrParseFeature = null;
+        LOG.debug("End parse document job.");
       }
       return desc;
     }
   }
 
   private IFuture<Void> startJob() {
+    LOG.debug("Start parse document job.");
     return Jobs.schedule(new ParseDocumentRunnable(this),
         Jobs.newInput()
-            .withExecutionTrigger(Jobs.newExecutionTrigger().withStartIn(2, TimeUnit.SECONDS))
+            .withExecutionTrigger(Jobs.newExecutionTrigger().withStartIn(10, TimeUnit.SECONDS))
             .withRunContext(RunContexts.empty().withSubject(Subject.getSubject(AccessController.getContext()))));
 
   }
@@ -69,47 +71,4 @@ public class OcrParseService implements IOcrParseService {
     }
   }
 
-//  public static class OcrParserProperty extends AbstractConfigProperty<Class<? extends IOcrParser>, String> implements IStartupValidatableBean {
-//    private static final Logger LOG = LoggerFactory.getLogger(OcrParserProperty.class);
-//
-//    public static final String BUILD_REPLACEMENT_VAR = "${docbox.ocr.parser}";
-//
-//    @Override
-//    public String getKey() {
-//      return "docbox.ocr.parser";
-//    }
-//
-//    @Override
-//    public Class<? extends IOcrParser> getDefaultValue() {
-//      return ShellScriptOcrParser.class;
-//    }
-//
-//    @SuppressWarnings("unchecked")
-//    @Override
-//    protected Class<? extends IOcrParser> parse(String value) {
-//      try {
-//        return (Class<? extends IOcrParser>) Class.forName(value);
-//      }
-//      catch (ClassNotFoundException e) {
-//        throw new ProcessingException(new ProcessingStatus(String.format("Cold not parse '%s' property (see '%s' for details).", getKey(), OcrParserProperty.class.getName()), e, 0, IStatus.ERROR));
-//      }
-//    }
-//
-//    @Override
-//    public String description() {
-//      return "The class of the OCR parser.";
-//    }
-//
-//    @Override
-//    public boolean validate() {
-//      try {
-//        getValue();
-//      }
-//      catch (Exception e) {
-//        LOG.error("ConfigProperty: '{}' does not exist.", getKey(), e);
-//        return false;
-//      }
-//      return true;
-//    }
-//  }
 }

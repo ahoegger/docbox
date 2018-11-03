@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.server.util.FieldValidator;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
-import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
+import ch.ahoegger.docbox.shared.document.OcrResultGroupBoxData;
 import ch.ahoegger.docbox.shared.ocr.IDocumentOcrService;
 
 /**
@@ -35,17 +35,17 @@ public class DocumentOcrService implements IDocumentOcrService {
   @RemoteServiceAccessDenied
   public void updateOrCreate(BigDecimal documentId, OcrParseResult parseResult) {
     boolean create = false;
-    DocumentOcrFormData fd = new DocumentOcrFormData();
+    OcrResultGroupBoxData fd = new OcrResultGroupBoxData();
     fd.setDocumentId(documentId);
     fd = load(fd);
     if (fd == null) {
-      fd = new DocumentOcrFormData();
+      fd = new OcrResultGroupBoxData();
       fd.setDocumentId(documentId);
       create = true;
     }
     fd.getParseCount().setValue(Optional.ofNullable(fd.getParseCount().getValue()).map(c -> c + 1).orElse(1));
     fd.getOcrParsed().setValue(parseResult.isOcrParsed());
-    fd.getText().setValue(parseResult.getText());
+    fd.getParsedText().setValue(parseResult.getText());
     fd.getParseFailedReason().setValue(Optional.ofNullable(parseResult.getParseError()).map(r -> r.toString()).orElse(null));
 
     if (create) {
@@ -56,7 +56,7 @@ public class DocumentOcrService implements IDocumentOcrService {
     }
   }
 
-  protected DocumentOcrFormData create(DocumentOcrFormData formData) {
+  protected OcrResultGroupBoxData create(OcrResultGroupBoxData formData) {
     DocumentOcr docOcr = DocumentOcr.DOCUMENT_OCR.as("DOC_OCR");
 
     int rowCount = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
@@ -65,7 +65,7 @@ public class DocumentOcrService implements IDocumentOcrService {
         .with(docOcr.FAILED_REASON, formData.getParseFailedReason().getValue())
         .with(docOcr.OCR_SCANNED, formData.getOcrParsed().getValue())
         .with(docOcr.PARSE_COUNT, formData.getParseCount().getValue())
-        .with(docOcr.TEXT, formData.getText().getValue())
+        .with(docOcr.TEXT, formData.getParsedText().getValue())
         .insert();
     if (rowCount == 1) {
       // notify backup needed
@@ -76,18 +76,18 @@ public class DocumentOcrService implements IDocumentOcrService {
   }
 
   @Override
-  public DocumentOcrFormData load(DocumentOcrFormData formData) {
+  public OcrResultGroupBoxData load(OcrResultGroupBoxData formData) {
     DocumentOcr docOcr = DocumentOcr.DOCUMENT_OCR.as("DOC_OCR");
     return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .fetch(docOcr, docOcr.DOCUMENT_NR.eq(formData.getDocumentId()))
         .stream()
         .map(rec -> {
-          DocumentOcrFormData fd = new DocumentOcrFormData();
+          OcrResultGroupBoxData fd = new OcrResultGroupBoxData();
           fd.setDocumentId(rec.get(docOcr.DOCUMENT_NR));
           fd.getOcrParsed().setValue(rec.get(docOcr.OCR_SCANNED));
           fd.getParseCount().setValue(rec.get(docOcr.PARSE_COUNT));
           fd.getParseFailedReason().setValue(rec.get(docOcr.FAILED_REASON));
-          fd.getText().setValue(rec.get(docOcr.TEXT));
+          fd.getParsedText().setValue(rec.get(docOcr.TEXT));
           return fd;
         })
         .findFirst()
@@ -95,7 +95,7 @@ public class DocumentOcrService implements IDocumentOcrService {
   }
 
   @Override
-  public DocumentOcrFormData store(DocumentOcrFormData formData) {
+  public OcrResultGroupBoxData store(OcrResultGroupBoxData formData) {
 
     DocumentOcr e = DocumentOcr.DOCUMENT_OCR;
     // validations
@@ -108,7 +108,7 @@ public class DocumentOcrService implements IDocumentOcrService {
   }
 
   @RemoteServiceAccessDenied
-  protected DocumentOcrFormData storeInternal(DocumentOcrFormData formData, FieldValidator validator) {
+  protected OcrResultGroupBoxData storeInternal(OcrResultGroupBoxData formData, FieldValidator validator) {
     DocumentOcr e = DocumentOcr.DOCUMENT_OCR;
     DocumentOcrRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .fetchOne(e, e.DOCUMENT_NR.eq(formData.getDocumentId()));
@@ -124,7 +124,7 @@ public class DocumentOcrService implements IDocumentOcrService {
     int rowCount = rec.with(e.FAILED_REASON, formData.getParseFailedReason().getValue())
         .with(e.OCR_SCANNED, formData.getOcrParsed().getValue())
         .with(e.PARSE_COUNT, formData.getParseCount().getValue())
-        .with(e.TEXT, formData.getText().getValue())
+        .with(e.TEXT, formData.getParsedText().getValue())
         .update();
 
     if (rowCount == 1) {
@@ -140,7 +140,7 @@ public class DocumentOcrService implements IDocumentOcrService {
    * @return
    */
   public Boolean exists(BigDecimal documentId) {
-    DocumentOcrFormData fd = new DocumentOcrFormData();
+    OcrResultGroupBoxData fd = new OcrResultGroupBoxData();
     fd.setDocumentId(documentId);
     return load(fd) != null && fd.getParseFailedReason().getValue() == null;
   }

@@ -104,6 +104,10 @@ public class DocumentFormData extends AbstractFormData {
     return getFieldByClass(OcrLanguage.class);
   }
 
+  public OcrResultBox getOcrResultBox() {
+    return getFieldByClass(OcrResultBox.class);
+  }
+
   public OriginalStorage getOriginalStorage() {
     return getFieldByClass(OriginalStorage.class);
   }
@@ -170,6 +174,11 @@ public class DocumentFormData extends AbstractFormData {
   }
 
   public static class OcrLanguage extends AbstractValueFieldData<String> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class OcrResultBox extends AbstractOcrResultGroupBoxData {
 
     private static final long serialVersionUID = 1L;
   }

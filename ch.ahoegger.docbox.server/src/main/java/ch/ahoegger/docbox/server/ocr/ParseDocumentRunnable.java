@@ -12,10 +12,12 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.ahoegger.docbox.shared.document.ocr.DocumentParsedNotification;
 import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
 
 /**
@@ -57,6 +59,7 @@ public class ParseDocumentRunnable implements IRunnable {
       @Override
       public void run() throws Exception {
         BEANS.get(DocumentOcrService.class).updateOrCreate(documentId, result);
+        BEANS.get(ClientNotificationRegistry.class).putForAllSessions(new DocumentParsedNotification().withDocumentId(documentId));
 
       }
     }, Jobs.newInput().withRunContext(

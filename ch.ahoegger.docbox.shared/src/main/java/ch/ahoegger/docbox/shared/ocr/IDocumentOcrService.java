@@ -3,7 +3,7 @@ package ch.ahoegger.docbox.shared.ocr;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
-import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
+import ch.ahoegger.docbox.shared.document.OcrResultGroupBoxData;
 
 /**
  * <h3>{@link IDocumentOcrService}</h3>
@@ -13,16 +13,22 @@ import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
 @TunnelToServer
 public interface IDocumentOcrService extends IService {
 
-  /**
-   * @param formData
-   * @return
-   */
-  DocumentOcrFormData load(DocumentOcrFormData formData);
+  OcrResultGroupBoxData load(OcrResultGroupBoxData formData);
 
-  /**
-   * @param formData
-   * @return
-   */
-  DocumentOcrFormData store(DocumentOcrFormData formData);
+  OcrResultGroupBoxData store(OcrResultGroupBoxData formData);
+
+//  /**
+//   * @param formData
+//   * @return
+//   */
+//  @Deprecated
+//  DocumentOcrFormData load(DocumentOcrFormData formData);
+//
+//  /**
+//   * @param formData
+//   * @return
+//   */
+//  @Deprecated
+//  DocumentOcrFormData store(DocumentOcrFormData formData);
 
 }

@@ -140,6 +140,11 @@ public class CategoryTablePage extends AbstractPageWithTable<CategoryTablePage.T
       }
 
       @Override
+      protected String getConfiguredIconId() {
+        return "font:icomoon \ue903";
+      }
+
+      @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
         return CollectionUtility.hashSet(TableMenuType.SingleSelection);
       }
@@ -157,6 +162,11 @@ public class CategoryTablePage extends AbstractPageWithTable<CategoryTablePage.T
       @Override
       protected String getConfiguredText() {
         return TEXTS.get("New");
+      }
+
+      @Override
+      protected String getConfiguredIconId() {
+        return "font:icomoon \uf067";
       }
 
       @Override

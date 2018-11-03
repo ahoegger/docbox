@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.OpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
@@ -380,8 +381,13 @@ public class DocumentTablePage extends AbstractDocboxPageWithTable<DocumentTable
       }
 
       @Override
+      protected String getConfiguredIconId() {
+        return "font:icomoon \uf067";
+      }
+
+      @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-        return CollectionUtility.hashSet(TableMenuType.EmptySpace, TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+        return CollectionUtility.hashSet(TableMenuType.EmptySpace);
       }
 
       @Override
@@ -404,6 +410,11 @@ public class DocumentTablePage extends AbstractDocboxPageWithTable<DocumentTable
       }
 
       @Override
+      protected String getConfiguredIconId() {
+        return "font:icomoon \ue903";
+      }
+
+      @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
         return CollectionUtility.hashSet(TableMenuType.SingleSelection);
       }
@@ -417,7 +428,34 @@ public class DocumentTablePage extends AbstractDocboxPageWithTable<DocumentTable
       }
     }
 
-    @Order(2500)
+    @Order(3000)
+    public class OpenPdfMenu extends AbstractMenu {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("OpenPdf");
+      }
+
+      @Override
+      protected String getConfiguredIconId() {
+        return "font:icomoon \ue901";
+      }
+
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+      }
+
+      @Override
+      protected void execAction() {
+        StringBuilder linkBuilder = new StringBuilder();
+        linkBuilder.append(CONFIG.getPropertyValue(DocumentLinkURI.class));
+        linkBuilder.append("?").append(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class)).append("=").append(getDocumentIdColumn().getSelectedValue());
+
+        IDesktop.CURRENT.get().openUri(linkBuilder.toString(), OpenUriAction.NEW_WINDOW);
+      }
+    }
+
+    @Order(4000)
     public class AdvancedMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {

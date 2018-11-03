@@ -104,6 +104,11 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
       }
 
       @Override
+      protected String getConfiguredIconId() {
+        return "font:icomoon \uf0ad";
+      }
+
+      @Override
       protected boolean getConfiguredVisible() {
         return false;
       }
@@ -129,6 +134,11 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
       }
 
       @Override
+      protected String getConfiguredIconId() {
+        return "font:icomoon \ue900";
+      }
+
+      @Override
       protected boolean getConfiguredVisible() {
         return false;
       }
@@ -151,6 +161,11 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
       @Override
       protected String getConfiguredText() {
         return TEXTS.get("Edit");
+      }
+
+      @Override
+      protected String getConfiguredIconId() {
+        return "font:icomoon \ue903";
       }
 
       @Override
@@ -202,6 +217,11 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
       @Override
       protected String getConfiguredText() {
         return TEXTS.get("Delete");
+      }
+
+      @Override
+      protected String getConfiguredIconId() {
+        return "font:icomoon \ue902";
       }
 
       @Override

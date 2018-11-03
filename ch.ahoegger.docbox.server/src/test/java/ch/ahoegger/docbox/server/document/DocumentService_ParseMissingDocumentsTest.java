@@ -24,7 +24,7 @@ import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.server.test.util.TestDocumentStoreService;
-import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
+import ch.ahoegger.docbox.shared.document.OcrResultGroupBoxData;
 import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
 import ch.ahoegger.docbox.shared.ocr.IDocumentOcrService;
 import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
@@ -48,21 +48,6 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
   public static void beforeClass() {
     IBeanManager beanManager = Platform.get().getBeanManager();
 
-//    s_mockBeans.add(beanManager.registerBean(
-//        new BeanMetaData(IOcrParseService.class)
-//            .withOrder(-10).withInitialInstance(new IOcrParseService() {
-//
-//              @Override
-//              public IFuture<Void> schedule(ParseDescription parseDescription) {
-//                return new NullFuture<Void>();
-//              }
-//
-//              @Override
-//              public IFuture<Void> getCurrentParsingFeature() {
-//                return new NullFuture<Void>();
-//              }
-//
-//            })));
     s_mockBeans.add(beanManager.registerBean(
         new BeanMetaData(IDocumentStoreService.class)
             .withOrder(-10).withInitialInstance(new TestDocumentStoreService() {
@@ -127,9 +112,7 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
   @Test
   public void testParseSome() {
     DocumentService service = BEANS.get(DocumentService.class);
-    System.out.println("parse missing start");
     service.buildOcrOfMissingDocumentsInternal(CollectionUtility.arrayList(documentId02)).awaitDone();
-    System.out.println("parse missing done");
     assertOcrData(documentId01, true);
     assertOcrData(documentId02, true);
     assertOcrData(documentId03, false);
@@ -138,9 +121,9 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
   }
 
   private void assertOcrData(BigDecimal documentId, boolean exist) {
-    DocumentOcrFormData fd1 = new DocumentOcrFormData();
+    OcrResultGroupBoxData fd1 = new OcrResultGroupBoxData();
     fd1.setDocumentId(documentId);
-    DocumentOcrFormData fd2 = BEANS.get(IDocumentOcrService.class).load(fd1);
+    OcrResultGroupBoxData fd2 = BEANS.get(IDocumentOcrService.class).load(fd1);
     if (exist) {
       Assert.assertNotNull(String.format("Expected document '%s' to have parsed content.", documentId), fd2);
     }

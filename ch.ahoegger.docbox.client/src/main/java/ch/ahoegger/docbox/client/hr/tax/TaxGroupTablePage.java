@@ -159,6 +159,11 @@ public class TaxGroupTablePage extends AbstractPageWithTable<Table> {
       }
 
       @Override
+      protected String getConfiguredIconId() {
+        return "font:icomoon \uf067";
+      }
+
+      @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
         return CollectionUtility.hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection, TableMenuType.EmptySpace);
       }
@@ -175,6 +180,11 @@ public class TaxGroupTablePage extends AbstractPageWithTable<Table> {
       @Override
       protected String getConfiguredText() {
         return TEXTS.get("Edit");
+      }
+
+      @Override
+      protected String getConfiguredIconId() {
+        return "font:icomoon \ue903";
       }
 
       @Override

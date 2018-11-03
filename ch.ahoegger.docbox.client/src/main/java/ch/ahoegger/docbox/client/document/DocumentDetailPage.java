@@ -1,9 +1,15 @@
 package ch.ahoegger.docbox.client.document;
 
 import java.math.BigDecimal;
+import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+
+import ch.ahoegger.docbox.client.util.INotInheritedMenu;
 
 /**
  * <h3>{@link DocumentDetailPage}</h3>
@@ -25,6 +31,11 @@ public class DocumentDetailPage extends AbstractPageWithNodes {
   @Override
   protected Class<? extends IForm> getConfiguredDetailForm() {
     return DocumentForm.class;
+  }
+
+  @Override
+  protected List<IMenu> execComputeParentTablePageMenus(IPageWithTable<?> parentTablePage) {
+    return ActionUtility.getActions(super.execComputeParentTablePageMenus(parentTablePage), a -> !(a instanceof INotInheritedMenu));
   }
 
   @Override

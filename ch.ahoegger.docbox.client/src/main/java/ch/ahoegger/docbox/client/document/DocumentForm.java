@@ -12,13 +12,13 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.ValueFieldMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
@@ -26,14 +26,15 @@ import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.AbstractFileC
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmartGroupBoxBodyGrid;
-import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
@@ -42,29 +43,31 @@ import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.CancelButton;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.AbstractField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.CapturedDateField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.CategoriesBox;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.ConversationField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.DocumentDateField;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.DocumentField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.LinksBox;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.LinksBox.OpenHtmlField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.LinksBox.ShowOcrButton;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OcrBox;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OcrBox.OcrLanguageField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OcrBox.ParseOcrField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.OriginalStorageField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PartnersField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.PermissionsField;
-import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.ValidDateField;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.TabBox;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.TabBox.MetaDataBox;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.TabBox.MetaDataBox.CategoriesBox;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.TabBox.MetaDataBox.ConversationField;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.TabBox.MetaDataBox.OriginalStorageField;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.TabBox.MetaDataBox.PartnersField;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.TabBox.MetaDataBox.PermissionsField;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.TabBox.MetaDataBox.ValidDateField;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.TabBox.OcrBox;
+import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.FieldBox.TabBox.OcrBox.OcrResultBox;
 import ch.ahoegger.docbox.client.document.DocumentForm.MainBox.OkButton;
+import ch.ahoegger.docbox.client.document.ReplaceDocumentForm.MainBox.FieldBox.OcrLanguageField;
 import ch.ahoegger.docbox.client.document.field.AbstractCategoriesListBox;
 import ch.ahoegger.docbox.client.document.field.AbstractPartnerTableField;
 import ch.ahoegger.docbox.client.document.field.AbstractPartnerTableField.Table;
 import ch.ahoegger.docbox.client.document.field.AbstractPermissionTableField;
-import ch.ahoegger.docbox.client.document.ocr.DocumentOcrForm;
+import ch.ahoegger.docbox.client.document.ocr.IDocumentOcrEntity;
+import ch.ahoegger.docbox.client.document.ocr.OcrParsedEent;
 import ch.ahoegger.docbox.shared.conversation.ConversationLookupCall;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
+import ch.ahoegger.docbox.shared.document.OcrResultGroupBoxData;
+import ch.ahoegger.docbox.shared.ocr.IDocumentOcrService;
 import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.validation.DateValidation;
 
@@ -79,6 +82,7 @@ public class DocumentForm extends AbstractForm {
   private BigDecimal m_documentId;
   private String m_documentPath;
   private Boolean m_hasOcrText;
+  private IDataChangeListener m_internalDataChangeListener;
 
   @Override
   protected String getConfiguredTitle() {
@@ -87,8 +91,12 @@ public class DocumentForm extends AbstractForm {
 
   @Override
   protected String getConfiguredIconId() {
-
     return "font:icomoon \uf15c";
+  }
+
+  @Override
+  protected boolean getConfiguredSaveNeededVisible() {
+    return true;
   }
 
   @Override
@@ -107,8 +115,49 @@ public class DocumentForm extends AbstractForm {
   }
 
   @Override
+  protected void execInitForm() {
+    if (m_internalDataChangeListener == null) {
+      m_internalDataChangeListener = event -> {
+        OcrParsedEent parsedEvent = (OcrParsedEent) event;
+        if (ObjectUtility.equals(parsedEvent.getDocumentId(), getDocumentId())) {
+          reloadOcrResult();
+        }
+      };
+    }
+    getDesktop().dataChangeListeners().add(m_internalDataChangeListener, true, IDocumentOcrEntity.ENTITY_KEY);
+  }
+
+  @Override
+  protected void execDisposeForm() {
+    if (m_internalDataChangeListener != null) {
+      getDesktop().dataChangeListeners().remove(m_internalDataChangeListener, IDocumentOcrEntity.ENTITY_KEY);
+    }
+  }
+
+  @Override
   protected void execStored() {
     getDesktop().dataChanged(IDocumentEntity.ENTITY_KEY);
+  }
+
+  protected void reloadOcrResult() {
+    OcrResultGroupBoxData ocrFormData = new OcrResultGroupBoxData();
+    ocrFormData.setDocumentId(getDocumentId());
+    ocrFormData = BEANS.get(IDocumentOcrService.class).load(ocrFormData);
+    if (ocrFormData != null) {
+      getOcrResultBox().setVisible(true);
+      getOcrResultBox().getOcrParsedField().setValue(ocrFormData.getOcrParsed().getValue());
+      getOcrResultBox().getOcrParsedField().markSaved();
+      getOcrResultBox().getParsedTextField().setValue(ocrFormData.getParsedText().getValue());
+      getOcrResultBox().getParsedTextField().markSaved();
+      getOcrResultBox().getParseCountField().setValue(ocrFormData.getParseCount().getValue());
+      getOcrResultBox().getParseCountField().markSaved();
+      getOcrResultBox().getParseFailedReasonField().setValue(ocrFormData.getParseFailedReason().getValue());
+      getOcrResultBox().getParseFailedReasonField().markSaved();
+    }
+    else {
+      getOcrResultBox().setVisible(false);
+    }
+
   }
 
   @FormData
@@ -161,10 +210,6 @@ public class DocumentForm extends AbstractForm {
     return getFieldByClass(ValidDateField.class);
   }
 
-  public OpenHtmlField getOpenHtmlField() {
-    return getFieldByClass(OpenHtmlField.class);
-  }
-
   public OriginalStorageField getOriginalStorageField() {
     return getFieldByClass(OriginalStorageField.class);
   }
@@ -193,16 +238,12 @@ public class DocumentForm extends AbstractForm {
     return getFieldByClass(ConversationField.class);
   }
 
-  public ParseOcrField getParseOcrField() {
-    return getFieldByClass(ParseOcrField.class);
+  public TabBox getTabBox() {
+    return getFieldByClass(TabBox.class);
   }
 
-  public LinksBox getLinksBox() {
-    return getFieldByClass(LinksBox.class);
-  }
-
-  public ShowOcrButton getShowOcrButton() {
-    return getFieldByClass(ShowOcrButton.class);
+  public MetaDataBox getMetaDataBox() {
+    return getFieldByClass(MetaDataBox.class);
   }
 
   public OcrBox getOcrBox() {
@@ -211,6 +252,10 @@ public class DocumentForm extends AbstractForm {
 
   public OcrLanguageField getOcrLanguageField() {
     return getFieldByClass(OcrLanguageField.class);
+  }
+
+  public OcrResultBox getOcrResultBox() {
+    return getFieldByClass(OcrResultBox.class);
   }
 
   public OkButton getOkButton() {
@@ -226,12 +271,7 @@ public class DocumentForm extends AbstractForm {
     @Order(10)
     public class FieldBox extends AbstractGroupBox {
 
-      @Override
-      protected Class<? extends IGroupBoxBodyGrid> getConfiguredBodyGrid() {
-        return VerticalSmartGroupBoxBodyGrid.class;
-      }
-
-      @Order(10)
+      @Order(100)
       public class DocumentField extends AbstractFileChooserField {
         @Override
         protected String getConfiguredLabel() {
@@ -242,53 +282,28 @@ public class DocumentForm extends AbstractForm {
         protected boolean getConfiguredVisible() {
           return false;
         }
-      }
-
-      @Order(20)
-      public class LinksBox extends AbstractSequenceBox {
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
 
         @Override
-        protected boolean getConfiguredAutoCheckFromTo() {
-          return false;
+        protected int getConfiguredGridW() {
+          return 2;
         }
-
-        @Order(10)
-        public class OpenHtmlField extends AbstractDocumentLinkField {
-
-        }
-
-        @Order(2000)
-        public class ShowOcrButton extends AbstractButton {
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("ShowParsedContent");
-          }
-
-          @Override
-          protected int getConfiguredDisplayStyle() {
-            return DISPLAY_STYLE_LINK;
-          }
-
-          @Override
-          protected boolean getConfiguredVisible() {
-            return true;
-          }
-
-          @Override
-          protected void execClickAction() {
-            DocumentOcrForm form = new DocumentOcrForm();
-            form.setDocumentId(getDocumentId());
-            form.start();
-          }
-        }
-
       }
 
-      @Order(30)
+      @Order(200)
+      public class DocumentDateField extends AbstractDateField {
+
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("DocumentDate");
+        }
+
+        @Override
+        protected boolean getConfiguredMandatory() {
+          return true;
+        }
+      }
+
+      @Order(300)
       public class CapturedDateField extends AbstractDateField {
         @Override
         protected String getConfiguredLabel() {
@@ -301,7 +316,7 @@ public class DocumentForm extends AbstractForm {
         }
       }
 
-      @Order(40)
+      @Order(400)
       public class AbstractField extends AbstractStringField {
         @Override
         protected String getConfiguredLabel() {
@@ -344,172 +359,182 @@ public class DocumentForm extends AbstractForm {
         }
       }
 
-      @Order(50)
-      public class DocumentDateField extends AbstractDateField {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("DocumentDate");
-        }
-
-        @Override
-        protected boolean getConfiguredMandatory() {
-          return true;
-        }
-      }
-
-      @Order(55)
-      public class ValidDateField extends AbstractDateField {
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("ValidUntil");
-        }
-
-        @Override
-        protected Class<? extends IValueField> getConfiguredMasterField() {
-          return DocumentDateField.class;
-        }
-
-        @Override
-        protected Date execValidateValue(Date rawValue) {
-          DateValidation.validateFromTo(getDocumentDateField().getValue(), rawValue);
-          return rawValue;
-        }
-      }
-
-      @Order(60)
-      public class PartnersField extends AbstractPartnerTableField {
-
-        @Override
-        protected int getConfiguredGridH() {
-          return 2;
-        }
-
-      }
-
-      @Order(70)
-      public class ConversationField extends AbstractSmartField<BigDecimal> {
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("Conversation");
-        }
-
-        @Override
-        protected void execInitField() {
-          getPartnersField().getTable().addTableListener(new TableAdapter() {
-
-            @Override
-            public void tableChanged(TableEvent e) {
-              switch (e.getType()) {
-                case TableEvent.TYPE_ROWS_DELETED:
-                case TableEvent.TYPE_ROWS_INSERTED:
-                case TableEvent.TYPE_ROWS_UPDATED:
-                  // TODO update smart value
-                  break;
-              }
-            }
-          });
-        }
-
-        @Override
-        protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
-          return ConversationLookupCall.class;
-        }
-
-        @Override
-        protected void execPrepareLookup(ILookupCall<BigDecimal> call) {
-          Table partnerTable = getPartnersField().getTable();
-
-          call.setMaster(partnerTable.getPartnerColumn().getValues().stream().filter(v -> v != null).collect(Collectors.toList()));
-          super.execPrepareLookup(call);
-        }
+      @Order(500)
+      public class TabBox extends AbstractTabBox {
 
         @Order(1000)
-        public class NewConversationMenu extends AbstractMenu {
+        public class MetaDataBox extends AbstractGroupBox {
           @Override
-          protected String getConfiguredText() {
-            return TEXTS.get("New");
+          protected String getConfiguredLabel() {
+            return TEXTS.get("MetaData");
           }
 
           @Override
-          protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-            return CollectionUtility.hashSet(ValueFieldMenuType.NotNull, ValueFieldMenuType.Null);
+          protected Class<? extends IGroupBoxBodyGrid> getConfiguredBodyGrid() {
+            return VerticalSmartGroupBoxBodyGrid.class;
           }
 
-          @Override
-          protected void execAction() {
-            ConversationForm form = new ConversationForm();
-            form.startNew();
-            form.addFormListener(new FormListener() {
-              @Override
-              public void formChanged(FormEvent e) {
-                if (FormEvent.TYPE_STORE_AFTER == e.getType()) {
-                  setValue(form.getConversationId());
+          @Order(100)
+          public class ValidDateField extends AbstractDateField {
+            @Override
+            protected String getConfiguredLabel() {
+              return TEXTS.get("ValidUntil");
+            }
+
+            @Override
+            protected Class<? extends IValueField> getConfiguredMasterField() {
+              return DocumentDateField.class;
+            }
+
+            @Override
+            protected Date execValidateValue(Date rawValue) {
+              DateValidation.validateFromTo(getDocumentDateField().getValue(), rawValue);
+              return rawValue;
+            }
+          }
+
+          @Order(200)
+          public class PartnersField extends AbstractPartnerTableField {
+
+            @Override
+            protected int getConfiguredGridH() {
+              return 2;
+            }
+
+          }
+
+          @Order(300)
+          public class ConversationField extends AbstractSmartField<BigDecimal> {
+            @Override
+            protected String getConfiguredLabel() {
+              return TEXTS.get("Conversation");
+            }
+
+            @Override
+            protected void execInitField() {
+              getPartnersField().getTable().addTableListener(new TableAdapter() {
+
+                @Override
+                public void tableChanged(TableEvent e) {
+                  switch (e.getType()) {
+                    case TableEvent.TYPE_ROWS_DELETED:
+                    case TableEvent.TYPE_ROWS_INSERTED:
+                    case TableEvent.TYPE_ROWS_UPDATED:
+                      // TODO update smart value
+                      break;
+                  }
                 }
+              });
+            }
+
+            @Override
+            protected Class<? extends ILookupCall<BigDecimal>> getConfiguredLookupCall() {
+              return ConversationLookupCall.class;
+            }
+
+            @Override
+            protected void execPrepareLookup(ILookupCall<BigDecimal> call) {
+              Table partnerTable = getPartnersField().getTable();
+
+              call.setMaster(partnerTable.getPartnerColumn().getValues().stream().filter(v -> v != null).collect(Collectors.toList()));
+              super.execPrepareLookup(call);
+            }
+
+            @Order(1000)
+            public class NewConversationMenu extends AbstractMenu {
+              @Override
+              protected String getConfiguredText() {
+                return TEXTS.get("New");
               }
-            });
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.hashSet(ValueFieldMenuType.NotNull, ValueFieldMenuType.Null);
+              }
+
+              @Override
+              protected void execAction() {
+                ConversationForm form = new ConversationForm();
+                form.startNew();
+                form.addFormListener(new FormListener() {
+                  @Override
+                  public void formChanged(FormEvent e) {
+                    if (FormEvent.TYPE_STORE_AFTER == e.getType()) {
+                      setValue(form.getConversationId());
+                    }
+                  }
+                });
+              }
+            }
+
+          }
+
+          @Order(400)
+          public class OriginalStorageField extends AbstractStringField {
+            @Override
+            protected String getConfiguredLabel() {
+              return TEXTS.get("OrignalStorage");
+            }
+
+            @Override
+            protected int getConfiguredMaxLength() {
+              return 128;
+            }
+          }
+
+          @Order(500)
+          public class PermissionsField extends AbstractPermissionTableField {
+
+            @Override
+            protected int getConfiguredGridH() {
+              return 2;
+            }
+
+          }
+
+          @Order(600)
+          public class CategoriesBox extends AbstractCategoriesListBox {
+            @Override
+            protected int getConfiguredGridH() {
+              return 8;
+            }
           }
         }
 
-      }
+        @Order(2000)
+        public class OcrBox extends AbstractGroupBox {
 
-      @Order(80)
-      public class OriginalStorageField extends AbstractStringField {
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("OrignalStorage");
-        }
-
-        @Override
-        protected int getConfiguredMaxLength() {
-          return 128;
-        }
-      }
-
-      @Order(90)
-      public class PermissionsField extends AbstractPermissionTableField {
-
-        @Override
-        protected int getConfiguredGridH() {
-          return 2;
-        }
-
-      }
-
-      @Order(110)
-      public class CategoriesBox extends AbstractCategoriesListBox {
-        @Override
-        protected int getConfiguredGridH() {
-          return 8;
-        }
-      }
-
-      @Order(2000)
-      public class OcrBox extends AbstractGroupBox {
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("OCR");
-        }
-
-        @Order(100)
-        public class ParseOcrField extends AbstractBooleanField {
           @Override
           protected String getConfiguredLabel() {
-            return TEXTS.get("ParseContent");
-          }
-        }
-
-        @Order(200)
-        public class OcrLanguageField extends AbstractSmartField<String> {
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("Language");
+            return TEXTS.get("OCR");
           }
 
-          @Override
-          protected Class<? extends ICodeType<?, String>> getConfiguredCodeType() {
-            return OcrLanguageCodeType.class;
+          @Order(100)
+          public class ParseOcrField extends AbstractBooleanField {
+            @Override
+            protected String getConfiguredLabel() {
+              return TEXTS.get("ParseContent");
+            }
           }
+
+          @Order(200)
+          public class OcrLanguageField extends AbstractSmartField<String> {
+            @Override
+            protected String getConfiguredLabel() {
+              return TEXTS.get("Language");
+            }
+
+            @Override
+            protected Class<? extends ICodeType<?, String>> getConfiguredCodeType() {
+              return OcrLanguageCodeType.class;
+            }
+          }
+
+          @Order(300)
+          public class OcrResultBox extends AbstractOcrResultGroupBox {
+
+          }
+
         }
 
       }
@@ -523,6 +548,37 @@ public class DocumentForm extends AbstractForm {
     @Order(1010)
     public class CancelButton extends AbstractCancelButton {
     }
+
+////    @Order(1000)
+////    public class OpenPdfMenu extends AbstractMenu {
+////      @Override
+////      protected String getConfiguredText() {
+////        return TEXTS.get("OpenPdf");
+////      }
+////
+////      @Override
+////      protected void execAction() {
+////        StringBuilder linkBuilder = new StringBuilder();
+////        linkBuilder.append(CONFIG.getPropertyValue(DocumentLinkURI.class));
+////        linkBuilder.append("?").append(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class)).append("=").append(getDocumentId());
+////        getDesktop().openUri(linkBuilder.toString(), OpenUriAction.NEW_WINDOW);
+////      }
+////    }
+//
+//    @Order(2000)
+//    public class OpenOcrTextMenu extends AbstractMenu {
+//      @Override
+//      protected String getConfiguredText() {
+//        return TEXTS.get("ShowParsedContent");
+//      }
+//
+//      @Override
+//      protected void execAction() {
+//        DocumentOcrForm form = new DocumentOcrForm();
+//        form.setDocumentId(getDocumentId());
+//        form.start();
+//      }
+//    }
 
   }
 
@@ -588,8 +644,9 @@ public class DocumentForm extends AbstractForm {
       getForm().importFormData(formData);
       getForm().getDocumentField().setVisible(true);
       getForm().getDocumentField().setMandatory(true);
-      getForm().getOpenHtmlField().setVisible(false);
-      getForm().getShowOcrButton().setVisible(false);
+      getForm().getOcrResultBox().setVisible(false);
+//      getForm().getMainBox().getMenuByClass(OpenPdfMenu.class).setVisible(false);
+//      getForm().getMainBox().getMenuByClass(OpenOcrTextMenu.class).setVisible(false);
       if (getPartnerId() != null) {
         getForm().getPartnersField().setValue(CollectionUtility.hashSet(getPartnerId()));
       }
@@ -633,9 +690,7 @@ public class DocumentForm extends AbstractForm {
       formData = BEANS.get(IDocumentService.class).load(formData);
       getForm().importFormData(formData);
       getForm().setTitle(formData.getAbstract().getValue());
-      getForm().getOpenHtmlField().setDocumentId(formData.getDocumentId());
-      getForm().getShowOcrButton().setVisible(getForm().getHasOcrText());
-
+      getForm().reloadOcrResult();
     }
 
     @Override
@@ -643,8 +698,16 @@ public class DocumentForm extends AbstractForm {
       DocumentFormData formData = new DocumentFormData();
       getForm().exportFormData(formData);
       BEANS.get(IDocumentService.class).store(formData);
+      if (getForm().getOcrResultBox().isVisible()) {
+        OcrResultGroupBoxData ocrFormData = new OcrResultGroupBoxData();
+        ocrFormData.setDocumentId(getDocumentId());
+        ocrFormData.getParseCount().setValue(getForm().getOcrResultBox().getParseCountField().getValue());
+        ocrFormData.getOcrParsed().setValue(getForm().getOcrResultBox().getOcrParsedField().getValue());
+        ocrFormData.getParsedText().setValue(getForm().getOcrResultBox().getParsedTextField().getValue());
+        ocrFormData.getParseFailedReason().setValue(getForm().getOcrResultBox().getParseFailedReasonField().getValue());
+        BEANS.get(IDocumentOcrService.class).store(ocrFormData);
+      }
     }
-
   }
 
   public static class DocumentFormPageHandler extends AbstractDocumentFormHandler {
@@ -678,12 +741,9 @@ public class DocumentForm extends AbstractForm {
 
       getForm().setTitle(formData.getAbstract().getValue());
 
-      getForm().getOpenHtmlField().setDocumentId(formData.getDocumentId());
-
       getForm().setAllEnabled(false);
-      getForm().getShowOcrButton().setEnabled(true, true);
-      getForm().getShowOcrButton().setEnabled(getForm().getHasOcrText(), true);
-      getForm().getShowOcrButton().setVisible(getForm().getHasOcrText());
+      getForm().reloadOcrResult();
+
     }
 
   }

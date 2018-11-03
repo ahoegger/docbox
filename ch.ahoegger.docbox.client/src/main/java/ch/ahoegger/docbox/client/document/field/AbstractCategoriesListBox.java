@@ -122,6 +122,11 @@ public abstract class AbstractCategoriesListBox extends AbstractListBox<BigDecim
       }
 
       @Override
+      protected String getConfiguredIconId() {
+        return "font:icomoon \ue903";
+      }
+
+      @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
         return CollectionUtility.hashSet(TableMenuType.SingleSelection);
       }

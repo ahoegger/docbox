@@ -23,7 +23,7 @@ import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
-import ch.ahoegger.docbox.shared.document.ocr.DocumentOcrFormData;
+import ch.ahoegger.docbox.shared.document.OcrResultGroupBoxData;
 import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
@@ -63,10 +63,10 @@ public class DocumentService_MultipleOcrParseTest extends AbstractTestWithDataba
 
     BEANS.get(DocumentService.class).buildOcrOfMissingDocumentsInternal(m_documentIds).awaitDone();
     for (BigDecimal docId : m_documentIds) {
-      DocumentOcrFormData fd = new DocumentOcrFormData();
+      OcrResultGroupBoxData fd = new OcrResultGroupBoxData();
       fd.setDocumentId(docId);
       fd = BEANS.get(DocumentOcrService.class).load(fd);
-      Assert.assertTrue(StringUtility.hasText(fd.getText().getValue()));
+      Assert.assertTrue(StringUtility.hasText(fd.getParsedText().getValue()));
       Assert.assertTrue(StringUtility.isNullOrEmpty(fd.getParseFailedReason().getValue()));
     }
 
