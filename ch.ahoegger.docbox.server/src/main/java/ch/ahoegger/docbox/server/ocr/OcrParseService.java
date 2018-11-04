@@ -59,7 +59,7 @@ public class OcrParseService implements IOcrParseService {
     LOG.debug("Start parse document job.");
     return Jobs.schedule(new ParseDocumentRunnable(this),
         Jobs.newInput()
-            .withExecutionTrigger(Jobs.newExecutionTrigger().withStartIn(10, TimeUnit.SECONDS))
+            .withExecutionTrigger(Jobs.newExecutionTrigger().withStartIn(300, TimeUnit.MILLISECONDS))
             .withRunContext(RunContexts.empty().withSubject(Subject.getSubject(AccessController.getContext()))));
 
   }
