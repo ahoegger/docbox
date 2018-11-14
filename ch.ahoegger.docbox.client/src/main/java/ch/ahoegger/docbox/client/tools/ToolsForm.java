@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
-import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.html.IHtmlElement;
 import org.eclipse.scout.rt.platform.html.IHtmlTable;
@@ -47,6 +46,7 @@ import ch.ahoegger.docbox.client.administration.DbDumpForm;
 import ch.ahoegger.docbox.client.tools.ToolsForm.MainBox.ApplyButton;
 import ch.ahoegger.docbox.client.tools.ToolsForm.MainBox.InfoField;
 import ch.ahoegger.docbox.client.tools.ToolsForm.MainBox.LocaleField;
+import ch.ahoegger.docbox.shared.DocboxVersion;
 import ch.ahoegger.docbox.shared.Icons;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
@@ -113,7 +113,7 @@ public class ToolsForm extends AbstractForm {
   }
 
   protected String getProductVersion() {
-    return CONFIG.getPropertyValue(ApplicationVersionProperty.class);
+    return DocboxVersion.VERSION;
   }
 
   protected Map<String, Object> getProperties() {
