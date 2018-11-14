@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 /**
  * <h3>{@link DocumentParsedNotification}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentParsedNotification implements Serializable {
 

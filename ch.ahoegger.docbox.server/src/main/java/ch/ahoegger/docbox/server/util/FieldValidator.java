@@ -14,7 +14,7 @@ import org.jooq.Record;
 /**
  * <h3>{@link FieldValidator}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class FieldValidator {
 

@@ -30,7 +30,7 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 /**
  * <h3>{@link DocumentService_MultipleOcrParseTest}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Ignore
 public class DocumentService_MultipleOcrParseTest extends AbstractTestWithDatabase {

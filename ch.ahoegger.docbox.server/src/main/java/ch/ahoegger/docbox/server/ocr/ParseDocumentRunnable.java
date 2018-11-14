@@ -23,7 +23,7 @@ import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
 /**
  * <h3>{@link ParseDocumentRunnable}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class ParseDocumentRunnable implements IRunnable {
 

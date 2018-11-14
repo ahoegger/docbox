@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 /**
  * <h3>{@link IOcrParser}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @ApplicationScoped
 public interface IOcrParser {

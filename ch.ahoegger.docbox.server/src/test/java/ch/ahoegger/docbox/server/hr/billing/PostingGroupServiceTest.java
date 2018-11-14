@@ -31,7 +31,7 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 /**
  * <h3>{@link PostingGroupServiceTest}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class PostingGroupServiceTest extends AbstractTestWithDatabase {
 

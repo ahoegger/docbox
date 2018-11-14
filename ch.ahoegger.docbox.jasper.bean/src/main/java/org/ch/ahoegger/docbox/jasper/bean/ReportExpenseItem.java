@@ -3,7 +3,7 @@ package org.ch.ahoegger.docbox.jasper.bean;
 /**
  * <h3>{@link ReportExpenseItem}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class ReportExpenseItem {
 

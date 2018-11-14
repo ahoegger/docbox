@@ -14,7 +14,7 @@ import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI
 /**
  * <h3>{@link AbstractDocumentLinkField}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @FormData(defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.IGNORE)
 public abstract class AbstractDocumentLinkField extends AbstractHtmlField {

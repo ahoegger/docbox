@@ -9,7 +9,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 /**
  * <h3>{@link ITableStatement}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @ApplicationScoped
 public interface ITableStatement {

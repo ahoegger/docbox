@@ -11,7 +11,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 /**
  * <h3>{@link AbstractDocboxLookupService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public abstract class AbstractDocboxLookupService<LOOKUP_ROW_KEY_TYPE> extends AbstractLookupService<LOOKUP_ROW_KEY_TYPE> {
 

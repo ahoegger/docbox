@@ -6,7 +6,7 @@ import java.time.LocalDate;
 /**
  * <h3>{@link ReportExpenseItem}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class Expense {
 

@@ -31,7 +31,7 @@ import ch.ahoegger.docbox.shared.validation.IStartupValidatableBean;
 /**
  * <h3>{@link ShellScriptOcrParser}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Order(100)
 public class ShellScriptOcrParser implements IOcrParser {

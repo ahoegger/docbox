@@ -3,7 +3,7 @@ package ch.ahoegger.docbox.or.definition.table;
 /**
  * <h3>{@link ICategoryTable}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public interface ICategoryTable {
 

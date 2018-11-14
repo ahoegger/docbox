@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 /**
  * <h3>{@link NullFuture}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class NullFuture<RESULT> implements IFuture<RESULT> {
 

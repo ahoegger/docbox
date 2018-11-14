@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 /**
  * <h3>{@link NullOcrParser}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Order(5000)
 public class NullOcrParser implements IOcrParser {

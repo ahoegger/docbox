@@ -51,7 +51,7 @@ import ch.ahoegger.docbox.shared.validation.IStartupValidatableBean;
 /**
  * <h3>{@link CppTesseractOcrParser}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Order(1000)
 public class CppTesseractOcrParser implements IOcrParser {

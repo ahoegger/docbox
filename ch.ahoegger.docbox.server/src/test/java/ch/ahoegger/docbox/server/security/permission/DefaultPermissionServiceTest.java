@@ -15,7 +15,7 @@ import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType.WriteCod
 /**
  * <h3>{@link DefaultPermissionServiceTest}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DefaultPermissionServiceTest extends AbstractTestWithDatabase {
 

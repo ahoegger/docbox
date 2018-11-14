@@ -13,7 +13,7 @@ import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 /**
  * <h3>{@link DocumentOcrServiceTest}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentOcrServiceTest extends AbstractTestWithDatabase {
 

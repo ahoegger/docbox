@@ -22,7 +22,7 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 /**
  * <h3>{@link PostingGroupServiceTest_FindUnbilld}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class PostingGroupServiceTest_FindUnbilld extends AbstractTestWithDatabase {
 

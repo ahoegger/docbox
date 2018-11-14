@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
 /**
  * <h3>{@link ITaxGroupService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @TunnelToServer
 public interface ITaxGroupService extends IService {

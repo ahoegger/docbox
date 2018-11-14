@@ -18,7 +18,7 @@ import ch.ahoegger.docbox.server.service.lookup.AbstractDocboxLookupService;
 /**
  * <h3>{@link AbstractUserLookupService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class AbstractUserLookupService extends AbstractDocboxLookupService<String> implements IUser {
 

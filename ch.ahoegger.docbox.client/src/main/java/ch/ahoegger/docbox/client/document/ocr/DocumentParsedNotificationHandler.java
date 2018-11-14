@@ -12,7 +12,7 @@ import ch.ahoegger.docbox.shared.document.ocr.DocumentParsedNotification;
 /**
  * <h3>{@link DocumentParsedNotificationHandler}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DocumentParsedNotificationHandler extends AbstractObservableNotificationHandler<DocumentParsedNotification> {
 

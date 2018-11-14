@@ -10,7 +10,7 @@ import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 /**
  * <h3>{@link PostingGroupCodeType}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class PostingGroupCodeType extends AbstractCodeType<BigDecimal, BigDecimal> {
 

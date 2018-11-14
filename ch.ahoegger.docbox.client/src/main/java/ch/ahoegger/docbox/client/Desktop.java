@@ -4,20 +4,17 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.notification.DesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
+import org.eclipse.scout.rt.client.ui.form.AbstractFormMenu;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.status.IStatus;
@@ -25,18 +22,15 @@ import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 import ch.ahoegger.docbox.client.administration.AdministrationOutline;
-import ch.ahoegger.docbox.client.administration.DbDumpForm;
 import ch.ahoegger.docbox.client.hr.HumanResourceOutline;
+import ch.ahoegger.docbox.client.tools.ToolsForm;
 import ch.ahoegger.docbox.client.work.WorkOutline;
 import ch.ahoegger.docbox.shared.Icons;
-import ch.ahoegger.docbox.shared.backup.IBackupService;
-import ch.ahoegger.docbox.shared.document.IDocumentService;
+import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
 import ch.ahoegger.docbox.shared.hr.employee.IEmployeeService;
 import ch.ahoegger.docbox.shared.hr.employer.EmployeeSearchFormData;
-import ch.ahoegger.docbox.shared.security.permission.AdministratorPermission;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
@@ -45,6 +39,7 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
  * @author Andreas Hoegger
  */
 public class Desktop extends AbstractDesktop {
+
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("ApplicationTitle");
@@ -91,7 +86,14 @@ public class Desktop extends AbstractDesktop {
   }
 
   @Order(1500)
-  public class ToolsMenu extends AbstractMenu {
+  public class ToolsMenu extends AbstractFormMenu<ToolsForm> {
+    @Override
+    protected void execInitAction() {
+      UserLookupCall call = new UserLookupCall();
+      call.setKey(ClientSession.get().getUserId());
+      setText(call.getDataByKey().get(0).getText());
+    }
+
     @Override
     protected String getConfiguredTooltipText() {
       return TEXTS.get("Tools");
@@ -102,85 +104,10 @@ public class Desktop extends AbstractDesktop {
       return Icons.Wrench;
     }
 
-    @Order(1000)
-    public class ManualBackupMenu extends AbstractMenu {
-      @Override
-      protected String getConfiguredText() {
-        return TEXTS.get("ManualBackup");
-      }
-
-      @Override
-      protected boolean getConfiguredVisible() {
-        return ACCESS.check(new AdministratorPermission());
-      }
-
-      @Override
-      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-        return CollectionUtility.hashSet();
-      }
-
-      @Override
-      protected void execAction() {
-        BEANS.get(IBackupService.class).backup();
-      }
+    @Override
+    protected Class<ToolsForm> getConfiguredForm() {
+      return ToolsForm.class;
     }
-
-    @Order(2000)
-    public class DbDumpMenu extends AbstractMenu {
-      @Override
-      protected String getConfiguredText() {
-        return TEXTS.get("DBDump");
-      }
-
-      @Override
-      protected boolean getConfiguredVisible() {
-        return ACCESS.check(new AdministratorPermission());
-      }
-
-      @Override
-      protected void execAction() {
-        DbDumpForm form = new DbDumpForm();
-        form.start();
-      }
-    }
-
-    @Order(3000)
-    public class ForceOcrScanMenu extends AbstractMenu {
-      @Override
-      protected String getConfiguredText() {
-        return TEXTS.get("ForceOCRScan");
-      }
-
-      @Override
-      protected boolean getConfiguredVisible() {
-        return ACCESS.check(new AdministratorPermission());
-      }
-
-      @Override
-      protected void execAction() {
-        BEANS.get(IDocumentService.class).buildOcrOfMissingDocuments();
-      }
-    }
-
-    @Order(4000)
-    public class SeparatorMenu extends AbstractMenuSeparator {
-    }
-
-    @Order(5000)
-    public class AboutMenu extends AbstractMenu {
-
-      @Override
-      protected String getConfiguredText() {
-        return TEXTS.get("About");
-      }
-
-      @Override
-      protected void execAction() {
-        ScoutInfoForm form = new ScoutInfoForm();
-        form.startModify();
-      }
-    }
-
   }
 
   @Order(2000)

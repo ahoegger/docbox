@@ -7,7 +7,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 /**
  * <h3>{@link IOcrParseService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @ApplicationScoped
 public interface IOcrParseService {

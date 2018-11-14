@@ -20,7 +20,7 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 /**
  * <h3>{@link WageCalculationService}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @ApplicationScoped
 public class WageCalculationService {

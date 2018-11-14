@@ -12,7 +12,7 @@ import ch.ahoegger.docbox.shared.hr.employee.AbstractEmployerBoxData;
 /**
  * <h3>{@link AbstractEmployerBox}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @FormData(value = AbstractEmployerBoxData.class, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE, sdkCommand = FormData.SdkCommand.CREATE)
 public abstract class AbstractEmployerBox extends AbstractGroupBox {

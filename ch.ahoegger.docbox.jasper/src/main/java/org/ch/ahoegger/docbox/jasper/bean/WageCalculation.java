@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * <h3>{@link WageCalculation}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class WageCalculation {
 

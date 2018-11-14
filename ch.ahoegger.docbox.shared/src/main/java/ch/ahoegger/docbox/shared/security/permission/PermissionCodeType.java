@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 /**
  * <h3>{@link PermissionCodeType}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class PermissionCodeType extends AbstractCodeType<Integer, Integer> {
 

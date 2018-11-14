@@ -16,7 +16,7 @@ import ch.ahoegger.docbox.shared.hr.billing.AbstractPostingCalculationBoxData;
 /**
  * <h3>{@link AbstractPostingCalculationBox}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @FormData(value = AbstractPostingCalculationBoxData.class, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE, sdkCommand = FormData.SdkCommand.CREATE)
 public abstract class AbstractPostingCalculationBox extends AbstractGroupBox {

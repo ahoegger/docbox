@@ -5,7 +5,7 @@ import org.eclipse.scout.rt.platform.Bean;
 /**
  * <h3>{@link IStartupValidatableBean}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @Bean
 public interface IStartupValidatableBean {

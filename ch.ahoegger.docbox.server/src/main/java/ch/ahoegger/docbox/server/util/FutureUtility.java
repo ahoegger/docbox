@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 /**
  * <h3>{@link FutureUtility}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class FutureUtility {
 

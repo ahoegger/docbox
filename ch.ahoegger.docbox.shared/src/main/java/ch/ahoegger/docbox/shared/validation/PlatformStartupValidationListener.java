@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.platform.PlatformEvent;
 /**
  * <h3>{@link PlatformStartupValidationListener}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class PlatformStartupValidationListener implements IPlatformListener {
   @Override

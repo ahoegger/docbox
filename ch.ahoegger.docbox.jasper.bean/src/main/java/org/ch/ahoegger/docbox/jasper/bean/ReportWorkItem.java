@@ -3,7 +3,7 @@ package org.ch.ahoegger.docbox.jasper.bean;
 /**
  * <h3>{@link ReportWorkItem}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class ReportWorkItem {
   public String m_date;

@@ -29,7 +29,7 @@ import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 /**
  * <h3>{@link ReplaceDocumentForm}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @FormData(value = ReplaceDocumentFormData.class, sdkCommand = SdkCommand.CREATE)
 public class ReplaceDocumentForm extends AbstractForm {

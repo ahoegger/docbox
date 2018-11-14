@@ -19,7 +19,7 @@ import ch.ahoegger.docbox.server.or.generator.table.ITableStatement;
 /**
  * <h3>{@link GeneratorOrClasses}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class GeneratorOrClasses {
 

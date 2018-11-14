@@ -8,7 +8,7 @@ import org.jooq.Converter;
 /**
  * <h3>{@link DateConverter}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class DateConverter implements Converter<java.sql.Date, Date> {
 

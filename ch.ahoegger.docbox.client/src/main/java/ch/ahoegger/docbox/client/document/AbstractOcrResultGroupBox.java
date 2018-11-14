@@ -16,7 +16,7 @@ import ch.ahoegger.docbox.shared.document.AbstractOcrResultGroupBoxData;
 /**
  * <h3>{@link AbstractOcrResultGroupBox}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @FormData(value = AbstractOcrResultGroupBoxData.class, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE, sdkCommand = FormData.SdkCommand.CREATE)
 public class AbstractOcrResultGroupBox extends AbstractGroupBox {

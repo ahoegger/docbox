@@ -8,7 +8,7 @@ import org.jooq.Converter;
 /**
  * <h3>{@link LongConverter}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class LongConverter implements Converter<Long, BigDecimal> {
   private static final long serialVersionUID = 1L;
