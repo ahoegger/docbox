@@ -76,7 +76,7 @@ public class ToolsForm extends AbstractForm {
   }
 
   protected void updateStorable() {
-    getApplyButton().setEnabled(getLocaleField().getValue() != null);
+    getApplyButton().setEnabled(getLocaleField().getValue() != null && !ObjectUtility.equals(ClientSession.get().getLocale(), getLocaleField().getValue()));
   }
 
   protected String createHtmlBody() {
@@ -321,6 +321,7 @@ public class ToolsForm extends AbstractForm {
     @Override
     protected void execLoad() {
       getInfoField().setValue(createHtmlBody());
+      getLocaleField().setValue(ClientSession.get().getLocale());
       updateStorable();
     }
 
