@@ -43,7 +43,7 @@ import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 public class EntitySearchForm extends AbstractSearchForm {
 
   private List<BigDecimal> m_entityIds;
-  private BigDecimal m_postingGroupId;
+  private BigDecimal m_payslipAccountingGroupId;
 
   public EntitySearchForm() {
     setHandler(new SearchHandler());
@@ -60,13 +60,13 @@ public class EntitySearchForm extends AbstractSearchForm {
   }
 
   @FormData
-  public void setPostingGroupId(BigDecimal postingGroupId) {
-    m_postingGroupId = postingGroupId;
+  public void setPayslipAccountingId(BigDecimal payslipAccountingId) {
+    m_payslipAccountingGroupId = payslipAccountingId;
   }
 
   @FormData
-  public BigDecimal getPostingGroupId() {
-    return m_postingGroupId;
+  public BigDecimal getPayslipAccountingId() {
+    return m_payslipAccountingGroupId;
   }
 
   public SearchBox getSearchBox() {

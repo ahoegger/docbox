@@ -16,9 +16,10 @@ import org.ch.ahoegger.docbox.server.or.app.tables.DocumentOcr;
 import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPartner;
 import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPermission;
 import org.ch.ahoegger.docbox.server.or.app.tables.Employee;
+import org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.Entity;
 import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
-import org.ch.ahoegger.docbox.server.or.app.tables.PostingGroup;
+import org.ch.ahoegger.docbox.server.or.app.tables.PayslipAccounting;
 import org.ch.ahoegger.docbox.server.or.app.tables.PrimaryKeySeq;
 import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 
@@ -87,6 +88,11 @@ public class Tables {
     public static final Employee EMPLOYEE = org.ch.ahoegger.docbox.server.or.app.tables.Employee.EMPLOYEE;
 
     /**
+     * The table <code>APP.EMPLOYEE_TAX_GROUP</code>.
+     */
+    public static final EmployeeTaxGroup EMPLOYEE_TAX_GROUP = org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup.EMPLOYEE_TAX_GROUP;
+
+    /**
      * The table <code>APP.ENTITY</code>.
      */
     public static final Entity ENTITY = org.ch.ahoegger.docbox.server.or.app.tables.Entity.ENTITY;
@@ -97,9 +103,9 @@ public class Tables {
     public static final Partner PARTNER = org.ch.ahoegger.docbox.server.or.app.tables.Partner.PARTNER;
 
     /**
-     * The table <code>APP.POSTING_GROUP</code>.
+     * The table <code>APP.PAYSLIP_ACCOUNTING</code>.
      */
-    public static final PostingGroup POSTING_GROUP = org.ch.ahoegger.docbox.server.or.app.tables.PostingGroup.POSTING_GROUP;
+    public static final PayslipAccounting PAYSLIP_ACCOUNTING = org.ch.ahoegger.docbox.server.or.app.tables.PayslipAccounting.PAYSLIP_ACCOUNTING;
 
     /**
      * The table <code>APP.PRIMARY_KEY_SEQ</code>.

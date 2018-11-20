@@ -7,10 +7,11 @@ import java.time.LocalDate;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.junit.Test;
 
+import ch.ahoegger.docbox.server.administration.taxgroup.TaxGroupService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
-import ch.ahoegger.docbox.shared.hr.tax.ITaxGroupService;
+import ch.ahoegger.docbox.shared.administration.taxgroup.ITaxGroupService;
 import ch.ahoegger.docbox.shared.hr.tax.TaxGroupFormData;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 

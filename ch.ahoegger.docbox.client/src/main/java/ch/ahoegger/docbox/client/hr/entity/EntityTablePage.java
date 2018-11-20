@@ -23,7 +23,7 @@ import ch.ahoegger.docbox.client.AbstractDocboxPageWithTable;
 import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table;
 import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table.NewExpenseMenu;
 import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table.NewWorkMenu;
-import ch.ahoegger.docbox.shared.hr.billing.PostingGroupCodeType.UnbilledCode;
+import ch.ahoegger.docbox.shared.hr.billing.PayslipAccountingCodeType.UnbilledCode;
 import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
@@ -34,7 +34,7 @@ import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
 public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
   private BigDecimal m_partnerId;
-  private BigDecimal m_postingGroupId;
+  private BigDecimal m_payslipAccountingId;
 
   public EntityTablePage(BigDecimal partnerId) {
     m_partnerId = partnerId;
@@ -63,7 +63,7 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
   @Override
   protected void execInitSearchForm() {
     getSearchFormInternal().getPartnerIdField().setValue(m_partnerId);
-    getSearchFormInternal().setPostingGroupId(getPostingGroupId());
+    getSearchFormInternal().setPayslipAccountingId(getPayslipAccountingId());
   }
 
   @Override
@@ -79,15 +79,14 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
     return m_partnerId;
   }
 
-  public void setPostingGroupId(BigDecimal postingGroupId) {
-    m_postingGroupId = postingGroupId;
-    getTable().getMenuByClass(NewWorkMenu.class).setVisible(ObjectUtility.equals(UnbilledCode.ID, m_postingGroupId));
-    getTable().getMenuByClass(NewExpenseMenu.class).setVisible(ObjectUtility.equals(UnbilledCode.ID, m_postingGroupId));
+  public void setPayslipAccountingId(BigDecimal payslipAccountingId) {
+    m_payslipAccountingId = payslipAccountingId;
+    getTable().getMenuByClass(NewWorkMenu.class).setVisible(ObjectUtility.equals(UnbilledCode.ID, m_payslipAccountingId));
+    getTable().getMenuByClass(NewExpenseMenu.class).setVisible(ObjectUtility.equals(UnbilledCode.ID, m_payslipAccountingId));
   }
 
-  public BigDecimal getPostingGroupId() {
-
-    return m_postingGroupId;
+  public BigDecimal getPayslipAccountingId() {
+    return m_payslipAccountingId;
   }
 
   protected IDesktop getDesktop() {
@@ -160,7 +159,7 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
     public class EditMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return TEXTS.get("Edit");
+        return TEXTS.get("EditEntity");
       }
 
       @Override
@@ -170,7 +169,7 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
       @Override
       protected void execOwnerValueChanged(Object newOwnerValue) {
-        setVisible(ObjectUtility.equals(getPostingGroupId(), UnbilledCode.ID));
+        setVisible(ObjectUtility.equals(getPayslipAccountingId(), UnbilledCode.ID));
       }
 
       @Override
@@ -191,12 +190,12 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
     public class ViewEntityMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return TEXTS.get("View");
+        return TEXTS.get("ViewEntity");
       }
 
       @Override
       protected void execOwnerValueChanged(Object newOwnerValue) {
-        setVisible(ObjectUtility.notEquals(getPostingGroupId(), UnbilledCode.ID));
+        setVisible(ObjectUtility.notEquals(getPayslipAccountingId(), UnbilledCode.ID));
       }
 
       @Override
@@ -216,7 +215,7 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
     public class DeleteMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return TEXTS.get("Delete");
+        return TEXTS.get("DeleteEntity");
       }
 
       @Override
@@ -226,7 +225,7 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
       @Override
       protected void execInitAction() {
-        setVisible(ObjectUtility.equals(getPostingGroupId(), UnbilledCode.ID));
+        setVisible(ObjectUtility.equals(getPayslipAccountingId(), UnbilledCode.ID));
       }
 
       @Override

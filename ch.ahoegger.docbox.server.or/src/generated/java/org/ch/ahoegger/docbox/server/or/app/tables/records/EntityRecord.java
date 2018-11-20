@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EntityRecord extends UpdatableRecordImpl<EntityRecord> implements Record8<BigDecimal, BigDecimal, BigDecimal, BigDecimal, Date, BigDecimal, BigDecimal, String> {
 
-    private static final long serialVersionUID = -883692458;
+    private static final long serialVersionUID = 2142834318;
 
     /**
      * Setter for <code>APP.ENTITY.ENTITY_NR</code>.
@@ -61,16 +61,16 @@ public class EntityRecord extends UpdatableRecordImpl<EntityRecord> implements R
     }
 
     /**
-     * Setter for <code>APP.ENTITY.POSTING_GROUP_NR</code>.
+     * Setter for <code>APP.ENTITY.PAYSLIP_ACCOUNTING_NR</code>.
      */
-    public void setPostingGroupNr(BigDecimal value) {
+    public void setPayslipAccountingNr(BigDecimal value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>APP.ENTITY.POSTING_GROUP_NR</code>.
+     * Getter for <code>APP.ENTITY.PAYSLIP_ACCOUNTING_NR</code>.
      */
-    public BigDecimal getPostingGroupNr() {
+    public BigDecimal getPayslipAccountingNr() {
         return (BigDecimal) get(2);
     }
 
@@ -197,7 +197,7 @@ public class EntityRecord extends UpdatableRecordImpl<EntityRecord> implements R
      */
     @Override
     public Field<BigDecimal> field3() {
-        return Entity.ENTITY.POSTING_GROUP_NR;
+        return Entity.ENTITY.PAYSLIP_ACCOUNTING_NR;
     }
 
     /**
@@ -261,7 +261,7 @@ public class EntityRecord extends UpdatableRecordImpl<EntityRecord> implements R
      */
     @Override
     public BigDecimal value3() {
-        return getPostingGroupNr();
+        return getPayslipAccountingNr();
     }
 
     /**
@@ -327,7 +327,7 @@ public class EntityRecord extends UpdatableRecordImpl<EntityRecord> implements R
      */
     @Override
     public EntityRecord value3(BigDecimal value) {
-        setPostingGroupNr(value);
+        setPayslipAccountingNr(value);
         return this;
     }
 
@@ -406,12 +406,12 @@ public class EntityRecord extends UpdatableRecordImpl<EntityRecord> implements R
     /**
      * Create a detached, initialised EntityRecord
      */
-    public EntityRecord(BigDecimal entityNr, BigDecimal partnerNr, BigDecimal postingGroupNr, BigDecimal entityType, Date entityDate, BigDecimal workingHours, BigDecimal expenseAmount, String description) {
+    public EntityRecord(BigDecimal entityNr, BigDecimal partnerNr, BigDecimal payslipAccountingNr, BigDecimal entityType, Date entityDate, BigDecimal workingHours, BigDecimal expenseAmount, String description) {
         super(Entity.ENTITY);
 
         set(0, entityNr);
         set(1, partnerNr);
-        set(2, postingGroupNr);
+        set(2, payslipAccountingNr);
         set(3, entityType);
         set(4, entityDate);
         set(5, workingHours);

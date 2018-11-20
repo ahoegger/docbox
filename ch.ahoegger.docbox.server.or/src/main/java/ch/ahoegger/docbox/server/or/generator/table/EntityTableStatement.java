@@ -26,7 +26,7 @@ public class EntityTableStatement implements ITableStatement, IEntityTable {
     statementBuilder.append("CREATE TABLE ").append(TABLE_NAME).append(" (");
     statementBuilder.append(ENTITY_NR).append(" BIGINT NOT NULL, ");
     statementBuilder.append(PARTNER_NR).append(" BIGINT NOT NULL, ");
-    statementBuilder.append(POSTING_GROUP_NR).append(" BIGINT, ");
+    statementBuilder.append(PAYSLIP_ACCOUNTING_NR).append(" BIGINT, ");
     statementBuilder.append(ENTITY_TYPE).append(" BIGINT NOT NULL, ");
     statementBuilder.append(ENTITY_DATE).append(" DATE, ");
     statementBuilder.append(WORKING_HOURS).append(" DECIMAL(4, 2), ");

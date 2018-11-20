@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DocumentCategory extends TableImpl<DocumentCategoryRecord> {
 
-    private static final long serialVersionUID = -1210984050;
+    private static final long serialVersionUID = 488494048;
 
     /**
      * The reference instance of <code>APP.DOCUMENT_CATEGORY</code>
@@ -96,7 +96,7 @@ public class DocumentCategory extends TableImpl<DocumentCategoryRecord> {
      */
     @Override
     public UniqueKey<DocumentCategoryRecord> getPrimaryKey() {
-        return Keys.SQL171103130309050;
+        return Keys.SQL181120214302000;
     }
 
     /**
@@ -104,7 +104,7 @@ public class DocumentCategory extends TableImpl<DocumentCategoryRecord> {
      */
     @Override
     public List<UniqueKey<DocumentCategoryRecord>> getKeys() {
-        return Arrays.<UniqueKey<DocumentCategoryRecord>>asList(Keys.SQL171103130309050);
+        return Arrays.<UniqueKey<DocumentCategoryRecord>>asList(Keys.SQL181120214302000);
     }
 
     /**

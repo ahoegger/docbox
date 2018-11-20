@@ -37,7 +37,7 @@ public class EntityForm extends AbstractForm {
   private BigDecimal m_entityId;
   private BigDecimal m_entityType;
   private BigDecimal m_partnerId;
-  private BigDecimal m_postingGroupId;
+  private BigDecimal m_payslipAccountingGroupId;
 
   public EntityForm(BigDecimal partnerId) {
     m_partnerId = partnerId;
@@ -79,13 +79,13 @@ public class EntityForm extends AbstractForm {
   }
 
   @FormData
-  public void setPostingGroupId(BigDecimal postingGroupId) {
-    m_postingGroupId = postingGroupId;
+  public void setPayslipAccountingId(BigDecimal payslipAccountingGroupId) {
+    m_payslipAccountingGroupId = payslipAccountingGroupId;
   }
 
   @FormData
-  public BigDecimal getPostingGroupId() {
-    return m_postingGroupId;
+  public BigDecimal getPayslipAccountingId() {
+    return m_payslipAccountingGroupId;
   }
 
   protected boolean isWork() {

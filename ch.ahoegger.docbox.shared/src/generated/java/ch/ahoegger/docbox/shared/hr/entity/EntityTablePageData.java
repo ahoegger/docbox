@@ -56,7 +56,7 @@ public class EntityTablePageData extends AbstractTablePageData {
     private static final long serialVersionUID = 1L;
     public static final String enityId = "enityId";
     public static final String partnerId = "partnerId";
-    public static final String postingGroupId = "postingGroupId";
+    public static final String payslipAccountingId = "payslipAccountingId";
     public static final String date = "date";
     public static final String entityType = "entityType";
     public static final String hours = "hours";
@@ -64,7 +64,7 @@ public class EntityTablePageData extends AbstractTablePageData {
     public static final String text = "text";
     private BigDecimal m_enityId;
     private BigDecimal m_partnerId;
-    private BigDecimal m_postingGroupId;
+    private BigDecimal m_payslipAccountingId;
     private Date m_date;
     private BigDecimal m_entityType;
     private BigDecimal m_hours;
@@ -87,12 +87,12 @@ public class EntityTablePageData extends AbstractTablePageData {
       m_partnerId = newPartnerId;
     }
 
-    public BigDecimal getPostingGroupId() {
-      return m_postingGroupId;
+    public BigDecimal getPayslipAccountingId() {
+      return m_payslipAccountingId;
     }
 
-    public void setPostingGroupId(BigDecimal newPostingGroupId) {
-      m_postingGroupId = newPostingGroupId;
+    public void setPayslipAccountingId(BigDecimal newPayslipAccountingId) {
+      m_payslipAccountingId = newPayslipAccountingId;
     }
 
     public Date getDate() {

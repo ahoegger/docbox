@@ -81,21 +81,21 @@ public class EntityFormData extends AbstractFormData {
   }
 
   /**
-   * access method for property PostingGroupId.
+   * access method for property PayslipAccountingId.
    */
-  public BigDecimal getPostingGroupId() {
-    return getPostingGroupIdProperty().getValue();
+  public BigDecimal getPayslipAccountingId() {
+    return getPayslipAccountingIdProperty().getValue();
   }
 
   /**
-   * access method for property PostingGroupId.
+   * access method for property PayslipAccountingId.
    */
-  public void setPostingGroupId(BigDecimal postingGroupId) {
-    getPostingGroupIdProperty().setValue(postingGroupId);
+  public void setPayslipAccountingId(BigDecimal payslipAccountingId) {
+    getPayslipAccountingIdProperty().setValue(payslipAccountingId);
   }
 
-  public PostingGroupIdProperty getPostingGroupIdProperty() {
-    return getPropertyByClass(PostingGroupIdProperty.class);
+  public PayslipAccountingIdProperty getPayslipAccountingIdProperty() {
+    return getPropertyByClass(PayslipAccountingIdProperty.class);
   }
 
   public Text getText() {
@@ -131,7 +131,7 @@ public class EntityFormData extends AbstractFormData {
     private static final long serialVersionUID = 1L;
   }
 
-  public static class PostingGroupIdProperty extends AbstractPropertyData<BigDecimal> {
+  public static class PayslipAccountingIdProperty extends AbstractPropertyData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

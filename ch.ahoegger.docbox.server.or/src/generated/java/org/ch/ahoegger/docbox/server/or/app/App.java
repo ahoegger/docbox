@@ -21,9 +21,10 @@ import org.ch.ahoegger.docbox.server.or.app.tables.DocumentOcr;
 import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPartner;
 import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPermission;
 import org.ch.ahoegger.docbox.server.or.app.tables.Employee;
+import org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.Entity;
 import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
-import org.ch.ahoegger.docbox.server.or.app.tables.PostingGroup;
+import org.ch.ahoegger.docbox.server.or.app.tables.PayslipAccounting;
 import org.ch.ahoegger.docbox.server.or.app.tables.PrimaryKeySeq;
 import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 import org.jooq.Catalog;
@@ -44,7 +45,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class App extends SchemaImpl {
 
-    private static final long serialVersionUID = 772193177;
+    private static final long serialVersionUID = 824501593;
 
     /**
      * The reference instance of <code>APP</code>
@@ -102,6 +103,11 @@ public class App extends SchemaImpl {
     public final Employee EMPLOYEE = org.ch.ahoegger.docbox.server.or.app.tables.Employee.EMPLOYEE;
 
     /**
+     * The table <code>APP.EMPLOYEE_TAX_GROUP</code>.
+     */
+    public final EmployeeTaxGroup EMPLOYEE_TAX_GROUP = org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup.EMPLOYEE_TAX_GROUP;
+
+    /**
      * The table <code>APP.ENTITY</code>.
      */
     public final Entity ENTITY = org.ch.ahoegger.docbox.server.or.app.tables.Entity.ENTITY;
@@ -112,9 +118,9 @@ public class App extends SchemaImpl {
     public final Partner PARTNER = org.ch.ahoegger.docbox.server.or.app.tables.Partner.PARTNER;
 
     /**
-     * The table <code>APP.POSTING_GROUP</code>.
+     * The table <code>APP.PAYSLIP_ACCOUNTING</code>.
      */
-    public final PostingGroup POSTING_GROUP = org.ch.ahoegger.docbox.server.or.app.tables.PostingGroup.POSTING_GROUP;
+    public final PayslipAccounting PAYSLIP_ACCOUNTING = org.ch.ahoegger.docbox.server.or.app.tables.PayslipAccounting.PAYSLIP_ACCOUNTING;
 
     /**
      * The table <code>APP.PRIMARY_KEY_SEQ</code>.
@@ -161,9 +167,10 @@ public class App extends SchemaImpl {
             DocumentPartner.DOCUMENT_PARTNER,
             DocumentPermission.DOCUMENT_PERMISSION,
             Employee.EMPLOYEE,
+            EmployeeTaxGroup.EMPLOYEE_TAX_GROUP,
             Entity.ENTITY,
             Partner.PARTNER,
-            PostingGroup.POSTING_GROUP,
+            PayslipAccounting.PAYSLIP_ACCOUNTING,
             PrimaryKeySeq.PRIMARY_KEY_SEQ,
             TaxGroup.TAX_GROUP);
     }

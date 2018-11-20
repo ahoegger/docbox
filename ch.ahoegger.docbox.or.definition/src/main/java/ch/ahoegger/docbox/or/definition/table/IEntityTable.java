@@ -15,7 +15,7 @@ public interface IEntityTable {
 
   public static String PARTNER_NR = IPartnerTable.PARTNER_NR;
 
-  public static String POSTING_GROUP_NR = IPostingGroupTable.POSTING_GROUP_NR;
+  public static String PAYSLIP_ACCOUNTING_NR = IPayslipAccountingTable.PAYSLIP_ACCOUNTING_NR;
 
   public static String ENTITY_TYPE = "ENTITY_TYPE";
 
