@@ -13,13 +13,13 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 
+import ch.ahoegger.docbox.client.hr.AbstractAddressBox;
 import ch.ahoegger.docbox.client.hr.employer.EmployerForm.MainBox.AddressBox;
 import ch.ahoegger.docbox.client.hr.employer.EmployerForm.MainBox.CancelButton;
 import ch.ahoegger.docbox.client.hr.employer.EmployerForm.MainBox.EmailField;
 import ch.ahoegger.docbox.client.hr.employer.EmployerForm.MainBox.NameField;
 import ch.ahoegger.docbox.client.hr.employer.EmployerForm.MainBox.OkButton;
 import ch.ahoegger.docbox.client.hr.employer.EmployerForm.MainBox.PhoneField;
-import ch.ahoegger.docbox.client.util.AbstractAddressBox;
 import ch.ahoegger.docbox.or.definition.table.IEmployerTable;
 import ch.ahoegger.docbox.shared.hr.employer.EmployerFormData;
 import ch.ahoegger.docbox.shared.hr.employer.IEmployerService;

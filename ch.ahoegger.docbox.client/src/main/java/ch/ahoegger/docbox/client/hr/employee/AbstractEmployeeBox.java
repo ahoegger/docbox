@@ -1,15 +1,20 @@
 package ch.ahoegger.docbox.client.hr.employee;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 
-import ch.ahoegger.docbox.client.util.AbstractAddressBox;
+import ch.ahoegger.docbox.client.hr.AbstractAddressBox;
 import ch.ahoegger.docbox.or.definition.table.IEmployeeTable;
 import ch.ahoegger.docbox.shared.hr.employee.AbstractEmployeeBoxData;
+import ch.ahoegger.docbox.shared.hr.tax.TaxCodeType;
 
 /**
  * <h3>{@link AbstractEmployeeBox}</h3>
@@ -43,6 +48,10 @@ public abstract class AbstractEmployeeBox extends AbstractGroupBox {
 
   public AddressBox getAddressBox() {
     return getFieldByClass(AddressBox.class);
+  }
+
+  public TaxTypeField getTaxTypeField() {
+    return getFieldByClass(TaxTypeField.class);
   }
 
   public LastNameField getLastNameField() {
@@ -112,6 +121,19 @@ public abstract class AbstractEmployeeBox extends AbstractGroupBox {
     @Override
     protected int getConfiguredMaxLength() {
       return IEmployeeTable.ACCOUNT_NUMBER_LENGTH;
+    }
+  }
+
+  @Order(10500)
+  public class TaxTypeField extends AbstractSmartField<BigDecimal> {
+    @Override
+    protected String getConfiguredLabel() {
+      return TEXTS.get("TaxType");
+    }
+
+    @Override
+    protected Class<? extends ICodeType<?, BigDecimal>> getConfiguredCodeType() {
+      return TaxCodeType.class;
     }
   }
 

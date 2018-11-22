@@ -27,6 +27,7 @@ import ch.ahoegger.docbox.shared.hr.billing.PayslipSearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.WorkCode;
+import ch.ahoegger.docbox.shared.hr.tax.TaxCodeType.SourceTax;
 import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
@@ -53,10 +54,8 @@ public class PayslipServiceTest extends AbstractTestWithDatabase {
     BEANS.get(PartnerService.class).insert(connection, partnerId, "employee01", "desc01", docCaptureDate, null);
     BigDecimal addressId = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
     BEANS.get(AddressService.class).insert(new AddressFormData().withAddressNr(addressId).withLine1("Nashvill Street 12a").withPlz("CA-90051").withCity("Santa Barbara"));
-    BEANS.get(EmployeeService.class).insert(connection, partnerId, "Homer", "Simpson", addressId, "ahv123564789", "iban987654321", LocalDateUtility.toDate(LocalDate.of(1993, 02, 15)),
-        BigDecimal.valueOf(26.30),
-        BigDecimal.valueOf(6.225), BigDecimal.valueOf(5.0), BigDecimal.valueOf(8.33),
-        EMPLOYER_ID);
+    BEANS.get(EmployeeService.class).insert(connection, partnerId, "Homer", "Simpson", addressId, "ahv123564789", "iban987654321", SourceTax.ID,
+        LocalDateUtility.toDate(LocalDate.of(1993, 02, 15)), BigDecimal.valueOf(26.30), BigDecimal.valueOf(6.225), BigDecimal.valueOf(5.0), BigDecimal.valueOf(8.33), EMPLOYER_ID);
 
     BEANS.get(DocumentService.class).insert(connection, documentId, "Abstract", docCaptureDate, LocalDateUtility.toDate(LocalDate.now().minusDays(4)), null, documentPath, null, null, true, OcrLanguageCodeType.GermanCode.ID);
 

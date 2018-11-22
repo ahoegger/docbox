@@ -19,6 +19,7 @@ import ch.ahoegger.docbox.server.test.util.IdGenerateService;
 import ch.ahoegger.docbox.shared.hr.employee.EmployeeFormData;
 import ch.ahoegger.docbox.shared.hr.employee.EmployeeFormData.PartnerGroupBox;
 import ch.ahoegger.docbox.shared.hr.employee.IEmployeeService;
+import ch.ahoegger.docbox.shared.hr.tax.TaxCodeType.SourceTax;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 public class EmployeeServiceTest extends AbstractTestWithDatabase {
@@ -39,7 +40,7 @@ public class EmployeeServiceTest extends AbstractTestWithDatabase {
     BEANS.get(AddressService.class).insert(new AddressFormData().withAddressNr(addressId).withLine1("Nashvill Street 12a").withPlz("CA-90051").withCity("Santa Barbara"));
 
     BEANS.get(EmployeeService.class).insert(connection, partnerId02_employee, "Homer", "Simpson", addressId, "ahv123564789", "iban987654321",
-        LocalDateUtility.toDate(LocalDate.of(1972, 12, 31)), BigDecimal.valueOf(26.30),
+        SourceTax.ID, LocalDateUtility.toDate(LocalDate.of(1972, 12, 31)), BigDecimal.valueOf(26.30),
         BigDecimal.valueOf(6.225), BigDecimal.valueOf(5.0), BigDecimal.valueOf(8.33),
         EMPLOYER_ID);
   }

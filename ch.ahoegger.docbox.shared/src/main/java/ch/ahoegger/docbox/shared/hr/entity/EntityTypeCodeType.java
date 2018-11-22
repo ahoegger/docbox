@@ -8,6 +8,8 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 
+import ch.ahoegger.docbox.shared.IHolyIds;
+
 /**
  * <h3>{@link EntityTypeCodeType}</h3>
  *
@@ -16,7 +18,7 @@ import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 public class EntityTypeCodeType extends AbstractCodeType<BigDecimal, BigDecimal> {
 
   private static final long serialVersionUID = 1L;
-  public static final BigDecimal ID = BigDecimal.valueOf(100L);
+  public static final BigDecimal ID = BigDecimal.valueOf(IHolyIds.ENTITY_CODE_TXPE_ID);
 
   @Override
   protected String getConfiguredText() {

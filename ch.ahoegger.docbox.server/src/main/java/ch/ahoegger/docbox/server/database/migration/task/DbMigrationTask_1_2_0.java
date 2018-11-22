@@ -17,6 +17,7 @@ import ch.ahoegger.docbox.or.definition.table.IEmployeeTable;
 import ch.ahoegger.docbox.or.definition.table.IEmployerTable;
 import ch.ahoegger.docbox.or.definition.table.IMigrationTable;
 import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
+import ch.ahoegger.docbox.or.definition.table.IStatementTable;
 import ch.ahoegger.docbox.server.database.migration.ITableDescription;
 import ch.ahoegger.docbox.server.database.migration.MigrationService;
 import ch.ahoegger.docbox.server.database.migration.MigrationUtility;
@@ -24,6 +25,8 @@ import ch.ahoegger.docbox.server.hr.AddressFormData;
 import ch.ahoegger.docbox.server.or.generator.table.AddressTableStatement;
 import ch.ahoegger.docbox.server.or.generator.table.EmployerTableStatement;
 import ch.ahoegger.docbox.server.or.generator.table.MigrationTableStatement;
+import ch.ahoegger.docbox.server.or.generator.table.StatementTableStatement;
+import ch.ahoegger.docbox.shared.hr.tax.TaxCodeType.SourceTax;
 
 /**
  * <h3>{@link DbMigrationTask_1_2_0}</h3>
@@ -45,6 +48,7 @@ public class DbMigrationTask_1_2_0 extends AbstractDbMigrationTask {
     migratePayslipTable();
     createAddressTable();
     createEmployerTable();
+    createStatementTable();
     migrateEmloyeeTable();
     BEANS.get(MigrationService.class).insert(TARGET_VERSION);
   }
@@ -82,6 +86,14 @@ public class DbMigrationTask_1_2_0 extends AbstractDbMigrationTask {
     }
   }
 
+  protected void createStatementTable() {
+    ITableDescription tableDesc = MigrationUtility.getTableDesription(IStatementTable.TABLE_NAME);
+    if (tableDesc == null) {
+      // create
+      SQL.update(BEANS.get(StatementTableStatement.class).getCreateTable());
+    }
+  }
+
   protected void migrateEmloyeeTable() {
     ITableDescription tableDesc = MigrationUtility.getTableDesription(IEmployeeTable.TABLE_NAME);
     if (!tableDesc.hasColumn(IEmployeeTable.ADDRESS_NR)) {
@@ -89,6 +101,9 @@ public class DbMigrationTask_1_2_0 extends AbstractDbMigrationTask {
     }
     if (!tableDesc.hasColumn(IEmployeeTable.EMPLOYER_NR)) {
       SQL.update("ALTER TABLE EMPLOYEE ADD " + IEmployeeTable.EMPLOYER_NR + " BIGINT DEFAULT -1 NOT NULL");
+    }
+    if (!tableDesc.hasColumn(IEmployeeTable.TAX_TYPE)) {
+      SQL.update("ALTER TABLE EMPLOYEE ADD " + IEmployeeTable.TAX_TYPE + " BIGINT DEFAULT :{taxType} NOT NULL", new NVPair("taxType", SourceTax.ID));
     }
     _extractEmployeeAddresses();
     _extractEmployer();

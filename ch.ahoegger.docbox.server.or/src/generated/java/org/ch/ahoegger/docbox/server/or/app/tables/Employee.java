@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Employee extends TableImpl<EmployeeRecord> {
 
-    private static final long serialVersionUID = -27536897;
+    private static final long serialVersionUID = 979620162;
 
     /**
      * The reference instance of <code>APP.EMPLOYEE</code>
@@ -92,6 +92,11 @@ public class Employee extends TableImpl<EmployeeRecord> {
      * The column <code>APP.EMPLOYEE.ACCOUNT_NUMBER</code>.
      */
     public final TableField<EmployeeRecord, String> ACCOUNT_NUMBER = createField("ACCOUNT_NUMBER", org.jooq.impl.SQLDataType.VARCHAR.length(128), this, "");
+
+    /**
+     * The column <code>APP.EMPLOYEE.TAX_TYPE</code>.
+     */
+    public final TableField<EmployeeRecord, BigDecimal> TAX_TYPE = createField("TAX_TYPE", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
      * The column <code>APP.EMPLOYEE.HOURLY_WAGE</code>.
@@ -148,7 +153,7 @@ public class Employee extends TableImpl<EmployeeRecord> {
      */
     @Override
     public UniqueKey<EmployeeRecord> getPrimaryKey() {
-        return Keys.SQL181121195936810;
+        return Keys.SQL181122110600380;
     }
 
     /**
@@ -156,7 +161,7 @@ public class Employee extends TableImpl<EmployeeRecord> {
      */
     @Override
     public List<UniqueKey<EmployeeRecord>> getKeys() {
-        return Arrays.<UniqueKey<EmployeeRecord>>asList(Keys.SQL181121195936810);
+        return Arrays.<UniqueKey<EmployeeRecord>>asList(Keys.SQL181122110600380);
     }
 
     /**

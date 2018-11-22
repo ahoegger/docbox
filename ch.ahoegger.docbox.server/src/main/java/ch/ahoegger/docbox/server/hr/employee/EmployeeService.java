@@ -82,7 +82,7 @@ public class EmployeeService implements IEmployeeService {
     }
 
     SelectConditionStep<Record> statement = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(emp.PARTNER_NR, emp.FIRST_NAME, emp.LAST_NAME, employeeAddress.LINE_1, employeeAddress.LINE_2, employeeAddress.PLZ, employeeAddress.CITY, emp.AHV_NUMBER, emp.ACCOUNT_NUMBER, emp.BIRTHDAY, emp.HOURLY_WAGE)
+        .select(emp.PARTNER_NR, emp.FIRST_NAME, emp.LAST_NAME, employeeAddress.LINE_1, employeeAddress.LINE_2, employeeAddress.PLZ, employeeAddress.CITY, emp.AHV_NUMBER, emp.ACCOUNT_NUMBER, emp.TAX_TYPE, emp.BIRTHDAY, emp.HOURLY_WAGE)
         .select(ptr.NAME, ptr.START_DATE, ptr.END_DATE)
         .from(emp)
         .leftOuterJoin(ptr)
@@ -103,6 +103,7 @@ public class EmployeeService implements IEmployeeService {
           row.setCity(employeeAddress.CITY.get(rec));
           row.setAHVNumber(emp.AHV_NUMBER.get(rec));
           row.setAccountNumber(emp.ACCOUNT_NUMBER.get(rec));
+          row.setTaxType(emp.TAX_TYPE.get(rec));
           row.setBirthday(emp.BIRTHDAY.get(rec));
           row.setHourlyWage(emp.HOURLY_WAGE.get(rec));
           row.setDisplayName(ptr.NAME.get(rec));
@@ -217,11 +218,11 @@ public class EmployeeService implements IEmployeeService {
   }
 
   @RemoteServiceAccessDenied
-  public int insert(Connection connection, BigDecimal partnerId, String firstName, String lastName, BigDecimal addressId, String ahvNumber, String accountNumber, Date birthday, BigDecimal hourlyWage,
+  public int insert(Connection connection, BigDecimal partnerId, String firstName, String lastName, BigDecimal addressId, String ahvNumber, String accountNumber, BigDecimal taxType, Date birthday, BigDecimal hourlyWage,
       BigDecimal socialInsuranceRate, BigDecimal sourceTaxRate, BigDecimal vacationExtraRate,
       BigDecimal employerId) {
     return DSL.using(connection, SQLDialect.DERBY)
-        .executeInsert(toRecord(partnerId, firstName, lastName, addressId, ahvNumber, accountNumber, birthday, hourlyWage, socialInsuranceRate, sourceTaxRate, vacationExtraRate, employerId));
+        .executeInsert(toRecord(partnerId, firstName, lastName, addressId, ahvNumber, accountNumber, taxType, birthday, hourlyWage, socialInsuranceRate, sourceTaxRate, vacationExtraRate, employerId));
 
   }
 
@@ -233,6 +234,7 @@ public class EmployeeService implements IEmployeeService {
     fd.getEmployeeBox().getAddressBox().setAddressId(rec.getAddressNr());
     fd.getEmployeeBox().getAhvNumber().setValue(rec.getAhvNumber());
     fd.getEmployeeBox().getAccountNumber().setValue(rec.getAccountNumber());
+    fd.getEmployeeBox().getTaxType().setValue(rec.getTaxType());
     fd.getEmployeeBox().getBirthday().setValue(rec.getBirthday());
     fd.getEmploymentBox().getHourlyWage().setValue(rec.getHourlyWage());
     fd.getEmploymentBox().getSocialInsuranceRate().setValue(rec.getSocialInsuranceRate());
@@ -243,18 +245,19 @@ public class EmployeeService implements IEmployeeService {
 
   protected EmployeeRecord toRecord(EmployeeFormData fd) {
     return toRecord(fd.getPartnerId(), fd.getEmployeeBox().getFirstName().getValue(), fd.getEmployeeBox().getLastName().getValue(), fd.getEmployeeBox().getAddressBox().getAddressId(),
-        fd.getEmployeeBox().getAhvNumber().getValue(), fd.getEmployeeBox().getAccountNumber().getValue(), fd.getEmployeeBox().getBirthday().getValue(), fd.getEmploymentBox().getHourlyWage().getValue(),
+        fd.getEmployeeBox().getAhvNumber().getValue(), fd.getEmployeeBox().getAccountNumber().getValue(), fd.getEmployeeBox().getTaxType().getValue(), fd.getEmployeeBox().getBirthday().getValue(),
+        fd.getEmploymentBox().getHourlyWage().getValue(),
         fd.getEmploymentBox().getSocialInsuranceRate().getValue(), fd.getEmploymentBox().getSourceTaxRate().getValue(), fd.getEmploymentBox().getVacationExtraRate().getValue(),
         fd.getEmployer().getValue());
   }
 
-  protected EmployeeRecord toRecord(BigDecimal partnerId, String firstName, String lastName, BigDecimal addressId, String ahvNumber, String accountNumber, Date birthday, BigDecimal hourlyWage,
+  protected EmployeeRecord toRecord(BigDecimal partnerId, String firstName, String lastName, BigDecimal addressId, String ahvNumber, String accountNumber, BigDecimal taxType, Date birthday, BigDecimal hourlyWage,
       BigDecimal socialInsuranceRate, BigDecimal sourceTaxRate, BigDecimal vacationExtraRate,
       BigDecimal employerId) {
-    return mapToRecord(new EmployeeRecord(), partnerId, firstName, lastName, addressId, ahvNumber, accountNumber, birthday, hourlyWage, socialInsuranceRate, sourceTaxRate, vacationExtraRate, employerId);
+    return mapToRecord(new EmployeeRecord(), partnerId, firstName, lastName, addressId, ahvNumber, accountNumber, taxType, birthday, hourlyWage, socialInsuranceRate, sourceTaxRate, vacationExtraRate, employerId);
   }
 
-  protected EmployeeRecord mapToRecord(EmployeeRecord rec, BigDecimal partnerId, String firstName, String lastName, BigDecimal addressId, String ahvNumber, String accountNumber, Date birthday, BigDecimal hourlyWage,
+  protected EmployeeRecord mapToRecord(EmployeeRecord rec, BigDecimal partnerId, String firstName, String lastName, BigDecimal addressId, String ahvNumber, String accountNumber, BigDecimal taxType, Date birthday, BigDecimal hourlyWage,
       BigDecimal socialInsuranceRate, BigDecimal sourceTaxRate, BigDecimal vacationExtraRate,
       BigDecimal employerId) {
     Employee t = Employee.EMPLOYEE;
@@ -263,6 +266,7 @@ public class EmployeeService implements IEmployeeService {
         .with(t.ACCOUNT_NUMBER, accountNumber)
         .with(t.ADDRESS_NR, addressId)
         .with(t.AHV_NUMBER, ahvNumber)
+        .with(t.TAX_TYPE, taxType)
         .with(t.BIRTHDAY, birthday)
         .with(t.FIRST_NAME, firstName)
         .with(t.HOURLY_WAGE, hourlyWage)

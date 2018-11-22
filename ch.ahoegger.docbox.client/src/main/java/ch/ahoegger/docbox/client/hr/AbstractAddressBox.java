@@ -1,4 +1,4 @@
-package ch.ahoegger.docbox.client.util;
+package ch.ahoegger.docbox.client.hr;
 
 import java.math.BigDecimal;
 

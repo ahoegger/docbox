@@ -11,6 +11,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -19,12 +20,14 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 import ch.ahoegger.docbox.or.definition.table.IEmployeeTable;
 import ch.ahoegger.docbox.shared.hr.employee.EmployeeSearchFormData;
 import ch.ahoegger.docbox.shared.hr.employee.EmployeeTableData;
 import ch.ahoegger.docbox.shared.hr.employee.IEmployeeService;
+import ch.ahoegger.docbox.shared.hr.tax.TaxCodeType;
 
 /**
  * <h3>{@link EmployeeTablePage}</h3>
@@ -113,6 +116,10 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
 
     public CityColumn getCityColumn() {
       return getColumnSet().getColumnByClass(CityColumn.class);
+    }
+
+    public TaxTypeColumn getTaxTypeColumn() {
+      return getColumnSet().getColumnByClass(TaxTypeColumn.class);
     }
 
     public PartnerIdColumn getPartnerIdColumn() {
@@ -263,6 +270,24 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       @Override
       protected int getConfiguredWidth() {
         return 180;
+      }
+    }
+
+    @Order(850)
+    public class TaxTypeColumn extends AbstractSmartColumn<BigDecimal> {
+      @Override
+      protected String getConfiguredHeaderText() {
+        return TEXTS.get("TaxType");
+      }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 120;
+      }
+
+      @Override
+      protected Class<? extends ICodeType<?, BigDecimal>> getConfiguredCodeType() {
+        return TaxCodeType.class;
       }
     }
 

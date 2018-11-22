@@ -64,6 +64,7 @@ public class EmployeeTableData extends AbstractTablePageData {
     public static final String city = "city";
     public static final String aHVNumber = "aHVNumber";
     public static final String accountNumber = "accountNumber";
+    public static final String taxType = "taxType";
     public static final String birthday = "birthday";
     public static final String hourlyWage = "hourlyWage";
     public static final String startDate = "startDate";
@@ -78,6 +79,7 @@ public class EmployeeTableData extends AbstractTablePageData {
     private String m_city;
     private String m_aHVNumber;
     private String m_accountNumber;
+    private BigDecimal m_taxType;
     private Date m_birthday;
     private BigDecimal m_hourlyWage;
     private Date m_startDate;
@@ -161,6 +163,14 @@ public class EmployeeTableData extends AbstractTablePageData {
 
     public void setAccountNumber(String newAccountNumber) {
       m_accountNumber = newAccountNumber;
+    }
+
+    public BigDecimal getTaxType() {
+      return m_taxType;
+    }
+
+    public void setTaxType(BigDecimal newTaxType) {
+      m_taxType = newTaxType;
     }
 
     public Date getBirthday() {

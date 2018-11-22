@@ -66,6 +66,7 @@ import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
 import ch.ahoegger.docbox.shared.hr.billing.PayslipCodeType.UnbilledCode;
 import ch.ahoegger.docbox.shared.hr.employer.EmployerFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType;
+import ch.ahoegger.docbox.shared.hr.tax.TaxCodeType.SourceTax;
 import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
@@ -327,7 +328,7 @@ public class DevDataProvider extends DataBaseInitialization {
     BEANS.get(AddressService.class).insert(new AddressFormData().withAddressNr(addressId).withLine1("Mountainview 01 e").withPlz("CA-90501").withCity("Santa Barbara e"));
 
     BEANS.get(EmployeeService.class).insert(sqlService.getConnection(), partnerId03_employee, "Hans", "Muster", addressId, "12.2568.2154.69", "PC 50-101-89-7",
-        LocalDateUtility.toDate(LocalDate.of(1968, 10, 02)), BigDecimal.valueOf(26.50),
+        SourceTax.ID, LocalDateUtility.toDate(LocalDate.of(1968, 10, 02)), BigDecimal.valueOf(26.50),
         BigDecimal.valueOf(6.225), BigDecimal.valueOf(5.0), BigDecimal.valueOf(8.33),
         employerId);
   }

@@ -29,6 +29,7 @@ import org.ch.ahoegger.docbox.server.or.app.tables.Migration;
 import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
 import org.ch.ahoegger.docbox.server.or.app.tables.Payslip;
 import org.ch.ahoegger.docbox.server.or.app.tables.PrimaryKeySeq;
+import org.ch.ahoegger.docbox.server.or.app.tables.Statement;
 import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 import org.jooq.Catalog;
 import org.jooq.Table;
@@ -48,7 +49,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class App extends SchemaImpl {
 
-    private static final long serialVersionUID = 1506068715;
+    private static final long serialVersionUID = 726934485;
 
     /**
      * The reference instance of <code>APP</code>
@@ -146,6 +147,11 @@ public class App extends SchemaImpl {
     public final PrimaryKeySeq PRIMARY_KEY_SEQ = org.ch.ahoegger.docbox.server.or.app.tables.PrimaryKeySeq.PRIMARY_KEY_SEQ;
 
     /**
+     * The table <code>APP.STATEMENT</code>.
+     */
+    public final Statement STATEMENT = org.ch.ahoegger.docbox.server.or.app.tables.Statement.STATEMENT;
+
+    /**
      * The table <code>APP.TAX_GROUP</code>.
      */
     public final TaxGroup TAX_GROUP = org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup.TAX_GROUP;
@@ -193,6 +199,7 @@ public class App extends SchemaImpl {
             Partner.PARTNER,
             Payslip.PAYSLIP,
             PrimaryKeySeq.PRIMARY_KEY_SEQ,
+            Statement.STATEMENT,
             TaxGroup.TAX_GROUP);
     }
 }

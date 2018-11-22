@@ -24,6 +24,7 @@ import org.ch.ahoegger.docbox.server.or.app.tables.Migration;
 import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
 import org.ch.ahoegger.docbox.server.or.app.tables.Payslip;
 import org.ch.ahoegger.docbox.server.or.app.tables.PrimaryKeySeq;
+import org.ch.ahoegger.docbox.server.or.app.tables.Statement;
 import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 
 
@@ -129,6 +130,11 @@ public class Tables {
      * The table <code>APP.PRIMARY_KEY_SEQ</code>.
      */
     public static final PrimaryKeySeq PRIMARY_KEY_SEQ = org.ch.ahoegger.docbox.server.or.app.tables.PrimaryKeySeq.PRIMARY_KEY_SEQ;
+
+    /**
+     * The table <code>APP.STATEMENT</code>.
+     */
+    public static final Statement STATEMENT = org.ch.ahoegger.docbox.server.or.app.tables.Statement.STATEMENT;
 
     /**
      * The table <code>APP.TAX_GROUP</code>.

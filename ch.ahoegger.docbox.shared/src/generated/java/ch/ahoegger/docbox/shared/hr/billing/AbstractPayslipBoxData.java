@@ -95,7 +95,7 @@ public abstract class AbstractPayslipBoxData extends AbstractFormFieldData {
       private static final long serialVersionUID = 1L;
       public static final String enityId = "enityId";
       public static final String partnerId = "partnerId";
-      public static final String PayslipId = "PayslipId";
+      public static final String payslipId = "payslipId";
       public static final String date = "date";
       public static final String entityType = "entityType";
       public static final String hours = "hours";
@@ -103,7 +103,7 @@ public abstract class AbstractPayslipBoxData extends AbstractFormFieldData {
       public static final String text = "text";
       private BigDecimal m_enityId;
       private BigDecimal m_partnerId;
-      private BigDecimal m_PayslipId;
+      private BigDecimal m_payslipId;
       private Date m_date;
       private BigDecimal m_entityType;
       private BigDecimal m_hours;
@@ -127,11 +127,11 @@ public abstract class AbstractPayslipBoxData extends AbstractFormFieldData {
       }
 
       public BigDecimal getPayslipId() {
-        return m_PayslipId;
+        return m_payslipId;
       }
 
       public void setPayslipId(BigDecimal newPayslipId) {
-        m_PayslipId = newPayslipId;
+        m_payslipId = newPayslipId;
       }
 
       public Date getDate() {

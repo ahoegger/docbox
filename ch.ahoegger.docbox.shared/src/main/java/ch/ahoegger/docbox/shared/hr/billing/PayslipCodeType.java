@@ -7,6 +7,8 @@ import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 
+import ch.ahoegger.docbox.shared.IHolyIds;
+
 /**
  * <h3>{@link PayslipCodeType}</h3>
  *
@@ -15,7 +17,7 @@ import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 public class PayslipCodeType extends AbstractCodeType<BigDecimal, BigDecimal> {
 
   private static final long serialVersionUID = 1L;
-  public static final BigDecimal ID = BigDecimal.valueOf(100L);
+  public static final BigDecimal ID = BigDecimal.valueOf(IHolyIds.PAYSLIP_CODE_TYPE_ID);
 
   @Override
   protected String getConfiguredText() {
@@ -30,7 +32,7 @@ public class PayslipCodeType extends AbstractCodeType<BigDecimal, BigDecimal> {
   @Order(1000)
   public static class UnbilledCode extends AbstractCode<BigDecimal> {
     private static final long serialVersionUID = 1L;
-    public static final BigDecimal ID = BigDecimal.valueOf(-1);
+    public static final BigDecimal ID = BigDecimal.valueOf(IHolyIds.PAYSLIP_UNBILLED_ID);
 
     @Override
     protected String getConfiguredText() {
