@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.ch.ahoegger.docbox.server.or.app.tables.Address;
 import org.ch.ahoegger.docbox.server.or.app.tables.Employee;
 import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.EmployeeRecord;
@@ -22,11 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.shared.backup.IBackupService;
+import ch.ahoegger.docbox.shared.hr.IAddressService;
 import ch.ahoegger.docbox.shared.hr.employee.EmployeeFormData;
+import ch.ahoegger.docbox.shared.hr.employee.EmployeeSearchFormData;
+import ch.ahoegger.docbox.shared.hr.employee.EmployeeTableData;
+import ch.ahoegger.docbox.shared.hr.employee.EmployeeTableData.EmployeeTableRowData;
 import ch.ahoegger.docbox.shared.hr.employee.IEmployeeService;
-import ch.ahoegger.docbox.shared.hr.employer.EmployeeSearchFormData;
-import ch.ahoegger.docbox.shared.hr.employer.EmployeeTableData;
-import ch.ahoegger.docbox.shared.hr.employer.EmployeeTableData.EmployeeTableRowData;
 import ch.ahoegger.docbox.shared.partner.IPartnerService;
 import ch.ahoegger.docbox.shared.partner.PartnerFormData;
 
@@ -43,6 +45,7 @@ public class EmployeeService implements IEmployeeService {
 
     Employee emp = Employee.EMPLOYEE.as("emp");
     Partner ptr = Partner.PARTNER.as("ptr");
+    Address employeeAddress = Address.ADDRESS.as("employeeAddress");
 
     Condition condition = DSL.trueCondition();
 
@@ -79,11 +82,12 @@ public class EmployeeService implements IEmployeeService {
     }
 
     SelectConditionStep<Record> statement = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(emp.PARTNER_NR, emp.FIRST_NAME, emp.LAST_NAME, emp.ADDRESS_LINE1, emp.ADDRESS_LINE2, emp.AHV_NUMBER, emp.ACCOUNT_NUMBER, emp.BIRTHDAY, emp.HOURLY_WAGE)
+        .select(emp.PARTNER_NR, emp.FIRST_NAME, emp.LAST_NAME, employeeAddress.LINE_1, employeeAddress.LINE_2, employeeAddress.PLZ, employeeAddress.CITY, emp.AHV_NUMBER, emp.ACCOUNT_NUMBER, emp.BIRTHDAY, emp.HOURLY_WAGE)
         .select(ptr.NAME, ptr.START_DATE, ptr.END_DATE)
         .from(emp)
         .leftOuterJoin(ptr)
         .on(emp.PARTNER_NR.eq(ptr.PARTNER_NR))
+        .leftOuterJoin(employeeAddress).on(employeeAddress.ADDRESS_NR.eq(emp.ADDRESS_NR))
         .where(condition);
 
     List<EmployeeTableRowData> rows = statement.fetch()
@@ -93,8 +97,10 @@ public class EmployeeService implements IEmployeeService {
           row.setPartnerId(rec.get(emp.PARTNER_NR));
           row.setFirstName(emp.FIRST_NAME.get(rec));
           row.setLastName(emp.LAST_NAME.get(rec));
-          row.setAddressLine1(emp.ADDRESS_LINE1.get(rec));
-          row.setAddressLine2(emp.ADDRESS_LINE2.get(rec));
+          row.setAddressLine1(employeeAddress.LINE_1.get(rec));
+          row.setAddressLine2(employeeAddress.LINE_2.get(rec));
+          row.setPlz(employeeAddress.PLZ.get(rec));
+          row.setCity(employeeAddress.CITY.get(rec));
           row.setAHVNumber(emp.AHV_NUMBER.get(rec));
           row.setAccountNumber(emp.ACCOUNT_NUMBER.get(rec));
           row.setBirthday(emp.BIRTHDAY.get(rec));
@@ -119,6 +125,7 @@ public class EmployeeService implements IEmployeeService {
   @Override
   public EmployeeFormData create(EmployeeFormData formData) {
     IPartnerService partnerService = BEANS.get(IPartnerService.class);
+    // partner
     BigDecimal partnerId = formData.getPartnerId();
     if (partnerId == null) {
       // create partner
@@ -135,9 +142,12 @@ public class EmployeeService implements IEmployeeService {
       }
       partnerId = partnerData.getPartnerId();
     }
-
     formData.setPartnerId(partnerId);
 
+    // address
+    BEANS.get(IAddressService.class).create(formData.getEmployeeBox().getAddressBox());
+
+    // employee
     int rowCount = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .executeInsert(toRecord(formData));
 
@@ -155,49 +165,27 @@ public class EmployeeService implements IEmployeeService {
   public EmployeeFormData load(EmployeeFormData formData) {
 
     Employee emp = Employee.EMPLOYEE.as("EMP");
-    Partner p = Partner.PARTNER.as("P");
 
-    Record empRec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(emp.PARTNER_NR, emp.FIRST_NAME, emp.LAST_NAME, emp.ADDRESS_LINE1, emp.ADDRESS_LINE2, emp.AHV_NUMBER, emp.ACCOUNT_NUMBER, emp.BIRTHDAY, emp.HOURLY_WAGE, emp.SOCIAL_INSURANCE_RATE, emp.SOURCE_TAX_RATE, emp.VACATION_EXTRA_RATE,
-            emp.EMPLOYER_ADDRESS_LINE1, emp.EMPLOYER_ADDRESS_LINE2, emp.EMPLOYER_ADDRESS_LINE3, emp.EMPLOYER_EMAIL, emp.EMPLOYER_PHONE)
-        .select(p.NAME, p.DESCRIPTION, p.START_DATE, p.END_DATE)
-        .from(emp)
-        .leftOuterJoin(p)
-        .on(p.PARTNER_NR.eq(emp.PARTNER_NR))
-        .where(emp.PARTNER_NR.eq(formData.getPartnerId()))
-        .fetchOne();
+    EmployeeRecord empRec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(emp, emp.PARTNER_NR.eq(formData.getPartnerId()));
     if (empRec == null) {
       return null;
     }
-    EmployeeFormData result = empRec
-        .map(rec -> {
-          EmployeeFormData fd = new EmployeeFormData();
-          fd.setPartnerId(rec.get(emp.PARTNER_NR));
-          fd.getEmployeeBox().getFirstName().setValue(rec.get(emp.FIRST_NAME));
-          fd.getEmployeeBox().getLastName().setValue(rec.get(emp.LAST_NAME));
-          fd.getEmployeeBox().getAddressLine1().setValue(rec.get(emp.ADDRESS_LINE1));
-          fd.getEmployeeBox().getAddressLine2().setValue(rec.get(emp.ADDRESS_LINE2));
-          fd.getEmployeeBox().getAhvNumber().setValue(rec.get(emp.AHV_NUMBER));
-          fd.getEmployeeBox().getAccountNumber().setValue(rec.get(emp.ACCOUNT_NUMBER));
-          fd.getEmployeeBox().getBirthday().setValue(rec.get(emp.BIRTHDAY));
-          fd.getEmploymentBox().getHourlyWage().setValue(rec.get(emp.HOURLY_WAGE));
-          fd.getEmploymentBox().getSocialInsuranceRate().setValue(rec.get(emp.SOCIAL_INSURANCE_RATE));
-          fd.getEmploymentBox().getSourceTaxRate().setValue(rec.get(emp.SOURCE_TAX_RATE));
-          fd.getEmploymentBox().getVacationExtraRate().setValue(rec.get(emp.VACATION_EXTRA_RATE));
+    fillFormData(empRec, formData);
 
-          fd.getEmployerBox().getAddressLine1().setValue(rec.get(emp.EMPLOYER_ADDRESS_LINE1));
-          fd.getEmployerBox().getAddressLine2().setValue(rec.get(emp.EMPLOYER_ADDRESS_LINE2));
-          fd.getEmployerBox().getAddressLine3().setValue(rec.get(emp.EMPLOYER_ADDRESS_LINE3));
-          fd.getEmployerBox().getEmail().setValue(rec.get(emp.EMPLOYER_EMAIL));
-          fd.getEmployerBox().getPhone().setValue(rec.get(emp.EMPLOYER_PHONE));
-          fd.getPartnerGroupBox().getName().setValue(rec.get(p.NAME));
-          fd.getPartnerGroupBox().getDescription().setValue(rec.get(p.DESCRIPTION));
-          fd.getPartnerGroupBox().getStartDate().setValue(rec.get(p.START_DATE));
-          fd.getPartnerGroupBox().getEndDate().setValue(rec.get(p.END_DATE));
-          return fd;
-        });
+    // partner
+    PartnerFormData partnerData = new PartnerFormData();
+    partnerData.setPartnerId(formData.getPartnerId());
+    partnerData = BEANS.get(IPartnerService.class).load(partnerData);
+    formData.getPartnerGroupBox().getName().setValue(partnerData.getPartnerBox().getName().getValue());
+    formData.getPartnerGroupBox().getDescription().setValue(partnerData.getPartnerBox().getDescription().getValue());
+    formData.getPartnerGroupBox().getStartDate().setValue(partnerData.getPartnerBox().getStartDate().getValue());
+    formData.getPartnerGroupBox().getEndDate().setValue(partnerData.getPartnerBox().getEndDate().getValue());
 
-    return result;
+    // address
+    BEANS.get(IAddressService.class).load(formData.getEmployeeBox().getAddressBox());
+
+    return formData;
 
   }
 
@@ -213,6 +201,8 @@ public class EmployeeService implements IEmployeeService {
     if (BEANS.get(IPartnerService.class).store(partnerData) == null) {
       return null;
     }
+    // address
+    BEANS.get(IAddressService.class).store(formData.getEmployeeBox().getAddressBox());
 
     int rowCount = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .executeUpdate(toRecord(formData));
@@ -227,46 +217,53 @@ public class EmployeeService implements IEmployeeService {
   }
 
   @RemoteServiceAccessDenied
-  public int insert(Connection connection, BigDecimal partnerId, String firstName, String lastName, String addressLine1, String addressLine2, String ahvNumber, String accountNumber, Date birthday, BigDecimal hourlyWage,
+  public int insert(Connection connection, BigDecimal partnerId, String firstName, String lastName, BigDecimal addressId, String ahvNumber, String accountNumber, Date birthday, BigDecimal hourlyWage,
       BigDecimal socialInsuranceRate, BigDecimal sourceTaxRate, BigDecimal vacationExtraRate,
-      String employerAddressLine1, String employerAddressLine2, String employerAddressLine3, String employerEmail, String employerPhone) {
+      BigDecimal employerId) {
     return DSL.using(connection, SQLDialect.DERBY)
-        .executeInsert(toRecord(partnerId, firstName, lastName, addressLine1, addressLine2, ahvNumber, accountNumber, birthday, hourlyWage, socialInsuranceRate, sourceTaxRate, vacationExtraRate, employerAddressLine1, employerAddressLine2,
-            employerAddressLine3, employerEmail, employerPhone));
+        .executeInsert(toRecord(partnerId, firstName, lastName, addressId, ahvNumber, accountNumber, birthday, hourlyWage, socialInsuranceRate, sourceTaxRate, vacationExtraRate, employerId));
 
+  }
+
+  protected EmployeeFormData fillFormData(EmployeeRecord rec, EmployeeFormData fd) {
+    fd.setPartnerId(rec.getPartnerNr());
+    fd.getEmployer().setValue(rec.getEmployerNr());
+    fd.getEmployeeBox().getFirstName().setValue(rec.getFirstName());
+    fd.getEmployeeBox().getLastName().setValue(rec.getLastName());
+    fd.getEmployeeBox().getAddressBox().setAddressId(rec.getAddressNr());
+    fd.getEmployeeBox().getAhvNumber().setValue(rec.getAhvNumber());
+    fd.getEmployeeBox().getAccountNumber().setValue(rec.getAccountNumber());
+    fd.getEmployeeBox().getBirthday().setValue(rec.getBirthday());
+    fd.getEmploymentBox().getHourlyWage().setValue(rec.getHourlyWage());
+    fd.getEmploymentBox().getSocialInsuranceRate().setValue(rec.getSocialInsuranceRate());
+    fd.getEmploymentBox().getSourceTaxRate().setValue(rec.getSourceTaxRate());
+    fd.getEmploymentBox().getVacationExtraRate().setValue(rec.getVacationExtraRate());
+    return fd;
   }
 
   protected EmployeeRecord toRecord(EmployeeFormData fd) {
-    return toRecord(fd.getPartnerId(), fd.getEmployeeBox().getFirstName().getValue(), fd.getEmployeeBox().getLastName().getValue(), fd.getEmployeeBox().getAddressLine1().getValue(), fd.getEmployeeBox().getAddressLine2().getValue(),
+    return toRecord(fd.getPartnerId(), fd.getEmployeeBox().getFirstName().getValue(), fd.getEmployeeBox().getLastName().getValue(), fd.getEmployeeBox().getAddressBox().getAddressId(),
         fd.getEmployeeBox().getAhvNumber().getValue(), fd.getEmployeeBox().getAccountNumber().getValue(), fd.getEmployeeBox().getBirthday().getValue(), fd.getEmploymentBox().getHourlyWage().getValue(),
         fd.getEmploymentBox().getSocialInsuranceRate().getValue(), fd.getEmploymentBox().getSourceTaxRate().getValue(), fd.getEmploymentBox().getVacationExtraRate().getValue(),
-        fd.getEmployerBox().getAddressLine1().getValue(),
-        fd.getEmployerBox().getAddressLine2().getValue(), fd.getEmployerBox().getAddressLine3().getValue(), fd.getEmployerBox().getEmail().getValue(),
-        fd.getEmployerBox().getPhone().getValue());
+        fd.getEmployer().getValue());
   }
 
-  protected EmployeeRecord toRecord(BigDecimal partnerId, String firstName, String lastName, String addressLine1, String addressLine2, String ahvNumber, String accountNumber, Date birthday, BigDecimal hourlyWage,
+  protected EmployeeRecord toRecord(BigDecimal partnerId, String firstName, String lastName, BigDecimal addressId, String ahvNumber, String accountNumber, Date birthday, BigDecimal hourlyWage,
       BigDecimal socialInsuranceRate, BigDecimal sourceTaxRate, BigDecimal vacationExtraRate,
-      String employerAddressLine1, String employerAddressLine2, String employerAddressLine3, String employerEmail, String employerPhone) {
-    return mapToRecord(new EmployeeRecord(), partnerId, firstName, lastName, addressLine1, addressLine2, ahvNumber, accountNumber, birthday, hourlyWage, socialInsuranceRate, sourceTaxRate, vacationExtraRate, employerAddressLine1,
-        employerAddressLine2, employerAddressLine3, employerEmail, employerPhone);
+      BigDecimal employerId) {
+    return mapToRecord(new EmployeeRecord(), partnerId, firstName, lastName, addressId, ahvNumber, accountNumber, birthday, hourlyWage, socialInsuranceRate, sourceTaxRate, vacationExtraRate, employerId);
   }
 
-  protected EmployeeRecord mapToRecord(EmployeeRecord rec, BigDecimal partnerId, String firstName, String lastName, String addressLine1, String addressLine2, String ahvNumber, String accountNumber, Date birthday, BigDecimal hourlyWage,
+  protected EmployeeRecord mapToRecord(EmployeeRecord rec, BigDecimal partnerId, String firstName, String lastName, BigDecimal addressId, String ahvNumber, String accountNumber, Date birthday, BigDecimal hourlyWage,
       BigDecimal socialInsuranceRate, BigDecimal sourceTaxRate, BigDecimal vacationExtraRate,
-      String employerAddressLine1, String employerAddressLine2, String employerAddressLine3, String employerEmail, String employerPhone) {
+      BigDecimal employerId) {
     Employee t = Employee.EMPLOYEE;
     return rec
+        .with(t.EMPLOYER_NR, employerId)
         .with(t.ACCOUNT_NUMBER, accountNumber)
-        .with(t.ADDRESS_LINE1, addressLine1)
-        .with(t.ADDRESS_LINE2, addressLine2)
+        .with(t.ADDRESS_NR, addressId)
         .with(t.AHV_NUMBER, ahvNumber)
         .with(t.BIRTHDAY, birthday)
-        .with(t.EMPLOYER_ADDRESS_LINE1, employerAddressLine1)
-        .with(t.EMPLOYER_ADDRESS_LINE2, employerAddressLine2)
-        .with(t.EMPLOYER_ADDRESS_LINE3, employerAddressLine3)
-        .with(t.EMPLOYER_EMAIL, employerEmail)
-        .with(t.EMPLOYER_PHONE, employerPhone)
         .with(t.FIRST_NAME, firstName)
         .with(t.HOURLY_WAGE, hourlyWage)
         .with(t.SOCIAL_INSURANCE_RATE, socialInsuranceRate)

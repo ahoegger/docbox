@@ -22,9 +22,9 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 import ch.ahoegger.docbox.or.definition.table.IEmployeeTable;
+import ch.ahoegger.docbox.shared.hr.employee.EmployeeSearchFormData;
+import ch.ahoegger.docbox.shared.hr.employee.EmployeeTableData;
 import ch.ahoegger.docbox.shared.hr.employee.IEmployeeService;
-import ch.ahoegger.docbox.shared.hr.employer.EmployeeSearchFormData;
-import ch.ahoegger.docbox.shared.hr.employer.EmployeeTableData;
 
 /**
  * <h3>{@link EmployeeTablePage}</h3>
@@ -105,6 +105,14 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
 
     public BirthdayColumn getBirthdayColumn() {
       return getColumnSet().getColumnByClass(BirthdayColumn.class);
+    }
+
+    public PlzColumn getPlzColumn() {
+      return getColumnSet().getColumnByClass(PlzColumn.class);
+    }
+
+    public CityColumn getCityColumn() {
+      return getColumnSet().getColumnByClass(CityColumn.class);
     }
 
     public PartnerIdColumn getPartnerIdColumn() {
@@ -198,6 +206,32 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
       @Override
       protected int getConfiguredWidth() {
         return 200;
+      }
+    }
+
+    @Order(650)
+    public class PlzColumn extends AbstractStringColumn {
+      @Override
+      protected String getConfiguredHeaderText() {
+        return TEXTS.get("PLZ");
+      }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 50;
+      }
+    }
+
+    @Order(675)
+    public class CityColumn extends AbstractStringColumn {
+      @Override
+      protected String getConfiguredHeaderText() {
+        return TEXTS.get("City");
+      }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 100;
       }
     }
 

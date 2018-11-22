@@ -7,6 +7,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 
+import ch.ahoegger.docbox.client.util.AbstractAddressBox;
 import ch.ahoegger.docbox.or.definition.table.IEmployeeTable;
 import ch.ahoegger.docbox.shared.hr.employee.AbstractEmployeeBoxData;
 
@@ -32,20 +33,16 @@ public abstract class AbstractEmployeeBox extends AbstractGroupBox {
     return getFieldByClass(AccountNumberField.class);
   }
 
-  public AddressLine1Field getAddressLine1Field() {
-    return getFieldByClass(AddressLine1Field.class);
-  }
-
-  public AddressLine2Field getAddressLine2Field() {
-    return getFieldByClass(AddressLine2Field.class);
-  }
-
   public AhvNumberField getAhvNumberField() {
     return getFieldByClass(AhvNumberField.class);
   }
 
   public BirthdayField getBirthdayField() {
     return getFieldByClass(BirthdayField.class);
+  }
+
+  public AddressBox getAddressBox() {
+    return getFieldByClass(AddressBox.class);
   }
 
   public LastNameField getLastNameField() {
@@ -92,32 +89,6 @@ public abstract class AbstractEmployeeBox extends AbstractGroupBox {
     }
   }
 
-  @Order(3000)
-  public class AddressLine1Field extends AbstractStringField {
-    @Override
-    protected String getConfiguredLabel() {
-      return TEXTS.get("AddressLine1");
-    }
-
-    @Override
-    protected int getConfiguredMaxLength() {
-      return IEmployeeTable.ADDRESS_LINE_LENGTH;
-    }
-  }
-
-  @Order(4000)
-  public class AddressLine2Field extends AbstractStringField {
-    @Override
-    protected String getConfiguredLabel() {
-      return TEXTS.get("AddressLine2");
-    }
-
-    @Override
-    protected int getConfiguredMaxLength() {
-      return IEmployeeTable.ADDRESS_LINE_LENGTH;
-    }
-  }
-
   @Order(5000)
   public class AhvNumberField extends AbstractStringField {
     @Override
@@ -155,6 +126,10 @@ public abstract class AbstractEmployeeBox extends AbstractGroupBox {
     protected int getConfiguredWidthInPixel() {
       return 100;
     }
+  }
+
+  @Order(12000)
+  public class AddressBox extends AbstractAddressBox {
   }
 
 }

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup;
-import org.ch.ahoegger.docbox.server.or.app.tables.PayslipAccounting;
+import org.ch.ahoegger.docbox.server.or.app.tables.Payslip;
 import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.TaxGroupRecord;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -125,7 +125,7 @@ public class TaxGroupService implements ITaxGroupService {
   @Override
   public TaxGroupFormData load(TaxGroupFormData formData) {
     TaxGroup t = TaxGroup.TAX_GROUP;
-    PayslipAccounting pg = PayslipAccounting.PAYSLIP_ACCOUNTING;
+    Payslip pg = Payslip.PAYSLIP;
     Condition condition = DSL.trueCondition();
     condition = condition.and(t.TAX_GROUP_NR.eq(formData.getTaxGroupId()));
     if (formData.getPartnerId() != null) {

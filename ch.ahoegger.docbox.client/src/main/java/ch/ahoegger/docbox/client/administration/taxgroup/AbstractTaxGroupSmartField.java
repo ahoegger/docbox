@@ -31,7 +31,6 @@ public abstract class AbstractTaxGroupSmartField extends AbstractSmartField<BigD
   }
 
   protected void execPrepareBrowseTaxGroupLookup(TaxGroupLookupCall call) {
-    super.execPrepareBrowseLookup(call);
   }
 
 }

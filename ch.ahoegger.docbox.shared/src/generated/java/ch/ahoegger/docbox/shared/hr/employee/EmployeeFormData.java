@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
 import ch.ahoegger.docbox.shared.partner.AbstractPartnerBoxData;
@@ -22,8 +23,8 @@ public class EmployeeFormData extends AbstractFormData {
     return getFieldByClass(EmployeeBox.class);
   }
 
-  public EmployerBox getEmployerBox() {
-    return getFieldByClass(EmployerBox.class);
+  public Employer getEmployer() {
+    return getFieldByClass(Employer.class);
   }
 
   public EmploymentBox getEmploymentBox() {
@@ -57,7 +58,7 @@ public class EmployeeFormData extends AbstractFormData {
     private static final long serialVersionUID = 1L;
   }
 
-  public static class EmployerBox extends AbstractEmployerBoxData {
+  public static class Employer extends AbstractValueFieldData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

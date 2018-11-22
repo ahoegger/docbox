@@ -3,7 +3,7 @@ package ch.ahoegger.docbox.server.or.generator.table;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
+import org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -46,7 +46,7 @@ public class EmployeeTaxGroupTableStatement implements ITableStatement, IEmploye
   @Override
   public void deleteTable(Connection connection) {
     LOG.info("SQL-DEV delete table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).delete(TaxGroup.TAX_GROUP)
+    DSL.using(connection, SQLDialect.DERBY).delete(EmployeeTaxGroup.EMPLOYEE_TAX_GROUP)
         .execute();
 
   }
@@ -54,7 +54,7 @@ public class EmployeeTaxGroupTableStatement implements ITableStatement, IEmploye
   @Override
   public void dropTable(Connection connection) {
     LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).dropTable(TaxGroup.TAX_GROUP)
+    DSL.using(connection, SQLDialect.DERBY).dropTable(EmployeeTaxGroup.EMPLOYEE_TAX_GROUP)
         .execute();
   }
 

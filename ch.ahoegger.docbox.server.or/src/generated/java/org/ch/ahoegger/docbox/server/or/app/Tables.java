@@ -6,6 +6,7 @@ package org.ch.ahoegger.docbox.server.or.app;
 
 import javax.annotation.Generated;
 
+import org.ch.ahoegger.docbox.server.or.app.tables.Address;
 import org.ch.ahoegger.docbox.server.or.app.tables.Category;
 import org.ch.ahoegger.docbox.server.or.app.tables.Conversation;
 import org.ch.ahoegger.docbox.server.or.app.tables.DefaultPermissionTable;
@@ -17,9 +18,11 @@ import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPartner;
 import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPermission;
 import org.ch.ahoegger.docbox.server.or.app.tables.Employee;
 import org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup;
+import org.ch.ahoegger.docbox.server.or.app.tables.Employer;
 import org.ch.ahoegger.docbox.server.or.app.tables.Entity;
+import org.ch.ahoegger.docbox.server.or.app.tables.Migration;
 import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
-import org.ch.ahoegger.docbox.server.or.app.tables.PayslipAccounting;
+import org.ch.ahoegger.docbox.server.or.app.tables.Payslip;
 import org.ch.ahoegger.docbox.server.or.app.tables.PrimaryKeySeq;
 import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 
@@ -36,6 +39,11 @@ import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
+
+    /**
+     * The table <code>APP.ADDRESS</code>.
+     */
+    public static final Address ADDRESS = org.ch.ahoegger.docbox.server.or.app.tables.Address.ADDRESS;
 
     /**
      * The table <code>APP.CATEGORY</code>.
@@ -93,9 +101,19 @@ public class Tables {
     public static final EmployeeTaxGroup EMPLOYEE_TAX_GROUP = org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup.EMPLOYEE_TAX_GROUP;
 
     /**
+     * The table <code>APP.EMPLOYER</code>.
+     */
+    public static final Employer EMPLOYER = org.ch.ahoegger.docbox.server.or.app.tables.Employer.EMPLOYER;
+
+    /**
      * The table <code>APP.ENTITY</code>.
      */
     public static final Entity ENTITY = org.ch.ahoegger.docbox.server.or.app.tables.Entity.ENTITY;
+
+    /**
+     * The table <code>APP.MIGRATION</code>.
+     */
+    public static final Migration MIGRATION = org.ch.ahoegger.docbox.server.or.app.tables.Migration.MIGRATION;
 
     /**
      * The table <code>APP.PARTNER</code>.
@@ -103,9 +121,9 @@ public class Tables {
     public static final Partner PARTNER = org.ch.ahoegger.docbox.server.or.app.tables.Partner.PARTNER;
 
     /**
-     * The table <code>APP.PAYSLIP_ACCOUNTING</code>.
+     * The table <code>APP.PAYSLIP</code>.
      */
-    public static final PayslipAccounting PAYSLIP_ACCOUNTING = org.ch.ahoegger.docbox.server.or.app.tables.PayslipAccounting.PAYSLIP_ACCOUNTING;
+    public static final Payslip PAYSLIP = org.ch.ahoegger.docbox.server.or.app.tables.Payslip.PAYSLIP;
 
     /**
      * The table <code>APP.PRIMARY_KEY_SEQ</code>.

@@ -29,8 +29,8 @@ import ch.ahoegger.docbox.client.tools.ToolsForm;
 import ch.ahoegger.docbox.client.work.WorkOutline;
 import ch.ahoegger.docbox.shared.Icons;
 import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
+import ch.ahoegger.docbox.shared.hr.employee.EmployeeSearchFormData;
 import ch.ahoegger.docbox.shared.hr.employee.IEmployeeService;
-import ch.ahoegger.docbox.shared.hr.employer.EmployeeSearchFormData;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**

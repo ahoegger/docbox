@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
 import ch.ahoegger.docbox.client.administration.taxgroup.TaxGroupTablePage;
 import ch.ahoegger.docbox.client.document.DocumentTablePage;
-import ch.ahoegger.docbox.client.hr.billing.PayslipAccountingTablePage;
+import ch.ahoegger.docbox.client.hr.billing.PayslipTablePage;
 
 public class EmployeeNodePage extends AbstractPageWithNodes {
 
@@ -16,7 +16,7 @@ public class EmployeeNodePage extends AbstractPageWithNodes {
 
   @Override
   protected void execCreateChildPages(List<IPage<?>> pageList) {
-    PayslipAccountingTablePage page = new PayslipAccountingTablePage();
+    PayslipTablePage page = new PayslipTablePage();
     page.setPartnerId(getPartnerId());
     pageList.add(page);
 

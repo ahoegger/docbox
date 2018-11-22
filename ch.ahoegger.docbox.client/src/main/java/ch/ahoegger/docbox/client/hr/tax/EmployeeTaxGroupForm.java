@@ -17,7 +17,6 @@ import ch.ahoegger.docbox.client.administration.taxgroup.AbstractTaxGroupSmartFi
 import ch.ahoegger.docbox.client.hr.tax.EmployeeTaxGroupForm.MainBox.CancelButton;
 import ch.ahoegger.docbox.client.hr.tax.EmployeeTaxGroupForm.MainBox.OKButton;
 import ch.ahoegger.docbox.client.hr.tax.EmployeeTaxGroupForm.MainBox.TaxGroupField;
-import ch.ahoegger.docbox.shared.administration.taxgroup.TaxGroupLookupCall;
 import ch.ahoegger.docbox.shared.hr.employee.IEmployeeTaxGroupService;
 import ch.ahoegger.docbox.shared.hr.tax.EmployeeTaxGroupFormData;
 
@@ -78,11 +77,6 @@ public class EmployeeTaxGroupForm extends AbstractForm {
     @ClassId("deb10e43-62be-4f54-90c4-e664f76bb111")
     public class TaxGroupField extends AbstractTaxGroupSmartField {
 
-      @Override
-      protected void execPrepareBrowseTaxGroupLookup(TaxGroupLookupCall call) {
-        super.execPrepareBrowseTaxGroupLookup(call);
-
-      }
     }
 
     @Order(10000)

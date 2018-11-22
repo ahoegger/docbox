@@ -11,6 +11,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import org.ch.ahoegger.docbox.server.or.DefaultCatalog;
+import org.ch.ahoegger.docbox.server.or.app.tables.Address;
 import org.ch.ahoegger.docbox.server.or.app.tables.Category;
 import org.ch.ahoegger.docbox.server.or.app.tables.Conversation;
 import org.ch.ahoegger.docbox.server.or.app.tables.DefaultPermissionTable;
@@ -22,9 +23,11 @@ import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPartner;
 import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPermission;
 import org.ch.ahoegger.docbox.server.or.app.tables.Employee;
 import org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup;
+import org.ch.ahoegger.docbox.server.or.app.tables.Employer;
 import org.ch.ahoegger.docbox.server.or.app.tables.Entity;
+import org.ch.ahoegger.docbox.server.or.app.tables.Migration;
 import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
-import org.ch.ahoegger.docbox.server.or.app.tables.PayslipAccounting;
+import org.ch.ahoegger.docbox.server.or.app.tables.Payslip;
 import org.ch.ahoegger.docbox.server.or.app.tables.PrimaryKeySeq;
 import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 import org.jooq.Catalog;
@@ -45,12 +48,17 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class App extends SchemaImpl {
 
-    private static final long serialVersionUID = 824501593;
+    private static final long serialVersionUID = 1506068715;
 
     /**
      * The reference instance of <code>APP</code>
      */
     public static final App APP = new App();
+
+    /**
+     * The table <code>APP.ADDRESS</code>.
+     */
+    public final Address ADDRESS = org.ch.ahoegger.docbox.server.or.app.tables.Address.ADDRESS;
 
     /**
      * The table <code>APP.CATEGORY</code>.
@@ -108,9 +116,19 @@ public class App extends SchemaImpl {
     public final EmployeeTaxGroup EMPLOYEE_TAX_GROUP = org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup.EMPLOYEE_TAX_GROUP;
 
     /**
+     * The table <code>APP.EMPLOYER</code>.
+     */
+    public final Employer EMPLOYER = org.ch.ahoegger.docbox.server.or.app.tables.Employer.EMPLOYER;
+
+    /**
      * The table <code>APP.ENTITY</code>.
      */
     public final Entity ENTITY = org.ch.ahoegger.docbox.server.or.app.tables.Entity.ENTITY;
+
+    /**
+     * The table <code>APP.MIGRATION</code>.
+     */
+    public final Migration MIGRATION = org.ch.ahoegger.docbox.server.or.app.tables.Migration.MIGRATION;
 
     /**
      * The table <code>APP.PARTNER</code>.
@@ -118,9 +136,9 @@ public class App extends SchemaImpl {
     public final Partner PARTNER = org.ch.ahoegger.docbox.server.or.app.tables.Partner.PARTNER;
 
     /**
-     * The table <code>APP.PAYSLIP_ACCOUNTING</code>.
+     * The table <code>APP.PAYSLIP</code>.
      */
-    public final PayslipAccounting PAYSLIP_ACCOUNTING = org.ch.ahoegger.docbox.server.or.app.tables.PayslipAccounting.PAYSLIP_ACCOUNTING;
+    public final Payslip PAYSLIP = org.ch.ahoegger.docbox.server.or.app.tables.Payslip.PAYSLIP;
 
     /**
      * The table <code>APP.PRIMARY_KEY_SEQ</code>.
@@ -157,6 +175,7 @@ public class App extends SchemaImpl {
 
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
+            Address.ADDRESS,
             Category.CATEGORY,
             Conversation.CONVERSATION,
             DefaultPermissionTable.DEFAULT_PERMISSION_TABLE,
@@ -168,9 +187,11 @@ public class App extends SchemaImpl {
             DocumentPermission.DOCUMENT_PERMISSION,
             Employee.EMPLOYEE,
             EmployeeTaxGroup.EMPLOYEE_TAX_GROUP,
+            Employer.EMPLOYER,
             Entity.ENTITY,
+            Migration.MIGRATION,
             Partner.PARTNER,
-            PayslipAccounting.PAYSLIP_ACCOUNTING,
+            Payslip.PAYSLIP,
             PrimaryKeySeq.PRIMARY_KEY_SEQ,
             TaxGroup.TAX_GROUP);
     }

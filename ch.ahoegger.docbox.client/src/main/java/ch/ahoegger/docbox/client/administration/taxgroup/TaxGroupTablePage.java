@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 import ch.ahoegger.docbox.client.administration.taxgroup.TaxGroupTablePage.Table;
-import ch.ahoegger.docbox.client.hr.billing.PayslipAccountingTablePage;
+import ch.ahoegger.docbox.client.hr.billing.PayslipTablePage;
 import ch.ahoegger.docbox.client.hr.tax.EmployeeTaxGroupForm;
 import ch.ahoegger.docbox.client.hr.tax.IEmployeeTaxGroupEntity;
 import ch.ahoegger.docbox.shared.administration.taxgroup.ITaxGroupService;
@@ -51,7 +51,7 @@ public class TaxGroupTablePage extends AbstractPageWithTable<Table> {
 
   @Override
   protected IPage<?> execCreateChildPage(ITableRow row) {
-    PayslipAccountingTablePage page = new PayslipAccountingTablePage();
+    PayslipTablePage page = new PayslipTablePage();
     page.setPartnerId(getPartnerId());
     page.setTaxGroupId(getTable().getTaxGroupIdColumn().getValue(row));
     page.getSearchFormInternal().setIncludeUnbilled(Boolean.FALSE);

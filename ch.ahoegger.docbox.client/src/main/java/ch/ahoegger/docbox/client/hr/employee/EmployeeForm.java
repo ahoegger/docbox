@@ -22,7 +22,9 @@ import ch.ahoegger.docbox.client.hr.employee.EmployeeForm.MainBox.CancelButton;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeForm.MainBox.OkButton;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeForm.MainBox.PartnerField;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeForm.MainBox.PartnerGroupBox;
+import ch.ahoegger.docbox.client.hr.employee.EmployeeForm.MainBox.TabBox.EmployerBox.EmployerField;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeForm.MainBox.TabBox.EmploymentBox;
+import ch.ahoegger.docbox.client.hr.employer.AbstractEmployerSmartField;
 import ch.ahoegger.docbox.client.partner.AbstractPartnerBox;
 import ch.ahoegger.docbox.client.partner.AbstractPartnerSmartField;
 import ch.ahoegger.docbox.client.partner.IPartnerEntity;
@@ -82,6 +84,10 @@ public class EmployeeForm extends AbstractForm {
 
   public EmploymentBox getEmploymentBox() {
     return getFieldByClass(EmploymentBox.class);
+  }
+
+  public EmployerField getEmployerField() {
+    return getFieldByClass(EmployerField.class);
   }
 
   public OkButton getOkButton() {
@@ -188,7 +194,12 @@ public class EmployeeForm extends AbstractForm {
       }
 
       @Order(2000)
-      public class EmployerBox extends AbstractEmployerBox {
+      public class EmployerBox extends AbstractGroupBox {
+
+        @Order(1000)
+        public class EmployerField extends AbstractEmployerSmartField {
+        }
+
       }
 
       @Order(3000)

@@ -55,21 +55,21 @@ public class EntitySearchFormData extends AbstractFormData {
   }
 
   /**
-   * access method for property PayslipAccountingId.
+   * access method for property PayslipId.
    */
-  public BigDecimal getPayslipAccountingId() {
-    return getPayslipAccountingIdProperty().getValue();
+  public BigDecimal getPayslipId() {
+    return getPayslipIdProperty().getValue();
   }
 
   /**
-   * access method for property PayslipAccountingId.
+   * access method for property PayslipId.
    */
-  public void setPayslipAccountingId(BigDecimal payslipAccountingId) {
-    getPayslipAccountingIdProperty().setValue(payslipAccountingId);
+  public void setPayslipId(BigDecimal payslipId) {
+    getPayslipIdProperty().setValue(payslipId);
   }
 
-  public PayslipAccountingIdProperty getPayslipAccountingIdProperty() {
-    return getPropertyByClass(PayslipAccountingIdProperty.class);
+  public PayslipIdProperty getPayslipIdProperty() {
+    return getPropertyByClass(PayslipIdProperty.class);
   }
 
   public static class BilledBox extends AbstractValueFieldData<TriState> {
@@ -97,7 +97,7 @@ public class EntitySearchFormData extends AbstractFormData {
     private static final long serialVersionUID = 1L;
   }
 
-  public static class PayslipAccountingIdProperty extends AbstractPropertyData<BigDecimal> {
+  public static class PayslipIdProperty extends AbstractPropertyData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

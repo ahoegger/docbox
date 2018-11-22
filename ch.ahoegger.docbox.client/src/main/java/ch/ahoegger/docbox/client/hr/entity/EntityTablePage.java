@@ -23,7 +23,7 @@ import ch.ahoegger.docbox.client.AbstractDocboxPageWithTable;
 import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table;
 import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table.NewExpenseMenu;
 import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table.NewWorkMenu;
-import ch.ahoegger.docbox.shared.hr.billing.PayslipAccountingCodeType.UnbilledCode;
+import ch.ahoegger.docbox.shared.hr.billing.PayslipCodeType.UnbilledCode;
 import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
@@ -34,7 +34,7 @@ import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
 public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
   private BigDecimal m_partnerId;
-  private BigDecimal m_payslipAccountingId;
+  private BigDecimal m_payslipId;
 
   public EntityTablePage(BigDecimal partnerId) {
     m_partnerId = partnerId;
@@ -63,7 +63,7 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
   @Override
   protected void execInitSearchForm() {
     getSearchFormInternal().getPartnerIdField().setValue(m_partnerId);
-    getSearchFormInternal().setPayslipAccountingId(getPayslipAccountingId());
+    getSearchFormInternal().setPayslipId(getPayslipId());
   }
 
   @Override
@@ -79,14 +79,14 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
     return m_partnerId;
   }
 
-  public void setPayslipAccountingId(BigDecimal payslipAccountingId) {
-    m_payslipAccountingId = payslipAccountingId;
-    getTable().getMenuByClass(NewWorkMenu.class).setVisible(ObjectUtility.equals(UnbilledCode.ID, m_payslipAccountingId));
-    getTable().getMenuByClass(NewExpenseMenu.class).setVisible(ObjectUtility.equals(UnbilledCode.ID, m_payslipAccountingId));
+  public void setPayslipId(BigDecimal payslipId) {
+    m_payslipId = payslipId;
+    getTable().getMenuByClass(NewWorkMenu.class).setVisible(ObjectUtility.equals(UnbilledCode.ID, m_payslipId));
+    getTable().getMenuByClass(NewExpenseMenu.class).setVisible(ObjectUtility.equals(UnbilledCode.ID, m_payslipId));
   }
 
-  public BigDecimal getPayslipAccountingId() {
-    return m_payslipAccountingId;
+  public BigDecimal getPayslipId() {
+    return m_payslipId;
   }
 
   protected IDesktop getDesktop() {
@@ -169,7 +169,7 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
       @Override
       protected void execOwnerValueChanged(Object newOwnerValue) {
-        setVisible(ObjectUtility.equals(getPayslipAccountingId(), UnbilledCode.ID));
+        setVisible(ObjectUtility.equals(getPayslipId(), UnbilledCode.ID));
       }
 
       @Override
@@ -195,7 +195,7 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
       @Override
       protected void execOwnerValueChanged(Object newOwnerValue) {
-        setVisible(ObjectUtility.notEquals(getPayslipAccountingId(), UnbilledCode.ID));
+        setVisible(ObjectUtility.notEquals(getPayslipId(), UnbilledCode.ID));
       }
 
       @Override
@@ -225,7 +225,7 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
       @Override
       protected void execInitAction() {
-        setVisible(ObjectUtility.equals(getPayslipAccountingId(), UnbilledCode.ID));
+        setVisible(ObjectUtility.equals(getPayslipId(), UnbilledCode.ID));
       }
 
       @Override

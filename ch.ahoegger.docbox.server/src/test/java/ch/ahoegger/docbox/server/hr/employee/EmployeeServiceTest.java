@@ -10,6 +10,8 @@ import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.junit.Assert;
 import org.junit.Test;
 
+import ch.ahoegger.docbox.server.hr.AddressFormData;
+import ch.ahoegger.docbox.server.hr.AddressService;
 import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
@@ -33,10 +35,13 @@ public class EmployeeServiceTest extends AbstractTestWithDatabase {
 
     BEANS.get(PartnerService.class).insert(connection, partnerId02_employee, "employee02", "desc02", LocalDateUtility.toDate(LocalDate.now().minusDays(5)), null);
 
-    BEANS.get(EmployeeService.class).insert(connection, partnerId02_employee, "Homer", "Simpson", "Nashvill Street 12a", "Santa Barbara CA-90051", "ahv123564789", "iban987654321",
+    BigDecimal addressId = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+    BEANS.get(AddressService.class).insert(new AddressFormData().withAddressNr(addressId).withLine1("Nashvill Street 12a").withPlz("CA-90051").withCity("Santa Barbara"));
+
+    BEANS.get(EmployeeService.class).insert(connection, partnerId02_employee, "Homer", "Simpson", addressId, "ahv123564789", "iban987654321",
         LocalDateUtility.toDate(LocalDate.of(1972, 12, 31)), BigDecimal.valueOf(26.30),
         BigDecimal.valueOf(6.225), BigDecimal.valueOf(5.0), BigDecimal.valueOf(8.33),
-        "Master Bob & Minor Molar", "Mountainview 12", "CA-90153 Santa Tropee", "master.bob@blu.com", "5445621236");
+        EMPLOYER_ID);
   }
 
   @Test
@@ -46,11 +51,9 @@ public class EmployeeServiceTest extends AbstractTestWithDatabase {
     fd1.setPartnerId(partnerId02_employee);
     fd1 = service.load(fd1);
 
-    Assert.assertEquals("Master Bob & Minor Molar", fd1.getEmployerBox().getAddressLine1().getValue());
-    Assert.assertEquals("Mountainview 12", fd1.getEmployerBox().getAddressLine2().getValue());
-    Assert.assertEquals("CA-90153 Santa Tropee", fd1.getEmployerBox().getAddressLine3().getValue());
-    Assert.assertEquals("master.bob@blu.com", fd1.getEmployerBox().getEmail().getValue());
-    Assert.assertEquals("5445621236", fd1.getEmployerBox().getPhone().getValue());
+    Assert.assertEquals("iban987654321", fd1.getEmployeeBox().getAccountNumber().getValue());
+    Assert.assertEquals("ahv123564789", fd1.getEmployeeBox().getAhvNumber().getValue());
+    Assert.assertEquals("Nashvill Street 12a", fd1.getEmployeeBox().getAddressBox().getLine1().getValue());
   }
 
   @Test
@@ -60,20 +63,13 @@ public class EmployeeServiceTest extends AbstractTestWithDatabase {
 
     EmployeeFormData fd1 = new EmployeeFormData();
     fd1 = service.prepareCreate(fd1);
-
+    fd1.getEmployer().setValue(EMPLOYER_ID);
     fd1.setPartnerId(partnerId01);
-    fd1.getEmployeeBox().getAddressLine1().setValue("addressLine01");
-    fd1.getEmployeeBox().getAddressLine2().setValue("addressLine02");
     fd1.getEmployeeBox().getAccountNumber().setValue("PC 50-1589-242-2");
     fd1.getEmployeeBox().getAhvNumber().setValue("50-4544 656");
     fd1.getEmployeeBox().getFirstName().setValue("Max");
     fd1.getEmploymentBox().getHourlyWage().setValue(BigDecimal.valueOf(26.75));
     fd1.getEmployeeBox().getLastName().setValue("Beeloq");
-    fd1.getEmployerBox().getAddressLine1().setValue("ad line 1");
-    fd1.getEmployerBox().getAddressLine2().setValue("ad line 2");
-    fd1.getEmployerBox().getAddressLine3().setValue("ad line 3");
-    fd1.getEmployerBox().getEmail().setValue("email emp");
-    fd1.getEmployerBox().getPhone().setValue("phone emp");
 
     fd1 = service.create(fd1);
 
@@ -92,24 +88,18 @@ public class EmployeeServiceTest extends AbstractTestWithDatabase {
     IEmployeeService service = BEANS.get(IEmployeeService.class);
 
     EmployeeFormData fd1 = new EmployeeFormData();
+    fd1.getEmployer().setValue(EMPLOYER_ID);
     fd1 = service.prepareCreate(fd1);
     fd1.getPartnerGroupBox().getName().setValue("Max Beeloq");
     fd1.getPartnerGroupBox().getDescription().setValue("Desc text");
     fd1.getPartnerGroupBox().getStartDate().setValue(LocalDateUtility.today());
     fd1.getPartnerGroupBox().getEndDate().setValue(LocalDateUtility.toDate(LocalDate.now().plusMonths(3)));
 
-    fd1.getEmployeeBox().getAddressLine1().setValue("addressLine01");
-    fd1.getEmployeeBox().getAddressLine2().setValue("addressLine02");
     fd1.getEmployeeBox().getAccountNumber().setValue("PC 50-1589-242-2");
     fd1.getEmployeeBox().getAhvNumber().setValue("50-4544 656");
     fd1.getEmployeeBox().getFirstName().setValue("Max");
     fd1.getEmploymentBox().getHourlyWage().setValue(BigDecimal.valueOf(26.75));
     fd1.getEmployeeBox().getLastName().setValue("Beeloq");
-    fd1.getEmployerBox().getAddressLine1().setValue("ad line 1");
-    fd1.getEmployerBox().getAddressLine2().setValue("ad line 2");
-    fd1.getEmployerBox().getAddressLine3().setValue("ad line 3");
-    fd1.getEmployerBox().getEmail().setValue("email emp");
-    fd1.getEmployerBox().getPhone().setValue("phone emp");
 
     fd1 = service.create(fd1);
 
@@ -127,18 +117,11 @@ public class EmployeeServiceTest extends AbstractTestWithDatabase {
     fd1.setPartnerId(partnerId02_employee);
     fd1 = service.load(fd1);
 
-    fd1.getEmployeeBox().getAddressLine1().setValue("addressLine01 mod");
-    fd1.getEmployeeBox().getAddressLine2().setValue("addressLine02 mod");
     fd1.getEmployeeBox().getAccountNumber().setValue("Acc mod");
     fd1.getEmployeeBox().getAhvNumber().setValue("50-4544 229");
     fd1.getEmployeeBox().getFirstName().setValue("Albert");
     fd1.getEmploymentBox().getHourlyWage().setValue(BigDecimal.valueOf(25.25));
     fd1.getEmployeeBox().getLastName().setValue("Berok");
-    fd1.getEmployerBox().getAddressLine1().setValue("ad line 1 mod");
-    fd1.getEmployerBox().getAddressLine2().setValue("ad line 2 mod");
-    fd1.getEmployerBox().getAddressLine3().setValue("ad line 3 mod");
-    fd1.getEmployerBox().getEmail().setValue("email emp mod");
-    fd1.getEmployerBox().getPhone().setValue("phone emp mod");
 
     fd1 = service.store(fd1);
 

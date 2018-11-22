@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Employee extends TableImpl<EmployeeRecord> {
 
-    private static final long serialVersionUID = 768781598;
+    private static final long serialVersionUID = -27536897;
 
     /**
      * The reference instance of <code>APP.EMPLOYEE</code>
@@ -59,6 +59,11 @@ public class Employee extends TableImpl<EmployeeRecord> {
     public final TableField<EmployeeRecord, BigDecimal> PARTNER_NR = createField("PARTNER_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
+     * The column <code>APP.EMPLOYEE.EMPLOYER_NR</code>.
+     */
+    public final TableField<EmployeeRecord, BigDecimal> EMPLOYER_NR = createField("EMPLOYER_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
+
+    /**
      * The column <code>APP.EMPLOYEE.FIRST_NAME</code>.
      */
     public final TableField<EmployeeRecord, String> FIRST_NAME = createField("FIRST_NAME", org.jooq.impl.SQLDataType.VARCHAR.length(200).nullable(false), this, "");
@@ -69,14 +74,9 @@ public class Employee extends TableImpl<EmployeeRecord> {
     public final TableField<EmployeeRecord, String> LAST_NAME = createField("LAST_NAME", org.jooq.impl.SQLDataType.VARCHAR.length(200).nullable(false), this, "");
 
     /**
-     * The column <code>APP.EMPLOYEE.ADDRESS_LINE1</code>.
+     * The column <code>APP.EMPLOYEE.ADDRESS_NR</code>.
      */
-    public final TableField<EmployeeRecord, String> ADDRESS_LINE1 = createField("ADDRESS_LINE1", org.jooq.impl.SQLDataType.VARCHAR.length(1200), this, "");
-
-    /**
-     * The column <code>APP.EMPLOYEE.ADDRESS_LINE2</code>.
-     */
-    public final TableField<EmployeeRecord, String> ADDRESS_LINE2 = createField("ADDRESS_LINE2", org.jooq.impl.SQLDataType.VARCHAR.length(1200), this, "");
+    public final TableField<EmployeeRecord, BigDecimal> ADDRESS_NR = createField("ADDRESS_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
      * The column <code>APP.EMPLOYEE.AHV_NUMBER</code>.
@@ -92,31 +92,6 @@ public class Employee extends TableImpl<EmployeeRecord> {
      * The column <code>APP.EMPLOYEE.ACCOUNT_NUMBER</code>.
      */
     public final TableField<EmployeeRecord, String> ACCOUNT_NUMBER = createField("ACCOUNT_NUMBER", org.jooq.impl.SQLDataType.VARCHAR.length(128), this, "");
-
-    /**
-     * The column <code>APP.EMPLOYEE.EMPLOYER_ADDRESS_LINE1</code>.
-     */
-    public final TableField<EmployeeRecord, String> EMPLOYER_ADDRESS_LINE1 = createField("EMPLOYER_ADDRESS_LINE1", org.jooq.impl.SQLDataType.VARCHAR.length(1200), this, "");
-
-    /**
-     * The column <code>APP.EMPLOYEE.EMPLOYER_ADDRESS_LINE2</code>.
-     */
-    public final TableField<EmployeeRecord, String> EMPLOYER_ADDRESS_LINE2 = createField("EMPLOYER_ADDRESS_LINE2", org.jooq.impl.SQLDataType.VARCHAR.length(1200), this, "");
-
-    /**
-     * The column <code>APP.EMPLOYEE.EMPLOYER_ADDRESS_LINE3</code>.
-     */
-    public final TableField<EmployeeRecord, String> EMPLOYER_ADDRESS_LINE3 = createField("EMPLOYER_ADDRESS_LINE3", org.jooq.impl.SQLDataType.VARCHAR.length(1200), this, "");
-
-    /**
-     * The column <code>APP.EMPLOYEE.EMPLOYER_EMAIL</code>.
-     */
-    public final TableField<EmployeeRecord, String> EMPLOYER_EMAIL = createField("EMPLOYER_EMAIL", org.jooq.impl.SQLDataType.VARCHAR.length(240), this, "");
-
-    /**
-     * The column <code>APP.EMPLOYEE.EMPLOYER_PHONE</code>.
-     */
-    public final TableField<EmployeeRecord, String> EMPLOYER_PHONE = createField("EMPLOYER_PHONE", org.jooq.impl.SQLDataType.VARCHAR.length(120), this, "");
 
     /**
      * The column <code>APP.EMPLOYEE.HOURLY_WAGE</code>.
@@ -173,7 +148,7 @@ public class Employee extends TableImpl<EmployeeRecord> {
      */
     @Override
     public UniqueKey<EmployeeRecord> getPrimaryKey() {
-        return Keys.SQL181120214302080;
+        return Keys.SQL181121195936810;
     }
 
     /**
@@ -181,7 +156,7 @@ public class Employee extends TableImpl<EmployeeRecord> {
      */
     @Override
     public List<UniqueKey<EmployeeRecord>> getKeys() {
-        return Arrays.<UniqueKey<EmployeeRecord>>asList(Keys.SQL181120214302080);
+        return Arrays.<UniqueKey<EmployeeRecord>>asList(Keys.SQL181121195936810);
     }
 
     /**

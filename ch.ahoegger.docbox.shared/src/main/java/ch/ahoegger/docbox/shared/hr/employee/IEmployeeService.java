@@ -3,9 +3,6 @@ package ch.ahoegger.docbox.shared.hr.employee;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
-import ch.ahoegger.docbox.shared.hr.employer.EmployeeSearchFormData;
-import ch.ahoegger.docbox.shared.hr.employer.EmployeeTableData;
-
 /**
  * <h3>{@link IEmployeeService}</h3>
  *

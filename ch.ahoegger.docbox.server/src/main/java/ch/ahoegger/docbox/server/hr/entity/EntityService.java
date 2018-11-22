@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
 import ch.ahoegger.docbox.server.util.FieldValidator;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
-import ch.ahoegger.docbox.shared.hr.billing.PayslipAccountingCodeType.UnbilledCode;
+import ch.ahoegger.docbox.shared.hr.billing.PayslipCodeType.UnbilledCode;
 import ch.ahoegger.docbox.shared.hr.entity.EntityFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
@@ -51,12 +51,12 @@ public class EntityService implements IEntityService {
       condition = condition.and(e.PARTNER_NR.eq(formData.getPartnerId().getValue()));
     }
 
-    // search payslipAccountingId
-    if (formData.getPayslipAccountingId() == null) {
-      condition = condition.and(e.PAYSLIP_ACCOUNTING_NR.isNull());
+    // search PayslipId
+    if (formData.getPayslipId() == null) {
+      condition = condition.and(e.PAYSLIP_NR.isNull());
     }
     else {
-      condition = condition.and(e.PAYSLIP_ACCOUNTING_NR.eq(formData.getPayslipAccountingId()));
+      condition = condition.and(e.PAYSLIP_NR.eq(formData.getPayslipId()));
     }
 
     // entity date from
@@ -73,7 +73,7 @@ public class EntityService implements IEntityService {
     }
 
     List<EntityTableRowData> rows = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(e.ENTITY_NR, e.PARTNER_NR, e.PAYSLIP_ACCOUNTING_NR, e.ENTITY_TYPE, e.ENTITY_DATE, e.WORKING_HOURS, e.EXPENSE_AMOUNT, e.DESCRIPTION)
+        .select(e.ENTITY_NR, e.PARTNER_NR, e.PAYSLIP_NR, e.ENTITY_TYPE, e.ENTITY_DATE, e.WORKING_HOURS, e.EXPENSE_AMOUNT, e.DESCRIPTION)
         .from(e)
         .where(condition)
         .orderBy(e.ENTITY_DATE)
@@ -83,7 +83,7 @@ public class EntityService implements IEntityService {
           EntityTableRowData rd = new EntityTableRowData();
           rd.setEnityId(rec.get(e.ENTITY_NR));
           rd.setPartnerId(rec.get(e.PARTNER_NR));
-          rd.setPayslipAccountingId(rec.get(e.PAYSLIP_ACCOUNTING_NR));
+          rd.setPayslipId(rec.get(e.PAYSLIP_NR));
           rd.setEntityType(rec.get(e.ENTITY_TYPE));
           rd.setDate(rec.get(e.ENTITY_DATE));
           rd.setHours(rec.get(e.WORKING_HOURS));
@@ -121,13 +121,13 @@ public class EntityService implements IEntityService {
         .map(rec -> rec.get(maxDate))
         .orElse(LocalDateUtility.toDate(today));
     formData.getEntityDate().setValue(date);
-    formData.setPayslipAccountingId(UnbilledCode.ID);
+    formData.setPayslipId(UnbilledCode.ID);
     return formData;
   }
 
   @Override
   public EntityFormData create(EntityFormData formData) {
-    if (formData.getPayslipAccountingId() == null) {
+    if (formData.getPayslipId() == null) {
       throw new VetoException("Payslip accounting id can not be null.");
     }
     formData.setEntityId(new BigDecimal(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME)));
@@ -154,14 +154,14 @@ public class EntityService implements IEntityService {
 
   @Override
   public EntityFormData store(EntityFormData formData) {
-    if (ObjectUtility.notEquals(UnbilledCode.ID, formData.getPayslipAccountingId())) {
+    if (ObjectUtility.notEquals(UnbilledCode.ID, formData.getPayslipId())) {
       throw new VetoException("Access denied.");
     }
     Entity e = Entity.ENTITY;
     FieldValidator validator = new FieldValidator();
     validator.add(FieldValidator.unmodifiableValidator(e.ENTITY_TYPE, formData.getEntityType()));
     validator.add(FieldValidator.unmodifiableValidator(e.PARTNER_NR, formData.getPartnerId()));
-    validator.add(FieldValidator.unmodifiableValidator(e.PAYSLIP_ACCOUNTING_NR, formData.getPayslipAccountingId()));
+    validator.add(FieldValidator.unmodifiableValidator(e.PAYSLIP_NR, formData.getPayslipId()));
     EntityRecord entity = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .fetchOne(e, e.ENTITY_NR.eq(formData.getEntityId()));
 
@@ -216,7 +216,7 @@ public class EntityService implements IEntityService {
 
     DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .update(e)
-        .set(e.PAYSLIP_ACCOUNTING_NR, groupId)
+        .set(e.PAYSLIP_NR, groupId)
         .where(condition)
         .execute();
 
@@ -225,9 +225,9 @@ public class EntityService implements IEntityService {
   }
 
   @RemoteServiceAccessDenied
-  public int insert(Connection connection, BigDecimal entityId, BigDecimal partnerId, BigDecimal payslipAccountingId, BigDecimal entityType, Date entityDate, BigDecimal hours, BigDecimal amount, String desc) {
+  public int insert(Connection connection, BigDecimal entityId, BigDecimal partnerId, BigDecimal payslipId, BigDecimal entityType, Date entityDate, BigDecimal hours, BigDecimal amount, String desc) {
     return DSL.using(connection, SQLDialect.DERBY)
-        .executeInsert(mapToRecord(new EntityRecord(), entityId, partnerId, payslipAccountingId, entityType, entityDate, hours, amount, desc));
+        .executeInsert(mapToRecord(new EntityRecord(), entityId, partnerId, payslipId, entityType, entityDate, hours, amount, desc));
   }
 
   protected EntityRecord toRecord(EntityFormData fd) {
@@ -242,11 +242,11 @@ public class EntityService implements IEntityService {
     if (fd == null) {
       return null;
     }
-    return mapToRecord(rec, fd.getEntityId(), fd.getPartnerId(), fd.getPayslipAccountingId(), fd.getEntityType(), fd.getEntityDate().getValue(), fd.getWorkHours().getValue(), fd.getExpenseAmount().getValue(), fd.getText().getValue());
+    return mapToRecord(rec, fd.getEntityId(), fd.getPartnerId(), fd.getPayslipId(), fd.getEntityType(), fd.getEntityDate().getValue(), fd.getWorkHours().getValue(), fd.getExpenseAmount().getValue(), fd.getText().getValue());
 
   }
 
-  protected EntityRecord mapToRecord(EntityRecord rec, BigDecimal entityId, BigDecimal partnerId, BigDecimal payslipAccountingId, BigDecimal entityType, Date entityDate, BigDecimal hours, BigDecimal amount, String desc) {
+  protected EntityRecord mapToRecord(EntityRecord rec, BigDecimal entityId, BigDecimal partnerId, BigDecimal payslipId, BigDecimal entityType, Date entityDate, BigDecimal hours, BigDecimal amount, String desc) {
     Entity e = Entity.ENTITY;
     return rec
         .with(e.EXPENSE_AMOUNT, amount)
@@ -256,7 +256,7 @@ public class EntityService implements IEntityService {
         .with(e.ENTITY_TYPE, entityType)
         .with(e.WORKING_HOURS, hours)
         .with(e.PARTNER_NR, partnerId)
-        .with(e.PAYSLIP_ACCOUNTING_NR, payslipAccountingId);
+        .with(e.PAYSLIP_NR, payslipId);
   }
 
   protected EntityFormData toFormData(EntityRecord rec) {
@@ -271,7 +271,7 @@ public class EntityService implements IEntityService {
     fd.setEntityType(rec.getEntityType());
     fd.getWorkHours().setValue(rec.getWorkingHours());
     fd.setPartnerId(rec.getPartnerNr());
-    fd.setPayslipAccountingId(rec.getPayslipAccountingNr());
+    fd.setPayslipId(rec.getPayslipNr());
     return fd;
   }
 
