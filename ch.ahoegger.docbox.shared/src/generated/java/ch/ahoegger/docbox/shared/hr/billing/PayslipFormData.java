@@ -43,6 +43,10 @@ public class PayslipFormData extends AbstractFormData {
     return getPropertyByClass(DocumentIdProperty.class);
   }
 
+  public Employer getEmployer() {
+    return getFieldByClass(Employer.class);
+  }
+
   public From getFrom() {
     return getFieldByClass(From.class);
   }
@@ -73,6 +77,24 @@ public class PayslipFormData extends AbstractFormData {
     return getPropertyByClass(PayslipIdProperty.class);
   }
 
+  /**
+   * access method for property StatementId.
+   */
+  public BigDecimal getStatementId() {
+    return getStatementIdProperty().getValue();
+  }
+
+  /**
+   * access method for property StatementId.
+   */
+  public void setStatementId(BigDecimal statementId) {
+    getStatementIdProperty().setValue(statementId);
+  }
+
+  public StatementIdProperty getStatementIdProperty() {
+    return getPropertyByClass(StatementIdProperty.class);
+  }
+
   public TaxGroup getTaxGroup() {
     return getFieldByClass(TaxGroup.class);
   }
@@ -100,6 +122,11 @@ public class PayslipFormData extends AbstractFormData {
     private static final long serialVersionUID = 1L;
   }
 
+  public static class Employer extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
   public static class From extends AbstractValueFieldData<java.util.Date> {
 
     private static final long serialVersionUID = 1L;
@@ -116,6 +143,11 @@ public class PayslipFormData extends AbstractFormData {
   }
 
   public static class PayslipIdProperty extends AbstractPropertyData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class StatementIdProperty extends AbstractPropertyData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

@@ -11,6 +11,7 @@ public interface IEmployeeTaxGroupTable {
 
   static String PARTNER_NR = "PARTNER_NR";
   static String TAX_GROUP_NR = "TAX_GROUP_NR";
+  static String STATEMENT_NR = IStatementTable.STATEMENT_NR;
   static String DOCUMENT_NR = IDocumentTable.DOCUMENT_NR;
 
 }

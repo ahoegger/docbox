@@ -26,6 +26,7 @@ public class EmployeeTaxGroupTableStatement implements ITableStatement, IEmploye
     statementBuilder.append("CREATE TABLE ").append(TABLE_NAME).append(" (");
     statementBuilder.append(PARTNER_NR).append(" BIGINT NOT NULL, ");
     statementBuilder.append(TAX_GROUP_NR).append(" BIGINT NOT NULL, ");
+    statementBuilder.append(STATEMENT_NR).append(" BIGINT, ");
     statementBuilder.append(DOCUMENT_NR).append(" BIGINT, ");
     statementBuilder.append("PRIMARY KEY (").append(ITableStatement.columns(PARTNER_NR, TAX_GROUP_NR)).append(")");
     statementBuilder.append(")");

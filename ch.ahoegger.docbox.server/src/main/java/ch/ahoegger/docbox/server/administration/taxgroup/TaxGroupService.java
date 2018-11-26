@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup;
-import org.ch.ahoegger.docbox.server.or.app.tables.Payslip;
 import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.TaxGroupRecord;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -48,10 +47,6 @@ public class TaxGroupService implements ITaxGroupService {
     if (formData.getPartner().getValue() != null) {
       condition = condition.and(etg.PARTNER_NR.eq(formData.getPartner().getValue()));
       table = tg.innerJoin(etg).on(etg.TAX_GROUP_NR.eq(tg.TAX_GROUP_NR));
-    }
-    if (formData.getPartner().getValue() != null) {
-      // join
-
     }
     // startDate
     if (formData.getStartDateFrom().getValue() != null) {
@@ -124,29 +119,30 @@ public class TaxGroupService implements ITaxGroupService {
 
   @Override
   public TaxGroupFormData load(TaxGroupFormData formData) {
-    TaxGroup t = TaxGroup.TAX_GROUP;
-    Payslip pg = Payslip.PAYSLIP;
-    Condition condition = DSL.trueCondition();
-    condition = condition.and(t.TAX_GROUP_NR.eq(formData.getTaxGroupId()));
-    if (formData.getPartnerId() != null) {
-      condition = condition.and(pg.PARTNER_NR.eq(formData.getPartnerId()));
-    }
-    // aliases
-    Field<BigDecimal> workingHours = DSL.sum(pg.WORKING_HOURS).as("WORKING_HOURS");
-    Field<BigDecimal> bruttoWage = DSL.sum(pg.BRUTTO_WAGE).as("BRUTTO_WAGE");
-    Field<BigDecimal> nettoWage = DSL.sum(pg.NETTO_WAGE).as("NETTO_WAGE");
-
-    Field<BigDecimal> sourceTax = DSL.sum(pg.SOURCE_TAX).as("SOURCE_TAX");
-    Field<BigDecimal> socialSecurtiyTax = DSL.sum(pg.SOCIAL_SECURITY_TAX).as("SOCIAL_SECURITY_TAX");
-    Field<BigDecimal> vacationExtra = DSL.sum(pg.VACATION_EXTRA).as("VACATION_EXTRA");
-
-    formData = toFormData(DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(t.TAX_GROUP_NR, t.NAME, t.START_DATE, t.END_DATE, workingHours, bruttoWage, nettoWage, sourceTax, socialSecurtiyTax, vacationExtra)
-        .from(t)
-        .leftJoin(pg).on(t.TAX_GROUP_NR.eq(pg.TAX_GROUP_NR))
-        .where(condition)
-        .groupBy(t.TAX_GROUP_NR, t.NAME, t.START_DATE, t.END_DATE)
-        .fetchOne(), workingHours, bruttoWage, nettoWage, sourceTax, socialSecurtiyTax, vacationExtra);
+    // TODO
+//    TaxGroup t = TaxGroup.TAX_GROUP;
+//    Payslip pg = Payslip.PAYSLIP;
+//    Condition condition = DSL.trueCondition();
+//    condition = condition.and(t.TAX_GROUP_NR.eq(formData.getTaxGroupId()));
+//    if (formData.getPartnerId() != null) {
+//      condition = condition.and(pg.PARTNER_NR.eq(formData.getPartnerId()));
+//    }
+//    // aliases
+//    Field<BigDecimal> workingHours = DSL.sum(pg.WORKING_HOURS).as("WORKING_HOURS");
+//    Field<BigDecimal> bruttoWage = DSL.sum(pg.BRUTTO_WAGE).as("BRUTTO_WAGE");
+//    Field<BigDecimal> nettoWage = DSL.sum(pg.NETTO_WAGE).as("NETTO_WAGE");
+//
+//    Field<BigDecimal> sourceTax = DSL.sum(pg.SOURCE_TAX).as("SOURCE_TAX");
+//    Field<BigDecimal> socialSecurtiyTax = DSL.sum(pg.SOCIAL_SECURITY_TAX).as("SOCIAL_SECURITY_TAX");
+//    Field<BigDecimal> vacationExtra = DSL.sum(pg.VACATION_EXTRA).as("VACATION_EXTRA");
+//
+//    formData = toFormData(DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+//        .select(t.TAX_GROUP_NR, t.NAME, t.START_DATE, t.END_DATE, workingHours, bruttoWage, nettoWage, sourceTax, socialSecurtiyTax, vacationExtra)
+//        .from(t)
+//        .leftJoin(pg).on(t.TAX_GROUP_NR.eq(pg.TAX_GROUP_NR))
+//        .where(condition)
+//        .groupBy(t.TAX_GROUP_NR, t.NAME, t.START_DATE, t.END_DATE)
+//        .fetchOne(), workingHours, bruttoWage, nettoWage, sourceTax, socialSecurtiyTax, vacationExtra);
 
     return formData;
   }

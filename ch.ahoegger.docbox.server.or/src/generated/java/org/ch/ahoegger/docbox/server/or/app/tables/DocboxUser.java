@@ -33,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DocboxUser extends TableImpl<DocboxUserRecord> {
 
-    private static final long serialVersionUID = -2013951349;
+    private static final long serialVersionUID = -139201127;
 
     /**
      * The reference instance of <code>APP.DOCBOX_USER</code>
@@ -113,7 +113,7 @@ public class DocboxUser extends TableImpl<DocboxUserRecord> {
      */
     @Override
     public UniqueKey<DocboxUserRecord> getPrimaryKey() {
-        return Keys.SQL181122110600580;
+        return Keys.SQL181126154908610;
     }
 
     /**
@@ -121,7 +121,7 @@ public class DocboxUser extends TableImpl<DocboxUserRecord> {
      */
     @Override
     public List<UniqueKey<DocboxUserRecord>> getKeys() {
-        return Arrays.<UniqueKey<DocboxUserRecord>>asList(Keys.SQL181122110600580);
+        return Arrays.<UniqueKey<DocboxUserRecord>>asList(Keys.SQL181126154908610);
     }
 
     /**

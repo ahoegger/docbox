@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DocumentOcr extends TableImpl<DocumentOcrRecord> {
 
-    private static final long serialVersionUID = -235825487;
+    private static final long serialVersionUID = -1492911483;
 
     /**
      * The reference instance of <code>APP.DOCUMENT_OCR</code>
@@ -111,7 +111,7 @@ public class DocumentOcr extends TableImpl<DocumentOcrRecord> {
      */
     @Override
     public UniqueKey<DocumentOcrRecord> getPrimaryKey() {
-        return Keys.SQL181122110600280;
+        return Keys.SQL181126154908120;
     }
 
     /**
@@ -119,7 +119,7 @@ public class DocumentOcr extends TableImpl<DocumentOcrRecord> {
      */
     @Override
     public List<UniqueKey<DocumentOcrRecord>> getKeys() {
-        return Arrays.<UniqueKey<DocumentOcrRecord>>asList(Keys.SQL181122110600280);
+        return Arrays.<UniqueKey<DocumentOcrRecord>>asList(Keys.SQL181126154908120);
     }
 
     /**

@@ -71,10 +71,12 @@ public class EmployerService implements IEmployerService {
   public EmployerFormData load(EmployerFormData formData) {
     Assertions.assertNotNull(formData.getEmployerId());
     Employer emp = Employer.EMPLOYER;
-    mapToFormData(formData, DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+    formData = mapToFormData(formData, DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .fetchOne(emp, emp.EMPLOYER_NR.eq(formData.getEmployerId())));
     // load address
-    BEANS.get(IAddressService.class).load(formData.getAddressBox());
+    if (formData != null) {
+      BEANS.get(IAddressService.class).load(formData.getAddressBox());
+    }
     return formData;
   }
 

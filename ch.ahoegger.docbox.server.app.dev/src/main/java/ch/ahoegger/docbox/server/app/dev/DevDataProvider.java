@@ -338,7 +338,10 @@ public class DevDataProvider extends DataBaseInitialization {
 
     taxGroupId01 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
 
-    BEANS.get(TaxGroupService.class).insert(sqlService.getConnection(), taxGroupId01, "2016", LocalDateUtility.toDate(LocalDate.of(2016, 01, 01)), LocalDateUtility.toDate(LocalDate.of(2016, 12, 31)));
+    LocalDate start = TODAY.minusMonths(2).withDayOfYear(1);
+    LocalDate end = TODAY.minusMonths(2).with(TemporalAdjusters.lastDayOfYear());
+    BEANS.get(TaxGroupService.class).insert(sqlService.getConnection(), taxGroupId01, start.format(DateTimeFormatter.ofPattern("yyyy", LocalDateUtility.DE_CH)), LocalDateUtility.toDate(start), LocalDateUtility.toDate(end));
+
   }
 
   protected void insertPayslip(ISqlService sqlService) {
@@ -348,7 +351,7 @@ public class DevDataProvider extends DataBaseInitialization {
     payslipId02 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
 
     DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy", LocalDateUtility.DE_CH);
-    BEANS.get(PayslipService.class).insert(sqlService.getConnection(), payslipId01, partnerId03_employee, taxGroupId01, documentId02, TODAY.minusMonths(1).format(monthFormatter),
+    BEANS.get(PayslipService.class).insert(sqlService.getConnection(), payslipId01, partnerId03_employee, employerId, taxGroupId01, documentId02, BigDecimal.valueOf(-1), TODAY.minusMonths(1).format(monthFormatter),
         LocalDateUtility.toDate(TODAY.minusMonths(2).withDayOfMonth(1)), // start period
         LocalDateUtility.toDate(TODAY.minusMonths(2).with(TemporalAdjusters.lastDayOfMonth())), // end period
         LocalDateUtility.toDate(TODAY.minusMonths(2).with(TemporalAdjusters.lastDayOfMonth())), // date creation
@@ -357,7 +360,7 @@ public class DevDataProvider extends DataBaseInitialization {
         BigDecimal.valueOf(230.50), BigDecimal.valueOf(-10.55),
         BigDecimal.valueOf(-5.55),
         BigDecimal.valueOf(9.87));
-    BEANS.get(PayslipService.class).insert(sqlService.getConnection(), payslipId02, partnerId03_employee, taxGroupId01, documentId02, "Oktober 2016",
+    BEANS.get(PayslipService.class).insert(sqlService.getConnection(), payslipId02, partnerId03_employee, employerId, taxGroupId01, documentId02, BigDecimal.valueOf(-1), "Oktober 2016",
         LocalDateUtility.toDate(LocalDate.of(2016, 11, 02)),
         LocalDateUtility.toDate(LocalDate.of(2016, 10, 1)),
         LocalDateUtility.toDate(LocalDate.of(2016, 10, 31)),

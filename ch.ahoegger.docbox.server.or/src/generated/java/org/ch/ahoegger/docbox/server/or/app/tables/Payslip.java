@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Payslip extends TableImpl<PayslipRecord> {
 
-    private static final long serialVersionUID = -566323405;
+    private static final long serialVersionUID = 1613737071;
 
     /**
      * The reference instance of <code>APP.PAYSLIP</code>
@@ -64,6 +64,11 @@ public class Payslip extends TableImpl<PayslipRecord> {
     public final TableField<PayslipRecord, BigDecimal> PARTNER_NR = createField("PARTNER_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
+     * The column <code>APP.PAYSLIP.EMPLOYER_NR</code>.
+     */
+    public final TableField<PayslipRecord, BigDecimal> EMPLOYER_NR = createField("EMPLOYER_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
+
+    /**
      * The column <code>APP.PAYSLIP.TAX_GROUP_NR</code>.
      */
     public final TableField<PayslipRecord, BigDecimal> TAX_GROUP_NR = createField("TAX_GROUP_NR", org.jooq.impl.SQLDataType.BIGINT, this, "", new LongConverter());
@@ -72,6 +77,11 @@ public class Payslip extends TableImpl<PayslipRecord> {
      * The column <code>APP.PAYSLIP.DOCUMENT_NR</code>.
      */
     public final TableField<PayslipRecord, BigDecimal> DOCUMENT_NR = createField("DOCUMENT_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
+
+    /**
+     * The column <code>APP.PAYSLIP.STATEMENT_NR</code>.
+     */
+    public final TableField<PayslipRecord, BigDecimal> STATEMENT_NR = createField("STATEMENT_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
      * The column <code>APP.PAYSLIP.NAME</code>.
@@ -87,41 +97,6 @@ public class Payslip extends TableImpl<PayslipRecord> {
      * The column <code>APP.PAYSLIP.END_DATE</code>.
      */
     public final TableField<PayslipRecord, Date> END_DATE = createField("END_DATE", org.jooq.impl.SQLDataType.DATE, this, "", new DateConverter());
-
-    /**
-     * The column <code>APP.PAYSLIP.STATEMENT_DATE</code>.
-     */
-    public final TableField<PayslipRecord, Date> STATEMENT_DATE = createField("STATEMENT_DATE", org.jooq.impl.SQLDataType.DATE, this, "", new DateConverter());
-
-    /**
-     * The column <code>APP.PAYSLIP.WORKING_HOURS</code>.
-     */
-    public final TableField<PayslipRecord, BigDecimal> WORKING_HOURS = createField("WORKING_HOURS", org.jooq.impl.SQLDataType.DECIMAL.precision(6, 2), this, "");
-
-    /**
-     * The column <code>APP.PAYSLIP.BRUTTO_WAGE</code>.
-     */
-    public final TableField<PayslipRecord, BigDecimal> BRUTTO_WAGE = createField("BRUTTO_WAGE", org.jooq.impl.SQLDataType.DECIMAL.precision(6, 2), this, "");
-
-    /**
-     * The column <code>APP.PAYSLIP.NETTO_WAGE</code>.
-     */
-    public final TableField<PayslipRecord, BigDecimal> NETTO_WAGE = createField("NETTO_WAGE", org.jooq.impl.SQLDataType.DECIMAL.precision(6, 2), this, "");
-
-    /**
-     * The column <code>APP.PAYSLIP.SOURCE_TAX</code>.
-     */
-    public final TableField<PayslipRecord, BigDecimal> SOURCE_TAX = createField("SOURCE_TAX", org.jooq.impl.SQLDataType.DECIMAL.precision(6, 2), this, "");
-
-    /**
-     * The column <code>APP.PAYSLIP.SOCIAL_SECURITY_TAX</code>.
-     */
-    public final TableField<PayslipRecord, BigDecimal> SOCIAL_SECURITY_TAX = createField("SOCIAL_SECURITY_TAX", org.jooq.impl.SQLDataType.DECIMAL.precision(6, 2), this, "");
-
-    /**
-     * The column <code>APP.PAYSLIP.VACATION_EXTRA</code>.
-     */
-    public final TableField<PayslipRecord, BigDecimal> VACATION_EXTRA = createField("VACATION_EXTRA", org.jooq.impl.SQLDataType.DECIMAL.precision(6, 2), this, "");
 
     /**
      * Create a <code>APP.PAYSLIP</code> table reference
@@ -158,7 +133,7 @@ public class Payslip extends TableImpl<PayslipRecord> {
      */
     @Override
     public UniqueKey<PayslipRecord> getPrimaryKey() {
-        return Keys.SQL181122110600500;
+        return Keys.SQL181126154908480;
     }
 
     /**
@@ -166,7 +141,7 @@ public class Payslip extends TableImpl<PayslipRecord> {
      */
     @Override
     public List<UniqueKey<PayslipRecord>> getKeys() {
-        return Arrays.<UniqueKey<PayslipRecord>>asList(Keys.SQL181122110600500);
+        return Arrays.<UniqueKey<PayslipRecord>>asList(Keys.SQL181126154908480);
     }
 
     /**

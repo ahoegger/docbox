@@ -215,6 +215,11 @@ public class TaxGroupTablePage extends AbstractPageWithTable<Table> {
       }
 
       @Override
+      protected void execInitAction() {
+        setVisible(getPartnerId() != null);
+      }
+
+      @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
         return CollectionUtility.hashSet(TableMenuType.EmptySpace);
       }

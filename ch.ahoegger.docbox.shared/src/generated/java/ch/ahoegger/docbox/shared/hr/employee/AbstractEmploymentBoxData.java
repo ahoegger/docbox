@@ -28,6 +28,10 @@ public class AbstractEmploymentBoxData extends AbstractFormFieldData {
     return getFieldByClass(SourceTaxRate.class);
   }
 
+  public TaxType getTaxType() {
+    return getFieldByClass(TaxType.class);
+  }
+
   public VacationExtraRate getVacationExtraRate() {
     return getFieldByClass(VacationExtraRate.class);
   }
@@ -43,6 +47,11 @@ public class AbstractEmploymentBoxData extends AbstractFormFieldData {
   }
 
   public static class SourceTaxRate extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class TaxType extends AbstractValueFieldData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

@@ -28,7 +28,7 @@ public abstract class AbstractDbMigrationTask implements IMigrationTask {
 
   abstract void runMigration();
 
-  private boolean isRequired() {
+  protected boolean isRequired() {
     if (MigrationUtility.getTableDesription(IMigrationTable.TABLE_NAME) == null) {
       return true;
     }

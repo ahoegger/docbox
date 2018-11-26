@@ -41,25 +41,37 @@ public interface IStatementTable {
 
   public static String WORKING_HOURS = "WORKING_HOURS";
   public static BigDecimal WORKING_HOURS_MIN = BigDecimal.valueOf(0d);
-  public static BigDecimal WORKING_HOURS_MAX = BigDecimal.valueOf(2000d);
+  public static BigDecimal WORKING_HOURS_MAX = BigDecimal.valueOf(9999999d);
+
+  public static String WAGE = "WAGE";
+  public static BigDecimal WAGE_MIN = BigDecimal.valueOf(0d);
+  public static BigDecimal WAGE_MAX = BigDecimal.valueOf(9999999d);
 
   public static String BRUTTO_WAGE = "BRUTTO_WAGE";
   public static BigDecimal BRUTTO_WAGE_MIN = BigDecimal.valueOf(0d);
-  public static BigDecimal BRUTTO_WAGE_MAX = BigDecimal.valueOf(20000d);
+  public static BigDecimal BRUTTO_WAGE_MAX = BigDecimal.valueOf(9999999d);
 
   public static String NETTO_WAGE = "NETTO_WAGE";
   public static BigDecimal NETTO_WAGE_MIN = BigDecimal.valueOf(0d);
-  public static BigDecimal NETTO_WAGE_MAX = BigDecimal.valueOf(20000d);
+  public static BigDecimal NETTO_WAGE_MAX = BigDecimal.valueOf(9999999d);
+
+  public static String NETTO_WAGE_PAYOUT = "NETTO_WAGE_PAYOUT";
+  public static BigDecimal NETTO_WAGE_PAYOUT_MIN = BigDecimal.valueOf(0d);
+  public static BigDecimal NETTO_WAGE_PAYOUT_MAX = BigDecimal.valueOf(9999999d);
 
   public static String SOURCE_TAX = "SOURCE_TAX";
   public static BigDecimal SOURCE_TAX_MIN = BigDecimal.valueOf(0d);
-  public static BigDecimal SOURCE_TAX_MAX = BigDecimal.valueOf(99999d);
+  public static BigDecimal SOURCE_TAX_MAX = BigDecimal.valueOf(9999999d);
 
   public static String SOCIAL_SECURITY_TAX = "SOCIAL_SECURITY_TAX";
   public static BigDecimal SOCIAL_SECURITY_TAX_MIN = BigDecimal.valueOf(0d);
-  public static BigDecimal SOCIAL_SECURITY_TAX_MAX = BigDecimal.valueOf(99999d);
+  public static BigDecimal SOCIAL_SECURITY_TAX_MAX = BigDecimal.valueOf(9999999d);
 
   public static String VACATION_EXTRA = "VACATION_EXTRA";
   public static BigDecimal VACATION_EXTRA_TAX_MIN = BigDecimal.valueOf(0d);
-  public static BigDecimal VACATION_EXTRA_TAX_MAX = BigDecimal.valueOf(2000d);
+  public static BigDecimal VACATION_EXTRA_TAX_MAX = BigDecimal.valueOf(9999999d);
+
+  public static String EXPENSES = "EXPENSES";
+  public static BigDecimal EXPENSES_MIN = BigDecimal.valueOf(0d);
+  public static BigDecimal EXPENSES_MAX = BigDecimal.valueOf(9999999d);
 }

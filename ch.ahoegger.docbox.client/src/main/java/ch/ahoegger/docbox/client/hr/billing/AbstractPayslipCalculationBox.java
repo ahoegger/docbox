@@ -10,7 +10,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 
 import ch.ahoegger.docbox.client.hr.entity.AbstractEntityTable;
-import ch.ahoegger.docbox.or.definition.table.IPayslipTable;
+import ch.ahoegger.docbox.or.definition.table.IStatementTable;
 import ch.ahoegger.docbox.shared.hr.billing.AbstractPayslipBoxData;
 
 /**
@@ -63,12 +63,12 @@ public abstract class AbstractPayslipCalculationBox extends AbstractGroupBox {
 
     @Override
     protected BigDecimal getConfiguredMinValue() {
-      return IPayslipTable.WORKING_HOURS_MIN;
+      return IStatementTable.WORKING_HOURS_MIN;
     }
 
     @Override
     protected BigDecimal getConfiguredMaxValue() {
-      return IPayslipTable.WORKING_HOURS_MAX;
+      return IStatementTable.WORKING_HOURS_MAX;
     }
   }
 
@@ -81,12 +81,12 @@ public abstract class AbstractPayslipCalculationBox extends AbstractGroupBox {
 
     @Override
     protected BigDecimal getConfiguredMinValue() {
-      return IPayslipTable.BRUTTO_WAGE_MIN;
+      return IStatementTable.BRUTTO_WAGE_MIN;
     }
 
     @Override
     protected BigDecimal getConfiguredMaxValue() {
-      return IPayslipTable.BRUTTO_WAGE_MAX;
+      return IStatementTable.BRUTTO_WAGE_MAX;
     }
   }
 
@@ -99,12 +99,12 @@ public abstract class AbstractPayslipCalculationBox extends AbstractGroupBox {
 
     @Override
     protected BigDecimal getConfiguredMinValue() {
-      return IPayslipTable.NETTO_WAGE_MIN;
+      return IStatementTable.NETTO_WAGE_MIN;
     }
 
     @Override
     protected BigDecimal getConfiguredMaxValue() {
-      return IPayslipTable.NETTO_WAGE_MAX;
+      return IStatementTable.NETTO_WAGE_MAX;
     }
   }
 
@@ -117,12 +117,12 @@ public abstract class AbstractPayslipCalculationBox extends AbstractGroupBox {
 
     @Override
     protected BigDecimal getConfiguredMinValue() {
-      return IPayslipTable.SOCIAL_SECURITY_TAX_MIN;
+      return IStatementTable.SOCIAL_SECURITY_TAX_MIN;
     }
 
     @Override
     protected BigDecimal getConfiguredMaxValue() {
-      return IPayslipTable.SOCIAL_SECURITY_TAX_MAX;
+      return IStatementTable.SOCIAL_SECURITY_TAX_MAX;
     }
   }
 
@@ -135,12 +135,12 @@ public abstract class AbstractPayslipCalculationBox extends AbstractGroupBox {
 
     @Override
     protected BigDecimal getConfiguredMinValue() {
-      return IPayslipTable.SOURCE_TAX_MIN;
+      return IStatementTable.SOURCE_TAX_MIN;
     }
 
     @Override
     protected BigDecimal getConfiguredMaxValue() {
-      return IPayslipTable.SOURCE_TAX_MAX;
+      return IStatementTable.SOURCE_TAX_MAX;
     }
   }
 
@@ -153,12 +153,12 @@ public abstract class AbstractPayslipCalculationBox extends AbstractGroupBox {
 
     @Override
     protected BigDecimal getConfiguredMinValue() {
-      return IPayslipTable.VACATION_EXTRA_TAX_MIN;
+      return IStatementTable.VACATION_EXTRA_TAX_MIN;
     }
 
     @Override
     protected BigDecimal getConfiguredMaxValue() {
-      return IPayslipTable.VACATION_EXTRA_TAX_MAX;
+      return IStatementTable.VACATION_EXTRA_TAX_MAX;
     }
   }
 

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -49,9 +50,14 @@ public class TaxGroupLookupService extends AbstractDocboxLookupService<BigDecima
   protected List<? extends ILookupRow<BigDecimal>> getData(Condition conditions, ILookupCall<BigDecimal> call) {
     final TaxGroupLookupCall taxGroupCall = (TaxGroupLookupCall) call;
     TaxGroup t = TaxGroup.TAX_GROUP;
+    EmployeeTaxGroup empT = EmployeeTaxGroup.EMPLOYEE_TAX_GROUP;
+    if (taxGroupCall.getPartnerId() != null) {
+      conditions = conditions.and(empT.PARTNER_NR.eq(taxGroupCall.getPartnerId()));
+    }
     return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(t.TAX_GROUP_NR, t.NAME, t.START_DATE, t.END_DATE)
+        .select(t.TAX_GROUP_NR, t.NAME, t.START_DATE, t.END_DATE, empT.PARTNER_NR)
         .from(t)
+        .leftOuterJoin(empT).on(t.TAX_GROUP_NR.eq(empT.TAX_GROUP_NR))
         .where(conditions)
         .fetch()
         .stream()

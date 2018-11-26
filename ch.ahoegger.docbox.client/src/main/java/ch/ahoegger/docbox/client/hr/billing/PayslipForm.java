@@ -28,6 +28,7 @@ import ch.ahoegger.docbox.client.hr.billing.PayslipForm.MainBox.CancelButton;
 import ch.ahoegger.docbox.client.hr.billing.PayslipForm.MainBox.DateField;
 import ch.ahoegger.docbox.client.hr.billing.PayslipForm.MainBox.DocumentAbstractField;
 import ch.ahoegger.docbox.client.hr.billing.PayslipForm.MainBox.DocumentLinkField;
+import ch.ahoegger.docbox.client.hr.billing.PayslipForm.MainBox.EmployerField;
 import ch.ahoegger.docbox.client.hr.billing.PayslipForm.MainBox.EntityDateBox;
 import ch.ahoegger.docbox.client.hr.billing.PayslipForm.MainBox.EntityDateBox.FromField;
 import ch.ahoegger.docbox.client.hr.billing.PayslipForm.MainBox.EntityDateBox.ToField;
@@ -36,6 +37,7 @@ import ch.ahoegger.docbox.client.hr.billing.PayslipForm.MainBox.PartnerField;
 import ch.ahoegger.docbox.client.hr.billing.PayslipForm.MainBox.PayslipCalculationBox;
 import ch.ahoegger.docbox.client.hr.billing.PayslipForm.MainBox.TaxGroupField;
 import ch.ahoegger.docbox.client.hr.billing.PayslipForm.MainBox.TitleField;
+import ch.ahoegger.docbox.client.hr.employer.AbstractEmployerSmartField;
 import ch.ahoegger.docbox.client.hr.entity.IWorkItemEntity;
 import ch.ahoegger.docbox.client.partner.AbstractPartnerSmartField;
 import ch.ahoegger.docbox.or.definition.table.IDocumentTable;
@@ -47,8 +49,9 @@ import ch.ahoegger.docbox.shared.hr.billing.PayslipFormData;
 @FormData(value = PayslipFormData.class, sdkCommand = FormData.SdkCommand.CREATE)
 public class PayslipForm extends AbstractForm {
 
-  private BigDecimal m_documentId;
   private BigDecimal m_payslipId;
+  private BigDecimal m_documentId;
+  private BigDecimal m_statementId;
 
   @Override
   protected String getConfiguredTitle() {
@@ -91,6 +94,16 @@ public class PayslipForm extends AbstractForm {
   @FormData
   public void setPayslipId(BigDecimal payslipId) {
     m_payslipId = payslipId;
+  }
+
+  @FormData
+  public BigDecimal getStatementId() {
+    return m_statementId;
+  }
+
+  @FormData
+  public void setStatementId(BigDecimal statementId) {
+    m_statementId = statementId;
   }
 
   private void calculateWage() {
@@ -155,6 +168,10 @@ public class PayslipForm extends AbstractForm {
     return getFieldByClass(TaxGroupField.class);
   }
 
+  public EmployerField getEmployerField() {
+    return getFieldByClass(EmployerField.class);
+  }
+
   public OkButton getOkButton() {
     return getFieldByClass(OkButton.class);
   }
@@ -165,6 +182,14 @@ public class PayslipForm extends AbstractForm {
     @Order(1000)
     public class PartnerField extends AbstractPartnerSmartField {
 
+    }
+
+    @Order(1500)
+    public class EmployerField extends AbstractEmployerSmartField {
+      @Override
+      protected boolean getConfiguredVisible() {
+        return false;
+      }
     }
 
     @Order(2000)
@@ -339,6 +364,7 @@ public class PayslipForm extends AbstractForm {
       getDocumentLinkField().setDocumentId(formData.getDocumentId());
 
       getPartnerField().setEnabled(false);
+      getEmployerField().setEnabled(false);
       getDocumentLinkField().setVisible(true);
       getTitleField().setEnabled(false);
       getDateField().setEnabled(false);

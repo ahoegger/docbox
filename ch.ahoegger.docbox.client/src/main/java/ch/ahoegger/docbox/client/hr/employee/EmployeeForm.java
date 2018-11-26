@@ -23,8 +23,8 @@ import ch.ahoegger.docbox.client.hr.employee.EmployeeForm.MainBox.OkButton;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeForm.MainBox.PartnerField;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeForm.MainBox.PartnerGroupBox;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeForm.MainBox.TabBox.EmployerBox.EmployerField;
-import ch.ahoegger.docbox.client.hr.employer.AbstractEmployerSmartField;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeForm.MainBox.TabBox.EmploymentBox;
+import ch.ahoegger.docbox.client.hr.employer.AbstractEmployerSmartField;
 import ch.ahoegger.docbox.client.partner.AbstractPartnerBox;
 import ch.ahoegger.docbox.client.partner.AbstractPartnerSmartField;
 import ch.ahoegger.docbox.client.partner.IPartnerEntity;
@@ -195,6 +195,10 @@ public class EmployeeForm extends AbstractForm {
 
       @Order(2000)
       public class EmployerBox extends AbstractGroupBox {
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("Employer");
+        }
 
         @Order(1000)
         public class EmployerField extends AbstractEmployerSmartField {

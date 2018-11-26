@@ -41,7 +41,7 @@ public class EntityServiceTest extends AbstractTestWithDatabase {
     BEANS.get(DocumentService.class).insert(connection, documentId01, "All fish are wet", LocalDateUtility.toDate(LocalDate.now().minusDays(3)), LocalDateUtility.today(), null, "2016_03_08_124640.pdf", null, null, false,
         OcrLanguageCodeType.GermanCode.ID);
 
-    BEANS.get(PayslipService.class).insert(connection, PayslipId01, partnerId01, UnbilledCode.ID, documentId01, "August 2016",
+    BEANS.get(PayslipService.class).insert(connection, PayslipId01, partnerId01, EMPLOYER_ID, UnbilledCode.ID, documentId01, BigDecimal.valueOf(-1), "August 2016",
         LocalDateUtility.toDate(LocalDate.of(2016, 8, 1)),
         LocalDateUtility.toDate(LocalDate.of(2016, 8, 31)),
         LocalDateUtility.toDate(LocalDate.of(2016, 9, 2)),

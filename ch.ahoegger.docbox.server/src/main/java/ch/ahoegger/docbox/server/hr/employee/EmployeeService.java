@@ -234,8 +234,8 @@ public class EmployeeService implements IEmployeeService {
     fd.getEmployeeBox().getAddressBox().setAddressId(rec.getAddressNr());
     fd.getEmployeeBox().getAhvNumber().setValue(rec.getAhvNumber());
     fd.getEmployeeBox().getAccountNumber().setValue(rec.getAccountNumber());
-    fd.getEmployeeBox().getTaxType().setValue(rec.getTaxType());
     fd.getEmployeeBox().getBirthday().setValue(rec.getBirthday());
+    fd.getEmploymentBox().getTaxType().setValue(rec.getTaxType());
     fd.getEmploymentBox().getHourlyWage().setValue(rec.getHourlyWage());
     fd.getEmploymentBox().getSocialInsuranceRate().setValue(rec.getSocialInsuranceRate());
     fd.getEmploymentBox().getSourceTaxRate().setValue(rec.getSourceTaxRate());
@@ -245,7 +245,7 @@ public class EmployeeService implements IEmployeeService {
 
   protected EmployeeRecord toRecord(EmployeeFormData fd) {
     return toRecord(fd.getPartnerId(), fd.getEmployeeBox().getFirstName().getValue(), fd.getEmployeeBox().getLastName().getValue(), fd.getEmployeeBox().getAddressBox().getAddressId(),
-        fd.getEmployeeBox().getAhvNumber().getValue(), fd.getEmployeeBox().getAccountNumber().getValue(), fd.getEmployeeBox().getTaxType().getValue(), fd.getEmployeeBox().getBirthday().getValue(),
+        fd.getEmployeeBox().getAhvNumber().getValue(), fd.getEmployeeBox().getAccountNumber().getValue(), fd.getEmploymentBox().getTaxType().getValue(), fd.getEmployeeBox().getBirthday().getValue(),
         fd.getEmploymentBox().getHourlyWage().getValue(),
         fd.getEmploymentBox().getSocialInsuranceRate().getValue(), fd.getEmploymentBox().getSourceTaxRate().getValue(), fd.getEmploymentBox().getVacationExtraRate().getValue(),
         fd.getEmployer().getValue());
@@ -266,9 +266,9 @@ public class EmployeeService implements IEmployeeService {
         .with(t.ACCOUNT_NUMBER, accountNumber)
         .with(t.ADDRESS_NR, addressId)
         .with(t.AHV_NUMBER, ahvNumber)
-        .with(t.TAX_TYPE, taxType)
         .with(t.BIRTHDAY, birthday)
         .with(t.FIRST_NAME, firstName)
+        .with(t.TAX_TYPE, taxType)
         .with(t.HOURLY_WAGE, hourlyWage)
         .with(t.SOCIAL_INSURANCE_RATE, socialInsuranceRate)
         .with(t.SOURCE_TAX_RATE, sourceTaxRate)

@@ -38,6 +38,7 @@ import ch.ahoegger.docbox.client.AbstractDocboxPageWithTable;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI;
 import ch.ahoegger.docbox.client.hr.entity.EntityTablePage;
+import ch.ahoegger.docbox.client.hr.entity.IWorkItemEntity;
 import ch.ahoegger.docbox.shared.administration.taxgroup.TaxGroupLookupCall;
 import ch.ahoegger.docbox.shared.hr.billing.IPayslipService;
 import ch.ahoegger.docbox.shared.hr.billing.PayslipCodeType.UnbilledCode;
@@ -74,7 +75,7 @@ public class PayslipTablePage extends AbstractDocboxPageWithTable<PayslipTablePa
 
   @Override
   protected void execInitPage() {
-    registerDataChangeListener(IPayslipEntity.ENTITY_KEY);
+    registerDataChangeListener(IPayslipEntity.ENTITY_KEY, IWorkItemEntity.WORK_ITEM_KEY);
   }
 
   @Override
@@ -120,6 +121,14 @@ public class PayslipTablePage extends AbstractDocboxPageWithTable<PayslipTablePa
   }
 
   public class Table extends AbstractTable {
+
+    @Override
+    protected void execDecorateRow(ITableRow row) {
+      if (UnbilledCode.ID.equals(getIdColumn().getValue(row))) {
+        row.setCssClass("unbilled");
+      }
+      super.execDecorateRow(row);
+    }
 
     @Override
     protected boolean getConfiguredSortEnabled() {

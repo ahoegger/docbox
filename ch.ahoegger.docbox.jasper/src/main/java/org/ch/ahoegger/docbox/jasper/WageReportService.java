@@ -54,6 +54,28 @@ public class WageReportService {
 
   }
 
+  public byte[] createMonthlyReport(ReportMonthPayslip bean) {
+    InputStream billStream = getClass().getResourceAsStream("/jasper/bill.jrxml");
+    InputStream billWorkStream = getClass().getResourceAsStream("/jasper/bill_work.jrxml");
+    InputStream billExpenseStream = getClass().getResourceAsStream("/jasper/bill_expenses.jrxml");
+
+    try {
+      JasperReport jasperBillReport = JasperCompileManager.compileReport(billStream);
+      JasperReport jasperWorkSubreport = JasperCompileManager.compileReport(billWorkStream);
+      JasperReport jasperExpensesSubreport = JasperCompileManager.compileReport(billExpenseStream);
+      Map<String, Object> parameters = new HashMap<>();
+      parameters.put("subreportWork", jasperWorkSubreport);
+      parameters.put("subreportExpenses", jasperExpensesSubreport);
+      JRBeanCollectionDataSource connection = new JRBeanCollectionDataSource(CollectionUtility.arrayList(bean));
+      JasperPrint print = JasperFillManager.fillReport(jasperBillReport, parameters, connection);
+      return JasperExportManager.exportReportToPdf(print);
+    }
+    catch (JRException e) {
+      throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
+    }
+
+  }
+
   public byte[] createMonthlyReport(String title, String addressLine1, String addressLine2, String addressLine3, LocalDate date, String iban, BigDecimal hourWage, WageCalculation wageCalculation,
       String employerAddressLine1, String employerAddressLine2, String employerAddressLine3, String employerEmail, String employerPhone) {
     ReportMonthPayslip account = new ReportMonthPayslip();

@@ -5,11 +5,15 @@ import java.math.BigDecimal;
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.placeholder.AbstractPlaceholderField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 
 import ch.ahoegger.docbox.or.definition.table.IEmployeeTable;
 import ch.ahoegger.docbox.shared.hr.employee.AbstractEmploymentBoxData;
+import ch.ahoegger.docbox.shared.hr.tax.TaxCodeType;
 
 /**
  * <h3>{@link AbstractEmploymentBox}</h3>
@@ -32,6 +36,14 @@ public class AbstractEmploymentBox extends AbstractGroupBox {
     return getFieldByClass(VacationExtraRateField.class);
   }
 
+  public TaxTypeField getTaxTypeField() {
+    return getFieldByClass(TaxTypeField.class);
+  }
+
+  public PlaceholderField getPlaceholderField() {
+    return getFieldByClass(PlaceholderField.class);
+  }
+
   public SocialInsuranceRateField getSocialInsuranceRateField() {
     return getFieldByClass(SocialInsuranceRateField.class);
   }
@@ -41,6 +53,30 @@ public class AbstractEmploymentBox extends AbstractGroupBox {
   }
 
   @Order(1000)
+  public class TaxTypeField extends AbstractSmartField<BigDecimal> {
+    @Override
+    protected String getConfiguredLabel() {
+      return TEXTS.get("TaxType");
+    }
+
+    @Override
+    protected boolean getConfiguredMandatory() {
+      return true;
+    }
+
+    @Override
+    protected Class<? extends ICodeType<?, BigDecimal>> getConfiguredCodeType() {
+      return TaxCodeType.class;
+    }
+
+  }
+
+  @Order(2000)
+  @FormData(sdkCommand = FormData.SdkCommand.IGNORE)
+  public class PlaceholderField extends AbstractPlaceholderField {
+  }
+
+  @Order(3000)
   public class HourlyWageField extends AbstractBigDecimalField {
     @Override
     protected String getConfiguredLabel() {
@@ -58,7 +94,7 @@ public class AbstractEmploymentBox extends AbstractGroupBox {
     }
   }
 
-  @Order(2000)
+  @Order(4000)
   public class SocialInsuranceRateField extends AbstractBigDecimalField {
     @Override
     protected String getConfiguredLabel() {
@@ -81,7 +117,7 @@ public class AbstractEmploymentBox extends AbstractGroupBox {
     }
   }
 
-  @Order(3000)
+  @Order(5000)
   public class SourceTaxRateField extends AbstractBigDecimalField {
     @Override
     protected String getConfiguredLabel() {
@@ -104,7 +140,7 @@ public class AbstractEmploymentBox extends AbstractGroupBox {
     }
   }
 
-  @Order(4000)
+  @Order(6000)
   public class VacationExtraRateField extends AbstractBigDecimalField {
     @Override
     protected String getConfiguredLabel() {

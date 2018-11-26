@@ -34,11 +34,14 @@ public class StatementTableStatement implements ITableStatement, IStatementTable
         .append(SOURCE_TAX_RATE).append(" DECIMAL(5, 3), ")
         .append(VACATION_EXTRA_RATE).append(" DECIMAL(5, 3), ")
         .append(WORKING_HOURS).append(" DECIMAL(9, 2), ")
+        .append(WAGE).append(" DECIMAL(9, 2), ")
         .append(BRUTTO_WAGE).append(" DECIMAL(9, 2), ")
         .append(NETTO_WAGE).append(" DECIMAL(9, 2), ")
+        .append(NETTO_WAGE_PAYOUT).append(" DECIMAL(9, 2), ")
         .append(SOURCE_TAX).append(" DECIMAL(9, 2), ")
         .append(SOCIAL_SECURITY_TAX).append(" DECIMAL(9, 2), ")
         .append(VACATION_EXTRA).append(" DECIMAL(9, 2), ")
+        .append(EXPENSES).append(" DECIMAL(9, 2), ")
         .append("PRIMARY KEY (").append(STATEMENT_NR).append(")")
         .append(")");
     return statementBuilder.toString();

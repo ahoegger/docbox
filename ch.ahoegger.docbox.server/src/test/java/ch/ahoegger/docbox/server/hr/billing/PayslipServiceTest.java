@@ -61,7 +61,7 @@ public class PayslipServiceTest extends AbstractTestWithDatabase {
 
     BEANS.get(DocumentPartnerService.class).insert(connection, documentId, partnerId);
 
-    BEANS.get(PayslipService.class).insert(connection, payslipGroupId, partnerId, null, documentId, "Dezember ",
+    BEANS.get(PayslipService.class).insert(connection, payslipGroupId, partnerId, EMPLOYER_ID, null, documentId, BigDecimal.valueOf(-1), "Dezember ",
         LocalDateUtility.toDate(LocalDate.of(2016, 12, 1)),
         LocalDateUtility.toDate(LocalDate.of(2016, 12, 31)),
         LocalDateUtility.toDate(LocalDate.of(2017, 1, 5)),

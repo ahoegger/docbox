@@ -11,25 +11,25 @@ public interface IEntityTable {
   public static String TABLE_NAME = "ENTITY";
 
   // columns
-  public static String ENTITY_NR = "ENTITY_NR";
+  String ENTITY_NR = "ENTITY_NR";
 
-  public static String PARTNER_NR = IPartnerTable.PARTNER_NR;
+  String PARTNER_NR = IPartnerTable.PARTNER_NR;
 
-  public static String PAYSLIP_NR = IPayslipTable.PAYSLIP_NR;
+  String PAYSLIP_NR = IPayslipTable.PAYSLIP_NR;
 
-  public static String ENTITY_TYPE = "ENTITY_TYPE";
+  String ENTITY_TYPE = "ENTITY_TYPE";
 
-  public static String DESCRIPTION = "DESCRIPTION";
-  public static int DESCRIPTION_LENGTH = 2400;
+  String DESCRIPTION = "DESCRIPTION";
+  int DESCRIPTION_LENGTH = 2400;
 
-  public static String ENTITY_DATE = "ENTITY_DATE";
+  String ENTITY_DATE = "ENTITY_DATE";
 
-  public static String WORKING_HOURS = "WORKING_HOURS";
-  public static BigDecimal WORKING_HOURS_MIN = BigDecimal.valueOf(0d);
-  public static BigDecimal WORKING_HOURS_MAX = BigDecimal.valueOf(24d);
+  String WORKING_HOURS = "WORKING_HOURS";
+  BigDecimal WORKING_HOURS_MIN = BigDecimal.valueOf(0d);
+  BigDecimal WORKING_HOURS_MAX = BigDecimal.valueOf(24d);
 
-  public static String EXPENSE_AMOUNT = "EXPENSE_AMOUNT";
-  public static BigDecimal EXPENSE_AMOUNT_MIN = BigDecimal.valueOf(0d);
-  public static BigDecimal EXPENSE_AMOUNT_MAX = BigDecimal.valueOf(999999d);
+  String EXPENSE_AMOUNT = "EXPENSE_AMOUNT";
+  BigDecimal EXPENSE_AMOUNT_MIN = BigDecimal.valueOf(0d);
+  BigDecimal EXPENSE_AMOUNT_MAX = BigDecimal.valueOf(999999d);
 
 }

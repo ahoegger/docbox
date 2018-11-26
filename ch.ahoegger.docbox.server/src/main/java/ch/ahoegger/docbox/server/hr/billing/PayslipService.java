@@ -3,18 +3,19 @@ package ch.ahoegger.docbox.server.hr.billing;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.ch.ahoegger.docbox.jasper.WageReportService;
-import org.ch.ahoegger.docbox.jasper.bean.WageCalculation;
+import org.ch.ahoegger.docbox.jasper.bean.ReportMonthPayslip;
 import org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.Payslip;
+import org.ch.ahoegger.docbox.server.or.app.tables.Statement;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.PayslipRecord;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
@@ -37,6 +38,8 @@ import ch.ahoegger.docbox.server.document.DocumentService;
 import ch.ahoegger.docbox.server.hr.employee.EmployeeService;
 import ch.ahoegger.docbox.server.hr.employer.EmployerService;
 import ch.ahoegger.docbox.server.hr.entity.EntityService;
+import ch.ahoegger.docbox.server.hr.statement.StatementBean;
+import ch.ahoegger.docbox.server.hr.statement.StatementService;
 import ch.ahoegger.docbox.server.util.FieldValidator;
 import ch.ahoegger.docbox.shared.administration.taxgroup.ITaxGroupService;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
@@ -55,6 +58,8 @@ import ch.ahoegger.docbox.shared.hr.employer.EmployerFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData.EntityTableRowData;
+import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
+import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.WorkCode;
 import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
 import ch.ahoegger.docbox.shared.hr.tax.TaxGroupSearchFormData;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
@@ -67,10 +72,16 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 public class PayslipService implements IPayslipService {
   private static final Logger LOG = LoggerFactory.getLogger(PayslipService.class);
 
+  private static Predicate<? super EntityTableRowData> entityExpenseFilter = e -> ExpenseCode.isEqual(e.getEntityType());
+  private static Predicate<? super EntityTableRowData> entityWorkFilter = e -> WorkCode.isEqual(e.getEntityType());
+
   @Override
   public PayslipTableData getTableData(PayslipSearchFormData formData) {
+
     Condition condition = DSL.trueCondition();
+
     Payslip pg = Payslip.PAYSLIP.as("PG");
+    Statement st = Statement.STATEMENT.as("ST");
     EmployeeTaxGroup etg = EmployeeTaxGroup.EMPLOYEE_TAX_GROUP.as("ETG");
     TableLike<?> table = pg;
 
@@ -100,9 +111,9 @@ public class PayslipService implements IPayslipService {
     }
 
     List<PayslipTableRowData> rows = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(pg.PAYSLIP_NR, pg.PARTNER_NR, pg.DOCUMENT_NR, pg.NAME, pg.START_DATE, pg.END_DATE, pg.STATEMENT_DATE, pg.WORKING_HOURS, pg.BRUTTO_WAGE, pg.NETTO_WAGE, pg.SOURCE_TAX, pg.SOCIAL_SECURITY_TAX, pg.VACATION_EXTRA,
-            pg.TAX_GROUP_NR)
-        .from(table)
+        .select(pg.PAYSLIP_NR, pg.PARTNER_NR, pg.TAX_GROUP_NR, st.STATEMENT_NR, pg.DOCUMENT_NR, pg.NAME, pg.START_DATE, pg.END_DATE, st.STATEMENT_DATE, st.WORKING_HOURS, st.BRUTTO_WAGE, st.NETTO_WAGE, st.SOURCE_TAX, st.SOCIAL_SECURITY_TAX,
+            st.VACATION_EXTRA)
+        .from(table).leftOuterJoin(st).on(pg.STATEMENT_NR.eq(st.STATEMENT_NR))
         .where(condition)
         .fetch()
         .stream()
@@ -113,13 +124,13 @@ public class PayslipService implements IPayslipService {
           rd.setName(rec.get(pg.NAME));
           rd.setStartDate(rec.get(pg.START_DATE));
           rd.setEndDate(rec.get(pg.END_DATE));
-          rd.setDate(rec.get(pg.STATEMENT_DATE));
-          rd.setWorkingHours(rec.get(pg.WORKING_HOURS));
-          rd.setBruttoWage(rec.get(pg.BRUTTO_WAGE));
-          rd.setSourceTax(rec.get(pg.SOURCE_TAX));
-          rd.setSocialSecurityTax(rec.get(pg.SOCIAL_SECURITY_TAX));
-          rd.setVacationExtra(rec.get(pg.VACATION_EXTRA));
-          rd.setNettoWage(rec.get(pg.NETTO_WAGE));
+          rd.setDate(rec.get(st.STATEMENT_DATE));
+          rd.setWorkingHours(rec.get(st.WORKING_HOURS));
+          rd.setBruttoWage(rec.get(st.BRUTTO_WAGE));
+          rd.setSourceTax(rec.get(st.SOURCE_TAX));
+          rd.setSocialSecurityTax(rec.get(st.SOCIAL_SECURITY_TAX));
+          rd.setVacationExtra(rec.get(st.VACATION_EXTRA));
+          rd.setNettoWage(rec.get(st.NETTO_WAGE));
           rd.setTaxGroup(rec.get(pg.TAX_GROUP_NR));
           rd.setPartnerId(rec.get(pg.PARTNER_NR));
           rd.setDocumentId(rec.get(pg.DOCUMENT_NR));
@@ -129,13 +140,35 @@ public class PayslipService implements IPayslipService {
 
     // unbilled row
     if (formData.getIncludeUnbilled() != null && formData.getIncludeUnbilled().booleanValue()) {
+      EmployeeFormData employeeData = new EmployeeFormData();
+      employeeData.setPartnerId(formData.getPartner().getValue());
+      employeeData = BEANS.get(EmployeeService.class).load(employeeData);
+
+      List<EntityTableRowData> unbilledEntities = getUnbilledEntities(null, null, formData.getPartner().getValue());
+      List<EntityTableRowData> expenseItems = unbilledEntities.stream().filter(entityExpenseFilter).collect(Collectors.toList());
+      List<EntityTableRowData> workItems = unbilledEntities.stream().filter(entityWorkFilter).collect(Collectors.toList());
+      WageCalculationInput calculationInput = new WageCalculationInput()
+          .withExpenseEntities(expenseItems)
+          .withHourlyWage(employeeData.getEmploymentBox().getHourlyWage().getValue())
+          .withSocialInsuranceRate(employeeData.getEmploymentBox().getSocialInsuranceRate().getValue())
+          .withSourceTaxRate(employeeData.getEmploymentBox().getSourceTaxRate().getValue())
+          .withTaxType(employeeData.getEmploymentBox().getTaxType().getValue())
+          .withVacationExtraRate(employeeData.getEmploymentBox().getVacationExtraRate().getValue())
+          .withWorkEntities(workItems);
+      WageCalculationResult calculationResult = BEANS.get(WageCalculationService.class).calculateWage(calculationInput);
+
       PayslipTableRowData unbilledRow = new PayslipTableRowData();
       unbilledRow.setId(UnbilledCode.ID);
       unbilledRow.setSortGroup(BigDecimal.valueOf(2));
       unbilledRow.setPartnerId(formData.getPartner().getValue());
       unbilledRow.setName(TEXTS.get("Unbilled"));
+      unbilledRow.setWorkingHours(calculationResult.getWorkingHours());
+      unbilledRow.setBruttoWage(calculationResult.getBruttoWage());
+      unbilledRow.setSourceTax(calculationResult.getSourceTax());
+      unbilledRow.setSocialSecurityTax(calculationResult.getSocialInsuranceTax());
+      unbilledRow.setVacationExtra(calculationResult.getVacationExtra());
+      unbilledRow.setNettoWage(calculationResult.getNettoWage());
       rows.add(unbilledRow);
-
     }
     PayslipTableData tableData = new PayslipTableData();
     tableData.setRows(rows.toArray(new PayslipTableRowData[0]));
@@ -166,6 +199,7 @@ public class PayslipService implements IPayslipService {
     TaxGroupSearchFormData taxGroupData = new TaxGroupSearchFormData();
     Date fromDate = formData.getFrom().getValue();
     Date toDate = formData.getTo().getValue();
+    taxGroupData.getPartner().setValue(formData.getPartner().getValue());
     BigDecimal taxGroupId = Arrays.stream(BEANS.get(ITaxGroupService.class).getTaxGroupTableData(taxGroupData).getRows())
         .filter(row -> Optional.ofNullable(row.getStartDate()).filter(sd -> sd.before(fromDate) || sd.equals(fromDate)).isPresent())
         .filter(row -> Optional.ofNullable(row.getEndDate()).filter(ed -> ed.after(toDate) || ed.equals(toDate)).isPresent())
@@ -187,16 +221,29 @@ public class PayslipService implements IPayslipService {
     EmployerFormData employerFormData = new EmployerFormData();
     employerFormData.setEmployerId(employeeData.getEmployer().getValue());
     employerFormData = BEANS.get(EmployerService.class).load(employerFormData);
+    formData.getEmployer().setValue(employerFormData.getEmployerId());
 
     List<EntityTableRowData> unbilledEntities = getUnbilledEntities(formData.getFrom().getValue(), formData.getTo().getValue(), formData.getPartner().getValue());
 
-    WageCalculation wageData = BEANS.get(WageCalculationService.class).calculateWage(unbilledEntities, employeeData.getEmploymentBox().getHourlyWage().getValue(),
-        employeeData.getEmploymentBox().getSocialInsuranceRate().getValue(), employeeData.getEmploymentBox().getSourceTaxRate().getValue(), employeeData.getEmploymentBox().getVacationExtraRate().getValue());
-    byte[] docContent = BEANS.get(WageReportService.class).createMonthlyReport(formData.getTitle().getValue(), employeeData.getEmployeeBox().getFirstName().getValue() + " " + employeeData.getEmployeeBox().getLastName().getValue(),
-        employeeData.getEmployeeBox().getAddressBox().getLine1().getValue(), employeeData.getEmployeeBox().getAddressBox().getPlz().getValue() + " " + employeeData.getEmployeeBox().getAddressBox().getCity().getValue(),
-        formData.getDate().getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), employeeData.getEmployeeBox().getAccountNumber().getValue(), employeeData.getEmploymentBox().getHourlyWage().getValue(), wageData,
-        employerFormData.getName().getValue(), employerFormData.getAddressBox().getLine1().getValue(), employerFormData.getAddressBox().getPlz().getValue() + " " + employerFormData.getAddressBox().getCity().getValue(),
-        employerFormData.getEmail().getValue(), employerFormData.getPhone().getValue());
+    List<EntityTableRowData> expenseItems = unbilledEntities.stream().filter(entityExpenseFilter).collect(Collectors.toList());
+    List<EntityTableRowData> workItems = unbilledEntities.stream().filter(entityWorkFilter).collect(Collectors.toList());
+    WageCalculationInput calculationInput = new WageCalculationInput()
+        .withExpenseEntities(expenseItems)
+        .withHourlyWage(employeeData.getEmploymentBox().getHourlyWage().getValue())
+        .withSocialInsuranceRate(employeeData.getEmploymentBox().getSocialInsuranceRate().getValue())
+        .withSourceTaxRate(employeeData.getEmploymentBox().getSourceTaxRate().getValue())
+        .withTaxType(employeeData.getEmploymentBox().getTaxType().getValue())
+        .withVacationExtraRate(employeeData.getEmploymentBox().getVacationExtraRate().getValue())
+        .withWorkEntities(workItems);
+    WageCalculationResult calculationResult = BEANS.get(WageCalculationService.class).calculateWage(calculationInput);
+
+    StatementBean statementBean = mapToStatementBean(new StatementBean(), employeeData, calculationResult);
+    statementBean = BEANS.get(StatementService.class).create(statementBean);
+    formData.setStatementId(statementBean.getStatementId());
+
+    ReportMonthPayslip reportBean = BEANS.get(MonthlyReportBeanMapper.class).map(employerFormData, employeeData, formData, statementBean, workItems, expenseItems);
+
+    byte[] docContent = BEANS.get(WageReportService.class).createMonthlyReport(reportBean);
 
     DocumentFormData documentData = new DocumentFormData();
     DocumentService documentService = BEANS.get(DocumentService.class);
@@ -238,16 +285,25 @@ public class PayslipService implements IPayslipService {
     employeeData = BEANS.get(IEmployeeService.class).load(employeeData);
 
     List<EntityTableRowData> unbilledEntities = getUnbilledEntities(formData.getFrom().getValue(), formData.getTo().getValue(), formData.getPartner().getValue());
-    WageCalculation wageCalc = BEANS.get(WageCalculationService.class).calculateWage(unbilledEntities,
-        employeeData.getEmploymentBox().getHourlyWage().getValue(), employeeData.getEmploymentBox().getSocialInsuranceRate().getValue(), employeeData.getEmploymentBox().getSourceTaxRate().getValue(),
-        employeeData.getEmploymentBox().getVacationExtraRate().getValue());
 
-    formData.getPayslipCalculationBox().getBruttoWage().setValue(wageCalc.getBruttoWage());
-    formData.getPayslipCalculationBox().getNettoWage().setValue(wageCalc.getNettoWage());
-    formData.getPayslipCalculationBox().getWorkingHours().setValue(wageCalc.getHoursTotal());
-    formData.getPayslipCalculationBox().getSocialSecurityTax().setValue(wageCalc.getSocialSecuityTax());
-    formData.getPayslipCalculationBox().getSourceTax().setValue(wageCalc.getSourceTax());
-    formData.getPayslipCalculationBox().getVacationExtra().setValue(wageCalc.getVacationExtra());
+    List<EntityTableRowData> expenseItems = unbilledEntities.stream().filter(entityExpenseFilter).collect(Collectors.toList());
+    List<EntityTableRowData> workItems = unbilledEntities.stream().filter(entityWorkFilter).collect(Collectors.toList());
+
+    WageCalculationInput calculationInput = new WageCalculationInput()
+        .withExpenseEntities(expenseItems)
+        .withHourlyWage(employeeData.getEmploymentBox().getHourlyWage().getValue())
+        .withSocialInsuranceRate(employeeData.getEmploymentBox().getSocialInsuranceRate().getValue())
+        .withSourceTaxRate(employeeData.getEmploymentBox().getSourceTaxRate().getValue())
+        .withTaxType(employeeData.getEmploymentBox().getTaxType().getValue())
+        .withVacationExtraRate(employeeData.getEmploymentBox().getVacationExtraRate().getValue())
+        .withWorkEntities(workItems);
+    WageCalculationResult calculationResult = BEANS.get(WageCalculationService.class).calculateWage(calculationInput);
+    formData.getPayslipCalculationBox().getBruttoWage().setValue(calculationResult.getBruttoWage());
+    formData.getPayslipCalculationBox().getNettoWage().setValue(calculationResult.getNettoWage());
+    formData.getPayslipCalculationBox().getWorkingHours().setValue(calculationResult.getWorkingHours());
+    formData.getPayslipCalculationBox().getSocialSecurityTax().setValue(calculationResult.getSocialInsuranceTax());
+    formData.getPayslipCalculationBox().getSourceTax().setValue(calculationResult.getSourceTax());
+    formData.getPayslipCalculationBox().getVacationExtra().setValue(calculationResult.getVacationExtra());
 
     List<EntitiesRowData> entityRows = unbilledEntities.stream().map(row -> {
       EntitiesRowData rd = new EntitiesRowData();
@@ -269,6 +325,17 @@ public class PayslipService implements IPayslipService {
     Payslip pg = Payslip.PAYSLIP;
     formData = toFormData(DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .fetchOne(pg, pg.PAYSLIP_NR.eq(formData.getPayslipId())));
+
+    // statement
+    StatementBean statementBean = new StatementBean().withStatementId(formData.getStatementId());
+    BEANS.get(StatementService.class).load(statementBean);
+    formData.getPayslipCalculationBox().getBruttoWage().setValue(statementBean.getBruttoWage());
+    formData.getPayslipCalculationBox().getNettoWage().setValue(statementBean.getNettoWage());
+    formData.getPayslipCalculationBox().getSocialSecurityTax().setValue(statementBean.getSocialInsuranceRate());
+    formData.getPayslipCalculationBox().getSourceTax().setValue(statementBean.getSourceTax());
+    formData.getPayslipCalculationBox().getVacationExtra().setValue(statementBean.getVacationExtra());
+    formData.getPayslipCalculationBox().getWorkingHours().setValue(statementBean.getWorkingHours());
+
     EntitySearchFormData entitySearchData = new EntitySearchFormData();
     entitySearchData.setPayslipId(formData.getPayslipId());
     List<EntitiesRowData> entityRows = CollectionUtility.arrayList(BEANS.get(EntityService.class).getEntityTableData(entitySearchData).getRows()).stream()
@@ -293,18 +360,13 @@ public class PayslipService implements IPayslipService {
     Payslip pg = Payslip.PAYSLIP;
 
     FieldValidator validator = new FieldValidator();
-    validator.add(FieldValidator.unmodifiableValidator(pg.BRUTTO_WAGE, formData.getPayslipCalculationBox().getBruttoWage().getValue()));
     validator.add(FieldValidator.unmodifiableValidator(pg.DOCUMENT_NR, formData.getDocumentId()));
     validator.add(FieldValidator.unmodifiableValidator(pg.END_DATE, formData.getTo().getValue()));
     validator.add(FieldValidator.unmodifiableValidator(pg.NAME, formData.getTitle().getValue()));
-    validator.add(FieldValidator.unmodifiableValidator(pg.NETTO_WAGE, formData.getPayslipCalculationBox().getNettoWage().getValue()));
+    validator.add(FieldValidator.unmodifiableValidator(pg.STATEMENT_NR, formData.getStatementId()));
     validator.add(FieldValidator.unmodifiableValidator(pg.PARTNER_NR, formData.getPartner().getValue()));
     validator.add(FieldValidator.unmodifiableValidator(pg.PAYSLIP_NR, formData.getPayslipId()));
-    validator.add(FieldValidator.unmodifiableValidator(pg.SOCIAL_SECURITY_TAX, formData.getPayslipCalculationBox().getSocialSecurityTax().getValue()));
     validator.add(FieldValidator.unmodifiableValidator(pg.START_DATE, formData.getFrom().getValue()));
-    validator.add(FieldValidator.unmodifiableValidator(pg.STATEMENT_DATE, formData.getDate().getValue()));
-    validator.add(FieldValidator.unmodifiableValidator(pg.VACATION_EXTRA, formData.getPayslipCalculationBox().getVacationExtra().getValue()));
-    validator.add(FieldValidator.unmodifiableValidator(pg.WORKING_HOURS, formData.getPayslipCalculationBox().getWorkingHours().getValue()));
 
     PayslipRecord Payslip = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .fetchOne(pg, pg.PAYSLIP_NR.eq(formData.getPayslipId()));
@@ -372,11 +434,22 @@ public class PayslipService implements IPayslipService {
   }
 
   @RemoteServiceAccessDenied
-  public int insert(Connection connection, BigDecimal PayslipId, BigDecimal partnerId, BigDecimal taxGroupId, BigDecimal documentId, String name,
+  public int insert(Connection connection, BigDecimal PayslipId, BigDecimal partnerId, BigDecimal employerNr, BigDecimal taxGroupId, BigDecimal documentId, BigDecimal statementId, String name,
       Date startDate, Date endDate, Date statementDate, BigDecimal workingHours, BigDecimal bruttoWage, BigDecimal nettoWage, BigDecimal sourceTax, BigDecimal socialSecurityTax, BigDecimal vacationExtra) {
-    return DSL.using(connection, SQLDialect.DERBY)
-        .executeInsert(
-            mapToRecord(new PayslipRecord(), PayslipId, partnerId, taxGroupId, documentId, name, startDate, endDate, statementDate, workingHours, bruttoWage, nettoWage, sourceTax, socialSecurityTax, vacationExtra));
+    PayslipFormData fd = new PayslipFormData();
+    fd.setDocumentId(documentId);
+    fd.getEmployer().setValue(employerNr);
+    fd.getFrom().setValue(startDate);
+    fd.getTitle().setValue(name);
+    fd.getPartner().setValue(partnerId);
+    fd.setPayslipId(PayslipId);
+    fd.setStatementId(statementId);
+    fd.getTaxGroup().setValue(taxGroupId);
+    fd.getTo().setValue(endDate);
+
+    Payslip pg = Payslip.PAYSLIP;
+    return mapToRecord(DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .newRecord(pg), fd).insert();
   }
 
   protected PayslipFormData toFormData(PayslipRecord rec) {
@@ -384,20 +457,15 @@ public class PayslipService implements IPayslipService {
       return null;
     }
     PayslipFormData fd = new PayslipFormData();
-    fd.getPayslipCalculationBox().getBruttoWage().setValue(rec.getBruttoWage());
     fd.setDocumentId(rec.getDocumentNr());
+    fd.getEmployer().setValue(rec.getEmployerNr());
     fd.getFrom().setValue(rec.getStartDate());
     fd.getTitle().setValue(rec.getName());
-    fd.getPayslipCalculationBox().getNettoWage().setValue(rec.getNettoWage());
     fd.getPartner().setValue(rec.getPartnerNr());
     fd.setPayslipId(rec.getPayslipNr());
-    fd.getPayslipCalculationBox().getSocialSecurityTax().setValue(rec.getSocialSecurityTax());
-    fd.getPayslipCalculationBox().getSourceTax().setValue(rec.getSourceTax());
-    fd.getDate().setValue(rec.getStatementDate());
+    fd.setStatementId(rec.getStatementNr());
     fd.getTaxGroup().setValue(rec.getTaxGroupNr());
     fd.getTo().setValue(rec.getEndDate());
-    fd.getPayslipCalculationBox().getVacationExtra().setValue(rec.getVacationExtra());
-    fd.getPayslipCalculationBox().getWorkingHours().setValue(rec.getWorkingHours());
     return fd;
 
   }
@@ -406,31 +474,37 @@ public class PayslipService implements IPayslipService {
     if (fd == null) {
       return null;
     }
-    return mapToRecord(rec, fd.getPayslipId(), fd.getPartner().getValue(), fd.getTaxGroup().getValue(), fd.getDocumentId(), fd.getTitle().getValue(),
-        fd.getFrom().getValue(), fd.getTo().getValue(), fd.getDate().getValue(), fd.getPayslipCalculationBox().getWorkingHours().getValue(), fd.getPayslipCalculationBox().getBruttoWage().getValue(),
-        fd.getPayslipCalculationBox().getNettoWage().getValue(), fd.getPayslipCalculationBox().getSourceTax().getValue(), fd.getPayslipCalculationBox().getSocialSecurityTax().getValue(),
-        fd.getPayslipCalculationBox().getVacationExtra().getValue());
-
-  }
-
-  protected PayslipRecord mapToRecord(PayslipRecord rec, BigDecimal PayslipId, BigDecimal partnerId, BigDecimal taxGroupId, BigDecimal documentId, String name,
-      Date startDate, Date endDate, Date statementDate, BigDecimal workingHours, BigDecimal bruttoWage, BigDecimal nettoWage, BigDecimal sourceTax, BigDecimal socialSecurityTax, BigDecimal vacationExtra) {
     Payslip pg = Payslip.PAYSLIP;
     return rec
-        .with(pg.BRUTTO_WAGE, bruttoWage)
-        .with(pg.DOCUMENT_NR, documentId)
-        .with(pg.END_DATE, endDate)
-        .with(pg.NAME, name)
-        .with(pg.NETTO_WAGE, nettoWage)
-        .with(pg.PARTNER_NR, partnerId)
-        .with(pg.PAYSLIP_NR, PayslipId)
-        .with(pg.SOCIAL_SECURITY_TAX, socialSecurityTax)
-        .with(pg.SOURCE_TAX, sourceTax)
-        .with(pg.START_DATE, startDate)
-        .with(pg.STATEMENT_DATE, startDate)
-        .with(pg.TAX_GROUP_NR, taxGroupId)
-        .with(pg.VACATION_EXTRA, vacationExtra)
-        .with(pg.WORKING_HOURS, workingHours);
+        .with(pg.DOCUMENT_NR, fd.getDocumentId())
+        .with(pg.STATEMENT_NR, fd.getStatementId())
+        .with(pg.EMPLOYER_NR, fd.getEmployer().getValue())
+        .with(pg.END_DATE, fd.getTo().getValue())
+        .with(pg.NAME, fd.getTitle().getValue())
+        .with(pg.PARTNER_NR, fd.getPartner().getValue())
+        .with(pg.PAYSLIP_NR, fd.getPayslipId())
+        .with(pg.START_DATE, fd.getFrom().getValue())
+        .with(pg.TAX_GROUP_NR, fd.getTaxGroup().getValue());
   }
 
+  protected StatementBean mapToStatementBean(StatementBean bean, EmployeeFormData employeeData, WageCalculationResult calculationResult) {
+
+    return bean.withAccountNumber(employeeData.getEmployeeBox().getAccountNumber().getValue())
+        .withBruttoWage(calculationResult.getBruttoWage())
+        .withNettoWage(calculationResult.getNettoWage())
+        .withNettoWageRounded(calculationResult.getNettoWageRounded())
+        .withSocialInsuranceTax(calculationResult.getSocialInsuranceTax())
+        .withSourceTax(calculationResult.getSourceTax())
+        .withVacationExtra(calculationResult.getVacationExtra())
+        .withWorkingHours(calculationResult.getWorkingHours())
+        .withExpenses(calculationResult.getExpenses())
+        .withHourlyWage(employeeData.getEmploymentBox().getHourlyWage().getValue())
+        .withPartnerId(employeeData.getPartnerId())
+        .withSocialInsuranceRate(employeeData.getEmploymentBox().getSocialInsuranceRate().getValue())
+        .withSourceTaxRate(employeeData.getEmploymentBox().getSourceTaxRate().getValue())
+        .withTaxType(employeeData.getEmploymentBox().getTaxType().getValue())
+        .withVacationExtraRate(employeeData.getEmploymentBox().getVacationExtraRate().getValue())
+        .withWage(calculationResult.getWage());
+
+  }
 }

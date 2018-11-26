@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Statement extends TableImpl<StatementRecord> {
 
-    private static final long serialVersionUID = -1206463787;
+    private static final long serialVersionUID = -1534677781;
 
     /**
      * The reference instance of <code>APP.STATEMENT</code>
@@ -104,6 +104,11 @@ public class Statement extends TableImpl<StatementRecord> {
     public final TableField<StatementRecord, BigDecimal> WORKING_HOURS = createField("WORKING_HOURS", org.jooq.impl.SQLDataType.DECIMAL.precision(9, 2), this, "");
 
     /**
+     * The column <code>APP.STATEMENT.WAGE</code>.
+     */
+    public final TableField<StatementRecord, BigDecimal> WAGE = createField("WAGE", org.jooq.impl.SQLDataType.DECIMAL.precision(9, 2), this, "");
+
+    /**
      * The column <code>APP.STATEMENT.BRUTTO_WAGE</code>.
      */
     public final TableField<StatementRecord, BigDecimal> BRUTTO_WAGE = createField("BRUTTO_WAGE", org.jooq.impl.SQLDataType.DECIMAL.precision(9, 2), this, "");
@@ -112,6 +117,11 @@ public class Statement extends TableImpl<StatementRecord> {
      * The column <code>APP.STATEMENT.NETTO_WAGE</code>.
      */
     public final TableField<StatementRecord, BigDecimal> NETTO_WAGE = createField("NETTO_WAGE", org.jooq.impl.SQLDataType.DECIMAL.precision(9, 2), this, "");
+
+    /**
+     * The column <code>APP.STATEMENT.NETTO_WAGE_PAYOUT</code>.
+     */
+    public final TableField<StatementRecord, BigDecimal> NETTO_WAGE_PAYOUT = createField("NETTO_WAGE_PAYOUT", org.jooq.impl.SQLDataType.DECIMAL.precision(9, 2), this, "");
 
     /**
      * The column <code>APP.STATEMENT.SOURCE_TAX</code>.
@@ -127,6 +137,11 @@ public class Statement extends TableImpl<StatementRecord> {
      * The column <code>APP.STATEMENT.VACATION_EXTRA</code>.
      */
     public final TableField<StatementRecord, BigDecimal> VACATION_EXTRA = createField("VACATION_EXTRA", org.jooq.impl.SQLDataType.DECIMAL.precision(9, 2), this, "");
+
+    /**
+     * The column <code>APP.STATEMENT.EXPENSES</code>.
+     */
+    public final TableField<StatementRecord, BigDecimal> EXPENSES = createField("EXPENSES", org.jooq.impl.SQLDataType.DECIMAL.precision(9, 2), this, "");
 
     /**
      * Create a <code>APP.STATEMENT</code> table reference
@@ -163,7 +178,7 @@ public class Statement extends TableImpl<StatementRecord> {
      */
     @Override
     public UniqueKey<StatementRecord> getPrimaryKey() {
-        return Keys.SQL181122110600530;
+        return Keys.SQL181126154908570;
     }
 
     /**
@@ -171,7 +186,7 @@ public class Statement extends TableImpl<StatementRecord> {
      */
     @Override
     public List<UniqueKey<StatementRecord>> getKeys() {
-        return Arrays.<UniqueKey<StatementRecord>>asList(Keys.SQL181122110600530);
+        return Arrays.<UniqueKey<StatementRecord>>asList(Keys.SQL181126154908570);
     }
 
     /**
