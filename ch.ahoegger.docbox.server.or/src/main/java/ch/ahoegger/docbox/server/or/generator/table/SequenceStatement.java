@@ -7,11 +7,13 @@ import org.ch.ahoegger.docbox.server.or.app.tables.PrimaryKeySeq;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.jooq.SQLDialect;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
+import ch.ahoegger.docbox.server.or.generator.IJooqTable;
 
 /**
  * <h3>{@link SequenceStatement}</h3>
@@ -19,8 +21,13 @@ import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
  * @author Andreas Hoegger
  */
 @Order(-20)
-public class SequenceStatement implements ITableStatement, ISequenceTable {
+public class SequenceStatement implements ITableStatement, IJooqTable, ISequenceTable {
   private static final Logger LOG = LoggerFactory.getLogger(SequenceStatement.class);
+
+  @Override
+  public Table<?> getJooqTable() {
+    return PrimaryKeySeq.PRIMARY_KEY_SEQ;
+  }
 
   @Override
   public String getCreateTable() {
@@ -45,7 +52,7 @@ public class SequenceStatement implements ITableStatement, ISequenceTable {
   @Override
   public void deleteTable(Connection connection) {
     LOG.info("SQL-DEV delete table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).delete(PrimaryKeySeq.PRIMARY_KEY_SEQ)
+    DSL.using(connection, SQLDialect.DERBY).delete(getJooqTable())
         .execute();
 
   }
@@ -53,7 +60,7 @@ public class SequenceStatement implements ITableStatement, ISequenceTable {
   @Override
   public void dropTable(Connection connection) {
     LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).dropTable(PrimaryKeySeq.PRIMARY_KEY_SEQ)
+    DSL.using(connection, SQLDialect.DERBY).dropTable(getJooqTable())
         .execute();
   }
 

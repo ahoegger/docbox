@@ -1,8 +1,13 @@
 package ch.ahoegger.docbox.server.test.util;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -10,6 +15,8 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.junit.Assert;
+
+import ch.ahoegger.docbox.server.util.BigDecimalUtilitiy;
 
 public class DocboxAssert extends Assert {
 
@@ -59,11 +66,18 @@ public class DocboxAssert extends Assert {
     if (fd1 instanceof AbstractValueFieldData) {
       Object val01 = ((AbstractValueFieldData) fd1).getValue();
       Object val02 = ((AbstractValueFieldData) fd2).getValue();
+
       if (val01 instanceof Date) {
-        assertTrue("Date of '" + fd1.getClass().getName() + "' not equals.", DateUtility.equals((Date) val01, (Date) val02));
+
+        assertTrue(String.format("Date of '%s' not equals [%s,%s]", fd1.getClass().getName(), val01, val02), DateUtility.equals((Date) val01, (Date) val02));
+      }
+      else if (val01 instanceof BigDecimal) {
+
+        assertTrue(String.format("BigDecimal of '%s' not equals [%s,%s]", fd1.getClass().getName(), val01, val02), BigDecimalUtilitiy.sameNumber((BigDecimal) val01, (BigDecimal) val02));
       }
       else {
-        assertEquals("Value of '" + fd1.getClass().getName() + "' not equals.", val01, val02);
+
+        assertEquals(String.format("Value of '%s' not equals [%s,%s]", fd1.getClass().getName(), val01, val02), val01, val02);
       }
     }
     assertEquals(fd1.getAllProperties(), fd2.getAllProperties());
@@ -84,5 +98,11 @@ public class DocboxAssert extends Assert {
     assertNotNull(pd2);
     assertEquals(pd1.getClass(), pd2.getClass());
     assertEquals(pd1.getValue(), pd2.getValue());
+  }
+
+  public static <T> void assertEqualsSort(List<T> l1, List<T> l2) {
+    l1 = Optional.ofNullable(l1).orElse(new ArrayList<T>()).stream().sorted().collect(Collectors.toList());
+    l2 = Optional.ofNullable(l2).orElse(new ArrayList<T>()).stream().sorted().collect(Collectors.toList());
+    assertEquals(l1, l2);
   }
 }

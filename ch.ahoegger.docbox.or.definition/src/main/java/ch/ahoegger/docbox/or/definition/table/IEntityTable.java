@@ -13,8 +13,6 @@ public interface IEntityTable {
   // columns
   String ENTITY_NR = "ENTITY_NR";
 
-  String PARTNER_NR = IPartnerTable.PARTNER_NR;
-
   String PAYSLIP_NR = IPayslipTable.PAYSLIP_NR;
 
   String ENTITY_TYPE = "ENTITY_TYPE";
@@ -31,5 +29,4 @@ public interface IEntityTable {
   String EXPENSE_AMOUNT = "EXPENSE_AMOUNT";
   BigDecimal EXPENSE_AMOUNT_MIN = BigDecimal.valueOf(0d);
   BigDecimal EXPENSE_AMOUNT_MAX = BigDecimal.valueOf(999999d);
-
 }

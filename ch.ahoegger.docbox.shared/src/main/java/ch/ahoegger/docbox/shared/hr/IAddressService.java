@@ -4,7 +4,7 @@ import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
 import ch.ahoegger.docbox.shared.hr.employer.EmployerFormData.AddressBox;
-import ch.ahoegger.docbox.shared.util.AbstractAddressBoxData;
+import ch.ahoegger.docbox.shared.template.AbstractAddressBoxData;
 
 /**
  * <h3>{@link IAddressService}</h3>

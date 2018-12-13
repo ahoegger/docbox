@@ -2,11 +2,9 @@ package ch.ahoegger.docbox.shared.hr.entity;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.Generated;
 
-import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
@@ -20,34 +18,12 @@ public class EntitySearchFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public BilledBox getBilledBox() {
-    return getFieldByClass(BilledBox.class);
-  }
-
   public EntityDateFrom getEntityDateFrom() {
     return getFieldByClass(EntityDateFrom.class);
   }
 
   public EntityDateTo getEntityDateTo() {
     return getFieldByClass(EntityDateTo.class);
-  }
-
-  /**
-   * access method for property EntityIds.
-   */
-  public List<BigDecimal> getEntityIds() {
-    return getEntityIdsProperty().getValue();
-  }
-
-  /**
-   * access method for property EntityIds.
-   */
-  public void setEntityIds(List<BigDecimal> entityIds) {
-    getEntityIdsProperty().setValue(entityIds);
-  }
-
-  public EntityIdsProperty getEntityIdsProperty() {
-    return getPropertyByClass(EntityIdsProperty.class);
   }
 
   public PartnerId getPartnerId() {
@@ -72,22 +48,12 @@ public class EntitySearchFormData extends AbstractFormData {
     return getPropertyByClass(PayslipIdProperty.class);
   }
 
-  public static class BilledBox extends AbstractValueFieldData<TriState> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
   public static class EntityDateFrom extends AbstractValueFieldData<Date> {
 
     private static final long serialVersionUID = 1L;
   }
 
   public static class EntityDateTo extends AbstractValueFieldData<Date> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class EntityIdsProperty extends AbstractPropertyData<List<BigDecimal>> {
 
     private static final long serialVersionUID = 1L;
   }

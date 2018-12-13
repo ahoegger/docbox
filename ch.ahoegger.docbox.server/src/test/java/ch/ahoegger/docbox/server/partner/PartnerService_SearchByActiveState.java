@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.partner.IPartnerService;
 import ch.ahoegger.docbox.shared.partner.PartnerSearchFormData;
 import ch.ahoegger.docbox.shared.partner.PartnerTableData;
@@ -31,9 +32,11 @@ public class PartnerService_SearchByActiveState extends AbstractTestWithDatabase
   private static final BigDecimal partnerId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
   private static final BigDecimal partnerId03 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
   private static final BigDecimal partnerId04 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private TestDataGenerator m_testDataGenerator;
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
+    m_testDataGenerator = testDataGenerator;
     LocalDate today = LocalDate.now();
 
     BEANS.get(PartnerService.class).insert(connection, partnerId01, "sample conversation 01", "some notes",
@@ -61,7 +64,7 @@ public class PartnerService_SearchByActiveState extends AbstractTestWithDatabase
     sd.getActiveBox().setValue(TriState.TRUE);
     PartnerTableData tableData = service.getTableData(sd);
 
-    Assert.assertEquals(CollectionUtility.arrayList(partnerId01, partnerId03, partnerId04),
+    Assert.assertEquals(CollectionUtility.arrayList(partnerId01, partnerId03, partnerId04, m_testDataGenerator.id_partner_nanny),
         Arrays.stream(tableData.getRows()).map(row -> row.getPartnerId())
             .map(bigDecKey -> bigDecKey)
             .sorted()
@@ -89,7 +92,7 @@ public class PartnerService_SearchByActiveState extends AbstractTestWithDatabase
     sd.getActiveBox().setValue(TriState.UNDEFINED);
     PartnerTableData tableData = service.getTableData(sd);
 
-    Assert.assertEquals(CollectionUtility.arrayList(partnerId01, partnerId02, partnerId03, partnerId04),
+    Assert.assertEquals(CollectionUtility.arrayList(partnerId01, partnerId02, partnerId03, partnerId04, m_testDataGenerator.id_partner_nanny),
         Arrays.stream(tableData.getRows()).map(row -> row.getPartnerId())
             .map(bigDecKey -> bigDecKey)
             .sorted()

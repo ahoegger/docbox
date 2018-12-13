@@ -10,11 +10,12 @@ import org.ch.ahoegger.docbox.server.or.app.tables.records.MigrationRecord;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
-import org.jooq.Field;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
+import ch.ahoegger.docbox.or.definition.table.IMigrationTable;
 import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
+import ch.ahoegger.docbox.server.or.generator.Version;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
@@ -25,11 +26,11 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
  */
 public class MigrationService implements IService {
 
-  public void insert(BigDecimal version) {
+  public void insert(Version version) {
     insert(SQL.getConnection(), version);
   }
 
-  public void insert(Connection connection, BigDecimal version) {
+  public void insert(Connection connection, Version version) {
     BigDecimal migrationNr = new BigDecimal(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
 
     Migration table = Migration.MIGRATION.as("MIG");
@@ -41,11 +42,11 @@ public class MigrationService implements IService {
     }
   }
 
-  protected MigrationRecord mapToRecord(MigrationRecord rec, BigDecimal migrationId, BigDecimal version, Date migrationDate) {
+  protected MigrationRecord mapToRecord(MigrationRecord rec, BigDecimal migrationId, Version version, Date migrationDate) {
     Migration table = Migration.MIGRATION;
     return rec
         .with(table.MIGRATION_NR, migrationId)
-        .with(table.VERSION, version)
+        .with(table.DOCBOX_VERSION, version)
         .with(table.EXECUTED_DATE, migrationDate);
   }
 
@@ -53,17 +54,19 @@ public class MigrationService implements IService {
    * @param version
    * @return
    */
-  public boolean isUpdateRequired(BigDecimal version) {
+  public boolean isUpdateRequired(Version version) {
+    if (MigrationUtility.getTableDesription(IMigrationTable.TABLE_NAME) == null) {
+      return true;
+    }
     Migration table = Migration.MIGRATION.as("MIG");
-    Field<BigDecimal> maxVersionField = DSL.max(table.VERSION).as("MAX_VERSION");
-    BigDecimal maxVersion = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(maxVersionField)
+    Version maxVersion = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(table.DOCBOX_VERSION)
         .from(table)
         .fetch()
         .stream()
-        .findFirst()
-        .map(rec -> rec.get(maxVersionField))
-        .orElse(BigDecimal.valueOf(-1));
+        .map(rec -> rec.get(table.DOCBOX_VERSION))
+        .max((v1, v2) -> v1.compareTo(v2))
+        .orElse(new Version(0, 0, 0));
     return version.compareTo(maxVersion) > 0;
   }
 }

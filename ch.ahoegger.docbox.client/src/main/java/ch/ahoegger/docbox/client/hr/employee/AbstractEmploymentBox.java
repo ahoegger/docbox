@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
+import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.placeholder.AbstractPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
@@ -40,6 +41,10 @@ public class AbstractEmploymentBox extends AbstractGroupBox {
     return getFieldByClass(TaxTypeField.class);
   }
 
+  public ReducedLunchField getReducedLunchField() {
+    return getFieldByClass(ReducedLunchField.class);
+  }
+
   public PlaceholderField getPlaceholderField() {
     return getFieldByClass(PlaceholderField.class);
   }
@@ -68,7 +73,14 @@ public class AbstractEmploymentBox extends AbstractGroupBox {
     protected Class<? extends ICodeType<?, BigDecimal>> getConfiguredCodeType() {
       return TaxCodeType.class;
     }
+  }
 
+  @Order(1500)
+  public class ReducedLunchField extends AbstractBooleanField {
+    @Override
+    protected String getConfiguredLabel() {
+      return TEXTS.get("ReducedLunch");
+    }
   }
 
   @Order(2000)
@@ -102,6 +114,11 @@ public class AbstractEmploymentBox extends AbstractGroupBox {
     }
 
     @Override
+    protected int getConfiguredFractionDigits() {
+      return 3;
+    }
+
+    @Override
     protected int getConfiguredMaxFractionDigits() {
       return 3;
     }
@@ -125,6 +142,11 @@ public class AbstractEmploymentBox extends AbstractGroupBox {
     }
 
     @Override
+    protected int getConfiguredFractionDigits() {
+      return 3;
+    }
+
+    @Override
     protected int getConfiguredMaxFractionDigits() {
       return 3;
     }
@@ -145,6 +167,11 @@ public class AbstractEmploymentBox extends AbstractGroupBox {
     @Override
     protected String getConfiguredLabel() {
       return TEXTS.get("VacationExtra");
+    }
+
+    @Override
+    protected int getConfiguredFractionDigits() {
+      return 3;
     }
 
     @Override

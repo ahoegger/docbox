@@ -53,6 +53,18 @@ public class FieldValidator {
         return Status.OK_STATUS;
       }
     };
+  }
 
+  public static <FIELD extends Field<VALUE>, VALUE> IFieldValidator<FIELD, VALUE> notNullValidator(FIELD field, VALUE value) {
+    return new IFieldValidator<FIELD, VALUE>() {
+      @Override
+      public IStatus validate(Record rec) {
+        if (value == null) {
+          Log.error(String.format("Field %s can not be null.", field.getName()));
+          return new Status(String.format("Field %s can not be null.", field.getName()), IStatus.ERROR);
+        }
+        return null;
+      }
+    };
   }
 }

@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.conversation.ConversationSearchFormData;
 import ch.ahoegger.docbox.shared.conversation.ConversationTableData;
 import ch.ahoegger.docbox.shared.conversation.IConversationService;
@@ -31,7 +32,8 @@ public class ConversationService_SearchByName extends AbstractTestWithDatabase {
   private static final BigDecimal conversationId04 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
+
     LocalDate today = LocalDate.now();
 
     BEANS.get(ConversationService.class).insert(connection, conversationId01, "dook haagen", "some notes",

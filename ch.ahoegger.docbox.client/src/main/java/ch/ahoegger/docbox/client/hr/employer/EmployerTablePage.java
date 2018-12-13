@@ -7,15 +7,19 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
-import ch.ahoegger.docbox.client.AbstractDocboxPageWithTable;
+import ch.ahoegger.docbox.client.templates.AbstractDocboxPageWithTable;
+import ch.ahoegger.docbox.shared.hr.employer.EmployerSearchFormData;
 import ch.ahoegger.docbox.shared.hr.employer.EmployerTablePageData;
 import ch.ahoegger.docbox.shared.hr.employer.IEmployerService;
 
@@ -33,9 +37,26 @@ public class EmployerTablePage extends AbstractDocboxPageWithTable<EmployerTable
   }
 
   @Override
-  protected void execLoadData(SearchFilter filter) {
+  protected Class<? extends ISearchForm> getConfiguredSearchForm() {
+    return EmployerSearchForm.class;
+  }
 
-    importPageData(BEANS.get(IEmployerService.class).getTableData());
+  @Override
+  protected void execInitPage() {
+    registerDataChangeListener(IEmployerEntity.ENTITY_KEY);
+  }
+
+  @Override
+  protected IPage<?> execCreateChildPage(ITableRow row) {
+    EmployerNodePage employerNodePage = new EmployerNodePage();
+    employerNodePage.setEmployerId(getTable().getEmployerIdColumn().getValue(row));
+    return employerNodePage;
+
+  }
+
+  @Override
+  protected void execLoadData(SearchFilter filter) {
+    importPageData(BEANS.get(IEmployerService.class).getTableData((EmployerSearchFormData) filter.getFormData()));
   }
 
   public class Table extends AbstractTable {

@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DocumentPartner extends TableImpl<DocumentPartnerRecord> {
 
-    private static final long serialVersionUID = 1308624180;
+    private static final long serialVersionUID = -835514208;
 
     /**
      * The reference instance of <code>APP.DOCUMENT_PARTNER</code>
@@ -96,7 +96,7 @@ public class DocumentPartner extends TableImpl<DocumentPartnerRecord> {
      */
     @Override
     public UniqueKey<DocumentPartnerRecord> getPrimaryKey() {
-        return Keys.SQL181126154908150;
+        return Keys.SQL181211162703010;
     }
 
     /**
@@ -104,7 +104,7 @@ public class DocumentPartner extends TableImpl<DocumentPartnerRecord> {
      */
     @Override
     public List<UniqueKey<DocumentPartnerRecord>> getKeys() {
-        return Arrays.<UniqueKey<DocumentPartnerRecord>>asList(Keys.SQL181126154908150);
+        return Arrays.<UniqueKey<DocumentPartnerRecord>>asList(Keys.SQL181211162703010);
     }
 
     /**

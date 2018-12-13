@@ -3,33 +3,46 @@ package ch.ahoegger.docbox.server.administration.taxgroup;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.TaxGroupRecord;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
+import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.status.Status;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
-import org.jooq.Field;
 import org.jooq.Record;
+import org.jooq.Result;
 import org.jooq.SQLDialect;
-import org.jooq.TableLike;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
+import ch.ahoegger.docbox.server.hr.employee.EmployeeService;
+import ch.ahoegger.docbox.server.hr.employee.EmployeeTaxGroupService;
+import ch.ahoegger.docbox.server.hr.employer.EmployerTaxGroupService;
+import ch.ahoegger.docbox.server.jooq.FieldValidators;
+import ch.ahoegger.docbox.shared.administration.hr.taxgroup.TaxGroupFormData;
+import ch.ahoegger.docbox.shared.administration.hr.taxgroup.TaxGroupSearchFormData;
+import ch.ahoegger.docbox.shared.administration.hr.taxgroup.TaxGroupTablePageData;
+import ch.ahoegger.docbox.shared.administration.hr.taxgroup.TaxGroupTablePageData.TaxGroupTableRowData;
 import ch.ahoegger.docbox.shared.administration.taxgroup.ITaxGroupService;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
-import ch.ahoegger.docbox.shared.hr.tax.TaxGroupFormData;
-import ch.ahoegger.docbox.shared.hr.tax.TaxGroupSearchFormData;
-import ch.ahoegger.docbox.shared.hr.tax.TaxGroupTablePageData;
-import ch.ahoegger.docbox.shared.hr.tax.TaxGroupTablePageData.TaxGroupTableRowData;
+import ch.ahoegger.docbox.shared.hr.employee.EmployeeFormData;
+import ch.ahoegger.docbox.shared.hr.employer.EmployerTaxGroupFormData;
+import ch.ahoegger.docbox.shared.hr.employer.EmployerTaxGroupSearchFormData;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 public class TaxGroupService implements ITaxGroupService {
@@ -39,15 +52,9 @@ public class TaxGroupService implements ITaxGroupService {
   public TaxGroupTablePageData getTaxGroupTableData(TaxGroupSearchFormData formData) {
 
     TaxGroup tg = TaxGroup.TAX_GROUP.as("TG");
-    EmployeeTaxGroup etg = EmployeeTaxGroup.EMPLOYEE_TAX_GROUP.as("ETG");
-    TableLike<?> table = tg;
 
     Condition condition = DSL.trueCondition();
 
-    if (formData.getPartner().getValue() != null) {
-      condition = condition.and(etg.PARTNER_NR.eq(formData.getPartner().getValue()));
-      table = tg.innerJoin(etg).on(etg.TAX_GROUP_NR.eq(tg.TAX_GROUP_NR));
-    }
     // startDate
     if (formData.getStartDateFrom().getValue() != null) {
       condition = condition.and(tg.START_DATE.ge(formData.getStartDateFrom().getValue()));
@@ -65,8 +72,9 @@ public class TaxGroupService implements ITaxGroupService {
 
     List<TaxGroupTableRowData> rows = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .select(tg.TAX_GROUP_NR, tg.NAME, tg.START_DATE, tg.END_DATE)
-        .from(table)
+        .from(tg)
         .where(condition)
+        .orderBy(tg.START_DATE)
         .fetch()
         .stream()
         .map(rec -> {
@@ -86,78 +94,111 @@ public class TaxGroupService implements ITaxGroupService {
 
   @Override
   public TaxGroupFormData prepareCreate(TaxGroupFormData formData) {
-    LocalDate firstOfYear = LocalDate.now().withDayOfYear(1);
-    LocalDate lastOfYear = firstOfYear.withDayOfYear(firstOfYear.lengthOfYear());
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
+    LocalDate startDate = Arrays.asList(getTaxGroupTableData(new TaxGroupSearchFormData()).getRows())
+        .stream()
+        .map(row -> row.getStartDate())
+        .filter(date -> date != null)
+        .map(d -> LocalDateUtility.toLocalDate(d))
+        .max((d1, d2) -> d1.compareTo(d2))
+        .map(d -> d.plusYears(1).withDayOfYear(1))
+        .orElse(LocalDate.now().withDayOfYear(1));
 
-    formData.getName().setValue(firstOfYear.format(formatter));
-    formData.getStartDate().setValue(LocalDateUtility.toDate(firstOfYear));
-    formData.getEndDate().setValue(LocalDateUtility.toDate(lastOfYear));
+    formData.getPeriodBox().getFrom().setValue(LocalDateUtility.toDate(startDate));
+    formData.getPeriodBox().getTo().setValue(LocalDateUtility.toDate(startDate.with(TemporalAdjusters.lastDayOfYear())));
     return formData;
   }
 
   @Override
   public TaxGroupFormData create(TaxGroupFormData formData) {
+    validate(formData, true);
     formData.setTaxGroupId(new BigDecimal(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME)));
 
+    TaxGroup taxGroup = TaxGroup.TAX_GROUP;
+    FieldValidators.notNullValidator()
+        .with(taxGroup.NAME, formData.getName().getValue())
+        .with(taxGroup.START_DATE, formData.getPeriodBox().getFrom().getValue())
+        .with(taxGroup.END_DATE, formData.getPeriodBox().getTo().getValue())
+        .validateAndThrow();
+
+    TaxGroupRecord newRecord = mapToRecord(taxGroup.newRecord(), formData);
     int rowCount = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .executeInsert(mapToRecord(new TaxGroupRecord(), formData));
+        .executeInsert(newRecord);
 
-    if (rowCount == 1) {
-      // notify backup needed
-      BEANS.get(IBackupService.class).notifyModification();
-      return formData;
+    if (rowCount != 1) {
+      throw new VetoException("Not able to create taxGroup.");
     }
-    return null;
-  }
 
-  @RemoteServiceAccessDenied
-  public int insert(Connection connection, BigDecimal taxGroupId, String name, Date startDate, Date endDate) {
-    return DSL.using(connection, SQLDialect.DERBY)
-        .executeInsert(mapToRecord(new TaxGroupRecord(), taxGroupId, name, startDate, endDate));
+    // LINKING
+
+    Optional.ofNullable(formData.getLinkingBox().getEmployersBox().getValue()).orElse(new HashSet<>())
+        // map to employerTaxGroup
+        .forEach(employerId -> {
+          System.out.println("Update for emp: " + employerId);
+          EmployerTaxGroupFormData erTaxGroupData = BEANS.get(EmployerTaxGroupService.class).getOrCreate(employerId, formData.getTaxGroupId());
+          Optional.ofNullable(formData.getLinkingBox().getEmployeesBox().getValue()).orElse(new HashSet<>())
+              .stream()
+              .filter(eeId -> {
+                EmployeeFormData employeeData = new EmployeeFormData();
+                employeeData.setPartnerId(eeId);
+                employeeData = BEANS.get(EmployeeService.class).load(employeeData);
+                return erTaxGroupData.getEmployerId().compareTo(employeeData.getEmployer().getValue()) == 0;
+              }).forEach(eeId -> {
+                // create or get eeTaxGroup
+                BEANS.get(EmployeeTaxGroupService.class).getOrCreate(eeId, erTaxGroupData.getEmployerTaxGroupId());
+
+              });
+        });
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+    return formData;
   }
 
   @Override
   public TaxGroupFormData load(TaxGroupFormData formData) {
-    // TODO
-//    TaxGroup t = TaxGroup.TAX_GROUP;
-//    Payslip pg = Payslip.PAYSLIP;
-//    Condition condition = DSL.trueCondition();
-//    condition = condition.and(t.TAX_GROUP_NR.eq(formData.getTaxGroupId()));
-//    if (formData.getPartnerId() != null) {
-//      condition = condition.and(pg.PARTNER_NR.eq(formData.getPartnerId()));
-//    }
-//    // aliases
-//    Field<BigDecimal> workingHours = DSL.sum(pg.WORKING_HOURS).as("WORKING_HOURS");
-//    Field<BigDecimal> bruttoWage = DSL.sum(pg.BRUTTO_WAGE).as("BRUTTO_WAGE");
-//    Field<BigDecimal> nettoWage = DSL.sum(pg.NETTO_WAGE).as("NETTO_WAGE");
-//
-//    Field<BigDecimal> sourceTax = DSL.sum(pg.SOURCE_TAX).as("SOURCE_TAX");
-//    Field<BigDecimal> socialSecurtiyTax = DSL.sum(pg.SOCIAL_SECURITY_TAX).as("SOCIAL_SECURITY_TAX");
-//    Field<BigDecimal> vacationExtra = DSL.sum(pg.VACATION_EXTRA).as("VACATION_EXTRA");
-//
-//    formData = toFormData(DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-//        .select(t.TAX_GROUP_NR, t.NAME, t.START_DATE, t.END_DATE, workingHours, bruttoWage, nettoWage, sourceTax, socialSecurtiyTax, vacationExtra)
-//        .from(t)
-//        .leftJoin(pg).on(t.TAX_GROUP_NR.eq(pg.TAX_GROUP_NR))
-//        .where(condition)
-//        .groupBy(t.TAX_GROUP_NR, t.NAME, t.START_DATE, t.END_DATE)
-//        .fetchOne(), workingHours, bruttoWage, nettoWage, sourceTax, socialSecurtiyTax, vacationExtra);
+    Assertions.assertNotNull(formData.getTaxGroupId());
 
+    TaxGroup taxGroup = TaxGroup.TAX_GROUP;
+    Record empRec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(taxGroup.fields())
+        .from(taxGroup)
+        .where(taxGroup.TAX_GROUP_NR.eq(formData.getTaxGroupId())).fetchOne();
+
+    mapToFormData(empRec, formData);
     return formData;
   }
 
   @Override
   public TaxGroupFormData store(TaxGroupFormData formData) {
-    TaxGroup e = TaxGroup.TAX_GROUP;
+    validate(formData, true);
+    TaxGroup taxGroup = TaxGroup.TAX_GROUP;
+
+    EmployerTaxGroupSearchFormData searchData = new EmployerTaxGroupSearchFormData();
+    searchData.getTaxGroup().setValue(formData.getTaxGroupId());
+    if (BEANS.get(EmployerTaxGroupService.class).hasTableData(searchData)) {
+      throw new VetoException("Not allowed to update tax group alread linked to employers");
+    }
+
+    FieldValidators.notNullValidator()
+        .with(taxGroup.NAME, formData.getName().getValue())
+        .with(taxGroup.START_DATE, formData.getPeriodBox().getFrom().getValue())
+        .with(taxGroup.END_DATE, formData.getPeriodBox().getTo().getValue())
+        .validateAndThrow();
 
     TaxGroupRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .fetchOne(e, e.TAX_GROUP_NR.eq(formData.getTaxGroupId()));
+        .fetchOne(taxGroup, taxGroup.TAX_GROUP_NR.eq(formData.getTaxGroupId()));
+
+    FieldValidators.unmodifiableValidator()
+        .with(taxGroup.TAX_GROUP_NR, formData.getTaxGroupId())
+        .validateAndThrow(rec);
+
+    rec = mapToRecord(rec, formData);
+
     if (rec == null) {
       LOG.warn("Try to update not existing record with id '{}'!", formData.getTaxGroupId());
       return null;
     }
-    if (mapToRecord(rec, formData).update() != 1) {
+    if (rec.update() != 1) {
       LOG.error("Could not update record with id '{}'!", formData.getTaxGroupId());
       return null;
     }
@@ -167,60 +208,99 @@ public class TaxGroupService implements ITaxGroupService {
     return formData;
   }
 
+  @Override
+  public boolean delete(BigDecimal selectedValue) {
+    EmployerTaxGroupSearchFormData searchData = new EmployerTaxGroupSearchFormData();
+    searchData.getTaxGroup().setValue(selectedValue);
+    if (BEANS.get(EmployerTaxGroupService.class).hasTableData(searchData)) {
+      throw new VetoException("Can only delete empty TaxGroups");
+    }
+
+    TaxGroup taxGroup = TaxGroup.TAX_GROUP;
+    TaxGroupRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(taxGroup, taxGroup.TAX_GROUP_NR.eq(selectedValue));
+    if (rec == null) {
+      LOG.warn("Try to delete not existing record with id '{}'!", selectedValue);
+      return false;
+    }
+    if (rec.delete() != 1) {
+      LOG.error("Could not delete record with id '{}'!", selectedValue);
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public IStatus validate(TaxGroupFormData formData) {
+    return validate(formData, false);
+  }
+
+  public IStatus validate(TaxGroupFormData formData, boolean throwException) {
+    TaxGroup taxGroup = TaxGroup.TAX_GROUP;
+    if (!FieldValidators.notNullValidator()
+        .with(taxGroup.START_DATE, formData.getPeriodBox().getFrom().getValue())
+        .with(taxGroup.END_DATE, formData.getPeriodBox().getTo().getValue())
+        .validate().isOK()) {
+      return Status.OK_STATUS;
+    }
+
+    Condition conditions = DSL.trueCondition();
+    if (formData.getTaxGroupId() != null) {
+      conditions = conditions.and(taxGroup.TAX_GROUP_NR.ne(formData.getTaxGroupId()));
+    }
+    Result<?> result = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(taxGroup.TAX_GROUP_NR, taxGroup.NAME, taxGroup.START_DATE, taxGroup.END_DATE)
+        .from(taxGroup)
+        .where(conditions)
+        .and(DSL.or(taxGroup.START_DATE.le(formData.getPeriodBox().getFrom().getValue())
+            .and(taxGroup.END_DATE.ge(formData.getPeriodBox().getFrom().getValue())),
+            taxGroup.START_DATE.le(formData.getPeriodBox().getTo().getValue())
+                .and(taxGroup.END_DATE.ge(formData.getPeriodBox().getTo().getValue()))))
+        .fetch();
+    if (result.size() > 0) {
+      Status status = new Status("Date period overlapping with tax group  '" + result.get(0).get(taxGroup.NAME) + "'", IStatus.ERROR);
+      if (throwException) {
+        throw new VetoException(new ProcessingStatus(status));
+      }
+      return status;
+    }
+
+    return Status.OK_STATUS;
+  }
+
   @RemoteServiceAccessDenied
-  public int createRow(Connection connection, BigDecimal taxGroupId, String name, Date startDate, Date endDate) {
+  public int insert(Connection connection, BigDecimal taxGroupId, String name, Date startDate, Date endDate) {
+    TaxGroupFormData fd = new TaxGroupFormData();
+    fd.setTaxGroupId(taxGroupId);
+    fd.getName().setValue(name);
+    fd.getPeriodBox().getFrom().setValue(startDate);
+    fd.getPeriodBox().getTo().setValue(endDate);
     return DSL.using(connection, SQLDialect.DERBY)
-        .executeInsert(mapToRecord(new TaxGroupRecord(), taxGroupId, name, startDate, endDate));
+        .executeInsert(mapToRecord(new TaxGroupRecord(), fd));
 
   }
 
-  protected TaxGroupRecord mapToRecord(TaxGroupRecord rec, TaxGroupFormData fd) {
-    if (fd == null) {
+  protected TaxGroupRecord mapToRecord(TaxGroupRecord rec, TaxGroupFormData formData) {
+    if (formData == null) {
       return null;
     }
-    return mapToRecord(rec, fd.getTaxGroupId(), fd.getName().getValue(), fd.getStartDate().getValue(), fd.getEndDate().getValue());
-
-  }
-
-  protected TaxGroupRecord mapToRecord(TaxGroupRecord rec, BigDecimal taxGroupId, String name, Date startDate, Date endDate) {
     TaxGroup t = TaxGroup.TAX_GROUP;
     return rec
-        .with(t.END_DATE, endDate)
-        .with(t.NAME, name)
-        .with(t.START_DATE, startDate)
-        .with(t.TAX_GROUP_NR, taxGroupId);
+        .with(t.END_DATE, formData.getPeriodBox().getTo().getValue())
+        .with(t.NAME, formData.getName().getValue())
+        .with(t.START_DATE, formData.getPeriodBox().getFrom().getValue())
+        .with(t.TAX_GROUP_NR, formData.getTaxGroupId());
 
   }
 
-  protected TaxGroupFormData toFormData(Record rec, Field<BigDecimal> workingHours, Field<BigDecimal> bruttoWage, Field<BigDecimal> nettoWage, Field<BigDecimal> sourceTax, Field<BigDecimal> socialSecurtiyTax,
-      Field<BigDecimal> vacationExtra) {
+  protected TaxGroupFormData mapToFormData(Record rec, TaxGroupFormData formData) {
     if (rec == null) {
       return null;
     }
-    TaxGroupFormData fd = new TaxGroupFormData();
-    fd.getEndDate().setValue(rec.get(TaxGroup.TAX_GROUP.END_DATE));
-    fd.getName().setValue(rec.get(TaxGroup.TAX_GROUP.NAME));
-    fd.getStartDate().setValue(rec.get(TaxGroup.TAX_GROUP.START_DATE));
-    fd.setTaxGroupId(rec.get(TaxGroup.TAX_GROUP.TAX_GROUP_NR));
-    if (workingHours != null) {
-      fd.getNettoWage().setValue(rec.get(nettoWage));
-    }
-    if (bruttoWage != null) {
-      fd.getBruttoWage().setValue(rec.get(bruttoWage));
-    }
-    if (workingHours != null) {
-      fd.getWorkHours().setValue(rec.get(workingHours));
-    }
-    if (sourceTax != null) {
-      fd.getSourceTax().setValue(rec.get(sourceTax));
-    }
-
-    if (socialSecurtiyTax != null) {
-      fd.getSocualInsurance().setValue(rec.get(socialSecurtiyTax));
-    }
-    if (vacationExtra != null) {
-      fd.getVacationExtra().setValue(rec.get(vacationExtra));
-    }
-    return fd;
+    formData.getPeriodBox().getTo().setValue(rec.get(TaxGroup.TAX_GROUP.END_DATE));
+    formData.getName().setValue(rec.get(TaxGroup.TAX_GROUP.NAME));
+    formData.getPeriodBox().getFrom().setValue(rec.get(TaxGroup.TAX_GROUP.START_DATE));
+    formData.setTaxGroupId(rec.get(TaxGroup.TAX_GROUP.TAX_GROUP_NR));
+    return formData;
   }
 }

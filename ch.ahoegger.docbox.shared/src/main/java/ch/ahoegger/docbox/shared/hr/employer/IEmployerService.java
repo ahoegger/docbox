@@ -12,9 +12,10 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
 public interface IEmployerService extends IService {
 
   /**
+   * @param formData
    * @return
    */
-  EmployerTablePageData getTableData();
+  EmployerTablePageData getTableData(EmployerSearchFormData formData);
 
   /**
    * @param formData

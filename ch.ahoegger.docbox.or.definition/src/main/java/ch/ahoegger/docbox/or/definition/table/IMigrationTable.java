@@ -11,7 +11,7 @@ public interface IMigrationTable {
   // columns
   public static String MIGRATION_NR = "MIGRATION_NR";
 
-  public static String VERSION = "VERSION";
+  public static String DOCBOX_VERSION = "DOCBOX_VERSION";
 
   public static String EXECUTED_DATE = "EXECUTED_DATE";
 

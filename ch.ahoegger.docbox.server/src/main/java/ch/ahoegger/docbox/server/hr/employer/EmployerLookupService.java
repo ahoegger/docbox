@@ -12,9 +12,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.jooq.Condition;
-import org.jooq.Record2;
 import org.jooq.SQLDialect;
-import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
 import ch.ahoegger.docbox.server.service.lookup.AbstractDocboxLookupService;
@@ -54,12 +52,14 @@ public class EmployerLookupService extends AbstractDocboxLookupService<BigDecima
 
   protected List<? extends ILookupRow<BigDecimal>> getData(Condition conditions, ILookupCall<BigDecimal> call) {
     Employer t = Employer.EMPLOYER;
-    SelectConditionStep<Record2<BigDecimal, String>> query = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .select(t.EMPLOYER_NR, t.NAME)
         .from(t)
-        .where(conditions);
-    return query
-        .fetch().stream().map(rec -> {
+        .where(conditions)
+        .orderBy(t.NAME)
+        .fetch()
+        .stream()
+        .map(rec -> {
           LookupRow<BigDecimal> row = new LookupRow<BigDecimal>(rec.get(t.EMPLOYER_NR), rec.get(t.NAME));
           row.withActive(true);
           return row;

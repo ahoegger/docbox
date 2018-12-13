@@ -6,38 +6,46 @@ import java.sql.SQLException;
 import org.ch.ahoegger.docbox.server.or.app.tables.Employee;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.jooq.SQLDialect;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.or.definition.table.IEmployeeTable;
+import ch.ahoegger.docbox.server.or.generator.IJooqTable;
 
 /**
  * <h3>{@link EmployeeTableStatement}</h3>
  *
  * @author Andreas Hoegger
  */
-public class EmployeeTableStatement implements ITableStatement, IEmployeeTable {
+public class EmployeeTableStatement implements ITableStatement, IJooqTable, IEmployeeTable {
   private static final Logger LOG = LoggerFactory.getLogger(EmployeeTableStatement.class);
+
+  @Override
+  public Table<?> getJooqTable() {
+    return Employee.EMPLOYEE;
+  }
 
   @Override
   public String getCreateTable() {
     StringBuilder statementBuilder = new StringBuilder();
     statementBuilder.append("CREATE TABLE ").append(TABLE_NAME).append(" (")
-        .append(PARTNER_NR).append(" BIGINT NOT NULL, ")
+        .append(EMPLOYEE_NR).append(" BIGINT NOT NULL, ")
         .append(EMPLOYER_NR).append(" BIGINT NOT NULL, ")
+        .append(ADDRESS_NR).append(" BIGINT NOT NULL, ")
         .append(FIRST_NAME).append(" VARCHAR(").append(FIRST_NAME_LENGTH).append(") NOT NULL, ")
         .append(LAST_NAME).append(" VARCHAR(").append(LAST_NAME_LENGTH).append(") NOT NULL, ")
-        .append(ADDRESS_NR).append(" BIGINT NOT NULL, ")
         .append(AHV_NUMBER).append(" VARCHAR(").append(AHV_NUMBER_LENGTH).append("), ")
         .append(BIRTHDAY).append(" DATE, ")
         .append(ACCOUNT_NUMBER).append(" VARCHAR(").append(ACCOUNT_NUMBER_LENGTH).append("), ")
         .append(TAX_TYPE).append(" BIGINT NOT NULL, ")
+        .append(REDUCED_LUNCH).append(" BOOLEAN NOT NULL, ")
         .append(HOURLY_WAGE).append(" DECIMAL(5, 2), ")
         .append(SOCIAL_INSURANCE_RATE).append(" DECIMAL(5, 3), ")
         .append(SOURCE_TAX_RATE).append(" DECIMAL(5, 3), ")
         .append(VACATION_EXTRA_RATE).append(" DECIMAL(5, 3), ")
-        .append("PRIMARY KEY (").append(PARTNER_NR).append(")")
+        .append("PRIMARY KEY (").append(EMPLOYEE_NR).append(")")
         .append(")");
     return statementBuilder.toString();
   }
@@ -56,7 +64,7 @@ public class EmployeeTableStatement implements ITableStatement, IEmployeeTable {
   @Override
   public void deleteTable(Connection connection) {
     LOG.info("SQL-DEV delete table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).delete(Employee.EMPLOYEE)
+    DSL.using(connection, SQLDialect.DERBY).delete(getJooqTable())
         .execute();
 
   }
@@ -64,7 +72,7 @@ public class EmployeeTableStatement implements ITableStatement, IEmployeeTable {
   @Override
   public void dropTable(Connection connection) {
     LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).dropTable(Employee.EMPLOYEE)
+    DSL.using(connection, SQLDialect.DERBY).dropTable(getJooqTable())
         .execute();
   }
 

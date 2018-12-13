@@ -8,11 +8,16 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
 import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
+import ch.ahoegger.docbox.shared.hr.billing.AbstractStatementBoxData;
+import ch.ahoegger.docbox.shared.hr.billing.payslip.PayslipTableData.PayslipTableRowData;
+import ch.ahoegger.docbox.shared.hr.employee.EmployeeTaxGroupTableData.EmployeeTaxGroupTableRowData;
+import ch.ahoegger.docbox.shared.hr.employer.EmployerTaxGroupTableData.EmployerTaxGroupTableRowData;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
@@ -78,13 +83,13 @@ public class StatementService implements IService {
     }
     return bean.withAccountNumber(rec.getAccountNumber())
         .withBruttoWage(rec.getBruttoWage())
+        .withDocumentId(rec.getDocumentNr())
         .withExpenses(rec.getExpenses())
         .withHourlyWage(rec.getHourlyWage())
         .withNettoWage(rec.getNettoWage())
-        .withNettoWageRounded(rec.getNettoWagePayout())
-        .withPartnerId(rec.getPartnerNr())
+        .withNettoWagePayout(rec.getNettoWagePayout())
         .withSocialInsuranceRate(rec.getSocialInsuranceRate())
-        .withSocialInsuranceTax(rec.getSocialSecurityTax())
+        .withSocialInsuranceTax(rec.getSocialInsuranceTax())
         .withSourceTax(rec.getSourceTax())
         .withSourceTaxRate(rec.getSourceTaxRate())
         .withStatementDate(rec.getStatementDate())
@@ -97,18 +102,19 @@ public class StatementService implements IService {
 
   }
 
+  @RemoteServiceAccessDenied
   protected StatementRecord mapToRecord(StatementRecord rec, StatementBean bean) {
     Statement table = Statement.STATEMENT;
     return rec
         .with(table.ACCOUNT_NUMBER, bean.getAccountNumber())
         .with(table.BRUTTO_WAGE, bean.getBruttoWage())
+        .with(table.DOCUMENT_NR, bean.getDocumentId())
         .with(table.EXPENSES, bean.getExpenses())
         .with(table.HOURLY_WAGE, bean.getHourlyWage())
         .with(table.NETTO_WAGE, bean.getNettoWage())
-        .with(table.NETTO_WAGE_PAYOUT, bean.getNettoWageRounded())
-        .with(table.PARTNER_NR, bean.getPartnerId())
+        .with(table.NETTO_WAGE_PAYOUT, bean.getNettoWagePayout())
         .with(table.SOCIAL_INSURANCE_RATE, bean.getSocialInsuranceRate())
-        .with(table.SOCIAL_SECURITY_TAX, bean.getSocialInsuranceTax())
+        .with(table.SOCIAL_INSURANCE_TAX, bean.getSocialInsuranceTax())
         .with(table.SOURCE_TAX, bean.getSourceTax())
         .with(table.SOURCE_TAX_RATE, bean.getSourceTaxRate())
         .with(table.STATEMENT_DATE, bean.getStatementDate())
@@ -119,4 +125,86 @@ public class StatementService implements IService {
         .with(table.WAGE, bean.getWage())
         .with(table.WORKING_HOURS, bean.getWorkingHours());
   }
+
+  @RemoteServiceAccessDenied
+  public AbstractStatementBoxData mapToStatementBoxData(AbstractStatementBoxData fd, StatementBean bean) {
+    fd.getBruttoWage().setValue(bean.getBruttoWage());
+    fd.getNettoWage().setValue(bean.getNettoWage());
+    fd.getSocialSecurityTax().setValue(bean.getSocialInsuranceTax());
+    fd.getSourceTax().setValue(bean.getSourceTax());
+    fd.getVacationExtra().setValue(bean.getVacationExtra());
+    fd.getWorkingHours().setValue(bean.getWorkingHours());
+    return fd;
+  }
+
+  /**
+   * @param rd
+   * @param calculateWage
+   */
+  @RemoteServiceAccessDenied
+  public PayslipTableRowData mapToPayslipRowData(PayslipTableRowData rd, StatementBean calculateWage) {
+    rd.setTaxType(calculateWage.getTaxType());
+    rd.setAccountNumber(calculateWage.getAccountNumber());
+    rd.setHourlyWage(calculateWage.getHourlyWage());
+    rd.setSocialInsuranceRate(calculateWage.getSocialInsuranceRate());
+    rd.setSourceTaxRate(calculateWage.getSourceTaxRate());
+    rd.setVacationExtraRate(calculateWage.getVacationExtraRate());
+    rd.setWorkingHours(calculateWage.getWorkingHours());
+    rd.setWage(calculateWage.getWage());
+    rd.setBrutto(calculateWage.getBruttoWage());
+    rd.setNetto(calculateWage.getNettoWage());
+    rd.setPayout(calculateWage.getNettoWagePayout());
+    rd.setSourceTax(calculateWage.getSourceTax());
+    rd.setSocialInsuranceTax(calculateWage.getSocialInsuranceTax());
+    rd.setVacationExtra(calculateWage.getVacationExtra());
+    rd.setExpenses(calculateWage.getExpenses());
+    return rd;
+  }
+
+  /**
+   * @param rd
+   * @param calculateWage
+   */
+  public EmployeeTaxGroupTableRowData mapToEmployeeTaxGruopRowData(EmployeeTaxGroupTableRowData rd, StatementBean calculateWage) {
+    rd.setTaxType(calculateWage.getTaxType());
+    rd.setAccountNumber(calculateWage.getAccountNumber());
+    rd.setHourlyWage(calculateWage.getHourlyWage());
+    rd.setSocialInsuranceRate(calculateWage.getSocialInsuranceRate());
+    rd.setSourceTaxRate(calculateWage.getSourceTaxRate());
+    rd.setVacationExtraRate(calculateWage.getVacationExtraRate());
+    rd.setWorkingHours(calculateWage.getWorkingHours());
+    rd.setWage(calculateWage.getWage());
+    rd.setBrutto(calculateWage.getBruttoWage());
+    rd.setNetto(calculateWage.getNettoWage());
+    rd.setPayout(calculateWage.getNettoWagePayout());
+    rd.setSourceTax(calculateWage.getSourceTax());
+    rd.setSocialInsuranceTax(calculateWage.getSocialInsuranceTax());
+    rd.setVacationExtra(calculateWage.getVacationExtra());
+    rd.setExpenses(calculateWage.getExpenses());
+    return rd;
+  }
+
+  /**
+   * @param rd
+   * @param calculateWage
+   */
+  public EmployerTaxGroupTableRowData mapToEmployerTaxGruopRowData(EmployerTaxGroupTableRowData rd, StatementBean calculateWage) {
+    rd.setTaxType(calculateWage.getTaxType());
+    rd.setAccountNumber(calculateWage.getAccountNumber());
+    rd.setHourlyWage(calculateWage.getHourlyWage());
+    rd.setSocialInsuranceRate(calculateWage.getSocialInsuranceRate());
+    rd.setSourceTaxRate(calculateWage.getSourceTaxRate());
+    rd.setVacationExtraRate(calculateWage.getVacationExtraRate());
+    rd.setWorkingHours(calculateWage.getWorkingHours());
+    rd.setWage(calculateWage.getWage());
+    rd.setBrutto(calculateWage.getBruttoWage());
+    rd.setNetto(calculateWage.getNettoWage());
+    rd.setPayout(calculateWage.getNettoWagePayout());
+    rd.setSourceTax(calculateWage.getSourceTax());
+    rd.setSocialInsuranceTax(calculateWage.getSocialInsuranceTax());
+    rd.setVacationExtra(calculateWage.getVacationExtra());
+    rd.setExpenses(calculateWage.getExpenses());
+    return rd;
+  }
+
 }

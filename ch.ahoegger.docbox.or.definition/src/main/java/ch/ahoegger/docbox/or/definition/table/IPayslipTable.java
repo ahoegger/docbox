@@ -7,27 +7,14 @@ package ch.ahoegger.docbox.or.definition.table;
  */
 public interface IPayslipTable {
 
-  public static String TABLE_NAME = "PAYSLIP";
+  String TABLE_NAME = "PAYSLIP";
 
   // columns
+  String PAYSLIP_NR = "PAYSLIP_NR"; // PK
 
-  public static String PAYSLIP_NR = "PAYSLIP_NR";
+  String BILLING_CYCLE_NR = IBillingCicleTable.BILLING_CYCLE_NR; // FK
 
-  public static String PARTNER_NR = IPartnerTable.PARTNER_NR;
+  String EMPLOYEE_TAX_GROUP_NR = IEmployeeTaxGroupTable.EMPLOYEE_TAX_GROUP_NR; // FK
 
-  public static String EMPLOYER_NR = IEmployerTable.EMPLOYER_NR;
-
-  public static String TAX_GROUP_NR = ITaxGroupTable.TAX_GROUP_NR;
-
-  public static String STATEMENT_NR = IStatementTable.STATEMENT_NR;
-
-  public static String DOCUMENT_NR = IDocumentTable.DOCUMENT_NR;
-
-  public static String NAME = "NAME";
-  public static int NAME_LENGTH = 200;
-
-  public static String START_DATE = "START_DATE";
-
-  public static String END_DATE = "END_DATE";
-
+  String STATEMENT_NR = IStatementTable.STATEMENT_NR;
 }

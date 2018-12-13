@@ -9,7 +9,7 @@ public interface IEmployerTable {
   public static String TABLE_NAME = "EMPLOYER";
 
   // columns
-  public static String EMPLOYER_NR = "EMPLOYER_NR"; //PK
+  public static String EMPLOYER_NR = "EMPLOYER_NR"; //PK, FK -> IPartnerTable.PARTNER_NR
 
   public static String ADDRESS_NR = IAddressTable.ADDRESS_NR;
 

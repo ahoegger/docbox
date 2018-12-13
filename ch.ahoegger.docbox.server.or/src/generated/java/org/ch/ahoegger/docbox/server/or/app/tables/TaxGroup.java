@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TaxGroup extends TableImpl<TaxGroupRecord> {
 
-    private static final long serialVersionUID = 672864265;
+    private static final long serialVersionUID = 588083988;
 
     /**
      * The reference instance of <code>APP.TAX_GROUP</code>
@@ -71,7 +71,7 @@ public class TaxGroup extends TableImpl<TaxGroupRecord> {
     /**
      * The column <code>APP.TAX_GROUP.END_DATE</code>.
      */
-    public final TableField<TaxGroupRecord, Date> END_DATE = createField("END_DATE", org.jooq.impl.SQLDataType.DATE, this, "", new DateConverter());
+    public final TableField<TaxGroupRecord, Date> END_DATE = createField("END_DATE", org.jooq.impl.SQLDataType.DATE.nullable(false), this, "", new DateConverter());
 
     /**
      * Create a <code>APP.TAX_GROUP</code> table reference
@@ -108,7 +108,7 @@ public class TaxGroup extends TableImpl<TaxGroupRecord> {
      */
     @Override
     public UniqueKey<TaxGroupRecord> getPrimaryKey() {
-        return Keys.SQL181126154908590;
+        return Keys.SQL181211162703560;
     }
 
     /**
@@ -116,7 +116,7 @@ public class TaxGroup extends TableImpl<TaxGroupRecord> {
      */
     @Override
     public List<UniqueKey<TaxGroupRecord>> getKeys() {
-        return Arrays.<UniqueKey<TaxGroupRecord>>asList(Keys.SQL181126154908590);
+        return Arrays.<UniqueKey<TaxGroupRecord>>asList(Keys.SQL181211162703560);
     }
 
     /**

@@ -4,10 +4,12 @@
 package org.ch.ahoegger.docbox.server.or.app.tables;
 
 
+import ch.ahoegger.docbox.server.or.generator.converter.DateConverter;
 import ch.ahoegger.docbox.server.or.generator.converter.LongConverter;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Generated;
@@ -36,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EmployeeTaxGroup extends TableImpl<EmployeeTaxGroupRecord> {
 
-    private static final long serialVersionUID = 1593754274;
+    private static final long serialVersionUID = 963195656;
 
     /**
      * The reference instance of <code>APP.EMPLOYEE_TAX_GROUP</code>
@@ -52,14 +54,19 @@ public class EmployeeTaxGroup extends TableImpl<EmployeeTaxGroupRecord> {
     }
 
     /**
-     * The column <code>APP.EMPLOYEE_TAX_GROUP.PARTNER_NR</code>.
+     * The column <code>APP.EMPLOYEE_TAX_GROUP.EMPLOYEE_TAX_GROUP_NR</code>.
      */
-    public final TableField<EmployeeTaxGroupRecord, BigDecimal> PARTNER_NR = createField("PARTNER_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
+    public final TableField<EmployeeTaxGroupRecord, BigDecimal> EMPLOYEE_TAX_GROUP_NR = createField("EMPLOYEE_TAX_GROUP_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
-     * The column <code>APP.EMPLOYEE_TAX_GROUP.TAX_GROUP_NR</code>.
+     * The column <code>APP.EMPLOYEE_TAX_GROUP.EMPLOYEE_NR</code>.
      */
-    public final TableField<EmployeeTaxGroupRecord, BigDecimal> TAX_GROUP_NR = createField("TAX_GROUP_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
+    public final TableField<EmployeeTaxGroupRecord, BigDecimal> EMPLOYEE_NR = createField("EMPLOYEE_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
+
+    /**
+     * The column <code>APP.EMPLOYEE_TAX_GROUP.EMPLOYER_TAX_GROUP_NR</code>.
+     */
+    public final TableField<EmployeeTaxGroupRecord, BigDecimal> EMPLOYER_TAX_GROUP_NR = createField("EMPLOYER_TAX_GROUP_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
      * The column <code>APP.EMPLOYEE_TAX_GROUP.STATEMENT_NR</code>.
@@ -67,9 +74,14 @@ public class EmployeeTaxGroup extends TableImpl<EmployeeTaxGroupRecord> {
     public final TableField<EmployeeTaxGroupRecord, BigDecimal> STATEMENT_NR = createField("STATEMENT_NR", org.jooq.impl.SQLDataType.BIGINT, this, "", new LongConverter());
 
     /**
-     * The column <code>APP.EMPLOYEE_TAX_GROUP.DOCUMENT_NR</code>.
+     * The column <code>APP.EMPLOYEE_TAX_GROUP.START_DATE</code>.
      */
-    public final TableField<EmployeeTaxGroupRecord, BigDecimal> DOCUMENT_NR = createField("DOCUMENT_NR", org.jooq.impl.SQLDataType.BIGINT, this, "", new LongConverter());
+    public final TableField<EmployeeTaxGroupRecord, Date> START_DATE = createField("START_DATE", org.jooq.impl.SQLDataType.DATE, this, "", new DateConverter());
+
+    /**
+     * The column <code>APP.EMPLOYEE_TAX_GROUP.END_DATE</code>.
+     */
+    public final TableField<EmployeeTaxGroupRecord, Date> END_DATE = createField("END_DATE", org.jooq.impl.SQLDataType.DATE, this, "", new DateConverter());
 
     /**
      * Create a <code>APP.EMPLOYEE_TAX_GROUP</code> table reference
@@ -106,7 +118,7 @@ public class EmployeeTaxGroup extends TableImpl<EmployeeTaxGroupRecord> {
      */
     @Override
     public UniqueKey<EmployeeTaxGroupRecord> getPrimaryKey() {
-        return Keys.SQL181126154908330;
+        return Keys.SQL181211162703170;
     }
 
     /**
@@ -114,7 +126,7 @@ public class EmployeeTaxGroup extends TableImpl<EmployeeTaxGroupRecord> {
      */
     @Override
     public List<UniqueKey<EmployeeTaxGroupRecord>> getKeys() {
-        return Arrays.<UniqueKey<EmployeeTaxGroupRecord>>asList(Keys.SQL181126154908330);
+        return Arrays.<UniqueKey<EmployeeTaxGroupRecord>>asList(Keys.SQL181211162703170, Keys.SQL181211162703171);
     }
 
     /**

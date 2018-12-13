@@ -28,7 +28,12 @@ public class HumanResourceOutline extends AbstractOutline {
 
   @Override
   protected void execCreateChildPages(List<IPage<?>> pageList) {
-    pageList.add(new EmployeeTablePage());
+    pageList.add(new EmployeeTablePage(true));
+  }
+
+  @Override
+  protected void execInitTree() {
+    super.execInitTree();
   }
 
 }

@@ -12,7 +12,7 @@ public class WageCalculationResult {
   private BigDecimal m_wage;
   private BigDecimal m_bruttoWage;
   private BigDecimal m_nettoWage;
-  private BigDecimal m_nettoWageRounded;
+  private BigDecimal m_nettoWagePayout;
   private BigDecimal m_sourceTax;
   private BigDecimal m_socialInsuranceTax;
   private BigDecimal m_vacationExtra;
@@ -54,12 +54,12 @@ public class WageCalculationResult {
     return this;
   }
 
-  public BigDecimal getNettoWageRounded() {
-    return m_nettoWageRounded;
+  public BigDecimal getNettoWagePayout() {
+    return m_nettoWagePayout;
   }
 
-  public WageCalculationResult withNettoWageRounded(BigDecimal nettoWageRounded) {
-    m_nettoWageRounded = nettoWageRounded;
+  public WageCalculationResult withNettoWagePayout(BigDecimal nettoWagePayout) {
+    m_nettoWagePayout = nettoWagePayout;
     return this;
   }
 

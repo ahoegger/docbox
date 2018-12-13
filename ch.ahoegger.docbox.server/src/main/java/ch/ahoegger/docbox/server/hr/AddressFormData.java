@@ -2,7 +2,7 @@ package ch.ahoegger.docbox.server.hr;
 
 import java.math.BigDecimal;
 
-import ch.ahoegger.docbox.shared.util.AbstractAddressBoxData;
+import ch.ahoegger.docbox.shared.template.AbstractAddressBoxData;
 
 /**
  * <h3>{@link AddressFormData}</h3>

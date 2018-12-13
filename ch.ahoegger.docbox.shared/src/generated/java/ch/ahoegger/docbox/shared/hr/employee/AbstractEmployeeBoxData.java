@@ -7,7 +7,7 @@ import javax.annotation.Generated;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 
-import ch.ahoegger.docbox.shared.util.AbstractAddressBoxData;
+import ch.ahoegger.docbox.shared.template.AbstractAddressBoxData;
 
 /**
  * <b>NOTE:</b><br>

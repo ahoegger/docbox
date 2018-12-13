@@ -6,19 +6,26 @@ import java.sql.SQLException;
 import org.ch.ahoegger.docbox.server.or.app.tables.DocumentCategory;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.jooq.SQLDialect;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.or.definition.table.IDocumentCategoryTable;
+import ch.ahoegger.docbox.server.or.generator.IJooqTable;
 
 /**
  * <h3>{@link DocumentCategoryTableStatement}</h3>
  *
  * @author Andreas Hoegger
  */
-public class DocumentCategoryTableStatement implements ITableStatement, IDocumentCategoryTable {
+public class DocumentCategoryTableStatement implements ITableStatement, IJooqTable, IDocumentCategoryTable {
   private static final Logger LOG = LoggerFactory.getLogger(DocumentCategoryTableStatement.class);
+
+  @Override
+  public Table<?> getJooqTable() {
+    return DocumentCategory.DOCUMENT_CATEGORY;
+  }
 
   @Override
   public String getCreateTable() {
@@ -46,7 +53,7 @@ public class DocumentCategoryTableStatement implements ITableStatement, IDocumen
   @Override
   public void deleteTable(Connection connection) {
     LOG.info("SQL-DEV delete table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).delete(DocumentCategory.DOCUMENT_CATEGORY)
+    DSL.using(connection, SQLDialect.DERBY).delete(getJooqTable())
         .execute();
 
   }
@@ -54,7 +61,7 @@ public class DocumentCategoryTableStatement implements ITableStatement, IDocumen
   @Override
   public void dropTable(Connection connection) {
     LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).dropTable(DocumentCategory.DOCUMENT_CATEGORY)
+    DSL.using(connection, SQLDialect.DERBY).dropTable(getJooqTable())
         .execute();
   }
 

@@ -1,7 +1,6 @@
 package ch.ahoegger.docbox.client.hr.entity;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
@@ -10,23 +9,19 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractSearchForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractResetButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractSearchButton;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
-import org.eclipse.scout.rt.platform.util.TriState;
 
 import ch.ahoegger.docbox.client.hr.entity.EntitySearchForm.MainBox.ResetButton;
 import ch.ahoegger.docbox.client.hr.entity.EntitySearchForm.MainBox.SearchButton;
 import ch.ahoegger.docbox.client.hr.entity.EntitySearchForm.MainBox.SearchTabBox;
 import ch.ahoegger.docbox.client.hr.entity.EntitySearchForm.MainBox.SearchTabBox.SearchBox;
-import ch.ahoegger.docbox.client.hr.entity.EntitySearchForm.MainBox.SearchTabBox.SearchBox.BilledBox;
 import ch.ahoegger.docbox.client.hr.entity.EntitySearchForm.MainBox.SearchTabBox.SearchBox.EntityDateBox;
 import ch.ahoegger.docbox.client.hr.entity.EntitySearchForm.MainBox.SearchTabBox.SearchBox.EntityDateBox.EntityDateFromField;
 import ch.ahoegger.docbox.client.hr.entity.EntitySearchForm.MainBox.SearchTabBox.SearchBox.EntityDateBox.EntityDateToField;
@@ -42,21 +37,10 @@ import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 @FormData(value = EntitySearchFormData.class, sdkCommand = SdkCommand.CREATE)
 public class EntitySearchForm extends AbstractSearchForm {
 
-  private List<BigDecimal> m_entityIds;
   private BigDecimal m_payslipId;
 
   public EntitySearchForm() {
     setHandler(new SearchHandler());
-  }
-
-  @FormData
-  public List<BigDecimal> getEntityIds() {
-    return m_entityIds;
-  }
-
-  @FormData
-  public void setEntityIds(List<BigDecimal> entityIds) {
-    m_entityIds = entityIds;
   }
 
   @FormData
@@ -75,10 +59,6 @@ public class EntitySearchForm extends AbstractSearchForm {
 
   public SearchTabBox getSearchTabBox() {
     return getFieldByClass(SearchTabBox.class);
-  }
-
-  public BilledBox getBilledBox() {
-    return getFieldByClass(BilledBox.class);
   }
 
   public EntityDateBox getEntityDateBox() {
@@ -160,49 +140,6 @@ public class EntitySearchForm extends AbstractSearchForm {
           }
         }
 
-        @Order(2000)
-        public class BilledBox extends AbstractRadioButtonGroup<TriState> {
-
-          @Order(1000)
-          public class BilledButton extends AbstractRadioButton<TriState> {
-            @Override
-            protected TriState getConfiguredRadioValue() {
-              return TriState.TRUE;
-            }
-
-            @Override
-            protected String getConfiguredLabel() {
-              return TEXTS.get("Billed");
-            }
-          }
-
-          @Order(2000)
-          public class UnbilledButton extends AbstractRadioButton<TriState> {
-            @Override
-            protected TriState getConfiguredRadioValue() {
-              return TriState.FALSE;
-            }
-
-            @Override
-            protected String getConfiguredLabel() {
-              return TEXTS.get("NotBilled");
-            }
-          }
-
-          @Order(3000)
-          public class AllButton extends AbstractRadioButton<TriState> {
-            @Override
-            protected TriState getConfiguredRadioValue() {
-              return TriState.UNDEFINED;
-            }
-
-            @Override
-            protected String getConfiguredLabel() {
-              return TEXTS.get("All");
-            }
-          }
-        }
-
       }
     }
 
@@ -234,7 +171,6 @@ public class EntitySearchForm extends AbstractSearchForm {
   public class SearchHandler extends AbstractFormHandler {
     @Override
     protected void execLoad() {
-      getBilledBox().setValue(TriState.TRUE);
     }
 
     @Override

@@ -37,9 +37,20 @@ import ch.ahoegger.docbox.shared.hr.tax.TaxCodeType;
 @PageData(EmployeeTableData.class)
 public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.Table> {
 
+  private final boolean m_employeePagesInitialExpanded;
+
+  public EmployeeTablePage(boolean childPagesExpanded) {
+    m_employeePagesInitialExpanded = childPagesExpanded;
+  }
+
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("Employee");
+  }
+
+  @Override
+  protected boolean getConfiguredExpanded() {
+    return true;
   }
 
   @Override
@@ -50,13 +61,19 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
   @Override
   protected IPage<?> execCreateChildPage(ITableRow row) {
     EmployeeNodePage nodePage = new EmployeeNodePage();
-    nodePage.setPartnerId(getTable().getPartnerIdColumn().getValue(row));
+    nodePage.setEmployeeId(getTable().getPartnerIdColumn().getValue(row));
+    nodePage.setExpanded(m_employeePagesInitialExpanded);
     return nodePage;
   }
 
   @Override
   protected void execLoadData(SearchFilter filter) {
     importPageData(BEANS.get(IEmployeeService.class).getTableData((EmployeeSearchFormData) filter.getFormData()));
+  }
+
+  @Override
+  public EmployeeSearchForm getSearchFormInternal() {
+    return (EmployeeSearchForm) super.getSearchFormInternal();
   }
 
   @Override
@@ -387,7 +404,7 @@ public class EmployeeTablePage extends AbstractPageWithTable<EmployeeTablePage.T
 
       @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-        return CollectionUtility.hashSet(TableMenuType.SingleSelection, TableMenuType.EmptySpace);
+        return CollectionUtility.hashSet(TableMenuType.EmptySpace);
       }
 
       @Override

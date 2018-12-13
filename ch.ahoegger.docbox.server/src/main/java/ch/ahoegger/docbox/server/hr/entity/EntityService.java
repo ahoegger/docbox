@@ -2,33 +2,44 @@ package ch.ahoegger.docbox.server.hr.entity;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.ch.ahoegger.docbox.server.or.app.tables.BillingCycle;
+import org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.Entity;
+import org.ch.ahoegger.docbox.server.or.app.tables.Payslip;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.EntityRecord;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.status.MultiStatus;
+import org.eclipse.scout.rt.platform.status.Status;
+import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
-import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record3;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
+import ch.ahoegger.docbox.server.administration.hr.billing.BillingCycleLookupService;
+import ch.ahoegger.docbox.server.administration.hr.billing.BillingCycleService;
+import ch.ahoegger.docbox.server.hr.billing.payslip.PayslipService;
 import ch.ahoegger.docbox.server.util.FieldValidator;
+import ch.ahoegger.docbox.shared.administration.hr.billingcycle.BillingCycleFormData;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
-import ch.ahoegger.docbox.shared.hr.billing.PayslipCodeType.UnbilledCode;
+import ch.ahoegger.docbox.shared.hr.billing.payslip.PayslipFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
@@ -43,19 +54,18 @@ public class EntityService implements IEntityService {
   public EntityTablePageData getEntityTableData(EntitySearchFormData formData) {
 
     Entity e = Entity.ENTITY.as("ENT");
+    Payslip payslip = Payslip.PAYSLIP;
+    EmployeeTaxGroup empTaxGrp = EmployeeTaxGroup.EMPLOYEE_TAX_GROUP;
 
     Condition condition = DSL.trueCondition();
 
     // search partnerId
     if (formData.getPartnerId().getValue() != null) {
-      condition = condition.and(e.PARTNER_NR.eq(formData.getPartnerId().getValue()));
+      condition = condition.and(empTaxGrp.EMPLOYEE_NR.eq(formData.getPartnerId().getValue()));
     }
 
     // search PayslipId
-    if (formData.getPayslipId() == null) {
-      condition = condition.and(e.PAYSLIP_NR.isNull());
-    }
-    else {
+    if (formData.getPayslipId() != null) {
       condition = condition.and(e.PAYSLIP_NR.eq(formData.getPayslipId()));
     }
 
@@ -68,13 +78,11 @@ public class EntityService implements IEntityService {
       condition = condition.and(e.ENTITY_DATE.le(formData.getEntityDateTo().getValue()));
     }
 
-    if (CollectionUtility.hasElements(formData.getEntityIds())) {
-      condition = condition.and(e.ENTITY_NR.in(formData.getEntityIds()));
-    }
-
     List<EntityTableRowData> rows = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(e.ENTITY_NR, e.PARTNER_NR, e.PAYSLIP_NR, e.ENTITY_TYPE, e.ENTITY_DATE, e.WORKING_HOURS, e.EXPENSE_AMOUNT, e.DESCRIPTION)
+        .select(e.ENTITY_NR, e.PAYSLIP_NR, e.ENTITY_TYPE, e.ENTITY_DATE, e.WORKING_HOURS, e.EXPENSE_AMOUNT, e.DESCRIPTION, payslip.STATEMENT_NR, empTaxGrp.EMPLOYEE_NR)
         .from(e)
+        .leftOuterJoin(payslip).on(e.PAYSLIP_NR.eq(payslip.PAYSLIP_NR))
+        .leftOuterJoin(empTaxGrp).on(payslip.EMPLOYEE_TAX_GROUP_NR.eq(empTaxGrp.EMPLOYEE_TAX_GROUP_NR))
         .where(condition)
         .orderBy(e.ENTITY_DATE)
         .fetch()
@@ -82,13 +90,13 @@ public class EntityService implements IEntityService {
         .map(rec -> {
           EntityTableRowData rd = new EntityTableRowData();
           rd.setEnityId(rec.get(e.ENTITY_NR));
-          rd.setPartnerId(rec.get(e.PARTNER_NR));
           rd.setPayslipId(rec.get(e.PAYSLIP_NR));
           rd.setEntityType(rec.get(e.ENTITY_TYPE));
           rd.setDate(rec.get(e.ENTITY_DATE));
           rd.setHours(rec.get(e.WORKING_HOURS));
           rd.setAmount(rec.get(e.EXPENSE_AMOUNT));
           rd.setText(rec.get(e.DESCRIPTION));
+          rd.setPayslipId(rec.get(payslip.STATEMENT_NR));
           return rd;
         })
         .collect(Collectors.toList());
@@ -100,29 +108,36 @@ public class EntityService implements IEntityService {
 
   @Override
   public EntityFormData prepareCreate(EntityFormData formData) {
-    Entity e = Entity.ENTITY.as("ENT");
+    Assertions.assertNotNull(formData.getPayslipId());
+    validatePayslipRelation(formData, new MultiStatus(), true);
+    PayslipFormData payslipData = new PayslipFormData();
+    payslipData.setPayslipId(formData.getPayslipId());
+    payslipData = BEANS.get(PayslipService.class).load(payslipData);
 
-    Condition condition = DSL.trueCondition();
-    // alias
-    Field<Date> maxDate = DSL.max(e.ENTITY_DATE).as("MAX_DATE");
-    // search partnerId
-    if (formData.getPartnerId() != null) {
-      condition = condition.and(e.PARTNER_NR.eq(formData.getPartnerId()));
+    BillingCycleFormData billingCycleData = new BillingCycleFormData();
+    billingCycleData.setBillingCycleId(payslipData.getBillingCycle().getValue());
+    billingCycleData = BEANS.get(BillingCycleService.class).load(billingCycleData);
+
+    EntitySearchFormData entitySearchData = new EntitySearchFormData();
+    entitySearchData.setPayslipId(formData.getPayslipId());
+    List<EntityTableRowData> entities = CollectionUtility.arrayList(getEntityTableData(entitySearchData).getRows());
+    if (entities.size() > 0) {
+      // find max
+      formData.getEntityDate().setValue(LocalDateUtility.toDate(entities.stream()
+          .map(e -> LocalDateUtility.toLocalDate(e.getDate()))
+          .max(Comparator.naturalOrder()).get()));
     }
-
-    LocalDate today = LocalDate.now();
-    Date date = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(maxDate)
-        .from(e)
-        .where(condition)
-        .fetch()
-        .stream()
-        .findFirst()
-        .map(rec -> rec.get(maxDate))
-        .orElse(LocalDateUtility.toDate(today));
-    formData.getEntityDate().setValue(date);
-    formData.setPayslipId(UnbilledCode.ID);
+    else {
+      formData.getEntityDate().setValue(billingCycleData.getPeriodBox().getFrom().getValue());
+    }
     return formData;
+  }
+
+  @Override
+  public IStatus validate(EntityFormData formData) {
+    MultiStatus status = new MultiStatus();
+    validatePayslipRelation(formData, status, false);
+    return status;
   }
 
   @Override
@@ -130,13 +145,15 @@ public class EntityService implements IEntityService {
     if (formData.getPayslipId() == null) {
       throw new VetoException("Payslip accounting id can not be null.");
     }
+    validatePayslipRelation(formData, new MultiStatus(), true);
+    BillingCycleFormData billingCycleData = BEANS.get(BillingCycleService.class).getBillingCycleByPayslipId(formData.getPayslipId());
+    if (!LocalDateUtility.isBetweenOrEqual(billingCycleData.getPeriodBox().getFrom().getValue(), billingCycleData.getPeriodBox().getTo().getValue(), formData.getEntityDate().getValue())) {
+      throw new VetoException(TEXTS.get("Validate_DateNotInPeriod", TEXTS.get("PaySlip")));
+    }
+
     formData.setEntityId(new BigDecimal(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME)));
 
-    Entity e = Entity.ENTITY.as("ENT");
-    int rowCount = mapToRecord(DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .newRecord(e), formData).insert();
-
-    if (rowCount == 1) {
+    if (insert(SQL.getConnection(), formData) == 1) {
       // notify backup needed
       BEANS.get(IBackupService.class).notifyModification();
       return formData;
@@ -147,20 +164,21 @@ public class EntityService implements IEntityService {
   @Override
   public EntityFormData load(EntityFormData formData) {
     Entity e = Entity.ENTITY.as("ENT");
-    return toFormData(DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .fetchOne(e, e.ENTITY_NR.eq(formData.getEntityId())));
-
+    return toFormData(
+        DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+            .select(e.fields())
+            .from(e)
+            .where(e.ENTITY_NR.eq(formData.getEntityId()))
+            .fetchOne(),
+        formData);
   }
 
   @Override
   public EntityFormData store(EntityFormData formData) {
-    if (ObjectUtility.notEquals(UnbilledCode.ID, formData.getPayslipId())) {
-      throw new VetoException("Access denied.");
-    }
+    validatePayslipRelation(formData, new MultiStatus(), true);
     Entity e = Entity.ENTITY;
     FieldValidator validator = new FieldValidator();
     validator.add(FieldValidator.unmodifiableValidator(e.ENTITY_TYPE, formData.getEntityType()));
-    validator.add(FieldValidator.unmodifiableValidator(e.PARTNER_NR, formData.getPartnerId()));
     validator.add(FieldValidator.unmodifiableValidator(e.PAYSLIP_NR, formData.getPayslipId()));
     EntityRecord entity = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .fetchOne(e, e.ENTITY_NR.eq(formData.getEntityId()));
@@ -188,8 +206,12 @@ public class EntityService implements IEntityService {
 
   @Override
   public boolean delete(BigDecimal entityId) {
-    Entity e = Entity.ENTITY.as("ent");
+    EntityFormData formData = new EntityFormData();
+    formData.setEntityId(entityId);
+    formData = load(formData);
+    validatePayslipRelation(formData, new MultiStatus(), true);
 
+    Entity e = Entity.ENTITY.as("ent");
     EntityRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .fetchOne(e, e.ENTITY_NR.eq(entityId));
     if (rec == null) {
@@ -224,10 +246,24 @@ public class EntityService implements IEntityService {
     BEANS.get(IBackupService.class).notifyModification();
   }
 
+//  entityId01, BigDecimal.valueOf(5), UnbilledCode.ID, WorkCode.ID, LocalDateUtility.toDate(LocalDate.of(2016, 3, 31)), BigDecimal.valueOf(2), null, "desc");
+  public int insert(Connection connection, BigDecimal entityId, BigDecimal payslipId, BigDecimal entityType, Date date, BigDecimal workingHours, BigDecimal expense, String text) {
+    EntityFormData fd = new EntityFormData();
+    fd.setEntityId(entityId);
+    fd.setPayslipId(payslipId);
+    fd.setEntityType(entityType);
+    fd.getEntityDate().setValue(date);
+    fd.getWorkHours().setValue(workingHours);
+    fd.getExpenseAmount().setValue(expense);
+    fd.getText().setValue(text);
+    return insert(connection, fd);
+  }
+
   @RemoteServiceAccessDenied
-  public int insert(Connection connection, BigDecimal entityId, BigDecimal partnerId, BigDecimal payslipId, BigDecimal entityType, Date entityDate, BigDecimal hours, BigDecimal amount, String desc) {
-    return DSL.using(connection, SQLDialect.DERBY)
-        .executeInsert(mapToRecord(new EntityRecord(), entityId, partnerId, payslipId, entityType, entityDate, hours, amount, desc));
+  public int insert(Connection connection, EntityFormData formData) {
+    Entity table = Entity.ENTITY;
+    return mapToRecord(DSL.using(connection, SQLDialect.DERBY)
+        .newRecord(table), formData).insert();
   }
 
   protected EntityRecord toRecord(EntityFormData fd) {
@@ -242,37 +278,63 @@ public class EntityService implements IEntityService {
     if (fd == null) {
       return null;
     }
-    return mapToRecord(rec, fd.getEntityId(), fd.getPartnerId(), fd.getPayslipId(), fd.getEntityType(), fd.getEntityDate().getValue(), fd.getWorkHours().getValue(), fd.getExpenseAmount().getValue(), fd.getText().getValue());
-
-  }
-
-  protected EntityRecord mapToRecord(EntityRecord rec, BigDecimal entityId, BigDecimal partnerId, BigDecimal payslipId, BigDecimal entityType, Date entityDate, BigDecimal hours, BigDecimal amount, String desc) {
     Entity e = Entity.ENTITY;
     return rec
-        .with(e.EXPENSE_AMOUNT, amount)
-        .with(e.DESCRIPTION, desc)
-        .with(e.ENTITY_DATE, entityDate)
-        .with(e.ENTITY_NR, entityId)
-        .with(e.ENTITY_TYPE, entityType)
-        .with(e.WORKING_HOURS, hours)
-        .with(e.PARTNER_NR, partnerId)
-        .with(e.PAYSLIP_NR, payslipId);
+        .with(e.EXPENSE_AMOUNT, fd.getExpenseAmount().getValue())
+        .with(e.DESCRIPTION, fd.getText().getValue())
+        .with(e.ENTITY_DATE, fd.getEntityDate().getValue())
+        .with(e.ENTITY_NR, fd.getEntityId())
+        .with(e.ENTITY_TYPE, fd.getEntityType())
+        .with(e.WORKING_HOURS, fd.getWorkHours().getValue())
+        .with(e.PAYSLIP_NR, fd.getPayslipId());
   }
 
-  protected EntityFormData toFormData(EntityRecord rec) {
+  protected EntityFormData toFormData(Record rec, EntityFormData fd) {
     if (rec == null) {
       return null;
     }
-    EntityFormData fd = new EntityFormData();
-    fd.getExpenseAmount().setValue(rec.getExpenseAmount());
-    fd.getText().setValue(rec.getDescription());
-    fd.getEntityDate().setValue(rec.getEntityDate());
-    fd.setEntityId(rec.getEntityNr());
-    fd.setEntityType(rec.getEntityType());
-    fd.getWorkHours().setValue(rec.getWorkingHours());
-    fd.setPartnerId(rec.getPartnerNr());
-    fd.setPayslipId(rec.getPayslipNr());
+    Entity e = Entity.ENTITY.as("ENT");
+
+    fd.getExpenseAmount().setValue(rec.get(e.EXPENSE_AMOUNT));
+    fd.getText().setValue(rec.get(e.DESCRIPTION));
+    fd.getEntityDate().setValue(rec.get(e.ENTITY_DATE));
+    fd.setEntityId(rec.get(e.ENTITY_NR));
+    fd.setEntityType(rec.get(e.ENTITY_TYPE));
+    fd.getWorkHours().setValue(rec.get(e.WORKING_HOURS));
+    fd.setPayslipId(rec.get(e.PAYSLIP_NR));
     return fd;
+  }
+
+  /**
+   * @param formData
+   * @param status
+   */
+  protected void validatePayslipRelation(EntityFormData formData, MultiStatus status, boolean throwVetoException) {
+
+    Payslip payslip = Payslip.PAYSLIP;
+    BillingCycle billingCycle = BillingCycle.BILLING_CYCLE;
+
+    Record3<BigDecimal, Date, Date> record = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .select(billingCycle.BILLING_CYCLE_NR, billingCycle.START_DATE, billingCycle.END_DATE)
+        .from(payslip)
+        .innerJoin(billingCycle).on(payslip.BILLING_CYCLE_NR.eq(billingCycle.BILLING_CYCLE_NR))
+        .where(payslip.PAYSLIP_NR.eq(formData.getPayslipId()))
+        .fetchOne();
+    if (formData.getEntityDate().getValue() != null) {
+      if (!LocalDateUtility.isBetweenOrEqual(record.get(billingCycle.START_DATE), record.get(billingCycle.END_DATE), formData.getEntityDate().getValue())) {
+        status.add(new Status(
+            new StringBuilder()
+                .append("Entity date is not in payslip '")
+                .append(BEANS.get(BillingCycleLookupService.class).getName(record.get(billingCycle.BILLING_CYCLE_NR)))
+                .append("' range.")
+                .toString(),
+            IStatus.WARNING));
+      }
+    }
+    IStatus finalizedStatus = BEANS.get(PayslipService.class).isFinalized(formData.getPayslipId());
+    if (!finalizedStatus.isOK()) {
+      throw new VetoException(new ProcessingStatus(finalizedStatus));
+    }
   }
 
 }

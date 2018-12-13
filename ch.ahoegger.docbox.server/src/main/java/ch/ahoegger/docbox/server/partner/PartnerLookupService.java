@@ -22,6 +22,7 @@ import org.jooq.impl.DSL;
 
 import ch.ahoegger.docbox.server.service.lookup.AbstractDocboxLookupService;
 import ch.ahoegger.docbox.shared.partner.IParterLookupService;
+import ch.ahoegger.docbox.shared.partner.PartnerLookupCall;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
@@ -30,6 +31,16 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
  * @author Andreas Hoegger
  */
 public class PartnerLookupService extends AbstractDocboxLookupService<BigDecimal> implements IParterLookupService {
+
+  /**
+   * @param taxGroup
+   * @return
+   */
+  public String getName(BigDecimal key) {
+    PartnerLookupCall call = new PartnerLookupCall();
+    call.setKey(key);
+    return getDataByKey(call).stream().findFirst().map(r -> r.getText()).orElse(null);
+  }
 
   @Override
   public List<? extends ILookupRow<BigDecimal>> getDataByKeyInternal(ILookupCall<BigDecimal> call) {
@@ -62,7 +73,6 @@ public class PartnerLookupService extends AbstractDocboxLookupService<BigDecimal
         .select(t.PARTNER_NR, t.NAME, t.START_DATE, t.END_DATE)
         .from(t)
         .where(conditions);
-    System.out.println(query.toString());
     return query
         .fetch().stream().map(rec -> {
           LookupRow<BigDecimal> row = new LookupRow<BigDecimal>(rec.get(t.PARTNER_NR), rec.get(t.NAME));

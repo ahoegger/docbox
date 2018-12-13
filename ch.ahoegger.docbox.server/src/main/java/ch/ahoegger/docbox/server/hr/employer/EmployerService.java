@@ -1,14 +1,19 @@
 package ch.ahoegger.docbox.server.hr.employer;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.ch.ahoegger.docbox.server.or.app.tables.DocboxUser;
 import org.ch.ahoegger.docbox.server.or.app.tables.Employer;
+import org.ch.ahoegger.docbox.server.or.app.tables.EmployerUser;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.EmployerRecord;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
+import org.jooq.Condition;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
@@ -16,6 +21,7 @@ import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.hr.IAddressService;
 import ch.ahoegger.docbox.shared.hr.employer.EmployerFormData;
+import ch.ahoegger.docbox.shared.hr.employer.EmployerSearchFormData;
 import ch.ahoegger.docbox.shared.hr.employer.EmployerTablePageData;
 import ch.ahoegger.docbox.shared.hr.employer.EmployerTablePageData.EmployerTableRowData;
 import ch.ahoegger.docbox.shared.hr.employer.IEmployerService;
@@ -28,11 +34,22 @@ import ch.ahoegger.docbox.shared.hr.employer.IEmployerService;
 public class EmployerService implements IEmployerService {
 
   @Override
-  public EmployerTablePageData getTableData() {
+  public EmployerTablePageData getTableData(EmployerSearchFormData formData) {
     Employer table = Employer.EMPLOYER;
+    EmployerUser erUser = EmployerUser.EMPLOYER_USER;
+    DocboxUser user = DocboxUser.DOCBOX_USER;
+
+    Condition condition = DSL.trueCondition();
+
+    if (formData.getUser().getValue() != null) {
+      condition = condition.and(user.USERNAME.eq(formData.getUser().getValue()));
+    }
     List<EmployerTableRowData> rows = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .select(table.EMPLOYER_NR, table.NAME, table.ADDRESS_NR, table.EMAIL, table.PHONE)
         .from(table)
+        .leftOuterJoin(erUser).on(table.EMPLOYER_NR.eq(erUser.EMPLOYER_NR))
+        .leftOuterJoin(user).on(erUser.USERNAME.eq(user.USERNAME))
+        .where(condition)
         .fetch()
         .stream()
         .map(rec -> {
@@ -105,9 +122,15 @@ public class EmployerService implements IEmployerService {
     return null;
   }
 
+  @RemoteServiceAccessDenied
   public int insert(EmployerFormData formData) {
+    return insert(SQL.getConnection(), formData);
+  }
+
+  @RemoteServiceAccessDenied
+  public int insert(Connection connection, EmployerFormData formData) {
     Employer emp = Employer.EMPLOYER;
-    return mapToRecord(DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+    return mapToRecord(DSL.using(connection, SQLDialect.DERBY)
         .newRecord(emp), formData).insert();
 
   }

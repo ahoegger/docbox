@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Statement extends TableImpl<StatementRecord> {
 
-    private static final long serialVersionUID = -1534677781;
+    private static final long serialVersionUID = 1748197364;
 
     /**
      * The reference instance of <code>APP.STATEMENT</code>
@@ -59,9 +59,14 @@ public class Statement extends TableImpl<StatementRecord> {
     public final TableField<StatementRecord, BigDecimal> STATEMENT_NR = createField("STATEMENT_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
-     * The column <code>APP.STATEMENT.PARTNER_NR</code>.
+     * The column <code>APP.STATEMENT.DOCUMENT_NR</code>.
      */
-    public final TableField<StatementRecord, BigDecimal> PARTNER_NR = createField("PARTNER_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
+    public final TableField<StatementRecord, BigDecimal> DOCUMENT_NR = createField("DOCUMENT_NR", org.jooq.impl.SQLDataType.BIGINT, this, "", new LongConverter());
+
+    /**
+     * The column <code>APP.STATEMENT.TAX_TYPE</code>.
+     */
+    public final TableField<StatementRecord, BigDecimal> TAX_TYPE = createField("TAX_TYPE", org.jooq.impl.SQLDataType.BIGINT, this, "", new LongConverter());
 
     /**
      * The column <code>APP.STATEMENT.STATEMENT_DATE</code>.
@@ -72,11 +77,6 @@ public class Statement extends TableImpl<StatementRecord> {
      * The column <code>APP.STATEMENT.ACCOUNT_NUMBER</code>.
      */
     public final TableField<StatementRecord, String> ACCOUNT_NUMBER = createField("ACCOUNT_NUMBER", org.jooq.impl.SQLDataType.VARCHAR.length(128), this, "");
-
-    /**
-     * The column <code>APP.STATEMENT.TAX_TYPE</code>.
-     */
-    public final TableField<StatementRecord, BigDecimal> TAX_TYPE = createField("TAX_TYPE", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
      * The column <code>APP.STATEMENT.HOURLY_WAGE</code>.
@@ -129,9 +129,9 @@ public class Statement extends TableImpl<StatementRecord> {
     public final TableField<StatementRecord, BigDecimal> SOURCE_TAX = createField("SOURCE_TAX", org.jooq.impl.SQLDataType.DECIMAL.precision(9, 2), this, "");
 
     /**
-     * The column <code>APP.STATEMENT.SOCIAL_SECURITY_TAX</code>.
+     * The column <code>APP.STATEMENT.SOCIAL_INSURANCE_TAX</code>.
      */
-    public final TableField<StatementRecord, BigDecimal> SOCIAL_SECURITY_TAX = createField("SOCIAL_SECURITY_TAX", org.jooq.impl.SQLDataType.DECIMAL.precision(9, 2), this, "");
+    public final TableField<StatementRecord, BigDecimal> SOCIAL_INSURANCE_TAX = createField("SOCIAL_INSURANCE_TAX", org.jooq.impl.SQLDataType.DECIMAL.precision(9, 2), this, "");
 
     /**
      * The column <code>APP.STATEMENT.VACATION_EXTRA</code>.
@@ -178,7 +178,7 @@ public class Statement extends TableImpl<StatementRecord> {
      */
     @Override
     public UniqueKey<StatementRecord> getPrimaryKey() {
-        return Keys.SQL181126154908570;
+        return Keys.SQL181211162703540;
     }
 
     /**
@@ -186,7 +186,7 @@ public class Statement extends TableImpl<StatementRecord> {
      */
     @Override
     public List<UniqueKey<StatementRecord>> getKeys() {
-        return Arrays.<UniqueKey<StatementRecord>>asList(Keys.SQL181126154908570);
+        return Arrays.<UniqueKey<StatementRecord>>asList(Keys.SQL181211162703540);
     }
 
     /**

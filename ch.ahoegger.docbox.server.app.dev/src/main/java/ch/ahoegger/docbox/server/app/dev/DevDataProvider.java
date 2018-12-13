@@ -18,6 +18,7 @@ import org.ch.ahoegger.docbox.server.or.app.tables.DocumentCategory;
 import org.ch.ahoegger.docbox.server.or.app.tables.DocumentOcr;
 import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPartner;
 import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPermission;
+import org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.Entity;
 import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
 import org.ch.ahoegger.docbox.server.or.app.tables.PrimaryKeySeq;
@@ -36,11 +37,15 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.ahoegger.docbox.or.definition.table.IBillingCicleTable;
 import ch.ahoegger.docbox.or.definition.table.IEmployeeTable;
+import ch.ahoegger.docbox.or.definition.table.IEmployeeTaxGroupTable;
 import ch.ahoegger.docbox.or.definition.table.IEmployerTable;
+import ch.ahoegger.docbox.or.definition.table.IEmployerTaxGroupTable;
 import ch.ahoegger.docbox.or.definition.table.IPayslipTable;
 import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
 import ch.ahoegger.docbox.or.definition.table.ITaxGroupTable;
+import ch.ahoegger.docbox.server.administration.hr.billing.BillingCycleService;
 import ch.ahoegger.docbox.server.administration.taxgroup.TaxGroupService;
 import ch.ahoegger.docbox.server.administration.user.UserService;
 import ch.ahoegger.docbox.server.category.CategoryService;
@@ -54,16 +59,16 @@ import ch.ahoegger.docbox.server.document.DocumentService;
 import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.server.hr.AddressFormData;
 import ch.ahoegger.docbox.server.hr.AddressService;
-import ch.ahoegger.docbox.server.hr.billing.PayslipService;
+import ch.ahoegger.docbox.server.hr.billing.payslip.PayslipService;
 import ch.ahoegger.docbox.server.hr.employee.EmployeeService;
 import ch.ahoegger.docbox.server.hr.employer.EmployerService;
+import ch.ahoegger.docbox.server.hr.employer.EmployerTaxGroupService;
 import ch.ahoegger.docbox.server.hr.entity.EntityService;
 import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.or.generator.table.ITableStatement;
 import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.security.SecurityService;
 import ch.ahoegger.docbox.server.security.permission.DefaultPermissionService;
-import ch.ahoegger.docbox.shared.hr.billing.PayslipCodeType.UnbilledCode;
 import ch.ahoegger.docbox.shared.hr.employer.EmployerFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType;
 import ch.ahoegger.docbox.shared.hr.tax.TaxCodeType.SourceTax;
@@ -99,15 +104,44 @@ public class DevDataProvider extends DataBaseInitialization {
 
   private BigDecimal employerId;
 
-  private BigDecimal entityId01;
-  private BigDecimal entityId02;
-  private BigDecimal entityId03;
-  private BigDecimal entityId04;
+  private BigDecimal taxGroupCurrentYear;
+  private BigDecimal employeeTaxGroupLastYear;
 
-  private BigDecimal payslipId01;
-  private BigDecimal payslipId02;
+  private BigDecimal billingCicleLastMonth;
 
-  private BigDecimal taxGroupId01;
+  private BigDecimal billingCicleCurrentMonth;
+
+  private BigDecimal taxGroupLastYear;
+
+  private BigDecimal employeeTaxGroupCurrentYear;
+
+  private BigDecimal payslipLastMonth;
+
+  private BigDecimal payslipCurrentMonth;
+
+  private BigDecimal entityWorkLastMonth01;
+
+  private BigDecimal entityWorkLastMonth02;
+
+  private BigDecimal entityExpenseLastMonth01;
+
+  private BigDecimal entityExpenseLastMonth02;
+
+  private BigDecimal entityWorkCurrentMonth02;
+
+  private BigDecimal entityWorkCurrentMonth01;
+
+  private BigDecimal entityWorkCurrentMonth03;
+
+  private BigDecimal employerTaxGroupLastYear;
+
+  private BigDecimal employerTaxGroupCurrentYear;
+
+  private BigDecimal taxGroupNextYear;
+
+  private BigDecimal employerTaxGroupNextYear;
+
+  private BigDecimal taxGroupAfterNextYear;
 
   private static final LocalDate TODAY = LocalDate.now();
 
@@ -146,10 +180,13 @@ public class DevDataProvider extends DataBaseInitialization {
       insertDocumentOcr(sqlService);
       // hr
       insertEmployer(sqlService);
-      insertEmployere(sqlService);
+      insertEmployee(sqlService);
       insertTaxGroups(sqlService);
-      insertPayslip(sqlService);
-      insertEntities(sqlService);
+      insertEmployerTaxGroups(sqlService);
+      insertEmployeeTaxGroups(sqlService);
+      insertBillingCycles();
+      insertPayslip();
+      insertEntities();
     }
   }
 
@@ -263,8 +300,6 @@ public class DevDataProvider extends DataBaseInitialization {
     URL resource = DevDerbySqlService.class.getClassLoader().getResource("devDocuments/" + fileName);
     BinaryResource br = BinaryResources.create().withFilename(fileName).withContentType(FileUtility.getContentTypeForExtension(FileUtility.getFileExtension(fileName))).withContent(IOUtility.readFromUrl(resource))
         .withLastModified(System.currentTimeMillis()).build();
-//    BinaryResource br = new BinaryResource(fileName, FileUtility.getContentTypeForExtension(FileUtility.getFileExtension(fileName)), IOUtility.getContent(resource.openStream()),
-//        System.currentTimeMillis());
     String docPath = BEANS.get(DocumentStoreService.class).store(br, insertDate, documentId);
 
     documentService.insert(connection, documentId, abstractText, documentDate, insertDate, validDate, docPath, originalStorage, conversationId, true, OcrLanguageCodeType.GermanCode.ID);
@@ -322,13 +357,13 @@ public class DevDataProvider extends DataBaseInitialization {
 
   }
 
-  protected void insertEmployere(ISqlService sqlService) {
+  protected void insertEmployee(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", IEmployeeTable.TABLE_NAME);
     BigDecimal addressId = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
     BEANS.get(AddressService.class).insert(new AddressFormData().withAddressNr(addressId).withLine1("Mountainview 01 e").withPlz("CA-90501").withCity("Santa Barbara e"));
 
     BEANS.get(EmployeeService.class).insert(sqlService.getConnection(), partnerId03_employee, "Hans", "Muster", addressId, "12.2568.2154.69", "PC 50-101-89-7",
-        SourceTax.ID, LocalDateUtility.toDate(LocalDate.of(1968, 10, 02)), BigDecimal.valueOf(26.50),
+        SourceTax.ID, false, LocalDateUtility.toDate(LocalDate.of(1968, 10, 02)), BigDecimal.valueOf(26.50),
         BigDecimal.valueOf(6.225), BigDecimal.valueOf(5.0), BigDecimal.valueOf(8.33),
         employerId);
   }
@@ -336,68 +371,130 @@ public class DevDataProvider extends DataBaseInitialization {
   protected void insertTaxGroups(ISqlService sqlService) {
     LOG.info("SQL-DEV create rows for: {}", ITaxGroupTable.TABLE_NAME);
 
-    taxGroupId01 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    taxGroupLastYear = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    LocalDate start = TODAY.minusYears(1).withDayOfYear(1);
+    LocalDate end = TODAY.minusYears(1).with(TemporalAdjusters.lastDayOfYear());
+    BEANS.get(TaxGroupService.class).insert(sqlService.getConnection(), taxGroupLastYear, start.format(DateTimeFormatter.ofPattern("yyyy", LocalDateUtility.DE_CH)), LocalDateUtility.toDate(start), LocalDateUtility.toDate(end));
 
-    LocalDate start = TODAY.minusMonths(2).withDayOfYear(1);
-    LocalDate end = TODAY.minusMonths(2).with(TemporalAdjusters.lastDayOfYear());
-    BEANS.get(TaxGroupService.class).insert(sqlService.getConnection(), taxGroupId01, start.format(DateTimeFormatter.ofPattern("yyyy", LocalDateUtility.DE_CH)), LocalDateUtility.toDate(start), LocalDateUtility.toDate(end));
+    taxGroupCurrentYear = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    start = TODAY.withDayOfYear(1);
+    end = TODAY.with(TemporalAdjusters.lastDayOfYear());
+    BEANS.get(TaxGroupService.class).insert(sqlService.getConnection(), taxGroupCurrentYear, start.format(DateTimeFormatter.ofPattern("yyyy", LocalDateUtility.DE_CH)), LocalDateUtility.toDate(start), LocalDateUtility.toDate(end));
+
+    taxGroupNextYear = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    start = TODAY.plusYears(1).withDayOfYear(1);
+    end = TODAY.plusYears(1).with(TemporalAdjusters.lastDayOfYear());
+    BEANS.get(TaxGroupService.class).insert(sqlService.getConnection(), taxGroupNextYear, start.format(DateTimeFormatter.ofPattern("yyyy", LocalDateUtility.DE_CH)), LocalDateUtility.toDate(start), LocalDateUtility.toDate(end));
+
+    taxGroupAfterNextYear = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    start = TODAY.plusYears(2).withDayOfYear(1);
+    end = TODAY.plusYears(2).with(TemporalAdjusters.lastDayOfYear());
+    BEANS.get(TaxGroupService.class).insert(sqlService.getConnection(), taxGroupAfterNextYear, start.format(DateTimeFormatter.ofPattern("yyyy", LocalDateUtility.DE_CH)), LocalDateUtility.toDate(start), LocalDateUtility.toDate(end));
+  }
+
+  protected void insertEmployerTaxGroups(ISqlService sqlService) {
+    LOG.info("SQL-DEV create rows for: {}", IEmployerTaxGroupTable.TABLE_NAME);
+
+    employerTaxGroupLastYear = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    BEANS.get(EmployerTaxGroupService.class).insert(SQL.getConnection(), employerTaxGroupLastYear, employerId, taxGroupLastYear, null);
+
+    employerTaxGroupCurrentYear = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    BEANS.get(EmployerTaxGroupService.class).insert(SQL.getConnection(), employerTaxGroupCurrentYear, employerId, taxGroupCurrentYear, null);
+
+    employerTaxGroupNextYear = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    BEANS.get(EmployerTaxGroupService.class).insert(SQL.getConnection(), employerTaxGroupNextYear, employerId, taxGroupNextYear, null);
+  }
+
+  protected void insertEmployeeTaxGroups(ISqlService sqlService) {
+    LOG.info("SQL-DEV create rows for: {}", IEmployeeTaxGroupTable.TABLE_NAME);
+
+    employeeTaxGroupLastYear = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    LocalDate start = TODAY.minusYears(1).withDayOfYear(1);
+    LocalDate end = TODAY.minusYears(1).with(TemporalAdjusters.lastDayOfYear());
+    EmployeeTaxGroup table = EmployeeTaxGroup.EMPLOYEE_TAX_GROUP;
+    DSL.using(SQL.getConnection(), SQLDialect.DERBY).newRecord(table)
+        .with(table.EMPLOYEE_NR, partnerId03_employee)
+        .with(table.EMPLOYEE_TAX_GROUP_NR, employeeTaxGroupLastYear)
+        .with(table.EMPLOYER_TAX_GROUP_NR, employerTaxGroupLastYear)
+        .with(table.END_DATE, LocalDateUtility.toDate(start))
+        .with(table.END_DATE, LocalDateUtility.toDate(end))
+        .insert();
+
+    employeeTaxGroupCurrentYear = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    start = TODAY.withDayOfYear(1);
+    end = TODAY.with(TemporalAdjusters.lastDayOfYear());
+    DSL.using(SQL.getConnection(), SQLDialect.DERBY).newRecord(table)
+        .with(table.EMPLOYEE_NR, partnerId03_employee)
+        .with(table.EMPLOYEE_TAX_GROUP_NR, employeeTaxGroupCurrentYear)
+        .with(table.EMPLOYER_TAX_GROUP_NR, employerTaxGroupCurrentYear)
+        .with(table.END_DATE, LocalDateUtility.toDate(start))
+        .with(table.END_DATE, LocalDateUtility.toDate(end))
+        .insert();
+  }
+
+  protected void insertBillingCycles() {
+    LOG.info("SQL-DEV create rows for: {}", IBillingCicleTable.TABLE_NAME);
+
+    billingCicleLastMonth = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    LocalDate start = TODAY.minusMonths(1).withDayOfMonth(1);
+    LocalDate end = TODAY.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+    BEANS.get(BillingCycleService.class).insert(SQL.getConnection(), billingCicleLastMonth, taxGroupCurrentYear, start.format(DateTimeFormatter.ofPattern("MMMM yyyy", LocalDateUtility.DE_CH)), LocalDateUtility.toDate(start),
+        LocalDateUtility.toDate(end));
+
+    billingCicleCurrentMonth = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    start = TODAY.withDayOfMonth(1);
+    end = TODAY.with(TemporalAdjusters.lastDayOfMonth());
+    BEANS.get(BillingCycleService.class).insert(SQL.getConnection(), billingCicleCurrentMonth, taxGroupCurrentYear, start.format(DateTimeFormatter.ofPattern("MMMM yyyy", LocalDateUtility.DE_CH)), LocalDateUtility.toDate(start),
+        LocalDateUtility.toDate(end));
+  }
+
+  protected void insertStatement() {
 
   }
 
-  protected void insertPayslip(ISqlService sqlService) {
+  protected void insertPayslip() {
     LOG.info("SQL-DEV create rows for: {}", IPayslipTable.TABLE_NAME);
 
-    payslipId01 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
-    payslipId02 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    payslipLastMonth = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    LocalDate start = TODAY.minusMonths(1).withDayOfMonth(1);
+    BigDecimal taxGroupId = employeeTaxGroupCurrentYear;
+    if (start.getMonthValue() == 12) {
+      taxGroupId = employeeTaxGroupLastYear;
+    }
+    BEANS.get(PayslipService.class).insert(SQL.getConnection(), payslipLastMonth, billingCicleLastMonth, taxGroupId, null);
 
-    DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy", LocalDateUtility.DE_CH);
-    BEANS.get(PayslipService.class).insert(sqlService.getConnection(), payslipId01, partnerId03_employee, employerId, taxGroupId01, documentId02, BigDecimal.valueOf(-1), TODAY.minusMonths(1).format(monthFormatter),
-        LocalDateUtility.toDate(TODAY.minusMonths(2).withDayOfMonth(1)), // start period
-        LocalDateUtility.toDate(TODAY.minusMonths(2).with(TemporalAdjusters.lastDayOfMonth())), // end period
-        LocalDateUtility.toDate(TODAY.minusMonths(2).with(TemporalAdjusters.lastDayOfMonth())), // date creation
-        BigDecimal.valueOf(9.25),
-        BigDecimal.valueOf(256.5),
-        BigDecimal.valueOf(230.50), BigDecimal.valueOf(-10.55),
-        BigDecimal.valueOf(-5.55),
-        BigDecimal.valueOf(9.87));
-    BEANS.get(PayslipService.class).insert(sqlService.getConnection(), payslipId02, partnerId03_employee, employerId, taxGroupId01, documentId02, BigDecimal.valueOf(-1), "Oktober 2016",
-        LocalDateUtility.toDate(LocalDate.of(2016, 11, 02)),
-        LocalDateUtility.toDate(LocalDate.of(2016, 10, 1)),
-        LocalDateUtility.toDate(LocalDate.of(2016, 10, 31)),
-        BigDecimal.valueOf(10.5),
-        BigDecimal.valueOf(256.5),
-        BigDecimal.valueOf(230.50), BigDecimal.valueOf(-10.55),
-        BigDecimal.valueOf(-5.55),
-        BigDecimal.valueOf(9.87));
+    payslipCurrentMonth = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    BEANS.get(PayslipService.class).insert(SQL.getConnection(), payslipCurrentMonth, billingCicleCurrentMonth, employeeTaxGroupCurrentYear, null);
   }
 
-  protected void insertEntities(ISqlService sqlService) {
+  protected void insertEntities() {
     LOG.info("SQL-DEV create rows for: {}", Entity.ENTITY.getName());
-
-    entityId01 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
-    entityId02 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
-    entityId03 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
-    entityId04 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
-
     EntityService entityService = BEANS.get(EntityService.class);
-    entityService.insert(sqlService.getConnection(), entityId01, partnerId03_employee, payslipId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusMonths(2).withDayOfMonth(5)), BigDecimal.valueOf(3.5), null,
-        "last month 01");
-    entityService.insert(sqlService.getConnection(), entityId02, partnerId03_employee, payslipId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusMonths(2).withDayOfMonth(8)), BigDecimal.valueOf(4.25), null,
-        "last month 02");
-    entityService.insert(sqlService.getConnection(), entityId03, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusMonths(1)), BigDecimal.valueOf(5.5), null, "First work");
-    entityService.insert(sqlService.getConnection(), entityId04, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusMonths(1).plusDays(1)), BigDecimal.valueOf(2.25), null,
-        "Second work");
-  }
 
-  protected void createEntity(ISqlService sqlService, int counter) {
-    BigDecimal entityId = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    entityWorkLastMonth01 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    entityService.insert(SQL.getConnection(), entityWorkLastMonth01, payslipLastMonth, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusMonths(1).withDayOfMonth(2)), BigDecimal.valueOf(8.5), null, "last month work 1");
 
-    BEANS.get(EntityService.class).insert(sqlService.getConnection(), entityId, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID,
-        LocalDateUtility.toDate(LocalDate.of(2016, 12, 01).plusDays(counter)), BigDecimal.valueOf(2.5), null, "Dez work " + counter);
+    entityWorkLastMonth02 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    entityService.insert(SQL.getConnection(), entityWorkLastMonth02, payslipLastMonth, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.minusMonths(1).withDayOfMonth(15)), BigDecimal.valueOf(5.25), null, "last month work 2");
 
-    entityId = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
-    BEANS.get(EntityService.class).insert(sqlService.getConnection(), entityId, partnerId03_employee, UnbilledCode.ID, EntityTypeCodeType.ExpenseCode.ID,
-        LocalDateUtility.toDate(LocalDate.of(2016, 12, 01).plusDays(counter)), null, BigDecimal.valueOf(12.35), "Dez expense " + counter);
+    entityExpenseLastMonth01 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    entityService.insert(SQL.getConnection(), entityExpenseLastMonth01, payslipLastMonth, EntityTypeCodeType.ExpenseCode.ID, LocalDateUtility.toDate(TODAY.minusMonths(1).withDayOfMonth(5)), null, BigDecimal.valueOf(15.45),
+        "shopping last month 01");
+
+    entityExpenseLastMonth02 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    entityService.insert(SQL.getConnection(), entityExpenseLastMonth02, payslipLastMonth, EntityTypeCodeType.ExpenseCode.ID, LocalDateUtility.toDate(TODAY.minusMonths(1).withDayOfMonth(25)), null, BigDecimal.valueOf(49.05),
+        "shopping last month 02");
+
+    // current month
+    entityWorkCurrentMonth01 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    entityService.insert(SQL.getConnection(), entityWorkCurrentMonth01, payslipCurrentMonth, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.withDayOfMonth(4)), BigDecimal.valueOf(3), null, "current month work 1");
+
+    entityWorkCurrentMonth02 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    entityService.insert(SQL.getConnection(), entityWorkCurrentMonth02, payslipCurrentMonth, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.withDayOfMonth(12)), BigDecimal.valueOf(2.25), null, "current month work 2");
+
+    entityWorkCurrentMonth03 = BigDecimal.valueOf(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME));
+    entityService.insert(SQL.getConnection(), entityWorkCurrentMonth03, payslipCurrentMonth, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.toDate(TODAY.withDayOfMonth(23)), BigDecimal.valueOf(9.5), null, "current month work 3");
+
   }
 
 }

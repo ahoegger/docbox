@@ -1,12 +1,14 @@
 package ch.ahoegger.docbox.server.hr;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.Address;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.AddressRecord;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.jdbc.SQL;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
@@ -14,7 +16,7 @@ import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.hr.IAddressService;
 import ch.ahoegger.docbox.shared.hr.employer.EmployerFormData.AddressBox;
-import ch.ahoegger.docbox.shared.util.AbstractAddressBoxData;
+import ch.ahoegger.docbox.shared.template.AbstractAddressBoxData;
 
 /**
  * <h3>{@link AddressService}</h3>
@@ -71,9 +73,15 @@ public class AddressService implements IAddressService {
     return null;
   }
 
+  @RemoteServiceAccessDenied
   public int insert(AbstractAddressBoxData formData) {
+    return insert(SQL.getConnection(), formData);
+  }
+
+  @RemoteServiceAccessDenied
+  public int insert(Connection connection, AbstractAddressBoxData formData) {
     Address table = Address.ADDRESS;
-    return mapToRecord(DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+    return mapToRecord(DSL.using(connection, SQLDialect.DERBY)
         .newRecord(table), formData).insert();
 
   }

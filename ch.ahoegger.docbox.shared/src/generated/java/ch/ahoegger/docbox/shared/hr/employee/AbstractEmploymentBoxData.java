@@ -20,6 +20,10 @@ public class AbstractEmploymentBoxData extends AbstractFormFieldData {
     return getFieldByClass(HourlyWage.class);
   }
 
+  public ReducedLunch getReducedLunch() {
+    return getFieldByClass(ReducedLunch.class);
+  }
+
   public SocialInsuranceRate getSocialInsuranceRate() {
     return getFieldByClass(SocialInsuranceRate.class);
   }
@@ -37,6 +41,11 @@ public class AbstractEmploymentBoxData extends AbstractFormFieldData {
   }
 
   public static class HourlyWage extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class ReducedLunch extends AbstractValueFieldData<Boolean> {
 
     private static final long serialVersionUID = 1L;
   }

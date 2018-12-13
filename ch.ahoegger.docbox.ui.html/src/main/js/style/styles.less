@@ -54,3 +54,49 @@
 	}
 }
 
+.html-field {
+	&.error {
+	  color: @status-error-color;
+	}
+}
+
+
+.docbox-status-box {
+
+	border: solid 1px;
+	border-radius: 5px;
+	padding: 5px 0;
+    margin: 3px 0;
+    
+	> * {
+      padding-left: 10px;
+      display: inline-block;
+      line-height: 20px;
+	}
+	
+	> .font-icomoon {
+	  font-size: 20px;
+      vertical-align: top
+	  
+	}
+	
+	> .message {
+	  display: inline-block;
+      vertical-align: bottom;
+	}
+	
+	&.warning {
+	  border-color: #cccc00;
+	  > .font-icomoon {
+	    color: #cccc00;
+	  }
+	}
+	
+	&.error {
+	  border-color: #e65c00;
+	   > .font-icomoon {
+	    color: #e65c00;
+	  }
+	}
+}
+

@@ -7,11 +7,15 @@ import java.util.Calendar;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
+import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.server.test.util.TestBackupService;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.category.CategoryFormData;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
@@ -22,12 +26,18 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
  */
 public class CategoryServiceTest extends AbstractTestWithDatabase {
 
-  private static final BigDecimal m_categoryId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static CategoryService service;
+  private static final BigDecimal id_category = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+
+  @BeforeClass
+  public static void initService() {
+    service = BEANS.get(CategoryService.class);
+  }
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
     LocalDate today = LocalDate.now();
-    BEANS.get(CategoryService.class).insertRow(connection, m_categoryId01, "Sample category", "A desc", LocalDateUtility.toDate(today), null);
+    service.insertRow(connection, id_category, "Sample category", "A desc", LocalDateUtility.toDate(today), null);
   }
 
   @Test
@@ -42,32 +52,34 @@ public class CategoryServiceTest extends AbstractTestWithDatabase {
     cal.set(2020, 02, 24);
     DateUtility.truncCalendar(cal);
     fd1.getEndDate().setValue(cal.getTime());
-    fd1 = BEANS.get(CategoryService.class).create(fd1);
+    fd1 = service.create(fd1);
 
     CategoryFormData fd2 = new CategoryFormData();
     fd2.setCategoryId(fd1.getCategoryId());
-    fd2 = BEANS.get(CategoryService.class).load(fd2);
+    fd2 = service.load(fd2);
 
     DocboxAssert.assertEquals(fd1, fd2);
+    Assert.assertTrue(BEANS.get(TestBackupService.class).isBackupNeeded());
   }
 
   @Test
   public void testUpdate() {
     CategoryFormData fd1 = new CategoryFormData();
-    fd1.setCategoryId(m_categoryId01);
-    fd1 = BEANS.get(CategoryService.class).load(fd1);
+    fd1.setCategoryId(id_category);
+    fd1 = service.load(fd1);
 
     fd1.getName().setValue("Modified name");
     fd1.getDescription().setValue("Mod description");
     fd1.getStartDate().setValue(LocalDateUtility.toDate(LocalDate.now().minusDays(20)));
     fd1.getStartDate().setValue(LocalDateUtility.toDate(LocalDate.now().plusDays(10)));
 
-    BEANS.get(CategoryService.class).store(fd1);
+    service.store(fd1);
 
     CategoryFormData fd2 = new CategoryFormData();
     fd2.setCategoryId(fd1.getCategoryId());
-    fd2 = BEANS.get(CategoryService.class).load(fd2);
+    fd2 = service.load(fd2);
 
     DocboxAssert.assertEquals(fd1, fd2);
+    Assert.assertTrue(BEANS.get(TestBackupService.class).isBackupNeeded());
   }
 }

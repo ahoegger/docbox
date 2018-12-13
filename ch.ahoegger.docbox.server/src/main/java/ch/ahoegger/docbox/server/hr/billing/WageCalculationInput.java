@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
+import ch.ahoegger.docbox.server.util.BigDecimalUtilitiy;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData.EntityTableRowData;
 
 /**
@@ -23,7 +24,7 @@ public class WageCalculationInput {
   private List<EntityTableRowData> m_expenseEntities = CollectionUtility.emptyArrayList();
 
   public BigDecimal getTaxType() {
-    return m_taxType;
+    return BigDecimalUtilitiy.orZero(m_taxType);
   }
 
   public WageCalculationInput withTaxType(BigDecimal taxType) {
@@ -32,7 +33,7 @@ public class WageCalculationInput {
   }
 
   public BigDecimal getHourlyWage() {
-    return m_hourlyWage;
+    return BigDecimalUtilitiy.orZero(m_hourlyWage);
   }
 
   public WageCalculationInput withHourlyWage(BigDecimal hourlyWage) {
@@ -41,7 +42,7 @@ public class WageCalculationInput {
   }
 
   public BigDecimal getSocialInsuranceRate() {
-    return m_socialInsuranceRate;
+    return BigDecimalUtilitiy.orZero(m_socialInsuranceRate);
   }
 
   public WageCalculationInput withSocialInsuranceRate(BigDecimal socialInsuranceRate) {
@@ -50,7 +51,7 @@ public class WageCalculationInput {
   }
 
   public BigDecimal getSourceTaxRate() {
-    return m_sourceTaxRate;
+    return BigDecimalUtilitiy.orZero(m_sourceTaxRate);
   }
 
   public WageCalculationInput withSourceTaxRate(BigDecimal sourceTaxRate) {
@@ -59,7 +60,7 @@ public class WageCalculationInput {
   }
 
   public BigDecimal getVacationExtraRate() {
-    return m_vacationExtraRate;
+    return BigDecimalUtilitiy.orZero(m_vacationExtraRate);
   }
 
   public WageCalculationInput withVacationExtraRate(BigDecimal vacationExtraRate) {

@@ -34,10 +34,10 @@ import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Partners.PartnersRowData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Permissions.PermissionsRowData;
-import ch.ahoegger.docbox.shared.document.IDocumentService;
 import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
 
@@ -48,46 +48,52 @@ import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
  */
 public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
-  private final BigDecimal documentId = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
-  private final BigDecimal categoryId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
-  private final BigDecimal categoryId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
-  private final BigDecimal conversationId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
-  private final BigDecimal conversationId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
-  private final BigDecimal partnerId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
-  private final BigDecimal partnerId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static DocumentService service;
+
+  private final BigDecimal id_document = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private final BigDecimal id_category_01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private final BigDecimal id_category_02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private final BigDecimal id_conversation_01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private final BigDecimal id_conversation_02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private final BigDecimal id_partner_01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private final BigDecimal id_partner_02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   private Date m_today;
 
   private static List<IBean<?>> s_mockBeans = new ArrayList<IBean<?>>();
 
-  @Override
-  protected void execSetupDb(Connection connection) throws Exception {
+  @BeforeClass
+  public static void initService() {
+    service = BEANS.get(DocumentService.class);
+  }
 
+  @Override
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
 
     m_today = cal.getTime();
 
     // create category
-    BEANS.get(CategoryService.class).insertRow(connection, categoryId01, "category01", "dec01", m_today, null);
-    BEANS.get(CategoryService.class).insertRow(connection, categoryId02, "category02", "dec02", m_today, null);
+    BEANS.get(CategoryService.class).insertRow(connection, id_category_01, "category01", "dec01", m_today, null);
+    BEANS.get(CategoryService.class).insertRow(connection, id_category_02, "category02", "dec02", m_today, null);
 
     // create conversation
-    BEANS.get(ConversationService.class).insert(connection, conversationId01, "con01", "dec01", m_today, null);
-    BEANS.get(ConversationService.class).insert(connection, conversationId02, "con02", "dec02", m_today, null);
+    BEANS.get(ConversationService.class).insert(connection, id_conversation_01, "con01", "dec01", m_today, null);
+    BEANS.get(ConversationService.class).insert(connection, id_conversation_02, "con02", "dec02", m_today, null);
 
     // create partner
-    BEANS.get(PartnerService.class).insert(connection, partnerId01, "partner01", "desc01", m_today, null);
-    BEANS.get(PartnerService.class).insert(connection, partnerId02, "partner02", "desc02", m_today, null);
+    BEANS.get(PartnerService.class).insert(connection, id_partner_01, "partner01", "desc01", m_today, null);
+    BEANS.get(PartnerService.class).insert(connection, id_partner_02, "partner02", "desc02", m_today, null);
 
     // create document
     Date docData = cal.getTime();
     Date insertDate = m_today;
-    BEANS.get(DocumentService.class).insert(connection, documentId, "doc 01", docData, insertDate, null, "2016_03_08_124640.pdf", "origStorage", conversationId01, false, null);
+    BEANS.get(DocumentService.class).insert(connection, id_document, "doc 01", docData, insertDate, null, "2016_03_08_124640.pdf", "origStorage", id_conversation_01, false, null);
     // links
-    BEANS.get(DocumentPartnerService.class).insert(connection, documentId, partnerId01);
-    BEANS.get(DocumentCategoryService.class).insert(connection, documentId, categoryId01);
-    BEANS.get(DocumentPermissionService.class).insert(connection, USER, documentId, PermissionCodeType.ReadCode.ID);
+    BEANS.get(DocumentPartnerService.class).insert(connection, id_document, id_partner_01);
+    BEANS.get(DocumentCategoryService.class).insert(connection, id_document, id_category_01);
+    BEANS.get(DocumentPermissionService.class).insert(connection, USER, id_document, PermissionCodeType.ReadCode.ID);
 
   }
 
@@ -113,22 +119,18 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
   @Test
   public void testModifyAbstract() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     fd.getAbstract().setValue("modifiedText");
     service.store(fd);
 
     // compare to new loaded
-    assertEqualsDb(service, fd);
+    assertEqualsDb(fd);
   }
 
   @Test(expected = VetoException.class)
   public void testUnmodifyCapturedDate() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     Calendar cal = Calendar.getInstance();
     cal.set(2013, 3, 3);
@@ -136,7 +138,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     fd.getCapturedDate().setValue(cal.getTime());
     service.store(fd);
 
-    DocumentFormData dbRef = loadDocument(service, documentId);
+    DocumentFormData dbRef = loadDocument(id_document);
 
     Assert.assertFalse(fd.getCapturedDate().getValue().equals(dbRef.getCapturedDate().getValue()));
     Assert.assertEquals(m_today, dbRef.getCapturedDate().getValue());
@@ -144,18 +146,16 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
   @Test
   public void testAddCategory() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     Set<BigDecimal> categories = new HashSet<BigDecimal>(fd.getCategoriesBox().getValue());
-    categories.add(categoryId02);
+    categories.add(id_category_02);
     fd.getCategoriesBox().setValue(categories);
     service.store(fd);
 
     // compare to new loaded
-    DocumentFormData refFd = assertEqualsDb(service, fd);
-    Assert.assertEquals(CollectionUtility.arrayList(categoryId01, categoryId02),
+    DocumentFormData refFd = assertEqualsDb(fd);
+    Assert.assertEquals(CollectionUtility.arrayList(id_category_01, id_category_02),
         refFd.getCategoriesBox().getValue().stream()
             .map(bd -> bd).sorted()
             .collect(Collectors.toList()));
@@ -164,17 +164,15 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
   @Test
   public void testRemoveCategory() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     Set<BigDecimal> categories = new HashSet<BigDecimal>(fd.getCategoriesBox().getValue());
-    categories.remove(categoryId01);
+    categories.remove(id_category_01);
     fd.getCategoriesBox().setValue(categories);
     service.store(fd);
 
     // compare to new loaded
-    DocumentFormData refFd = assertEqualsDb(service, fd);
+    DocumentFormData refFd = assertEqualsDb(fd);
     Assert.assertEquals(CollectionUtility.arrayList(),
         refFd.getCategoriesBox().getValue().stream()
             .map(bd -> bd).sorted()
@@ -184,19 +182,17 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
   @Test
   public void testReplaceCategory() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     Set<BigDecimal> categories = new HashSet<BigDecimal>();
-    categories.add(categoryId02);
+    categories.add(id_category_02);
     fd.getCategoriesBox().setValue(categories);
     service.store(fd);
 
     // compare to new loaded
-    DocumentFormData refFd = assertEqualsDb(service, fd);
+    DocumentFormData refFd = assertEqualsDb(fd);
     Assert.assertEquals(1, refFd.getCategoriesBox().getValue().size());
-    Assert.assertEquals(CollectionUtility.arrayList(categoryId02),
+    Assert.assertEquals(CollectionUtility.arrayList(id_category_02),
         refFd.getCategoriesBox().getValue().stream()
             .map(bd -> bd).sorted()
             .collect(Collectors.toList()));
@@ -205,23 +201,19 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
   @Test
   public void testModifyConversation() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
-    fd.getConversation().setValue(conversationId02);
+    fd.getConversation().setValue(id_conversation_02);
     service.store(fd);
 
     // compare to new loaded
-    DocumentFormData refFd = assertEqualsDb(service, fd);
-    Assert.assertEquals(conversationId02, Optional.of(refFd.getConversation().getValue()).map(bd -> bd).orElse(null));
+    DocumentFormData refFd = assertEqualsDb(fd);
+    Assert.assertEquals(id_conversation_02, Optional.of(refFd.getConversation().getValue()).map(bd -> bd).orElse(null));
   }
 
   @Test
   public void testModifyDocumentDate() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
@@ -231,16 +223,14 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     service.store(fd);
 
     // compare to new loaded
-    DocumentFormData refFd = assertEqualsDb(service, fd);
+    DocumentFormData refFd = assertEqualsDb(fd);
     Assert.assertEquals(docDate, Optional.of(refFd.getDocumentDate().getValue()).orElse(null));
 
   }
 
   @Test(expected = VetoException.class)
   public void testUnmodifiableDocumentPath() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     fd.setDocumentPath("modified/path");
     service.store(fd);
@@ -249,60 +239,53 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
   @Test
   public void testOcrLanguage() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     fd.getOcrLanguage().setValue(OcrLanguageCodeType.EnglishCode.ID);
     service.store(fd);
 
     // compare to new loaded
-    DocumentFormData refFd = loadDocument(service, documentId);
+    DocumentFormData refFd = loadDocument(id_document);
     Assert.assertEquals(OcrLanguageCodeType.EnglishCode.ID, refFd.getOcrLanguage().getValue());
   }
 
   @Test
   @Ignore
   public void testParseOcr() {
-    DocumentService service = BEANS.get(DocumentService.class);
 
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     fd.getParseOcr().setValue(true);
     service.storeInternal(fd).awaitDone();
 
     // compare to new loaded
-    DocumentFormData refFd = loadDocument(service, documentId);
+    DocumentFormData refFd = loadDocument(id_document);
     Assert.assertTrue(refFd.getParseOcr().getValue());
   }
 
   @Test
   public void testModifyOriginalStorage() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     fd.getOriginalStorage().setValue("mod storage");
     service.store(fd);
 
     // compare to new loaded
-    DocumentFormData refFd = assertEqualsDb(service, fd);
+    DocumentFormData refFd = assertEqualsDb(fd);
     Assert.assertEquals("mod storage", refFd.getOriginalStorage().getValue());
   }
 
   @Test
   public void testAddPartner() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     PartnersRowData newRow = fd.getPartners().addRow();
-    newRow.setPartner(partnerId02);
+    newRow.setPartner(id_partner_02);
     service.store(fd);
 
     // compare to new loaded
-    DocumentFormData refFd = assertEqualsDb(service, fd);
-    Assert.assertEquals(CollectionUtility.arrayList(partnerId01, partnerId02),
+    DocumentFormData refFd = assertEqualsDb(fd);
+    Assert.assertEquals(CollectionUtility.arrayList(id_partner_01, id_partner_02),
         Arrays.stream(refFd.getPartners().getRows())
             .map(row -> row.getPartner())
             .filter(p -> p != null)
@@ -313,19 +296,17 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
   @Test
   public void testRemovePartner() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     for (PartnersRowData rd : fd.getPartners().getRows()) {
-      if (ObjectUtility.equals(partnerId01, rd.getPartner())) {
+      if (ObjectUtility.equals(id_partner_01, rd.getPartner())) {
         fd.getPartners().removeRow(rd);
       }
     }
     service.store(fd);
 
     // compare to new loaded
-    DocumentFormData refFd = assertEqualsDb(service, fd);
+    DocumentFormData refFd = assertEqualsDb(fd);
     Assert.assertEquals(CollectionUtility.arrayList(),
         Arrays.stream(refFd.getPartners().getRows())
             .map(row -> row.getPartner())
@@ -338,18 +319,16 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
   @Test
   public void testReplacePartner() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     fd.getPartners().clearRows();
     PartnersRowData newRow = fd.getPartners().addRow();
-    newRow.setPartner(partnerId02);
+    newRow.setPartner(id_partner_02);
     service.store(fd);
 
     // compare to new loaded
-    DocumentFormData refFd = assertEqualsDb(service, fd);
-    Assert.assertEquals(CollectionUtility.arrayList(partnerId02),
+    DocumentFormData refFd = assertEqualsDb(fd);
+    Assert.assertEquals(CollectionUtility.arrayList(id_partner_02),
         Arrays.stream(refFd.getPartners().getRows())
             .map(row -> row.getPartner())
             .filter(p -> p != null)
@@ -360,9 +339,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
   @Test
   public void testChangePermissionOfUser() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     PermissionsRowData rd = Arrays.stream(fd.getPermissions().getRows()).filter(row -> USER.equals(row.getUser())).findFirst().get();
     rd.setPermission(PermissionCodeType.WriteCode.ID);
@@ -370,7 +347,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     service.store(fd);
 
     // compare to new loaded
-    DocumentFormData refFd = assertEqualsDb(service, fd);
+    DocumentFormData refFd = assertEqualsDb(fd);
     List<PermissionsRowData> sortedValidPermissions =
         Arrays.stream(refFd.getPermissions().getRows())
             .filter(row -> row.getUser() != null && row.getPermission() != null)
@@ -387,9 +364,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
   @Test
   public void testAddPermissionUser() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     PermissionsRowData newRow = fd.getPermissions().addRow();
     newRow.setUser(USER_INACTIVE);
@@ -397,7 +372,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     service.store(fd);
 
     // compare to new loaded
-    DocumentFormData refFd = assertEqualsDb(service, fd);
+    DocumentFormData refFd = assertEqualsDb(fd);
     List<PermissionsRowData> sortedValidPermissions =
         Arrays.stream(refFd.getPermissions().getRows())
             .filter(row -> row.getUser() != null && row.getPermission() != null)
@@ -413,9 +388,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
   @Test
   public void testRemovePermissionUser() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
 
     for (PermissionsRowData rd : fd.getPermissions().getRows()) {
@@ -426,7 +399,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     service.store(fd);
 
     // compare to new loaded
-    DocumentFormData refFd = assertEqualsDb(service, fd);
+    DocumentFormData refFd = assertEqualsDb(fd);
     List<PermissionsRowData> sortedValidPermissions =
         Arrays.stream(refFd.getPermissions().getRows())
             .filter(row -> row.getUser() != null && row.getPermission() != null)
@@ -443,9 +416,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
   @Test
   public void testReplacePermissionUser() {
-    IDocumentService service = BEANS.get(IDocumentService.class);
-
-    DocumentFormData fd = loadDocument(service, documentId);
+    DocumentFormData fd = loadDocument(id_document);
     // modify
     fd.getPermissions().clearRows();
     PermissionsRowData newRow = fd.getPermissions().addRow();
@@ -455,7 +426,7 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
     service.store(fd);
 
     // compare to new loaded
-    DocumentFormData refFd = assertEqualsDb(service, fd);
+    DocumentFormData refFd = assertEqualsDb(fd);
     List<PermissionsRowData> sortedValidPermissions =
         Arrays.stream(refFd.getPermissions().getRows())
             .filter(row -> row.getUser() != null && row.getPermission() != null)
@@ -470,15 +441,15 @@ public class DocumentService_ModifyTest extends AbstractTestWithDatabase {
 
   }
 
-  private DocumentFormData loadDocument(IDocumentService service, BigDecimal docId) {
+  private DocumentFormData loadDocument(BigDecimal docId) {
     DocumentFormData fd = new DocumentFormData();
     fd.setDocumentId(docId);
     fd = service.load(fd);
     return fd;
   }
 
-  private DocumentFormData assertEqualsDb(IDocumentService service, DocumentFormData fd) {
-    DocumentFormData dbFormData = loadDocument(service, fd.getDocumentId());
+  private DocumentFormData assertEqualsDb(DocumentFormData fd) {
+    DocumentFormData dbFormData = loadDocument(fd.getDocumentId());
     DocboxAssert.assertEquals(dbFormData, fd);
     return dbFormData;
 

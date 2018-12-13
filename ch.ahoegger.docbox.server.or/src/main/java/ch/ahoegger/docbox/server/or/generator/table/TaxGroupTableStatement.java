@@ -6,19 +6,26 @@ import java.sql.SQLException;
 import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.jooq.SQLDialect;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.or.definition.table.ITaxGroupTable;
+import ch.ahoegger.docbox.server.or.generator.IJooqTable;
 
 /**
  * <h3>{@link TaxGroupTableStatement}</h3>
  *
  * @author Andreas Hoegger
  */
-public class TaxGroupTableStatement implements ITableStatement, ITaxGroupTable {
+public class TaxGroupTableStatement implements ITableStatement, IJooqTable, ITaxGroupTable {
   private static final Logger LOG = LoggerFactory.getLogger(TaxGroupTableStatement.class);
+
+  @Override
+  public Table<?> getJooqTable() {
+    return TaxGroup.TAX_GROUP;
+  }
 
   @Override
   public String getCreateTable() {
@@ -27,7 +34,7 @@ public class TaxGroupTableStatement implements ITableStatement, ITaxGroupTable {
     statementBuilder.append(TAX_GROUP_NR).append(" BIGINT NOT NULL, ");
     statementBuilder.append(NAME).append(" VARCHAR(").append(NAME_LENGTH).append(") NOT NULL, ");
     statementBuilder.append(START_DATE).append(" DATE NOT NULL, ");
-    statementBuilder.append(END_DATE).append(" DATE, ");
+    statementBuilder.append(END_DATE).append(" DATE NOT NULL, ");
     statementBuilder.append("PRIMARY KEY (").append(TAX_GROUP_NR).append(")");
     statementBuilder.append(")");
     return statementBuilder.toString();
@@ -47,7 +54,7 @@ public class TaxGroupTableStatement implements ITableStatement, ITaxGroupTable {
   @Override
   public void deleteTable(Connection connection) {
     LOG.info("SQL-DEV delete table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).delete(TaxGroup.TAX_GROUP)
+    DSL.using(connection, SQLDialect.DERBY).delete(getJooqTable())
         .execute();
 
   }
@@ -55,7 +62,7 @@ public class TaxGroupTableStatement implements ITableStatement, ITaxGroupTable {
   @Override
   public void dropTable(Connection connection) {
     LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).dropTable(TaxGroup.TAX_GROUP)
+    DSL.using(connection, SQLDialect.DERBY).dropTable(getJooqTable())
         .execute();
   }
 

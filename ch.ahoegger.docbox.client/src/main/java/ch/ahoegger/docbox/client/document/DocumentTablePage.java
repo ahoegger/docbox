@@ -39,9 +39,9 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
-import ch.ahoegger.docbox.client.AbstractDocboxPageWithTable;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkDocumentIdParamName;
 import ch.ahoegger.docbox.client.document.DocumentLinkProperties.DocumentLinkURI;
+import ch.ahoegger.docbox.client.templates.AbstractDocboxPageWithTable;
 import ch.ahoegger.docbox.shared.administration.user.UserLookupCall;
 import ch.ahoegger.docbox.shared.conversation.ConversationLookupCall;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;

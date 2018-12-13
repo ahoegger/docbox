@@ -300,7 +300,6 @@ public class UserForm extends AbstractForm {
           removeErrorStatus(UserValidationStatus.AdministratorAtLeastOne.class);
           if (!rawValue) {
             AdministratorLookupCall call = new AdministratorLookupCall();
-            call.getDataByAll().stream().forEach(r -> System.out.println(r.getKey()));
             if (call.getDataByAll().stream()
                 .filter(row -> !row.getKey().equals(getUsernameField().getValue())).count() < 1) {
               // only one admin left

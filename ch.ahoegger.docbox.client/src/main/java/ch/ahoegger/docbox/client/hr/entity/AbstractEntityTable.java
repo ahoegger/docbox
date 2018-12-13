@@ -41,10 +41,6 @@ public abstract class AbstractEntityTable extends AbstractTable {
     return getColumnSet().getColumnByClass(PayslipIdColumn.class);
   }
 
-  public PartnerIdColumn getPartnerIdColumn() {
-    return getColumnSet().getColumnByClass(PartnerIdColumn.class);
-  }
-
   public HoursColumn getHoursColumn() {
     return getColumnSet().getColumnByClass(HoursColumn.class);
   }
@@ -55,15 +51,6 @@ public abstract class AbstractEntityTable extends AbstractTable {
 
   @Order(1000)
   public class EnityIdColumn extends AbstractBigDecimalColumn {
-    @Override
-    protected boolean getConfiguredDisplayable() {
-      return false;
-    }
-  }
-
-  @Order(1500)
-  public class PartnerIdColumn extends AbstractBigDecimalColumn {
-
     @Override
     protected boolean getConfiguredDisplayable() {
       return false;

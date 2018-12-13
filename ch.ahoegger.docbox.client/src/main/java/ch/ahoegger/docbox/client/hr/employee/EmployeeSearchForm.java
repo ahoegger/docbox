@@ -27,8 +27,10 @@ import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTa
 import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox.BirthdayBox;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox.BirthdayBox.BirthdayToField;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox.BirthdayBox.BirtheayFromField;
+import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox.EmployerField;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox.FirstNameField;
 import ch.ahoegger.docbox.client.hr.employee.EmployeeSearchForm.MainBox.SearchTabBox.SearchBox.LastNameField;
+import ch.ahoegger.docbox.client.hr.employer.AbstractEmployerSmartField;
 import ch.ahoegger.docbox.or.definition.table.IEmployeeTable;
 import ch.ahoegger.docbox.shared.hr.employee.EmployeeSearchFormData;
 
@@ -81,6 +83,10 @@ public class EmployeeSearchForm extends AbstractSearchForm {
     return getFieldByClass(BirthdayToField.class);
   }
 
+  public EmployerField getEmployerField() {
+    return getFieldByClass(EmployerField.class);
+  }
+
   public ResetButton getResetButton() {
     return getFieldByClass(ResetButton.class);
   }
@@ -95,6 +101,10 @@ public class EmployeeSearchForm extends AbstractSearchForm {
         @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("Search");
+        }
+
+        @Order(0)
+        public class EmployerField extends AbstractEmployerSmartField {
         }
 
         @Order(1000)

@@ -10,6 +10,7 @@ import org.eclipse.scout.rt.platform.text.TEXTS;
 import ch.ahoegger.docbox.client.category.CategoryTablePage;
 import ch.ahoegger.docbox.client.conversation.ConversationTablePage;
 import ch.ahoegger.docbox.client.document.DocumentTablePage;
+import ch.ahoegger.docbox.client.hr.employer.EmployerTablePage;
 import ch.ahoegger.docbox.client.partner.PartnerTablePage;
 import ch.ahoegger.docbox.shared.Icons;
 
@@ -37,6 +38,7 @@ public class WorkOutline extends AbstractOutline {
     pageList.add(new ConversationTablePage());
     pageList.add(new PartnerTablePage());
     pageList.add(new CategoryTablePage());
+    pageList.add(new EmployerTablePage());
   }
 
 }

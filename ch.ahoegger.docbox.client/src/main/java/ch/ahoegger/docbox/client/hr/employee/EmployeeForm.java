@@ -97,6 +97,16 @@ public class EmployeeForm extends AbstractForm {
   @Order(1000)
   public class MainBox extends AbstractGroupBox {
 
+    @Override
+    protected boolean getConfiguredBorderVisible() {
+      return true;
+    }
+
+    @Override
+    protected String getConfiguredBorderDecoration() {
+      return BORDER_DECORATION_EMPTY;
+    }
+
     @Order(0)
     @FormData(sdkCommand = SdkCommand.IGNORE)
     public class PartnerField extends AbstractPartnerSmartField {

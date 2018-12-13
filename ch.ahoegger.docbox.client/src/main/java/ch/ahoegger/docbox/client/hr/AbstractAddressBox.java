@@ -9,7 +9,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 
 import ch.ahoegger.docbox.or.definition.table.IAddressTable;
-import ch.ahoegger.docbox.shared.util.AbstractAddressBoxData;
+import ch.ahoegger.docbox.shared.template.AbstractAddressBoxData;
 
 /**
  * <h3>{@link AbstractAddressBox}</h3>

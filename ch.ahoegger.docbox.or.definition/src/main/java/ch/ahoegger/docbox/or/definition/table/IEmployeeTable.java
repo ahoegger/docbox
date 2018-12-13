@@ -12,17 +12,15 @@ public interface IEmployeeTable {
 
   // columns
 
-  String PARTNER_NR = IPartnerTable.PARTNER_NR;
-
+  String EMPLOYEE_NR = "EMPLOYEE_NR";// PK, FK -> IPartnerTable.PARTNER_NR;
   String EMPLOYER_NR = IEmployerTable.EMPLOYER_NR;
+  String ADDRESS_NR = IAddressTable.ADDRESS_NR;
 
   String FIRST_NAME = "FIRST_NAME";
   int FIRST_NAME_LENGTH = 200;
 
   String LAST_NAME = "LAST_NAME";
   int LAST_NAME_LENGTH = 200;
-
-  static String ADDRESS_NR = IAddressTable.ADDRESS_NR;
 
   String AHV_NUMBER = "AHV_NUMBER";
   int AHV_NUMBER_LENGTH = 16;
@@ -33,6 +31,8 @@ public interface IEmployeeTable {
   int ACCOUNT_NUMBER_LENGTH = 128;
 
   String TAX_TYPE = "TAX_TYPE";
+
+  String REDUCED_LUNCH = "REDUCED_LUNCH";
 
   String HOURLY_WAGE = "HOURLY_WAGE";
   BigDecimal HOURLY_WAGE_MIN = BigDecimal.valueOf(0d);

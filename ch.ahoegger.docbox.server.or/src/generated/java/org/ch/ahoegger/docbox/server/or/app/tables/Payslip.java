@@ -4,12 +4,10 @@
 package org.ch.ahoegger.docbox.server.or.app.tables;
 
 
-import ch.ahoegger.docbox.server.or.generator.converter.DateConverter;
 import ch.ahoegger.docbox.server.or.generator.converter.LongConverter;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Generated;
@@ -38,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Payslip extends TableImpl<PayslipRecord> {
 
-    private static final long serialVersionUID = 1613737071;
+    private static final long serialVersionUID = -1465511941;
 
     /**
      * The reference instance of <code>APP.PAYSLIP</code>
@@ -59,44 +57,19 @@ public class Payslip extends TableImpl<PayslipRecord> {
     public final TableField<PayslipRecord, BigDecimal> PAYSLIP_NR = createField("PAYSLIP_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
-     * The column <code>APP.PAYSLIP.PARTNER_NR</code>.
+     * The column <code>APP.PAYSLIP.BILLING_CYCLE_NR</code>.
      */
-    public final TableField<PayslipRecord, BigDecimal> PARTNER_NR = createField("PARTNER_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
+    public final TableField<PayslipRecord, BigDecimal> BILLING_CYCLE_NR = createField("BILLING_CYCLE_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
-     * The column <code>APP.PAYSLIP.EMPLOYER_NR</code>.
+     * The column <code>APP.PAYSLIP.EMPLOYEE_TAX_GROUP_NR</code>.
      */
-    public final TableField<PayslipRecord, BigDecimal> EMPLOYER_NR = createField("EMPLOYER_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
-
-    /**
-     * The column <code>APP.PAYSLIP.TAX_GROUP_NR</code>.
-     */
-    public final TableField<PayslipRecord, BigDecimal> TAX_GROUP_NR = createField("TAX_GROUP_NR", org.jooq.impl.SQLDataType.BIGINT, this, "", new LongConverter());
-
-    /**
-     * The column <code>APP.PAYSLIP.DOCUMENT_NR</code>.
-     */
-    public final TableField<PayslipRecord, BigDecimal> DOCUMENT_NR = createField("DOCUMENT_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
+    public final TableField<PayslipRecord, BigDecimal> EMPLOYEE_TAX_GROUP_NR = createField("EMPLOYEE_TAX_GROUP_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
      * The column <code>APP.PAYSLIP.STATEMENT_NR</code>.
      */
-    public final TableField<PayslipRecord, BigDecimal> STATEMENT_NR = createField("STATEMENT_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
-
-    /**
-     * The column <code>APP.PAYSLIP.NAME</code>.
-     */
-    public final TableField<PayslipRecord, String> NAME = createField("NAME", org.jooq.impl.SQLDataType.VARCHAR.length(200), this, "");
-
-    /**
-     * The column <code>APP.PAYSLIP.START_DATE</code>.
-     */
-    public final TableField<PayslipRecord, Date> START_DATE = createField("START_DATE", org.jooq.impl.SQLDataType.DATE, this, "", new DateConverter());
-
-    /**
-     * The column <code>APP.PAYSLIP.END_DATE</code>.
-     */
-    public final TableField<PayslipRecord, Date> END_DATE = createField("END_DATE", org.jooq.impl.SQLDataType.DATE, this, "", new DateConverter());
+    public final TableField<PayslipRecord, BigDecimal> STATEMENT_NR = createField("STATEMENT_NR", org.jooq.impl.SQLDataType.BIGINT, this, "", new LongConverter());
 
     /**
      * Create a <code>APP.PAYSLIP</code> table reference
@@ -133,7 +106,7 @@ public class Payslip extends TableImpl<PayslipRecord> {
      */
     @Override
     public UniqueKey<PayslipRecord> getPrimaryKey() {
-        return Keys.SQL181126154908480;
+        return Keys.SQL181211162703390;
     }
 
     /**
@@ -141,7 +114,7 @@ public class Payslip extends TableImpl<PayslipRecord> {
      */
     @Override
     public List<UniqueKey<PayslipRecord>> getKeys() {
-        return Arrays.<UniqueKey<PayslipRecord>>asList(Keys.SQL181126154908480);
+        return Arrays.<UniqueKey<PayslipRecord>>asList(Keys.SQL181211162703390, Keys.SQL181211162703391);
     }
 
     /**

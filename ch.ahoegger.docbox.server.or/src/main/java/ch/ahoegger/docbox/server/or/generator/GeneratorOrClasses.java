@@ -1,9 +1,11 @@
 package ch.ahoegger.docbox.server.or.generator;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.jooq.util.GenerationTool;
@@ -14,6 +16,10 @@ import org.jooq.util.jaxb.ForcedType;
 import org.jooq.util.jaxb.Generator;
 import org.jooq.util.jaxb.Target;
 
+import ch.ahoegger.docbox.or.definition.table.IMigrationTable;
+import ch.ahoegger.docbox.server.or.generator.converter.DateConverter;
+import ch.ahoegger.docbox.server.or.generator.converter.LongConverter;
+import ch.ahoegger.docbox.server.or.generator.converter.VersionConverter;
 import ch.ahoegger.docbox.server.or.generator.table.ITableStatement;
 
 /**
@@ -33,17 +39,24 @@ public class GeneratorOrClasses {
                       new Database()
                           .withCustomTypes(
                               new CustomType()
-                                  .withConverter("ch.ahoegger.docbox.server.or.generator.converter.DateConverter")
-                                  .withName("java.util.Date"),
+                                  .withConverter(DateConverter.class.getName())
+                                  .withName(Date.class.getName()),
                               new CustomType()
-                                  .withConverter("ch.ahoegger.docbox.server.or.generator.converter.LongConverter")
-                                  .withName("java.math.BigDecimal"))
+                                  .withConverter(VersionConverter.class.getName())
+                                  .withName(Version.class.getName()),
+                              new CustomType()
+                                  .withConverter(LongConverter.class.getName())
+                                  .withName(BigDecimal.class.getName()))
                           .withForcedTypes(
                               new ForcedType()
-                                  .withName("java.util.Date")
+                                  .withName(Date.class.getName())
                                   .withTypes("date"),
                               new ForcedType()
-                                  .withName("java.math.BigDecimal")
+                                  .withName(Version.class.getName())
+                                  .withExpression(IMigrationTable.DOCBOX_VERSION)
+                                  .withTypes(".*"),
+                              new ForcedType()
+                                  .withName(BigDecimal.class.getName())
                                   .withTypes("bigint"))
                           .withName("org.jooq.util.derby.DerbyDatabase")
                           .withIncludes(".*")

@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Entity extends TableImpl<EntityRecord> {
 
-    private static final long serialVersionUID = 79764861;
+    private static final long serialVersionUID = -503102172;
 
     /**
      * The reference instance of <code>APP.ENTITY</code>
@@ -59,14 +59,9 @@ public class Entity extends TableImpl<EntityRecord> {
     public final TableField<EntityRecord, BigDecimal> ENTITY_NR = createField("ENTITY_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
-     * The column <code>APP.ENTITY.PARTNER_NR</code>.
-     */
-    public final TableField<EntityRecord, BigDecimal> PARTNER_NR = createField("PARTNER_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
-
-    /**
      * The column <code>APP.ENTITY.PAYSLIP_NR</code>.
      */
-    public final TableField<EntityRecord, BigDecimal> PAYSLIP_NR = createField("PAYSLIP_NR", org.jooq.impl.SQLDataType.BIGINT, this, "", new LongConverter());
+    public final TableField<EntityRecord, BigDecimal> PAYSLIP_NR = createField("PAYSLIP_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
      * The column <code>APP.ENTITY.ENTITY_TYPE</code>.
@@ -128,7 +123,7 @@ public class Entity extends TableImpl<EntityRecord> {
      */
     @Override
     public UniqueKey<EntityRecord> getPrimaryKey() {
-        return Keys.SQL181126154908390;
+        return Keys.SQL181211162703310;
     }
 
     /**
@@ -136,7 +131,7 @@ public class Entity extends TableImpl<EntityRecord> {
      */
     @Override
     public List<UniqueKey<EntityRecord>> getKeys() {
-        return Arrays.<UniqueKey<EntityRecord>>asList(Keys.SQL181126154908390);
+        return Arrays.<UniqueKey<EntityRecord>>asList(Keys.SQL181211162703310);
     }
 
     /**

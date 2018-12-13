@@ -3,7 +3,6 @@ package ch.ahoegger.docbox.client.hr.entity;
 import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.client.dto.FormData;
-import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
@@ -14,6 +13,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
@@ -23,8 +23,11 @@ import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.ExpenseAmountField
 import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.OkButton;
 import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.SaveAndNewExpenseButton;
 import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.SaveAndNewWorkButton;
+import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.StatusField;
 import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.TextField;
 import ch.ahoegger.docbox.client.hr.entity.EntityForm.MainBox.WorkHoursField;
+import ch.ahoegger.docbox.client.templates.AbstractStatusField;
+import ch.ahoegger.docbox.client.util.AbstractValidatableForm;
 import ch.ahoegger.docbox.or.definition.table.IEntityTable;
 import ch.ahoegger.docbox.shared.hr.entity.EntityFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
@@ -32,15 +35,14 @@ import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.WorkCode;
 import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
 
 @FormData(value = EntityFormData.class, sdkCommand = FormData.SdkCommand.CREATE)
-public class EntityForm extends AbstractForm {
+public class EntityForm extends AbstractValidatableForm {
 
   private BigDecimal m_entityId;
-  private BigDecimal m_entityType;
-  private BigDecimal m_partnerId;
-  private BigDecimal m_payslipId;
 
-  public EntityForm(BigDecimal partnerId) {
-    m_partnerId = partnerId;
+  private BigDecimal m_payslipId;
+  private BigDecimal m_entityType;
+
+  public EntityForm() {
   }
 
   @Override
@@ -66,16 +68,6 @@ public class EntityForm extends AbstractForm {
   @FormData
   public BigDecimal getEntityType() {
     return m_entityType;
-  }
-
-  @FormData
-  public void setPartnerId(BigDecimal partnerId) {
-    m_partnerId = partnerId;
-  }
-
-  @FormData
-  public BigDecimal getPartnerId() {
-    return m_partnerId;
   }
 
   @FormData
@@ -136,6 +128,11 @@ public class EntityForm extends AbstractForm {
     return getFieldByClass(SaveAndNewExpenseButton.class);
   }
 
+  @Override
+  public StatusField getStatusField() {
+    return getFieldByClass(StatusField.class);
+  }
+
   public OkButton getOkButton() {
     return getFieldByClass(OkButton.class);
   }
@@ -154,14 +151,34 @@ public class EntityForm extends AbstractForm {
     }
 
     @Order(1000)
+    public class StatusField extends AbstractStatusField {
+    }
+
+    @Order(2000)
     public class EntityDateField extends AbstractDateField {
       @Override
       protected String getConfiguredLabel() {
         return TEXTS.get("Date");
       }
+
+      @Override
+      protected boolean getConfiguredMandatory() {
+        return true;
+      }
+
+//      @Override
+//      protected Date execValidateValue(Date rawValue) {
+//        if (rawValue == null) {
+//          return rawValue;
+//        }
+//        if (!LocalDateUtility.isBetweenOrEqual(getBillingCycleStart(), getBillingCycleEnd(), rawValue)) {
+//          throw new VetoException(TEXTS.get("Validate_DateNotInPeriod", TEXTS.get("PaySlip")));
+//        }
+//        return rawValue;
+//      }
     }
 
-    @Order(2000)
+    @Order(3000)
     public class WorkHoursField extends AbstractBigDecimalField {
       @Override
       protected String getConfiguredLabel() {
@@ -180,7 +197,7 @@ public class EntityForm extends AbstractForm {
 
     }
 
-    @Order(3000)
+    @Order(4000)
     public class ExpenseAmountField extends AbstractBigDecimalField {
       @Override
       protected String getConfiguredLabel() {
@@ -199,7 +216,7 @@ public class EntityForm extends AbstractForm {
 
     }
 
-    @Order(4000)
+    @Order(5000)
     public class TextField extends AbstractStringField {
       @Override
       protected String getConfiguredLabel() {
@@ -234,17 +251,19 @@ public class EntityForm extends AbstractForm {
 
       @Override
       protected void execClickAction() {
-        if (getHandler() instanceof ModifyHandler) {
-          saveModify();
-        }
-        else if (getHandler() instanceof NewHandler) {
-          saveNew();
-        }
+        doSave();
+//        if (getHandler() instanceof ModifyHandler) {
+//          saveModify();
+//        }
+//        else if (getHandler() instanceof NewHandler) {
+//          saveNew();
+//        }
         setEntityType(WorkCode.ID);
         getWorkHoursField().setValue(null);
         getExpenseAmountField().setValue(null);
         getTextField().setValue(null);
-        loadNew();
+        setHandler(new NewHandler());
+        loadStateInternal();
       }
     }
 
@@ -257,45 +276,22 @@ public class EntityForm extends AbstractForm {
 
       @Override
       protected void execClickAction() {
-        if (getHandler() instanceof ModifyHandler) {
-          saveModify();
-        }
-        else if (getHandler() instanceof NewHandler) {
-          saveNew();
-        }
+        doSave();
+//        if (getHandler() instanceof ModifyHandler) {
+//          saveModify();
+//        }
+//        else if (getHandler() instanceof NewHandler) {
+//          saveNew();
+//        }
         setEntityType(ExpenseCode.ID);
         getWorkHoursField().setValue(null);
         getExpenseAmountField().setValue(null);
         getTextField().setValue(null);
-        loadNew();
+        setHandler(new NewHandler());
+        loadStateInternal();
       }
     }
 
-  }
-
-  protected void loadNew() {
-    IEntityService service = BEANS.get(IEntityService.class);
-    EntityFormData formData = new EntityFormData();
-    exportFormData(formData);
-    formData = service.prepareCreate(formData);
-    importFormData(formData);
-    handleEntityCodeUpdated();
-  }
-
-  protected void saveNew() {
-    IEntityService service = BEANS.get(IEntityService.class);
-    EntityFormData formData = new EntityFormData();
-    exportFormData(formData);
-    service.create(formData);
-    getDesktop().dataChanged(IWorkItemEntity.WORK_ITEM_KEY);
-  }
-
-  protected void saveModify() {
-    IEntityService service = BEANS.get(IEntityService.class);
-    EntityFormData formData = new EntityFormData();
-    exportFormData(formData);
-    service.store(formData);
-    getDesktop().dataChanged(IWorkItemEntity.WORK_ITEM_KEY);
   }
 
   protected void handleEntityCodeUpdated() {
@@ -327,8 +323,21 @@ public class EntityForm extends AbstractForm {
     }
 
     @Override
+    protected boolean execValidate() {
+      EntityFormData formData = new EntityFormData();
+      exportFormData(formData);
+      IStatus status = BEANS.get(IEntityService.class).validate(formData);
+      getStatusField().setValidationStatus(status);
+      return status.getSeverity() != IStatus.ERROR;
+    }
+
+    @Override
     protected void execStore() {
-      saveModify();
+      IEntityService service = BEANS.get(IEntityService.class);
+      EntityFormData formData = new EntityFormData();
+      exportFormData(formData);
+      service.store(formData);
+      getDesktop().dataChanged(IWorkItemEntity.WORK_ITEM_KEY);
     }
   }
 
@@ -336,12 +345,30 @@ public class EntityForm extends AbstractForm {
 
     @Override
     protected void execLoad() {
-      loadNew();
+      IEntityService service = BEANS.get(IEntityService.class);
+      EntityFormData formData = new EntityFormData();
+      exportFormData(formData);
+      formData = service.prepareCreate(formData);
+      importFormData(formData);
+      handleEntityCodeUpdated();
+    }
+
+    @Override
+    protected boolean execValidate() {
+      EntityFormData formData = new EntityFormData();
+      exportFormData(formData);
+      IStatus status = BEANS.get(IEntityService.class).validate(formData);
+      getStatusField().setValidationStatus(status);
+      return status.getSeverity() != IStatus.ERROR;
     }
 
     @Override
     protected void execStore() {
-      saveNew();
+      IEntityService service = BEANS.get(IEntityService.class);
+      EntityFormData formData = new EntityFormData();
+      exportFormData(formData);
+      service.create(formData);
+      getDesktop().dataChanged(IWorkItemEntity.WORK_ITEM_KEY);
     }
   }
 

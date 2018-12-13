@@ -7,6 +7,7 @@ package org.ch.ahoegger.docbox.server.or.app;
 import javax.annotation.Generated;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.Address;
+import org.ch.ahoegger.docbox.server.or.app.tables.BillingCycle;
 import org.ch.ahoegger.docbox.server.or.app.tables.Category;
 import org.ch.ahoegger.docbox.server.or.app.tables.Conversation;
 import org.ch.ahoegger.docbox.server.or.app.tables.DefaultPermissionTable;
@@ -19,6 +20,8 @@ import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPermission;
 import org.ch.ahoegger.docbox.server.or.app.tables.Employee;
 import org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.Employer;
+import org.ch.ahoegger.docbox.server.or.app.tables.EmployerTaxGroup;
+import org.ch.ahoegger.docbox.server.or.app.tables.EmployerUser;
 import org.ch.ahoegger.docbox.server.or.app.tables.Entity;
 import org.ch.ahoegger.docbox.server.or.app.tables.Migration;
 import org.ch.ahoegger.docbox.server.or.app.tables.Partner;
@@ -45,6 +48,11 @@ public class Tables {
      * The table <code>APP.ADDRESS</code>.
      */
     public static final Address ADDRESS = org.ch.ahoegger.docbox.server.or.app.tables.Address.ADDRESS;
+
+    /**
+     * The table <code>APP.BILLING_CYCLE</code>.
+     */
+    public static final BillingCycle BILLING_CYCLE = org.ch.ahoegger.docbox.server.or.app.tables.BillingCycle.BILLING_CYCLE;
 
     /**
      * The table <code>APP.CATEGORY</code>.
@@ -105,6 +113,16 @@ public class Tables {
      * The table <code>APP.EMPLOYER</code>.
      */
     public static final Employer EMPLOYER = org.ch.ahoegger.docbox.server.or.app.tables.Employer.EMPLOYER;
+
+    /**
+     * The table <code>APP.EMPLOYER_TAX_GROUP</code>.
+     */
+    public static final EmployerTaxGroup EMPLOYER_TAX_GROUP = org.ch.ahoegger.docbox.server.or.app.tables.EmployerTaxGroup.EMPLOYER_TAX_GROUP;
+
+    /**
+     * The table <code>APP.EMPLOYER_USER</code>.
+     */
+    public static final EmployerUser EMPLOYER_USER = org.ch.ahoegger.docbox.server.or.app.tables.EmployerUser.EMPLOYER_USER;
 
     /**
      * The table <code>APP.ENTITY</code>.

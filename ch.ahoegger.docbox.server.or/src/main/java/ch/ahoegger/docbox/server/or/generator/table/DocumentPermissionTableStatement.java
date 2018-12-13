@@ -6,19 +6,26 @@ import java.sql.SQLException;
 import org.ch.ahoegger.docbox.server.or.app.tables.DocumentPermission;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.jooq.SQLDialect;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.or.definition.table.IDocumentPermissionTable;
+import ch.ahoegger.docbox.server.or.generator.IJooqTable;
 
 /**
  * <h3>{@link DocumentPermissionTableStatement}</h3>
  *
  * @author Andreas Hoegger
  */
-public class DocumentPermissionTableStatement implements ITableStatement, IDocumentPermissionTable {
+public class DocumentPermissionTableStatement implements ITableStatement, IJooqTable, IDocumentPermissionTable {
   private static final Logger LOG = LoggerFactory.getLogger(DocumentPermissionTableStatement.class);
+
+  @Override
+  public Table<?> getJooqTable() {
+    return DocumentPermission.DOCUMENT_PERMISSION;
+  }
 
   @Override
   public String getCreateTable() {
@@ -47,7 +54,7 @@ public class DocumentPermissionTableStatement implements ITableStatement, IDocum
   @Override
   public void deleteTable(Connection connection) {
     LOG.info("SQL-DEV delete table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).delete(DocumentPermission.DOCUMENT_PERMISSION)
+    DSL.using(connection, SQLDialect.DERBY).delete(getJooqTable())
         .execute();
 
   }
@@ -55,7 +62,7 @@ public class DocumentPermissionTableStatement implements ITableStatement, IDocum
   @Override
   public void dropTable(Connection connection) {
     LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).dropTable(DocumentPermission.DOCUMENT_PERMISSION)
+    DSL.using(connection, SQLDialect.DERBY).dropTable(getJooqTable())
         .execute();
   }
 

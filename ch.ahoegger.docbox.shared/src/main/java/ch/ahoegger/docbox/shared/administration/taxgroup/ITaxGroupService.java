@@ -1,11 +1,14 @@
 package ch.ahoegger.docbox.shared.administration.taxgroup;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
-import ch.ahoegger.docbox.shared.hr.tax.TaxGroupFormData;
-import ch.ahoegger.docbox.shared.hr.tax.TaxGroupSearchFormData;
-import ch.ahoegger.docbox.shared.hr.tax.TaxGroupTablePageData;
+import ch.ahoegger.docbox.shared.administration.hr.taxgroup.TaxGroupFormData;
+import ch.ahoegger.docbox.shared.administration.hr.taxgroup.TaxGroupSearchFormData;
+import ch.ahoegger.docbox.shared.administration.hr.taxgroup.TaxGroupTablePageData;
 
 /**
  * <h3>{@link ITaxGroupService}</h3>
@@ -42,4 +45,16 @@ public interface ITaxGroupService extends IService {
    * @param formData
    */
   TaxGroupFormData store(TaxGroupFormData formData);
+
+  /**
+   * @param selectedValue
+   * @return
+   */
+  boolean delete(BigDecimal selectedValue);
+
+  /**
+   * @param formData
+   * @return
+   */
+  IStatus validate(TaxGroupFormData formData);
 }

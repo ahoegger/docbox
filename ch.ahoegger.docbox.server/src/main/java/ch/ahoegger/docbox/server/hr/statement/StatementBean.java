@@ -11,10 +11,10 @@ import java.util.Date;
 public class StatementBean {
 
   private BigDecimal m_statementId;
-  private BigDecimal m_partnerId;
+  private BigDecimal m_documentId;
+  private BigDecimal m_taxType;
   private Date m_statementDate;
   private String m_accountNumber;
-  private BigDecimal m_taxType;
   private BigDecimal m_hourlyWage;
   private BigDecimal m_socialInsuranceRate;
   private BigDecimal m_sourceTaxRate;
@@ -23,7 +23,7 @@ public class StatementBean {
   private BigDecimal m_wage;
   private BigDecimal m_bruttoWage;
   private BigDecimal m_nettoWage;
-  private BigDecimal m_nettoWageRounded;
+  private BigDecimal m_nettoWagePayout;
   private BigDecimal m_sourceTax;
   private BigDecimal m_socialInsuranceTax;
   private BigDecimal m_vacationExtra;
@@ -38,12 +38,21 @@ public class StatementBean {
     return this;
   }
 
-  public BigDecimal getPartnerId() {
-    return m_partnerId;
+  public BigDecimal getDocumentId() {
+    return m_documentId;
   }
 
-  public StatementBean withPartnerId(BigDecimal partnerId) {
-    m_partnerId = partnerId;
+  public StatementBean withDocumentId(BigDecimal documentId) {
+    m_documentId = documentId;
+    return this;
+  }
+
+  public BigDecimal getTaxType() {
+    return m_taxType;
+  }
+
+  public StatementBean withTaxType(BigDecimal taxType) {
+    m_taxType = taxType;
     return this;
   }
 
@@ -62,15 +71,6 @@ public class StatementBean {
 
   public StatementBean withAccountNumber(String accountNumber) {
     m_accountNumber = accountNumber;
-    return this;
-  }
-
-  public BigDecimal getTaxType() {
-    return m_taxType;
-  }
-
-  public StatementBean withTaxType(BigDecimal taxType) {
-    m_taxType = taxType;
     return this;
   }
 
@@ -146,12 +146,12 @@ public class StatementBean {
     return this;
   }
 
-  public BigDecimal getNettoWageRounded() {
-    return m_nettoWageRounded;
+  public BigDecimal getNettoWagePayout() {
+    return m_nettoWagePayout;
   }
 
-  public StatementBean withNettoWageRounded(BigDecimal nettoWageRounded) {
-    m_nettoWageRounded = nettoWageRounded;
+  public StatementBean withNettoWagePayout(BigDecimal nettoWagePayout) {
+    m_nettoWagePayout = nettoWagePayout;
     return this;
   }
 

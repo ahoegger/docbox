@@ -17,13 +17,9 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 
 import ch.ahoegger.docbox.server.ServerSession;
-import ch.ahoegger.docbox.server.administration.user.UserService;
-import ch.ahoegger.docbox.server.hr.AddressFormData;
-import ch.ahoegger.docbox.server.hr.AddressService;
-import ch.ahoegger.docbox.server.hr.employer.EmployerService;
 import ch.ahoegger.docbox.server.or.generator.table.ITableStatement;
 import ch.ahoegger.docbox.server.security.SecurityService;
-import ch.ahoegger.docbox.shared.hr.employer.EmployerFormData;
+import ch.ahoegger.docbox.shared.backup.IBackupService;
 
 /**
  * <h3>{@link AbstractTestWithDatabase}</h3>
@@ -49,6 +45,8 @@ public abstract class AbstractTestWithDatabase {
   @Before
   public void beforeTransactional() {
     ServerRunContexts.copyCurrent().withTransactionScope(TransactionScope.REQUIRES_NEW).run(() -> setupDb());
+    // backup needed to false;
+    BEANS.get(IBackupService.class).backup();
   }
 
   private final void setupDb() throws Exception {
@@ -66,24 +64,9 @@ public abstract class AbstractTestWithDatabase {
         .set(PrimaryKeySeq.PRIMARY_KEY_SEQ.LAST_VAL, BigDecimal.valueOf(1000))
         .execute();
 
-    // setup user table
-    UserService userService = BEANS.get(UserService.class);
-    userService.insert(connection, "admin", "manager", ADMIN, "secret", true, true);
-    userService.insert(connection, "name01", "firstname01", USER, "secret", true, false);
-    userService.insert(connection, "name02", "firstname02", USER_INACTIVE, "secret", false, false);
+    TestDataGenerator testDataGenerator = new TestDataGenerator(connection).createDefaults();
 
-    BEANS.get(AddressService.class).insert(new AddressFormData().withAddressNr(ANY_ADDRESS_ID).withLine1("Any street 3ab").withPlz("577").withCity("Sabora"));
-
-    BEANS.get(AddressService.class).insert(new AddressFormData().withAddressNr(EMPLOYER_ADDRESS_ID).withLine1("Jeanpuk street 3ab").withPlz("555").withCity("Clokeria"));
-
-    EmployerFormData formData = new EmployerFormData();
-    formData.setEmployerId(EMPLOYER_ID);
-    formData.getName().setValue("Simpson Family");
-    formData.getPhone().setValue("031 87 454 2687 25");
-    formData.getEmail().setValue("simpson@family.okg");
-    formData.getAddressBox().setAddressId(EMPLOYER_ADDRESS_ID);
-    BEANS.get(EmployerService.class).insert(formData);
-
+    execSetupDb(connection, testDataGenerator);
     execSetupDb(connection);
 
   }
@@ -94,6 +77,14 @@ public abstract class AbstractTestWithDatabase {
    * @param connection
    * @throws Exception
    */
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
+
+  }
+
+  /**
+   * @deprecated use {@link #execSetupDb(Connection, TestDataGenerator)} instead
+   */
+  @Deprecated
   protected void execSetupDb(Connection connection) throws Exception {
 
   }

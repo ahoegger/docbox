@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.shared.hr.employee;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.annotation.Generated;
@@ -29,6 +30,10 @@ public class EmployeeSearchFormData extends AbstractFormData {
     return getFieldByClass(BirtheayFrom.class);
   }
 
+  public Employer getEmployer() {
+    return getFieldByClass(Employer.class);
+  }
+
   public FirstName getFirstName() {
     return getFieldByClass(FirstName.class);
   }
@@ -48,6 +53,11 @@ public class EmployeeSearchFormData extends AbstractFormData {
   }
 
   public static class BirtheayFrom extends AbstractValueFieldData<Date> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class Employer extends AbstractValueFieldData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

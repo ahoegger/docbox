@@ -1,9 +1,15 @@
 package ch.ahoegger.docbox.shared.hr.entity;
 
 import java.math.BigDecimal;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.shared.TunnelToServer;
+
+import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData.EntityTableRowData;
+import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
+import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.WorkCode;
 
 /**
  * <h3>{@link IEntityService}</h3>
@@ -12,6 +18,9 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
  */
 @TunnelToServer
 public interface IEntityService extends IService {
+
+  Predicate<? super EntityTableRowData> EXPENSE_FILTER = e -> ExpenseCode.isEqual(e.getEntityType());
+  Predicate<? super EntityTableRowData> WORK_FILTER = e -> WorkCode.isEqual(e.getEntityType());
 
   /**
    * @param filter
@@ -24,6 +33,12 @@ public interface IEntityService extends IService {
    * @return
    */
   EntityFormData prepareCreate(EntityFormData formData);
+
+  /**
+   * @param formData
+   * @return
+   */
+  IStatus validate(EntityFormData formData);
 
   /**
    * @param formData
@@ -44,4 +59,5 @@ public interface IEntityService extends IService {
   EntityFormData store(EntityFormData formData);
 
   boolean delete(BigDecimal entityId);
+
 }

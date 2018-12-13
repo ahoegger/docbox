@@ -8,6 +8,7 @@ import org.eclipse.scout.rt.client.dto.Data;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
@@ -16,14 +17,13 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
-import ch.ahoegger.docbox.client.AbstractDocboxPageWithTable;
+import ch.ahoegger.docbox.client.hr.billing.payslip.PayslipForm;
 import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table;
-import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table.NewExpenseMenu;
-import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table.NewWorkMenu;
-import ch.ahoegger.docbox.shared.hr.billing.PayslipCodeType.UnbilledCode;
+import ch.ahoegger.docbox.client.templates.AbstractDocboxPageWithTable;
+import ch.ahoegger.docbox.shared.administration.hr.billing.BillingCycleLookupCall;
+import ch.ahoegger.docbox.shared.administration.hr.billing.IBillingCycleLookupService;
 import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
@@ -33,11 +33,24 @@ import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
 @Data(EntityTablePageData.class)
 public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
-  private BigDecimal m_partnerId;
   private BigDecimal m_payslipId;
 
-  public EntityTablePage(BigDecimal partnerId) {
-    m_partnerId = partnerId;
+  public EntityTablePage() {
+
+  }
+
+  public EntityTablePage(BigDecimal payslipId) {
+    m_payslipId = payslipId;
+  }
+
+  public void setTitle(BigDecimal billingCycleId) {
+    BillingCycleLookupCall call = new BillingCycleLookupCall();
+    call.setKey(billingCycleId);
+    setTitle(BEANS.get(IBillingCycleLookupService.class).getDataByKey(call).get(0).getText());
+  }
+
+  public void setTitle(String title) {
+    getCellForUpdate().setText(title);
   }
 
   @Override
@@ -62,7 +75,6 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
   @Override
   protected void execInitSearchForm() {
-    getSearchFormInternal().getPartnerIdField().setValue(m_partnerId);
     getSearchFormInternal().setPayslipId(getPayslipId());
   }
 
@@ -71,18 +83,8 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
     importPageData(BEANS.get(IEntityService.class).getEntityTableData((EntitySearchFormData) filter.getFormData()));
   }
 
-  public void setPartnerId(BigDecimal partnerId) {
-    m_partnerId = partnerId;
-  }
-
-  public BigDecimal getPartnerId() {
-    return m_partnerId;
-  }
-
   public void setPayslipId(BigDecimal payslipId) {
     m_payslipId = payslipId;
-    getTable().getMenuByClass(NewWorkMenu.class).setVisible(ObjectUtility.equals(UnbilledCode.ID, m_payslipId));
-    getTable().getMenuByClass(NewExpenseMenu.class).setVisible(ObjectUtility.equals(UnbilledCode.ID, m_payslipId));
   }
 
   public BigDecimal getPayslipId() {
@@ -94,6 +96,18 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
   }
 
   public class Table extends AbstractEntityTable {
+
+    public StatementIdColumn getStatementIdColumn() {
+      return getColumnSet().getColumnByClass(StatementIdColumn.class);
+    }
+
+    @Order(5000)
+    public class StatementIdColumn extends AbstractBigDecimalColumn {
+      @Override
+      protected boolean getConfiguredDisplayable() {
+        return false;
+      }
+    }
 
     @Order(1000)
     public class NewWorkMenu extends AbstractMenu {
@@ -108,18 +122,19 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
       }
 
       @Override
-      protected boolean getConfiguredVisible() {
-        return false;
+      protected void execOwnerValueChanged(Object newOwnerValue) {
+        setVisible(getStatementIdColumn().getSelectedValue() == null);
       }
 
       @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-        return CollectionUtility.hashSet(TableMenuType.SingleSelection, TableMenuType.EmptySpace);
+        return CollectionUtility.hashSet(TableMenuType.EmptySpace);
       }
 
       @Override
       protected void execAction() {
-        EntityForm form = new EntityForm(getPartnerId());
+        EntityForm form = new EntityForm();
+        form.setPayslipId(getPayslipId());
         form.setEntityType(WorkCode.ID);
         form.startNew();
       }
@@ -138,18 +153,19 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
       }
 
       @Override
-      protected boolean getConfiguredVisible() {
-        return false;
+      protected void execOwnerValueChanged(Object newOwnerValue) {
+        setVisible(getStatementIdColumn().getSelectedValue() == null);
       }
 
       @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-        return CollectionUtility.hashSet(TableMenuType.SingleSelection, TableMenuType.EmptySpace);
+        return CollectionUtility.hashSet(TableMenuType.EmptySpace);
       }
 
       @Override
       protected void execAction() {
-        EntityForm form = new EntityForm(getPartnerId());
+        EntityForm form = new EntityForm();
+        form.setPayslipId(getPayslipId());
         form.setEntityType(ExpenseCode.ID);
         form.startNew();
       }
@@ -168,18 +184,18 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
       }
 
       @Override
-      protected void execOwnerValueChanged(Object newOwnerValue) {
-        setVisible(ObjectUtility.equals(getPayslipId(), UnbilledCode.ID));
-      }
-
-      @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
         return CollectionUtility.hashSet(TableMenuType.SingleSelection);
       }
 
       @Override
+      protected void execOwnerValueChanged(Object newOwnerValue) {
+        setVisible(getStatementIdColumn().getSelectedValue() == null);
+      }
+
+      @Override
       protected void execAction() {
-        EntityForm form = new EntityForm(getPartnerIdColumn().getSelectedValue());
+        EntityForm form = new EntityForm();
         form.setEntityId(getEnityIdColumn().getSelectedValue());
         form.startModify();
 
@@ -195,7 +211,7 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
       @Override
       protected void execOwnerValueChanged(Object newOwnerValue) {
-        setVisible(ObjectUtility.notEquals(getPayslipId(), UnbilledCode.ID));
+        setVisible(getStatementIdColumn().getSelectedValue() != null);
       }
 
       @Override
@@ -205,7 +221,7 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
       @Override
       protected void execAction() {
-        EntityForm form = new EntityForm(getPartnerIdColumn().getSelectedValue());
+        EntityForm form = new EntityForm();
         form.setEntityId(getEnityIdColumn().getSelectedValue());
         form.startViewEntity();
       }
@@ -224,8 +240,8 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
       }
 
       @Override
-      protected void execInitAction() {
-        setVisible(ObjectUtility.equals(getPayslipId(), UnbilledCode.ID));
+      protected void execOwnerValueChanged(Object newOwnerValue) {
+        setVisible(getStatementIdColumn().getSelectedValue() == null);
       }
 
       @Override
@@ -242,6 +258,32 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
           getDesktop().dataChanged(IWorkItemEntity.WORK_ITEM_KEY);
         }
+      }
+    }
+
+    @Order(5000)
+    public class FinalizePayslipMenu extends AbstractMenu {
+
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("Finalize");
+      }
+
+      @Override
+      protected boolean getConfiguredVisible() {
+        return false;
+      }
+
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TableMenuType.EmptySpace);
+      }
+
+      @Override
+      protected void execAction() {
+        PayslipForm form = new PayslipForm();
+        form.setPayslipId(getPayslipId());
+        form.startFinalize();
       }
     }
 

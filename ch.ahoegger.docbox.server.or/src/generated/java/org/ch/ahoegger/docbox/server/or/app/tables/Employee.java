@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Employee extends TableImpl<EmployeeRecord> {
 
-    private static final long serialVersionUID = 686095760;
+    private static final long serialVersionUID = -990098433;
 
     /**
      * The reference instance of <code>APP.EMPLOYEE</code>
@@ -54,14 +54,19 @@ public class Employee extends TableImpl<EmployeeRecord> {
     }
 
     /**
-     * The column <code>APP.EMPLOYEE.PARTNER_NR</code>.
+     * The column <code>APP.EMPLOYEE.EMPLOYEE_NR</code>.
      */
-    public final TableField<EmployeeRecord, BigDecimal> PARTNER_NR = createField("PARTNER_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
+    public final TableField<EmployeeRecord, BigDecimal> EMPLOYEE_NR = createField("EMPLOYEE_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
      * The column <code>APP.EMPLOYEE.EMPLOYER_NR</code>.
      */
     public final TableField<EmployeeRecord, BigDecimal> EMPLOYER_NR = createField("EMPLOYER_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
+
+    /**
+     * The column <code>APP.EMPLOYEE.ADDRESS_NR</code>.
+     */
+    public final TableField<EmployeeRecord, BigDecimal> ADDRESS_NR = createField("ADDRESS_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
      * The column <code>APP.EMPLOYEE.FIRST_NAME</code>.
@@ -72,11 +77,6 @@ public class Employee extends TableImpl<EmployeeRecord> {
      * The column <code>APP.EMPLOYEE.LAST_NAME</code>.
      */
     public final TableField<EmployeeRecord, String> LAST_NAME = createField("LAST_NAME", org.jooq.impl.SQLDataType.VARCHAR.length(200).nullable(false), this, "");
-
-    /**
-     * The column <code>APP.EMPLOYEE.ADDRESS_NR</code>.
-     */
-    public final TableField<EmployeeRecord, BigDecimal> ADDRESS_NR = createField("ADDRESS_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
      * The column <code>APP.EMPLOYEE.AHV_NUMBER</code>.
@@ -97,6 +97,11 @@ public class Employee extends TableImpl<EmployeeRecord> {
      * The column <code>APP.EMPLOYEE.TAX_TYPE</code>.
      */
     public final TableField<EmployeeRecord, BigDecimal> TAX_TYPE = createField("TAX_TYPE", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
+
+    /**
+     * The column <code>APP.EMPLOYEE.REDUCED_LUNCH</code>.
+     */
+    public final TableField<EmployeeRecord, Boolean> REDUCED_LUNCH = createField("REDUCED_LUNCH", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>APP.EMPLOYEE.HOURLY_WAGE</code>.
@@ -153,7 +158,7 @@ public class Employee extends TableImpl<EmployeeRecord> {
      */
     @Override
     public UniqueKey<EmployeeRecord> getPrimaryKey() {
-        return Keys.SQL181126154908300;
+        return Keys.SQL181211162703140;
     }
 
     /**
@@ -161,7 +166,7 @@ public class Employee extends TableImpl<EmployeeRecord> {
      */
     @Override
     public List<UniqueKey<EmployeeRecord>> getKeys() {
-        return Arrays.<UniqueKey<EmployeeRecord>>asList(Keys.SQL181126154908300);
+        return Arrays.<UniqueKey<EmployeeRecord>>asList(Keys.SQL181211162703140);
     }
 
     /**

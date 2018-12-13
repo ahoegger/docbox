@@ -7,11 +7,17 @@ package ch.ahoegger.docbox.or.definition.table;
  */
 public interface IEmployeeTaxGroupTable {
 
-  static String TABLE_NAME = "EMPLOYEE_TAX_GROUP";
+  String TABLE_NAME = "EMPLOYEE_TAX_GROUP";
 
-  static String PARTNER_NR = "PARTNER_NR";
-  static String TAX_GROUP_NR = "TAX_GROUP_NR";
-  static String STATEMENT_NR = IStatementTable.STATEMENT_NR;
-  static String DOCUMENT_NR = IDocumentTable.DOCUMENT_NR;
+  String EMPLOYEE_TAX_GROUP_NR = "EMPLOYEE_TAX_GROUP_NR"; // PK
 
+  String EMPLOYEE_NR = IEmployeeTable.EMPLOYEE_NR; // FK
+
+  String EMPLOYER_TAX_GROUP_NR = IEmployerTaxGroupTable.EMPLOYER_TAX_GROUP_NR; // FK
+
+  String STATEMENT_NR = IStatementTable.STATEMENT_NR; // FK
+
+  String START_DATE = "START_DATE";
+
+  String END_DATE = "END_DATE";
 }

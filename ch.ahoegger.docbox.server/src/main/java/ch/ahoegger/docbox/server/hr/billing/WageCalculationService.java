@@ -6,6 +6,7 @@ import java.math.RoundingMode;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
+import ch.ahoegger.docbox.server.hr.statement.StatementBean;
 import ch.ahoegger.docbox.server.util.BigDecimalUtilitiy;
 import ch.ahoegger.docbox.shared.hr.tax.TaxCodeType;
 
@@ -22,15 +23,12 @@ public class WageCalculationService {
     WageCalculationResult result = new WageCalculationResult()
         .withWorkingHours(input.getWorkEntities().stream()
             .map(work -> work.getHours())
-            .reduce((h1, h2) -> h1.add(h2))
-            .orElse(BigDecimal.ZERO)
+            .reduce(BigDecimal.ZERO, (h1, h2) -> h1.add(h2))
             .setScale(2, RoundingMode.HALF_UP))
         .withExpenses(input.getExpenseEntities().stream()
             .map(expense -> expense.getAmount())
-            .reduce((h1, h2) -> h1.add(h2))
-            .orElse(BigDecimal.ZERO)
+            .reduce(BigDecimal.ZERO, (h1, h2) -> h1.add(h2))
             .setScale(2, RoundingMode.HALF_UP));
-
     result.withWage(result.getWorkingHours().multiply(input.getHourlyWage()).setScale(2, RoundingMode.HALF_UP));
     result.withVacationExtra(input.getVacationExtraRate().divide(BigDecimal.valueOf(100.0)).multiply(result.getWage()).setScale(2, RoundingMode.HALF_UP));
     result.withBruttoWage(result.getWage().add(result.getVacationExtra()).setScale(2, RoundingMode.HALF_UP));
@@ -42,10 +40,23 @@ public class WageCalculationService {
       result.withSourceTax(BigDecimal.ZERO);
     }
     result.withNettoWage(result.getBruttoWage().add(result.getExpenses()).subtract(result.getSocialInsuranceTax()).subtract(result.getSourceTax()));
-    result.withNettoWageRounded(BigDecimalUtilitiy.financeRound(result.getNettoWage(), BigDecimal.valueOf(0.05), RoundingMode.UP));
+    result.withNettoWagePayout(BigDecimalUtilitiy.financeRound(result.getNettoWage(), BigDecimal.valueOf(0.05), RoundingMode.UP));
 
     return result;
 
+  }
+
+  @RemoteServiceAccessDenied
+  public StatementBean mapToStatementBean(WageCalculationResult result, StatementBean bean) {
+    return bean.withBruttoWage(result.getBruttoWage())
+        .withExpenses(result.getExpenses())
+        .withNettoWage(result.getNettoWage())
+        .withNettoWagePayout(result.getNettoWagePayout())
+        .withSocialInsuranceTax(result.getSocialInsuranceTax())
+        .withSourceTax(result.getSourceTax())
+        .withVacationExtra(result.getVacationExtra())
+        .withWage(result.getWage())
+        .withWorkingHours(result.getWorkingHours());
   }
 
 }

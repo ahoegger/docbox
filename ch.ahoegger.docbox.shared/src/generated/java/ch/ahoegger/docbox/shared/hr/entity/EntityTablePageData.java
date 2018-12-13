@@ -55,21 +55,21 @@ public class EntityTablePageData extends AbstractTablePageData {
 
     private static final long serialVersionUID = 1L;
     public static final String enityId = "enityId";
-    public static final String partnerId = "partnerId";
     public static final String payslipId = "payslipId";
     public static final String date = "date";
     public static final String entityType = "entityType";
     public static final String hours = "hours";
     public static final String amount = "amount";
     public static final String text = "text";
+    public static final String statementId = "statementId";
     private BigDecimal m_enityId;
-    private BigDecimal m_partnerId;
     private BigDecimal m_payslipId;
     private Date m_date;
     private BigDecimal m_entityType;
     private BigDecimal m_hours;
     private BigDecimal m_amount;
     private String m_text;
+    private BigDecimal m_statementId;
 
     public BigDecimal getEnityId() {
       return m_enityId;
@@ -77,14 +77,6 @@ public class EntityTablePageData extends AbstractTablePageData {
 
     public void setEnityId(BigDecimal newEnityId) {
       m_enityId = newEnityId;
-    }
-
-    public BigDecimal getPartnerId() {
-      return m_partnerId;
-    }
-
-    public void setPartnerId(BigDecimal newPartnerId) {
-      m_partnerId = newPartnerId;
     }
 
     public BigDecimal getPayslipId() {
@@ -133,6 +125,14 @@ public class EntityTablePageData extends AbstractTablePageData {
 
     public void setText(String newText) {
       m_text = newText;
+    }
+
+    public BigDecimal getStatementId() {
+      return m_statementId;
+    }
+
+    public void setStatementId(BigDecimal newStatementId) {
+      m_statementId = newStatementId;
     }
   }
 }

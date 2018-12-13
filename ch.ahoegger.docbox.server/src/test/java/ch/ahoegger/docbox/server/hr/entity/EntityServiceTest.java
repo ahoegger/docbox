@@ -1,171 +1,124 @@
 package ch.ahoegger.docbox.server.hr.entity;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.time.LocalDate;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.VetoException;
-import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ch.ahoegger.docbox.server.document.DocumentService;
-import ch.ahoegger.docbox.server.hr.billing.PayslipService;
-import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
-import ch.ahoegger.docbox.server.test.util.IdGenerateService;
-import ch.ahoegger.docbox.shared.hr.billing.PayslipCodeType.UnbilledCode;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.hr.entity.EntityFormData;
-import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
-import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
-import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.ExpenseCode;
-import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
-import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
+import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType.WorkCode;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 public class EntityServiceTest extends AbstractTestWithDatabase {
 
-  private BigDecimal partnerId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
-  private BigDecimal documentId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
-  private BigDecimal PayslipId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
-  private BigDecimal entityId01 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
-  private BigDecimal entityId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
-  private BigDecimal entityId03 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
+  private static EntityService entityService;
+
+  private TestDataGenerator m_testDataGenerator;
+  private BigDecimal id_payslip_2000_04_finalized;
+
+  private BigDecimal id_entity_finalized;
+  private BigDecimal id_entity_01;
+
+  @BeforeClass
+  public static void loadService() {
+    entityService = BEANS.get(EntityService.class);
+  }
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
-    BEANS.get(PartnerService.class).insert(connection, partnerId01, "patnerName01", "desc01", LocalDateUtility.today(), null);
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
+    m_testDataGenerator = testDataGenerator;
+    id_payslip_2000_04_finalized = m_testDataGenerator.nextId();
+    id_entity_finalized = m_testDataGenerator.nextId();
+    id_entity_01 = m_testDataGenerator.nextId();
+    BigDecimal billingCycleId = m_testDataGenerator.nextId(),
+        statementId = m_testDataGenerator.nextId();
 
-    BEANS.get(DocumentService.class).insert(connection, documentId01, "All fish are wet", LocalDateUtility.toDate(LocalDate.now().minusDays(3)), LocalDateUtility.today(), null, "2016_03_08_124640.pdf", null, null, false,
-        OcrLanguageCodeType.GermanCode.ID);
-
-    BEANS.get(PayslipService.class).insert(connection, PayslipId01, partnerId01, EMPLOYER_ID, UnbilledCode.ID, documentId01, BigDecimal.valueOf(-1), "August 2016",
-        LocalDateUtility.toDate(LocalDate.of(2016, 8, 1)),
-        LocalDateUtility.toDate(LocalDate.of(2016, 8, 31)),
-        LocalDateUtility.toDate(LocalDate.of(2016, 9, 2)),
-        BigDecimal.valueOf(234.9), BigDecimal.valueOf(10.5),
-        BigDecimal.valueOf(232.1),
-        BigDecimal.valueOf(-10.0),
-        BigDecimal.valueOf(-4.5), BigDecimal.valueOf(5.30));
-
-    BEANS.get(EntityService.class).insert(connection, entityId01, partnerId01, PayslipId01, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.today(), BigDecimal.valueOf(3.25), null, "Work01");
-
-    BEANS.get(EntityService.class).insert(connection, entityId02, partnerId01, UnbilledCode.ID, EntityTypeCodeType.WorkCode.ID, LocalDateUtility.today(), BigDecimal.valueOf(3.25), null, "Work01");
-    BEANS.get(EntityService.class).insert(connection, entityId03, partnerId01, UnbilledCode.ID, EntityTypeCodeType.ExpenseCode.ID, LocalDateUtility.today(), null, BigDecimal.valueOf(3.25), "Expense01");
+    m_testDataGenerator
+        .createBillingCycle(billingCycleId, m_testDataGenerator.id_taxGroup2000, LocalDate.of(2000, 04, 01))
+        .createAnyStatement(statementId)
+        .createPayslip(id_payslip_2000_04_finalized, billingCycleId, m_testDataGenerator.id_employeeTaxGroup_nanny_2000, statementId)
+        .createEntity(id_entity_finalized, id_payslip_2000_04_finalized, WorkCode.ID, LocalDate.of(2000, 4, 22), BigDecimal.valueOf(5.9), null, "work to finalized")
+        .createEntity(id_entity_01, m_testDataGenerator.id_payslip_nanny_2000_01, WorkCode.ID, LocalDate.of(2000, 1, 22), BigDecimal.valueOf(5.9), null, "work item");
   }
 
   @Test
-  public void testUnbiled() {
-    EntitySearchFormData searchFd = new EntitySearchFormData();
-    searchFd.getPartnerId().setValue(partnerId01);
-    searchFd.setPayslipId(UnbilledCode.ID);
-    EntityTablePageData entityTableData = BEANS.get(IEntityService.class).getEntityTableData(searchFd);
-    Assert.assertEquals(2, entityTableData.getRowCount());
-  }
-
-  @Test
-  public void testCreate() {
-    IEntityService service = BEANS.get(IEntityService.class);
-
+  public void testCreateWork() {
     EntityFormData fd1 = new EntityFormData();
-    fd1 = service.prepareCreate(fd1);
-
-    fd1.getExpenseAmount().setValue(BigDecimal.valueOf(10).setScale(2));
-    fd1.getText().setValue("a desc");
-    fd1.getEntityDate().setValue(LocalDateUtility.today());
-    fd1.setEntityType(ExpenseCode.ID);
-    fd1.getWorkHours().setValue(BigDecimal.valueOf(2.50).setScale(2));
-    fd1.setPartnerId(BigDecimal.valueOf(2222));
-    fd1.setPayslipId(UnbilledCode.ID);
-
-    fd1 = service.create(fd1);
+    fd1.setPayslipId(m_testDataGenerator.id_payslip_nanny_2000_01);
+    fd1.setEntityType(WorkCode.ID);
+    fd1.getEntityDate().setValue(LocalDateUtility.toDate(LocalDate.of(2000, 01, 02)));
+    fd1.getText().setValue("Work item1");
+    fd1.getWorkHours().setValue(BigDecimal.valueOf(9.5));
+    fd1 = entityService.create(fd1);
+    assertNotNull(fd1.getEntityId());
 
     EntityFormData fd2 = new EntityFormData();
     fd2.setEntityId(fd1.getEntityId());
-    fd2 = service.load(fd2);
+    fd2 = entityService.load(fd2);
 
     DocboxAssert.assertEquals(fd1, fd2);
   }
 
   @Test
-  public void testModifyWork() {
-    IEntityService service = BEANS.get(IEntityService.class);
+  public void testCreateExpense() {
+    EntityFormData fd1 = new EntityFormData();
+    fd1.setPayslipId(m_testDataGenerator.id_payslip_nanny_2000_01);
+    fd1.setEntityType(ExpenseCode.ID);
+    fd1.getEntityDate().setValue(LocalDateUtility.toDate(LocalDate.of(2000, 01, 02)));
+    fd1.getText().setValue("Expense item1");
+    fd1.getExpenseAmount().setValue(BigDecimal.valueOf(9.5));
+    fd1 = entityService.create(fd1);
+    assertNotNull(fd1.getEntityId());
 
-    EntityFormData fd = new EntityFormData();
-    fd.setEntityId(entityId02);
-    fd = service.load(fd);
+    EntityFormData fd2 = new EntityFormData();
+    fd2.setEntityId(fd1.getEntityId());
+    fd2 = entityService.load(fd2);
 
-    fd.getWorkHours().setValue(BigDecimal.valueOf(5).setScale(2));
-    fd.getText().setValue("Modified text");
-    fd.getEntityDate().setValue(LocalDateUtility.toDate(LocalDate.now().minusDays(2)));
-
-    service.store(fd);
-
-    EntityFormData dbRef = new EntityFormData();
-    dbRef.setEntityId(entityId02);
-    dbRef = service.load(dbRef);
-
-    DocboxAssert.assertEquals(fd, dbRef);
-  }
-
-  @Test(expected = VetoException.class)
-  public void testModifyWorkPartnerId() {
-    IEntityService service = BEANS.get(IEntityService.class);
-
-    EntityFormData fd = new EntityFormData();
-    fd.setEntityId(entityId02);
-    fd = service.load(fd);
-
-    fd.setPartnerId(BigDecimal.valueOf(22222));
-
-    service.store(fd);
-
-    EntityFormData dbRef = new EntityFormData();
-    dbRef.setEntityId(entityId02);
-    dbRef = service.load(dbRef);
-
-    DocboxAssert.assertEquals(fd, dbRef);
-  }
-
-  @Test(expected = VetoException.class)
-  public void testModifyWorkPayslip() {
-    IEntityService service = BEANS.get(IEntityService.class);
-
-    EntityFormData fd = new EntityFormData();
-    fd.setEntityId(entityId02);
-    fd = service.load(fd);
-
-    fd.setPayslipId(BigDecimal.valueOf(22222));
-
-    service.store(fd);
-
-    EntityFormData dbRef = new EntityFormData();
-    dbRef.setEntityId(entityId02);
-    dbRef = service.load(dbRef);
-
-    DocboxAssert.assertEquals(fd, dbRef);
+    DocboxAssert.assertEquals(fd1, fd2);
   }
 
   @Test
-  public void testModifyExpense() {
-    IEntityService service = BEANS.get(IEntityService.class);
+  public void testModify() {
+    EntityFormData fd1 = new EntityFormData();
+    fd1.setEntityId(id_entity_01);
+    entityService.load(fd1);
+    fd1.getWorkHours().setValue(BigDecimal.valueOf(2));
+    entityService.store(fd1);
 
-    EntityFormData fd = new EntityFormData();
-    fd.setEntityId(entityId03);
-    fd = service.load(fd);
+    EntityFormData fd2 = new EntityFormData();
+    fd2.setEntityId(fd1.getEntityId());
+    entityService.load(fd2);
 
-    fd.getExpenseAmount().setValue(BigDecimal.valueOf(33).setScale(2));
-    fd.getText().setValue("Modified text");
-    fd.getEntityDate().setValue(LocalDateUtility.toDate(LocalDate.now().minusDays(2)));
+    DocboxAssert.assertEquals(fd1, fd2);
+  }
 
-    service.store(fd);
+  @Test(expected = VetoException.class)
+  public void testAddEntryToFinalizedPayslip() {
+    EntityFormData fd1 = new EntityFormData();
+    fd1.setPayslipId(id_payslip_2000_04_finalized);
+    fd1.setEntityType(WorkCode.ID);
+    fd1.getEntityDate().setValue(LocalDateUtility.toDate(LocalDate.of(2000, 01, 02)));
+    fd1.getText().setValue("Work item1");
+    fd1.getWorkHours().setValue(BigDecimal.valueOf(9.5));
+    fd1 = entityService.create(fd1);
+  }
 
-    EntityFormData dbRef = new EntityFormData();
-    dbRef.setEntityId(entityId03);
-    dbRef = service.load(dbRef);
-
-    DocboxAssert.assertEquals(fd, dbRef);
+  @Test(expected = VetoException.class)
+  public void testEditFinalizedEntity() {
+    EntityFormData fd1 = new EntityFormData();
+    fd1.setPayslipId(id_payslip_2000_04_finalized);
+    entityService.load(fd1);
+    fd1.getWorkHours().setValue(BigDecimal.valueOf(2));
+    entityService.store(fd1);
   }
 }

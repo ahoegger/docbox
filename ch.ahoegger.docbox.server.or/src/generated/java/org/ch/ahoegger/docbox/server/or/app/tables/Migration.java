@@ -4,8 +4,10 @@
 package org.ch.ahoegger.docbox.server.or.app.tables;
 
 
+import ch.ahoegger.docbox.server.or.generator.Version;
 import ch.ahoegger.docbox.server.or.generator.converter.DateConverter;
 import ch.ahoegger.docbox.server.or.generator.converter.LongConverter;
+import ch.ahoegger.docbox.server.or.generator.converter.VersionConverter;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -38,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Migration extends TableImpl<MigrationRecord> {
 
-    private static final long serialVersionUID = 1479939062;
+    private static final long serialVersionUID = -1389708152;
 
     /**
      * The reference instance of <code>APP.MIGRATION</code>
@@ -59,9 +61,9 @@ public class Migration extends TableImpl<MigrationRecord> {
     public final TableField<MigrationRecord, BigDecimal> MIGRATION_NR = createField("MIGRATION_NR", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
 
     /**
-     * The column <code>APP.MIGRATION.VERSION</code>.
+     * The column <code>APP.MIGRATION.DOCBOX_VERSION</code>.
      */
-    public final TableField<MigrationRecord, BigDecimal> VERSION = createField("VERSION", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "", new LongConverter());
+    public final TableField<MigrationRecord, Version> DOCBOX_VERSION = createField("DOCBOX_VERSION", org.jooq.impl.SQLDataType.VARCHAR.length(200).nullable(false), this, "", new VersionConverter());
 
     /**
      * The column <code>APP.MIGRATION.EXECUTED_DATE</code>.
@@ -103,7 +105,7 @@ public class Migration extends TableImpl<MigrationRecord> {
      */
     @Override
     public UniqueKey<MigrationRecord> getPrimaryKey() {
-        return Keys.SQL181126154908400;
+        return Keys.SQL181211162703330;
     }
 
     /**
@@ -111,7 +113,7 @@ public class Migration extends TableImpl<MigrationRecord> {
      */
     @Override
     public List<UniqueKey<MigrationRecord>> getKeys() {
-        return Arrays.<UniqueKey<MigrationRecord>>asList(Keys.SQL181126154908400);
+        return Arrays.<UniqueKey<MigrationRecord>>asList(Keys.SQL181211162703330);
     }
 
     /**

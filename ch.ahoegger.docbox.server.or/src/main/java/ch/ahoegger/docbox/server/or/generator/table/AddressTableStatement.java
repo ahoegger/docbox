@@ -6,19 +6,26 @@ import java.sql.SQLException;
 import org.ch.ahoegger.docbox.server.or.app.tables.Address;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.jooq.SQLDialect;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.or.definition.table.IAddressTable;
+import ch.ahoegger.docbox.server.or.generator.IJooqTable;
 
 /**
  * <h3>{@link AddressTableStatement}</h3>
  *
  * @author Andreas Hoegger
  */
-public class AddressTableStatement implements ITableStatement, IAddressTable {
+public class AddressTableStatement implements ITableStatement, IJooqTable, IAddressTable {
   private static final Logger LOG = LoggerFactory.getLogger(AddressTableStatement.class);
+
+  @Override
+  public Table<?> getJooqTable() {
+    return Address.ADDRESS;
+  }
 
   @Override
   public String getCreateTable() {
@@ -49,7 +56,7 @@ public class AddressTableStatement implements ITableStatement, IAddressTable {
   @Override
   public void deleteTable(Connection connection) {
     LOG.info("SQL-DEV delete table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).delete(Address.ADDRESS)
+    DSL.using(connection, SQLDialect.DERBY).delete(getJooqTable())
         .execute();
 
   }
@@ -57,7 +64,7 @@ public class AddressTableStatement implements ITableStatement, IAddressTable {
   @Override
   public void dropTable(Connection connection) {
     LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).dropTable(Address.ADDRESS)
+    DSL.using(connection, SQLDialect.DERBY).dropTable(getJooqTable())
         .execute();
   }
 

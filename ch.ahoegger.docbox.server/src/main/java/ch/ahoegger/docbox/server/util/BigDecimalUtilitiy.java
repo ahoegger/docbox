@@ -2,6 +2,7 @@ package ch.ahoegger.docbox.server.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Optional;
 
 /**
  * <h3>{@link BigDecimalUtilitiy}</h3>
@@ -22,4 +23,26 @@ public class BigDecimalUtilitiy {
       return result;
     }
   }
+
+  public static BigDecimal orZero(BigDecimal n) {
+    return Optional.ofNullable(n).orElse(BigDecimal.ZERO);
+  }
+
+  public static BigDecimal nullSafeAdd(BigDecimal n1, BigDecimal n2) {
+    return Optional.ofNullable(n1).orElse(BigDecimal.ZERO).add(Optional.ofNullable(n2).orElse(BigDecimal.ZERO));
+  }
+
+  public static boolean sameNumber(BigDecimal n1, BigDecimal n2) {
+    if (n1 == null && n2 == null) {
+      return true;
+    }
+    if (n1 == null) {
+      return false;
+    }
+    if (n2 == null) {
+      return false;
+    }
+    return n1.compareTo(n2) == 0;
+  }
+
 }

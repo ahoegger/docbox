@@ -63,24 +63,6 @@ public class EntityFormData extends AbstractFormData {
   }
 
   /**
-   * access method for property PartnerId.
-   */
-  public BigDecimal getPartnerId() {
-    return getPartnerIdProperty().getValue();
-  }
-
-  /**
-   * access method for property PartnerId.
-   */
-  public void setPartnerId(BigDecimal partnerId) {
-    getPartnerIdProperty().setValue(partnerId);
-  }
-
-  public PartnerIdProperty getPartnerIdProperty() {
-    return getPropertyByClass(PartnerIdProperty.class);
-  }
-
-  /**
    * access method for property PayslipId.
    */
   public BigDecimal getPayslipId() {
@@ -122,11 +104,6 @@ public class EntityFormData extends AbstractFormData {
   }
 
   public static class ExpenseAmount extends AbstractValueFieldData<BigDecimal> {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public static class PartnerIdProperty extends AbstractPropertyData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

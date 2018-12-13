@@ -6,19 +6,26 @@ import java.sql.SQLException;
 import org.ch.ahoegger.docbox.server.or.app.tables.Document;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.jooq.SQLDialect;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.or.definition.table.IDocumentTable;
+import ch.ahoegger.docbox.server.or.generator.IJooqTable;
 
 /**
  * <h3>{@link DocumentTableStatement}</h3>
  *
  * @author Andreas Hoegger
  */
-public class DocumentTableStatement implements ITableStatement, IDocumentTable {
+public class DocumentTableStatement implements ITableStatement, IJooqTable, IDocumentTable {
   private static final Logger LOG = LoggerFactory.getLogger(DocumentTableStatement.class);
+
+  @Override
+  public Table<?> getJooqTable() {
+    return Document.DOCUMENT;
+  }
 
   @Override
   public String getCreateTable() {
@@ -53,7 +60,7 @@ public class DocumentTableStatement implements ITableStatement, IDocumentTable {
   @Override
   public void deleteTable(Connection connection) {
     LOG.info("SQL-DEV delete table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).delete(Document.DOCUMENT)
+    DSL.using(connection, SQLDialect.DERBY).delete(getJooqTable())
         .execute();
 
   }
@@ -61,7 +68,7 @@ public class DocumentTableStatement implements ITableStatement, IDocumentTable {
   @Override
   public void dropTable(Connection connection) {
     LOG.info("SQL-DEV drop table: {}", TABLE_NAME);
-    DSL.using(connection, SQLDialect.DERBY).dropTable(Document.DOCUMENT)
+    DSL.using(connection, SQLDialect.DERBY).dropTable(getJooqTable())
         .execute();
   }
 
