@@ -9,16 +9,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup;
-import org.ch.ahoegger.docbox.server.or.app.tables.Employer;
 import org.ch.ahoegger.docbox.server.or.app.tables.EmployerTaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.Statement;
-import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.EmployerTaxGroupRecord;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
-import org.eclipse.scout.rt.platform.status.IStatus;
-import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
@@ -51,6 +46,7 @@ import ch.ahoegger.docbox.shared.hr.employer.EmployerTaxGroupSearchFormData;
 import ch.ahoegger.docbox.shared.hr.employer.EmployerTaxGroupTableData;
 import ch.ahoegger.docbox.shared.hr.employer.EmployerTaxGroupTableData.EmployerTaxGroupTableRowData;
 import ch.ahoegger.docbox.shared.hr.employer.IEmployerTaxGroupService;
+import ch.ahoegger.docbox.shared.util.FormDataResult;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 /**
@@ -307,37 +303,45 @@ public class EmployerTaxGroupService implements IEmployerTaxGroupService {
         });
   }
 
-  /**
-   * @param employerTaxGroupNr
-   * @return
-   */
-  @RemoteServiceAccessDenied
-  public IStatus isFinalized(BigDecimal employerTaxGroupNr) {
-    EmployerTaxGroup erTaxGroup = EmployerTaxGroup.EMPLOYER_TAX_GROUP;
-    TaxGroup taxGroup = TaxGroup.TAX_GROUP;
-    Employer employer = Employer.EMPLOYER;
-
-    Record rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(taxGroup.NAME, taxGroup.START_DATE, taxGroup.END_DATE, employer.NAME, erTaxGroup.STATEMENT_NR)
-        .from(erTaxGroup)
-        .leftOuterJoin(employer).on(erTaxGroup.EMPLOYER_NR.eq(employer.EMPLOYER_NR))
-        .leftOuterJoin(taxGroup).on(erTaxGroup.TAX_GROUP_NR.eq(taxGroup.TAX_GROUP_NR))
-        .where(erTaxGroup.EMPLOYER_TAX_GROUP_NR.eq(employerTaxGroupNr))
-        .fetchOne();
-    if (rec == null) {
-      throw new ProcessingException("EmployeeTaxGroup with id:'{}' not found in DB.", employerTaxGroupNr);
-    }
-    if (rec.get(erTaxGroup.STATEMENT_NR) != null) {
-      return new Status(
-          String.format("Employer tax group '%s (%s-%s)' of employer '%s' is already finalized!",
-              rec.get(taxGroup.NAME),
-              LocalDateUtility.format(rec.get(taxGroup.START_DATE), LocalDateUtility.DATE_FORMATTER_ddMMyyyy),
-              LocalDateUtility.format(rec.get(taxGroup.END_DATE), LocalDateUtility.DATE_FORMATTER_ddMMyyyy),
-              rec.get(employer.NAME)),
-          IStatus.ERROR);
-    }
-    return Status.OK_STATUS;
+  @Override
+  public FormDataResult<EmployerTaxGroupFormData, Boolean> isFinalized(BigDecimal employerTaxgroupId) {
+    Assertions.assertNotNull(employerTaxgroupId);
+    EmployerTaxGroupFormData formData = new EmployerTaxGroupFormData();
+    formData.setEmployerTaxGroupId(employerTaxgroupId);
+    formData = load(formData);
+    return new FormDataResult<>(formData, formData.getStatementId() != null);
   }
+//  /**
+//   * @param employerTaxGroupNr
+//   * @return
+//   */
+//  @RemoteServiceAccessDenied
+//  public IStatus isFinalized(BigDecimal employerTaxGroupNr) {
+//    EmployerTaxGroup erTaxGroup = EmployerTaxGroup.EMPLOYER_TAX_GROUP;
+//    TaxGroup taxGroup = TaxGroup.TAX_GROUP;
+//    Employer employer = Employer.EMPLOYER;
+//
+//    Record rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+//        .select(taxGroup.NAME, taxGroup.START_DATE, taxGroup.END_DATE, employer.NAME, erTaxGroup.STATEMENT_NR)
+//        .from(erTaxGroup)
+//        .leftOuterJoin(employer).on(erTaxGroup.EMPLOYER_NR.eq(employer.EMPLOYER_NR))
+//        .leftOuterJoin(taxGroup).on(erTaxGroup.TAX_GROUP_NR.eq(taxGroup.TAX_GROUP_NR))
+//        .where(erTaxGroup.EMPLOYER_TAX_GROUP_NR.eq(employerTaxGroupNr))
+//        .fetchOne();
+//    if (rec == null) {
+//      throw new ProcessingException("EmployeeTaxGroup with id:'{}' not found in DB.", employerTaxGroupNr);
+//    }
+//    if (rec.get(erTaxGroup.STATEMENT_NR) != null) {
+//      return new Status(
+//          String.format("Employer tax group '%s (%s-%s)' of employer '%s' is already finalized!",
+//              rec.get(taxGroup.NAME),
+//              LocalDateUtility.format(rec.get(taxGroup.START_DATE), LocalDateUtility.DATE_FORMATTER_ddMMyyyy),
+//              LocalDateUtility.format(rec.get(taxGroup.END_DATE), LocalDateUtility.DATE_FORMATTER_ddMMyyyy),
+//              rec.get(employer.NAME)),
+//          IStatus.ERROR);
+//    }
+//    return Status.OK_STATUS;
+//  }
 
   @RemoteServiceAccessDenied
   public int insert(Connection connection, BigDecimal employerTaxGroupId, BigDecimal employerId, BigDecimal taxGroupId, BigDecimal statementId) {

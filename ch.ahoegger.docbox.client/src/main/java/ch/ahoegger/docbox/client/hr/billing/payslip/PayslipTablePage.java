@@ -11,10 +11,11 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.OpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -34,6 +35,8 @@ import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table.NewExpenseMenu;
 import ch.ahoegger.docbox.client.hr.entity.EntityTablePage.Table.NewWorkMenu;
 import ch.ahoegger.docbox.client.templates.AbstractActionWithDataChangedListener;
 import ch.ahoegger.docbox.client.templates.AbstractDocboxPageWithTable;
+import ch.ahoegger.docbox.client.templates.INotInherited;
+import ch.ahoegger.docbox.shared.Icons;
 import ch.ahoegger.docbox.shared.administration.hr.billing.BillingCycleLookupCall;
 import ch.ahoegger.docbox.shared.hr.billing.payslip.IPayslipService;
 import ch.ahoegger.docbox.shared.hr.billing.payslip.PayslipSearchFormData;
@@ -134,12 +137,24 @@ public class PayslipTablePage extends AbstractDocboxPageWithTable<PayslipTablePa
       return getColumnSet().getColumnByClass(EmployeeColumn.class);
     }
 
+    public EmployeeTaxGroupColumn getEmployeeTaxGroupColumn() {
+      return getColumnSet().getColumnByClass(EmployeeTaxGroupColumn.class);
+    }
+
     public PayslipIdColumn getPayslipIdColumn() {
       return getColumnSet().getColumnByClass(PayslipIdColumn.class);
     }
 
     @Order(1000)
     public class PayslipIdColumn extends AbstractBigDecimalColumn {
+      @Override
+      protected boolean getConfiguredDisplayable() {
+        return false;
+      }
+    }
+
+    @Order(1250)
+    public class EmployeeTaxGroupColumn extends AbstractBigDecimalColumn {
       @Override
       protected boolean getConfiguredDisplayable() {
         return false;
@@ -257,6 +272,30 @@ public class PayslipTablePage extends AbstractDocboxPageWithTable<PayslipTablePa
       }
     }
 
+    @Order(50500)
+    public class DeleteMenu extends AbstractActionWithDataChangedListener {
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("Delete");
+      }
+
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+      }
+
+      @Override
+      protected void execAction() {
+        if (MessageBox.YES_OPTION == MessageBoxes.createYesNo()
+            .withHeader(TEXTS.get("Delete"))
+            .withBody(TEXTS.get("VerificationDelete", getBillingCycleColumn().getSelectedDisplayText())).show()) {
+          BEANS.get(IPayslipService.class).delete(getPayslipIdColumn().getSelectedValue());
+
+          getDesktop().dataChanged(IPayslipEntity.ENTITY_KEY);
+        }
+      }
+    }
+
     @Order(51000)
     public class FinalizeMenu extends AbstractMenu {
       @Override
@@ -309,7 +348,44 @@ public class PayslipTablePage extends AbstractDocboxPageWithTable<PayslipTablePa
         StringBuilder linkBuilder = new StringBuilder();
         linkBuilder.append(CONFIG.getPropertyValue(DocumentLinkURI.class));
         linkBuilder.append("?").append(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class)).append("=").append(getDocumentIdColumn().getSelectedValue());
-        IDesktop.CURRENT.get().openUri(linkBuilder.toString(), OpenUriAction.NEW_WINDOW);
+        getDesktop().openUri(linkBuilder.toString(), OpenUriAction.NEW_WINDOW);
+      }
+    }
+
+    @Order(53000)
+    public class AdvancedMenu extends AbstractMenu implements INotInherited {
+
+      @Override
+      protected String getConfiguredIconId() {
+        return Icons.EllipsisV;
+      }
+
+      @Order(1000)
+      public class UnfinalizeMenu extends AbstractMenu {
+        @Override
+        protected String getConfiguredText() {
+          return TEXTS.get("Unfinalize");
+        }
+
+        @Override
+        protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+          return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+        }
+
+        @Override
+        protected void execOwnerValueChanged(Object newOwnerValue) {
+          setVisible(
+              BEANS.get(IEmployeeTaxGroupService.class).isFinalized(getEmployeeTaxGroupColumn().getSelectedValue()).getValue()
+                  && getStatementIdColumn().getSelectedValue() != null);
+        }
+
+        @Override
+        protected void execAction() {
+          if (MessageBoxes.createYesNo().withBody(TEXTS.get("UnfinalizeConfirmationText", getBillingCycleColumn().getSelectedDisplayText())).show() == MessageBox.YES_OPTION) {
+            BEANS.get(IPayslipService.class).unfinalize(getPayslipIdColumn().getSelectedValue());
+            getDesktop().dataChanged(IPayslipEntity.ENTITY_KEY_FINALIZE);
+          }
+        }
       }
     }
 

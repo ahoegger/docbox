@@ -11,14 +11,11 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.ch.ahoegger.docbox.server.or.app.tables.Employee;
 import org.ch.ahoegger.docbox.server.or.app.tables.EmployeeTaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.EmployerTaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.Statement;
-import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.EmployeeTaxGroupRecord;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -26,6 +23,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
@@ -46,6 +44,7 @@ import ch.ahoegger.docbox.shared.administration.hr.taxgroup.TaxGroupFormData;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Partners.PartnersRowData;
+import ch.ahoegger.docbox.shared.hr.billing.payslip.IPayslipService;
 import ch.ahoegger.docbox.shared.hr.billing.payslip.PayslipSearchFormData;
 import ch.ahoegger.docbox.shared.hr.billing.payslip.PayslipTableData;
 import ch.ahoegger.docbox.shared.hr.billing.payslip.PayslipTableData.PayslipTableRowData;
@@ -57,6 +56,7 @@ import ch.ahoegger.docbox.shared.hr.employee.EmployeeTaxGroupTableData;
 import ch.ahoegger.docbox.shared.hr.employee.EmployeeTaxGroupTableData.EmployeeTaxGroupTableRowData;
 import ch.ahoegger.docbox.shared.hr.employer.EmployerTaxGroupFormData;
 import ch.ahoegger.docbox.shared.hr.employer.EmployerTaxGroupSearchFormData;
+import ch.ahoegger.docbox.shared.util.FormDataResult;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility.LocalDateRange;
 
@@ -258,9 +258,11 @@ public class EmployeeTaxGroupService implements IEmployeeTaxGroupService {
     ensureEmployerTaxGroup(formData);
     Assertions.assertNotNull(formData.getEmployerTaxGroupId());
 
-    IStatus finalizedStatus = BEANS.get(EmployerTaxGroupService.class).isFinalized(formData.getEmployerTaxGroupId());
-    if (!finalizedStatus.isOK()) {
-      throw new VetoException(new ProcessingStatus(finalizedStatus));
+    FormDataResult<EmployerTaxGroupFormData, Boolean> finalizedResult = BEANS.get(EmployerTaxGroupService.class).isFinalized(formData.getEmployerTaxGroupId());
+    if (finalizedResult.getValue()) {
+      throw new VetoException(new ProcessingStatus(
+          String.format("EmployerTaxGroup is finalized!"),
+          IStatus.ERROR));
     }
     formData.setEmployeeTaxGroupId(new BigDecimal(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME)));
     int rowCount = insert(SQL.getConnection(), formData);
@@ -324,9 +326,11 @@ public class EmployeeTaxGroupService implements IEmployeeTaxGroupService {
     Assertions.assertNotNull(formData.getEmployeeTaxGroupId());
     validate(formData, true);
 
-    IStatus finalizedStatus = BEANS.get(EmployerTaxGroupService.class).isFinalized(formData.getEmployerTaxGroupId());
-    if (!finalizedStatus.isOK()) {
-      throw new VetoException(new ProcessingStatus(finalizedStatus));
+    FormDataResult<EmployerTaxGroupFormData, Boolean> finalizedResult = BEANS.get(EmployerTaxGroupService.class).isFinalized(formData.getEmployerTaxGroupId());
+    if (finalizedResult.getValue()) {
+      throw new VetoException(new ProcessingStatus(
+          String.format("EmployerTaxGroup is finalized!"),
+          IStatus.ERROR));
     }
     EmployeeTaxGroup eeTaxGroup = EmployeeTaxGroup.EMPLOYEE_TAX_GROUP;
     EmployeeTaxGroupRecord record = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
@@ -347,9 +351,17 @@ public class EmployeeTaxGroupService implements IEmployeeTaxGroupService {
   public EmployeeTaxGroupFormData finalize(EmployeeTaxGroupFormData formData) {
     Assertions.assertNotNull(formData.getEmployeeTaxGroupId());
 
-    IStatus finalizedStatus = isFinalized(formData.getEmployeeTaxGroupId());
-    if (!finalizedStatus.isOK()) {
-      throw new VetoException(new ProcessingStatus(finalizedStatus));
+    // if already finalized
+    if (formData.getStatementId() != null) {
+      throw new VetoException(new ProcessingStatus("EmployeeTaxGroup is already finalized.", IStatus.ERROR));
+    }
+
+    // check all payslips are finalized
+    PayslipSearchFormData payslipSearchData = new PayslipSearchFormData();
+    payslipSearchData.setEmployeeTaxGroupId(formData.getEmployeeTaxGroupId());
+    payslipSearchData.getFinalzedRadioGroup().setValue(TriState.FALSE);
+    if (BEANS.get(IPayslipService.class).hasTableData(payslipSearchData)) {
+      throw new VetoException(new ProcessingStatus("Payslips of EmployeeTaxGroup are not finalized.", IStatus.ERROR));
     }
 
     EmployeeFormData employeeData = new EmployeeFormData();
@@ -407,6 +419,32 @@ public class EmployeeTaxGroupService implements IEmployeeTaxGroupService {
     return formData;
   }
 
+  @Override
+  public EmployeeTaxGroupFormData unfinalize(BigDecimal employeeTaxGroupId) {
+    Assertions.assertNotNull(employeeTaxGroupId);
+    EmployeeTaxGroupFormData formData = new EmployeeTaxGroupFormData();
+    formData.setEmployeeTaxGroupId(employeeTaxGroupId);
+    formData = load(formData);
+
+    // delete statement
+    BEANS.get(StatementService.class).delete(formData.getStatementId());
+
+    // update employeeTaxGroup
+    EmployeeTaxGroup eeTaxGroup = EmployeeTaxGroup.EMPLOYEE_TAX_GROUP;
+    formData.setStatementId(null);
+    EmployeeTaxGroupRecord record = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(eeTaxGroup, eeTaxGroup.EMPLOYEE_TAX_GROUP_NR.eq(formData.getEmployeeTaxGroupId()));
+    if (record == null) {
+      return null;
+    }
+    int rowCount = mapToRecord(record, formData).update();
+    if (rowCount == 1) {
+      // notify backup needed
+      BEANS.get(IBackupService.class).notifyModification();
+    }
+    return formData;
+  }
+
   /**
    * @param employeeId
    * @param employerTaxGroupId
@@ -431,41 +469,13 @@ public class EmployeeTaxGroupService implements IEmployeeTaxGroupService {
         });
   }
 
-  /**
-   * @param employeeTaxGroupId
-   * @return
-   */
-  @RemoteServiceAccessDenied
-  public IStatus isFinalized(BigDecimal employeeTaxGroupId) {
-
-    EmployeeTaxGroup eeTaxGroup = EmployeeTaxGroup.EMPLOYEE_TAX_GROUP;
-    EmployerTaxGroup erTaxGroup = EmployerTaxGroup.EMPLOYER_TAX_GROUP;
-    TaxGroup taxGroup = TaxGroup.TAX_GROUP;
-    Employee employee = Employee.EMPLOYEE;
-
-    Record rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(taxGroup.NAME, eeTaxGroup.START_DATE, eeTaxGroup.END_DATE, employee.FIRST_NAME, employee.LAST_NAME, eeTaxGroup.STATEMENT_NR, eeTaxGroup.EMPLOYER_TAX_GROUP_NR)
-        .from(eeTaxGroup)
-        .leftOuterJoin(employee).on(eeTaxGroup.EMPLOYEE_NR.eq(employee.EMPLOYEE_NR))
-        .leftOuterJoin(erTaxGroup).on(eeTaxGroup.EMPLOYER_TAX_GROUP_NR.eq(erTaxGroup.EMPLOYER_TAX_GROUP_NR))
-        .leftOuterJoin(taxGroup).on(erTaxGroup.TAX_GROUP_NR.eq(taxGroup.TAX_GROUP_NR))
-        .where(eeTaxGroup.EMPLOYEE_TAX_GROUP_NR.eq(employeeTaxGroupId))
-        .fetchOne();
-    if (rec == null) {
-      throw new ProcessingException("EmployeeTaxGroup with id:'{}' not found in DB.", employeeTaxGroupId);
-    }
-    if (rec.get(eeTaxGroup.STATEMENT_NR) != null) {
-      return new Status(
-          String.format("Employee tax group '%s (%s-%s)' of user '%s %s' is already finalized!",
-              rec.get(taxGroup.NAME),
-              LocalDateUtility.format(rec.get(eeTaxGroup.START_DATE), LocalDateUtility.DATE_FORMATTER_ddMMyyyy),
-              LocalDateUtility.format(rec.get(eeTaxGroup.END_DATE), LocalDateUtility.DATE_FORMATTER_ddMMyyyy),
-              rec.get(employee.FIRST_NAME),
-              rec.get(employee.LAST_NAME)),
-          IStatus.ERROR);
-    }
-
-    return BEANS.get(EmployerTaxGroupService.class).isFinalized(rec.get(eeTaxGroup.EMPLOYER_TAX_GROUP_NR));
+  @Override
+  public FormDataResult<EmployeeTaxGroupFormData, Boolean> isFinalized(BigDecimal employeeTaxgroupId) {
+    Assertions.assertNotNull(employeeTaxgroupId);
+    EmployeeTaxGroupFormData formData = new EmployeeTaxGroupFormData();
+    formData.setEmployeeTaxGroupId(employeeTaxgroupId);
+    formData = load(formData);
+    return new FormDataResult<>(formData, formData.getStatementId() != null);
   }
 
   @RemoteServiceAccessDenied

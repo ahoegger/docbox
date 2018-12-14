@@ -3,13 +3,11 @@ package ch.ahoegger.docbox.client.hr.entity;
 import java.math.BigDecimal;
 import java.util.Set;
 
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.dto.Data;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
@@ -89,10 +87,6 @@ public class EntityTablePage extends AbstractDocboxPageWithTable<Table> {
 
   public BigDecimal getPayslipId() {
     return m_payslipId;
-  }
-
-  protected IDesktop getDesktop() {
-    return ClientRunContexts.copyCurrent().getDesktop();
   }
 
   public class Table extends AbstractEntityTable {

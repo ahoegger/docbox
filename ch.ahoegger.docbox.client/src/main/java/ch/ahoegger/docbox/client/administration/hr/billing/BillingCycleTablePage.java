@@ -11,7 +11,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
@@ -232,7 +231,7 @@ public class BillingCycleTablePage extends AbstractDocboxPageWithTable<BillingCy
       protected void execAction() {
         if (MessageBoxes.createYesNo().withBody(TEXTS.get("DeleteConfirmationTextX", getNameColumn().getSelectedDisplayText())).show() == MessageBox.YES_OPTION) {
           BEANS.get(IBillingCycleService.class).delete(getIdColumn().getSelectedValue());
-          IDesktop.CURRENT.get().dataChanged(IBillingCycleEntity.ENTITY_KEY);
+          getDesktop().dataChanged(IBillingCycleEntity.ENTITY_KEY);
         }
       }
 

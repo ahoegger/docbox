@@ -55,6 +55,7 @@ public class PayslipTableData extends AbstractTablePageData {
 
     private static final long serialVersionUID = 1L;
     public static final String payslipId = "payslipId";
+    public static final String employeeTaxGroup = "employeeTaxGroup";
     public static final String employee = "employee";
     public static final String billingCycle = "billingCycle";
     public static final String periodFrom = "periodFrom";
@@ -78,6 +79,7 @@ public class PayslipTableData extends AbstractTablePageData {
     public static final String vacationExtra = "vacationExtra";
     public static final String expenses = "expenses";
     private BigDecimal m_payslipId;
+    private BigDecimal m_employeeTaxGroup;
     private BigDecimal m_employee;
     private BigDecimal m_billingCycle;
     private Date m_periodFrom;
@@ -107,6 +109,14 @@ public class PayslipTableData extends AbstractTablePageData {
 
     public void setPayslipId(BigDecimal newPayslipId) {
       m_payslipId = newPayslipId;
+    }
+
+    public BigDecimal getEmployeeTaxGroup() {
+      return m_employeeTaxGroup;
+    }
+
+    public void setEmployeeTaxGroup(BigDecimal newEmployeeTaxGroup) {
+      m_employeeTaxGroup = newEmployeeTaxGroup;
     }
 
     public BigDecimal getEmployee() {

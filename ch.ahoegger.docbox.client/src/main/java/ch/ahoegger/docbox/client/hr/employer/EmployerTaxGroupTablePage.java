@@ -10,8 +10,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
@@ -29,6 +27,7 @@ import ch.ahoegger.docbox.client.hr.billing.payslip.PayslipTablePage;
 import ch.ahoegger.docbox.client.hr.billing.statement.AbstractStatementTable;
 import ch.ahoegger.docbox.client.hr.employee.IEmployeeTaxGroupEntity;
 import ch.ahoegger.docbox.client.templates.AbstractActionWithDataChangedListener;
+import ch.ahoegger.docbox.client.templates.AbstractDocboxPageWithTable;
 import ch.ahoegger.docbox.client.templates.INotInherited;
 import ch.ahoegger.docbox.shared.administration.taxgroup.TaxGroupLookupCall;
 import ch.ahoegger.docbox.shared.hr.billing.taxgroup.IEmployeeTaxGroupService;
@@ -44,7 +43,7 @@ import ch.ahoegger.docbox.shared.hr.employer.IEmployerTaxGroupService;
  * @author aho
  */
 @Data(EmployerTaxGroupTableData.class)
-public class EmployerTaxGroupTablePage extends AbstractPageWithTable<EmployerTaxGroupTablePage.Table> {
+public class EmployerTaxGroupTablePage extends AbstractDocboxPageWithTable<EmployerTaxGroupTablePage.Table> {
 
   @Override
   protected String getConfiguredTitle() {
@@ -203,7 +202,7 @@ public class EmployerTaxGroupTablePage extends AbstractPageWithTable<EmployerTax
       protected void execAction() {
         if (MessageBoxes.createYesNo().withBody(TEXTS.get("DeleteConfirmationTextX", getTaxGroupColumn().getSelectedDisplayText())).show() == MessageBox.YES_OPTION) {
           BEANS.get(IEmployerTaxGroupService.class).delete(getEmployerTaxGroupIdColumn().getSelectedValue());
-          IDesktop.CURRENT.get().dataChanged(IEmployerTaxGroupEntity.ENTITY_KEY);
+          getDesktop().dataChanged(IEmployerTaxGroupEntity.ENTITY_KEY);
         }
       }
     }

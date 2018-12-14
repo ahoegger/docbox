@@ -14,6 +14,7 @@ import org.jooq.impl.DSL;
 import ch.ahoegger.docbox.server.administration.hr.billing.BillingCycleService;
 import ch.ahoegger.docbox.server.administration.taxgroup.TaxGroupService;
 import ch.ahoegger.docbox.server.administration.user.UserService;
+import ch.ahoegger.docbox.server.document.DocumentService;
 import ch.ahoegger.docbox.server.hr.AddressFormData;
 import ch.ahoegger.docbox.server.hr.AddressService;
 import ch.ahoegger.docbox.server.hr.billing.payslip.PayslipService;
@@ -24,7 +25,10 @@ import ch.ahoegger.docbox.server.hr.employer.EmployerTaxGroupService;
 import ch.ahoegger.docbox.server.hr.entity.EntityService;
 import ch.ahoegger.docbox.server.hr.statement.StatementBean;
 import ch.ahoegger.docbox.server.hr.statement.StatementService;
+import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.partner.PartnerService;
+import ch.ahoegger.docbox.server.test.util.beans.DocumentBean;
+import ch.ahoegger.docbox.server.test.util.beans.DocumentOcrBean;
 import ch.ahoegger.docbox.shared.hr.employer.EmployerFormData;
 import ch.ahoegger.docbox.shared.hr.tax.TaxCodeType.SourceTax;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
@@ -279,6 +283,41 @@ public final class TestDataGenerator {
             .withSocialInsuranceTax(socialInsuranceTax)
             .withVacationExtra(vacationExtra)
             .withExpenses(expenses));
+    return this;
+  }
+
+  public DocumentBean newDocumentBean(BigDecimal documentId) {
+    return new DocumentBean(documentId, this);
+  }
+
+  public TestDataGenerator create(DocumentBean bean) {
+    BEANS.get(DocumentService.class).insert(
+        m_connection,
+        bean.getDocumentId(),
+        bean.getAbstractText(),
+        LocalDateUtility.toDate(bean.getDocumentDate()),
+        LocalDateUtility.toDate(bean.getCapturedDate()),
+        LocalDateUtility.toDate(bean.getValidDate()),
+        bean.getDocPath(),
+        bean.getOriginalStorage(),
+        bean.getConversationId(),
+        bean.isParseOcr(),
+        bean.getOcrLanguage());
+    return this;
+  }
+
+  public DocumentOcrBean newDocumentOcrBean(BigDecimal documentId) {
+    return new DocumentOcrBean(documentId, this);
+  }
+
+  public TestDataGenerator create(DocumentOcrBean bean) {
+    BEANS.get(DocumentOcrService.class).insert(
+        m_connection,
+        bean.getDocumentId(),
+        bean.getText(),
+        bean.isParsed(),
+        bean.getParseCount(),
+        bean.getParseFailedReason());
     return this;
   }
 

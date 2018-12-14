@@ -11,8 +11,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
@@ -24,6 +22,7 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 import ch.ahoegger.docbox.client.administration.user.UserForm.FORM_MODE;
+import ch.ahoegger.docbox.client.templates.AbstractDocboxPageWithTable;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
 import ch.ahoegger.docbox.shared.administration.user.UserTablePageData;
 
@@ -33,7 +32,7 @@ import ch.ahoegger.docbox.shared.administration.user.UserTablePageData;
  * @author Andreas Hoegger
  */
 @PageData(UserTablePageData.class)
-public class UserTablePage extends AbstractPageWithTable<UserTablePage.Table> {
+public class UserTablePage extends AbstractDocboxPageWithTable<UserTablePage.Table> {
 
   @Override
   protected String getConfiguredTitle() {
@@ -222,7 +221,7 @@ public class UserTablePage extends AbstractPageWithTable<UserTablePage.Table> {
       protected void execAction() {
         if (MessageBoxes.createYesNo().withBody(TEXTS.get("DeleteConfirmationTextX", getUsernameColumn().getSelectedDisplayText())).show() == MessageBox.YES_OPTION) {
           BEANS.get(IUserService.class).delete(getUsernameColumn().getSelectedValue());
-          IDesktop.CURRENT.get().dataChanged(IUserEntity.ENTITY_KEY);
+          getDesktop().dataChanged(IUserEntity.ENTITY_KEY);
         }
       }
     }

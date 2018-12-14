@@ -18,12 +18,10 @@ import org.ch.ahoegger.docbox.server.or.app.tables.Payslip;
 import org.ch.ahoegger.docbox.server.or.app.tables.Statement;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.PayslipRecord;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
-import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
@@ -33,6 +31,8 @@ import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
 import ch.ahoegger.docbox.server.administration.hr.billing.BillingCycleService;
@@ -64,6 +64,7 @@ import ch.ahoegger.docbox.shared.hr.employer.EmployerFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData.EntityTableRowData;
 import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
+import ch.ahoegger.docbox.shared.util.FormDataResult;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility.LocalDateRange;
 
@@ -73,6 +74,8 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility.LocalDateRange;
  * @author aho
  */
 public class PayslipService implements IPayslipService {
+
+  private static final Logger LOG = LoggerFactory.getLogger(PayslipService.class);
 
   @Override
   public PayslipSearchFormData loadSearch(PayslipSearchFormData searchData) {
@@ -144,7 +147,7 @@ public class PayslipService implements IPayslipService {
 
     List<PayslipTableRowData> rows = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .select(payslip.PAYSLIP_NR, payslip.BILLING_CYCLE_NR, billingCycle.START_DATE, billingCycle.END_DATE, payslip.STATEMENT_NR, payslip.EMPLOYEE_TAX_GROUP_NR,
-            eeTaxGroup.EMPLOYEE_NR,
+            eeTaxGroup.EMPLOYEE_TAX_GROUP_NR, eeTaxGroup.EMPLOYEE_NR,
             statement.DOCUMENT_NR, statement.TAX_TYPE, statement.STATEMENT_DATE, statement.ACCOUNT_NUMBER, statement.HOURLY_WAGE,
             statement.SOCIAL_INSURANCE_RATE, statement.SOURCE_TAX_RATE, statement.VACATION_EXTRA_RATE, statement.WORKING_HOURS, statement.WAGE,
             statement.BRUTTO_WAGE, statement.NETTO_WAGE, statement.NETTO_WAGE_PAYOUT, statement.SOURCE_TAX, statement.SOCIAL_INSURANCE_TAX,
@@ -161,6 +164,7 @@ public class PayslipService implements IPayslipService {
         .map(rec -> {
           PayslipTableRowData rd = new PayslipTableRowData();
           rd.setPayslipId(rec.get(payslip.PAYSLIP_NR));
+          rd.setEmployeeTaxGroup(rec.get(eeTaxGroup.EMPLOYEE_TAX_GROUP_NR));
           rd.setEmployee(rec.get(eeTaxGroup.EMPLOYEE_NR));
           rd.setBillingCycle(rec.get(payslip.BILLING_CYCLE_NR));
           rd.setPeriodFrom(rec.get(billingCycle.START_DATE));
@@ -262,9 +266,11 @@ public class PayslipService implements IPayslipService {
         .with(payslip.EMPLOYEE_TAX_GROUP_NR, formData.getEmployeeTaxGroupId())
         .validateAndThrow();
 
-    IStatus finalizedStatus = BEANS.get(EmployeeTaxGroupService.class).isFinalized(formData.getEmployeeTaxGroupId());
-    if (!finalizedStatus.isOK()) {
-      throw new VetoException(new ProcessingStatus(finalizedStatus));
+    FormDataResult<EmployeeTaxGroupFormData, Boolean> finalizedResult = BEANS.get(EmployeeTaxGroupService.class).isFinalized(formData.getEmployeeTaxGroupId());
+    if (finalizedResult.getValue()) {
+      throw new VetoException(new ProcessingStatus(
+          String.format("EmployeeTaxGroup is finalized!"),
+          IStatus.ERROR));
     }
 
     formData.setPayslipId(new BigDecimal(SQL.getSequenceNextval(ISequenceTable.TABLE_NAME)));
@@ -336,9 +342,8 @@ public class PayslipService implements IPayslipService {
   @Override
   public PayslipFormData finalize(PayslipFormData formData) {
     Assertions.assertNotNull(formData.getPayslipId());
-    IStatus finalizedStatus = isFinalized(formData.getPayslipId());
-    if (!finalizedStatus.isOK()) {
-      throw new VetoException(new ProcessingStatus(finalizedStatus));
+    if (formData.getStatementId() != null) {
+      throw new VetoException(new ProcessingStatus("Payslip already finalized.", IStatus.ERROR));
     }
     Payslip payslip = Payslip.PAYSLIP;
 
@@ -416,7 +421,6 @@ public class PayslipService implements IPayslipService {
     formData.setStatementId(statementBean.getStatementId());
 
     // update payslip
-
     PayslipRecord record = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .fetchOne(payslip, payslip.PAYSLIP_NR.eq(formData.getPayslipId()));
     if (record == null) {
@@ -433,9 +437,65 @@ public class PayslipService implements IPayslipService {
   }
 
   @Override
+  public PayslipFormData unfinalize(BigDecimal payslipId) {
+    Assertions.assertNotNull(payslipId);
+    PayslipFormData formData = new PayslipFormData();
+    formData.setPayslipId(payslipId);
+    formData = load(formData);
+
+    // delete statement
+    BEANS.get(StatementService.class).delete(formData.getStatementId());
+
+    // update payslip
+    Payslip payslip = Payslip.PAYSLIP;
+    formData.setStatementId(null);
+    PayslipRecord record = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(payslip, payslip.PAYSLIP_NR.eq(formData.getPayslipId()));
+    if (record == null) {
+      return null;
+    }
+    int rowCount = mapToRecord(record, formData).update();
+    if (rowCount == 1) {
+      // notify backup needed
+      BEANS.get(IBackupService.class).notifyModification();
+    }
+    return formData;
+  }
+
+  @Override
   public boolean delete(BigDecimal payslipId) {
-    // TODO
-    return false;
+    Assertions.assertNotNull(payslipId);
+    PayslipFormData formData = new PayslipFormData();
+    formData.setPayslipId(payslipId);
+    formData = load(formData);
+    if (formData.getStatementId() != null) {
+      throw new VetoException(new ProcessingStatus(
+          String.format("Finalized payslips can not be deleted!"),
+          IStatus.ERROR));
+    }
+    EntitySearchFormData entitySearchData = new EntitySearchFormData();
+    entitySearchData.setPayslipId(payslipId);
+    if (BEANS.get(EntityService.class).getEntityTableData(entitySearchData).getRowCount() > 0) {
+      throw new VetoException(new ProcessingStatus(
+          String.format("Payslips with entities can not be deleted!"),
+          IStatus.ERROR));
+    }
+
+    Payslip e = Payslip.PAYSLIP;
+    PayslipRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(e, e.PAYSLIP_NR.eq(payslipId));
+    if (rec == null) {
+      LOG.warn("Try to delete not existing record with id '{}'!", payslipId);
+      return false;
+    }
+    if (rec.delete() != 1) {
+      LOG.error("Could not delete record with id '{}'!", payslipId);
+      return false;
+    }
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+    return true;
   }
 
   @Override
@@ -450,34 +510,13 @@ public class PayslipService implements IPayslipService {
         .count() == 0;
   }
 
-  @RemoteServiceAccessDenied
-  public IStatus isFinalized(BigDecimal payslipId) {
-    Payslip payslip = Payslip.PAYSLIP;
-    BillingCycle billingCycle = BillingCycle.BILLING_CYCLE;
-    EmployeeTaxGroup eeTaxGroup = EmployeeTaxGroup.EMPLOYEE_TAX_GROUP;
-    Employee employee = Employee.EMPLOYEE;
-    Record rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(billingCycle.NAME, billingCycle.START_DATE, billingCycle.END_DATE, employee.FIRST_NAME, employee.LAST_NAME, payslip.STATEMENT_NR, payslip.EMPLOYEE_TAX_GROUP_NR)
-        .from(payslip)
-        .leftOuterJoin(billingCycle).on(payslip.BILLING_CYCLE_NR.eq(billingCycle.BILLING_CYCLE_NR))
-        .leftOuterJoin(eeTaxGroup).on(payslip.EMPLOYEE_TAX_GROUP_NR.eq(eeTaxGroup.EMPLOYEE_TAX_GROUP_NR))
-        .leftOuterJoin(employee).on(eeTaxGroup.EMPLOYEE_NR.eq(employee.EMPLOYEE_NR))
-        .where(payslip.PAYSLIP_NR.eq(payslipId))
-        .fetchOne();
-    if (rec == null) {
-      throw new ProcessingException("Payslip with id:'{}' not found in DB.", payslipId);
-    }
-    if (rec.get(payslip.STATEMENT_NR) != null) {
-      return new Status(
-          String.format("Payslip '%s (%s-%s)' of user '%s %s' is already finalized!",
-              rec.get(billingCycle.NAME),
-              LocalDateUtility.format(rec.get(billingCycle.START_DATE), LocalDateUtility.DATE_FORMATTER_ddMMyyyy),
-              LocalDateUtility.format(rec.get(billingCycle.END_DATE), LocalDateUtility.DATE_FORMATTER_ddMMyyyy),
-              rec.get(employee.FIRST_NAME),
-              rec.get(employee.LAST_NAME)),
-          IStatus.ERROR);
-    }
-    return BEANS.get(EmployeeTaxGroupService.class).isFinalized(rec.get(payslip.EMPLOYEE_TAX_GROUP_NR));
+  @Override
+  public FormDataResult<PayslipFormData, Boolean> isFinalized(BigDecimal payslipId) {
+    Assertions.assertNotNull(payslipId);
+    PayslipFormData formData = new PayslipFormData();
+    formData.setPayslipId(payslipId);
+    formData = load(formData);
+    return new FormDataResult<>(formData, formData.getStatementId() != null);
   }
 
   @RemoteServiceAccessDenied

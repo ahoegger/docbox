@@ -45,6 +45,7 @@ import ch.ahoegger.docbox.shared.hr.entity.EntitySearchFormData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData;
 import ch.ahoegger.docbox.shared.hr.entity.EntityTablePageData.EntityTableRowData;
 import ch.ahoegger.docbox.shared.hr.entity.IEntityService;
+import ch.ahoegger.docbox.shared.util.FormDataResult;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
 
 public class EntityService implements IEntityService {
@@ -331,9 +332,12 @@ public class EntityService implements IEntityService {
             IStatus.WARNING));
       }
     }
-    IStatus finalizedStatus = BEANS.get(PayslipService.class).isFinalized(formData.getPayslipId());
-    if (!finalizedStatus.isOK()) {
-      throw new VetoException(new ProcessingStatus(finalizedStatus));
+
+    FormDataResult<PayslipFormData, Boolean> finalizedResult = BEANS.get(PayslipService.class).isFinalized(formData.getPayslipId());
+    if (finalizedResult.getValue()) {
+      throw new VetoException(new ProcessingStatus(
+          String.format("EmployerTaxGroup is finalized!"),
+          IStatus.ERROR));
     }
   }
 

@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.OpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
@@ -451,7 +450,7 @@ public class DocumentTablePage extends AbstractDocboxPageWithTable<DocumentTable
         linkBuilder.append(CONFIG.getPropertyValue(DocumentLinkURI.class));
         linkBuilder.append("?").append(CONFIG.getPropertyValue(DocumentLinkDocumentIdParamName.class)).append("=").append(getDocumentIdColumn().getSelectedValue());
 
-        IDesktop.CURRENT.get().openUri(linkBuilder.toString(), OpenUriAction.NEW_WINDOW);
+        getDesktop().openUri(linkBuilder.toString(), OpenUriAction.NEW_WINDOW);
       }
     }
 
@@ -484,7 +483,7 @@ public class DocumentTablePage extends AbstractDocboxPageWithTable<DocumentTable
         protected void execAction() {
           if (MessageBoxes.createYesNo().withBody(TEXTS.get("DeleteConfirmationTextX", getAbstractColumn().getSelectedDisplayText())).show() == MessageBox.YES_OPTION) {
             BEANS.get(IDocumentService.class).delete(getDocumentIdColumn().getSelectedValue());
-            IDesktop.CURRENT.get().dataChanged(IDocumentEntity.ENTITY_KEY);
+            getDesktop().dataChanged(IDocumentEntity.ENTITY_KEY);
 
           }
         }

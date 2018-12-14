@@ -5,14 +5,18 @@ import java.math.BigDecimal;
 import org.ch.ahoegger.docbox.server.or.app.tables.Statement;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.StatementRecord;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.ahoegger.docbox.or.definition.table.ISequenceTable;
+import ch.ahoegger.docbox.server.document.DocumentService;
 import ch.ahoegger.docbox.shared.backup.IBackupService;
 import ch.ahoegger.docbox.shared.hr.billing.AbstractStatementBoxData;
 import ch.ahoegger.docbox.shared.hr.billing.payslip.PayslipTableData.PayslipTableRowData;
@@ -26,6 +30,7 @@ import ch.ahoegger.docbox.shared.util.LocalDateUtility;
  * @author aho
  */
 public class StatementService implements IService {
+  private static final Logger LOG = LoggerFactory.getLogger(StatementService.class);
 
   public StatementBean prepareCreate(StatementBean bean) {
     return bean;
@@ -52,22 +57,33 @@ public class StatementService implements IService {
   }
 
   public StatementBean store(StatementBean bean) {
-    Assertions.assertNotNull(bean.getStatementId());
-    Statement table = Statement.STATEMENT;
-    StatementRecord record = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .fetchOne(table, table.STATEMENT_NR.eq(bean.getStatementId()));
+    throw new VetoException("Modification of statements is not allowed");
+  }
 
-    if (record == null) {
-      return null;
+  public boolean delete(BigDecimal statementId) {
+    Assertions.assertNotNull(statementId);
+    Statement statement = Statement.STATEMENT;
+    StatementRecord rec = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+        .fetchOne(statement, statement.STATEMENT_NR.eq(statementId));
+    if (rec == null) {
+      LOG.warn("Try to delete not existing record with id '{}'!", statementId);
+      return false;
     }
 
-    int rowCount = mapToRecord(record, bean).update();
-    if (rowCount == 1) {
-      // notify backup needed
-      BEANS.get(IBackupService.class).notifyModification();
-      return bean;
+    // document if available
+    BigDecimal documentId = rec.get(statement.DOCUMENT_NR);
+    if (documentId != null) {
+      BEANS.get(DocumentService.class).delete(documentId);
     }
-    return null;
+
+    if (rec.delete() != 1) {
+      LOG.error("Could not delete record with id '{}'!", statementId);
+      return false;
+    }
+
+    // notify backup needed
+    BEANS.get(IBackupService.class).notifyModification();
+    return true;
   }
 
   public int insert(StatementBean bean) {

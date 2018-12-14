@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
+import ch.ahoegger.docbox.shared.util.FormDataResult;
+
 /**
  * <h3>{@link IPayslipService}</h3>
  *
@@ -55,6 +57,12 @@ public interface IPayslipService extends IService {
    */
   PayslipFormData finalize(PayslipFormData formData);
 
+  /**
+   * @param formData
+   * @return
+   */
+  PayslipFormData unfinalize(BigDecimal payslipId);
+
   boolean delete(BigDecimal payslipId);
 
   /**
@@ -62,5 +70,11 @@ public interface IPayslipService extends IService {
    * @return
    */
   boolean finalized(PayslipSearchFormData payslipSearchFormData);
+
+  /**
+   * @param payslipId
+   * @return
+   */
+  FormDataResult<PayslipFormData, Boolean> isFinalized(BigDecimal payslipId);
 
 }

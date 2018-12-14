@@ -5,9 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -50,6 +52,10 @@ public abstract class AbstractDocboxPageWithTable<TABLE extends ITable> extends 
    */
   public AbstractDocboxPageWithTable(String userPreferenceContext) {
     super(userPreferenceContext);
+  }
+
+  protected IDesktop getDesktop() {
+    return ClientRunContexts.copyCurrent().getDesktop();
   }
 
   @Override

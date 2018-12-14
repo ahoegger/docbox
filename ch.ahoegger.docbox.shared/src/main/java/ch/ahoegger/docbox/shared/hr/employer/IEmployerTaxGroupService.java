@@ -6,6 +6,7 @@ import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
 import ch.ahoegger.docbox.shared.administration.hr.taxgroup.TaxGroupFormData;
+import ch.ahoegger.docbox.shared.util.FormDataResult;
 
 /**
  * <h3>{@link IEmployerTaxGroupService}</h3>
@@ -50,6 +51,12 @@ public interface IEmployerTaxGroupService extends IService {
    * @return
    */
   EmployerTaxGroupFormData finalize(EmployerTaxGroupFormData formData);
+
+  /**
+   * @param employerTaxgroupId
+   * @return
+   */
+  FormDataResult<EmployerTaxGroupFormData, Boolean> isFinalized(BigDecimal employerTaxgroupId);
 
   /**
    * @param selectedValue
