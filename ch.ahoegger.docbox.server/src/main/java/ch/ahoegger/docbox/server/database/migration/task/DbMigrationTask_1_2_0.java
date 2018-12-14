@@ -25,6 +25,7 @@ import org.ch.ahoegger.docbox.server.or.app.tables.Statement;
 import org.ch.ahoegger.docbox.server.or.app.tables.TaxGroup;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.EmployeeTaxGroupRecord;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.SQL;
@@ -62,10 +63,12 @@ import ch.ahoegger.docbox.shared.hr.entity.EntityTypeCodeType;
 import ch.ahoegger.docbox.shared.hr.tax.TaxCodeType;
 
 /**
- * <h3>{@link DbMigrationTask_1_2_0}</h3>
+ * <h3>{@link DbMigrationTask_1_2_0}</h3><br>
+ * <note>Ignored since it is already executed - safety first!</note>
  *
  * @author aho
  */
+@IgnoreBean
 public class DbMigrationTask_1_2_0 implements IMigrationTask {
 
   public static final Version TARGET_VERSION = new Version(1, 2, 0);

@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.BillingCycle;
+import org.ch.ahoegger.docbox.server.or.app.tables.Entity;
 import org.ch.ahoegger.docbox.server.or.app.tables.Payslip;
 import org.ch.ahoegger.docbox.server.or.app.tables.records.BillingCycleRecord;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -28,6 +29,7 @@ import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.jooq.Condition;
 import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -314,12 +316,16 @@ public class BillingCycleService implements IBillingCycleService {
       conditions = conditions.and(billingCycle.BILLING_CYCLE_NR.ne(formData.getBillingCycleId()));
     }
 
+    // check no overlap with other billing cycle
     Result<?> result = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .select(billingCycle.NAME, billingCycle.START_DATE, billingCycle.END_DATE)
         .from(billingCycle)
         .where(conditions)
-        .and(DSL.or(billingCycle.START_DATE.le(formData.getPeriodBox().getFrom().getValue()).and(billingCycle.END_DATE.ge(formData.getPeriodBox().getFrom().getValue())),
-            billingCycle.START_DATE.le(formData.getPeriodBox().getTo().getValue()).and(billingCycle.END_DATE.ge(formData.getPeriodBox().getTo().getValue()))))
+        .and(
+            DSL.or(
+                billingCycle.START_DATE.le(formData.getPeriodBox().getTo().getValue()).and(billingCycle.START_DATE.ge(formData.getPeriodBox().getFrom().getValue())),
+                billingCycle.END_DATE.ge(formData.getPeriodBox().getFrom().getValue()).and(billingCycle.END_DATE.le(formData.getPeriodBox().getTo().getValue())),
+                billingCycle.START_DATE.le(formData.getPeriodBox().getFrom().getValue()).and(billingCycle.END_DATE.ge(formData.getPeriodBox().getTo().getValue()))))
         .fetch();
     if (result.size() > 0) {
       IStatus status = new Status("Date period overlapping with billing cylce '" + result.get(0).get(billingCycle.NAME) + "'", IStatus.ERROR);
@@ -328,6 +334,33 @@ public class BillingCycleService implements IBillingCycleService {
         throw new VetoException(new ProcessingStatus(status));
       }
     }
+
+    // check all entities within range
+    if (formData.getBillingCycleId() != null) {
+      Entity entity = Entity.ENTITY;
+      Payslip payslip = Payslip.PAYSLIP;
+
+      Result<Record1<Date>> records = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+          .select(entity.ENTITY_DATE)
+          .from(entity)
+          .leftOuterJoin(payslip).on(entity.PAYSLIP_NR.eq(entity.PAYSLIP_NR))
+          .leftOuterJoin(billingCycle).on(payslip.BILLING_CYCLE_NR.eq(billingCycle.BILLING_CYCLE_NR))
+          .where(billingCycle.BILLING_CYCLE_NR.eq(formData.getBillingCycleId()))
+          .and(DSL.or(
+              entity.ENTITY_DATE.lessThan(formData.getPeriodBox().getFrom().getValue()),
+              entity.ENTITY_DATE.greaterThan(formData.getPeriodBox().getTo().getValue())))
+          .fetch();
+      if (records.size() > 0) {
+        IStatus status = new Status(
+            String.format("Billing cycle period does not cover entity of '%s'.", LocalDateUtility.format(records.get(0).get(entity.ENTITY_DATE), LocalDateUtility.DATE_FORMATTER_ddMMyyyy)),
+            IStatus.ERROR);
+        statusCollector.add(status);
+        if (throwVetoException) {
+          throw new VetoException(new ProcessingStatus(status));
+        }
+      }
+    }
+
   }
 
   protected BillingCycleRecord mapToRecord(BillingCycleRecord rec, BillingCycleFormData formData) {

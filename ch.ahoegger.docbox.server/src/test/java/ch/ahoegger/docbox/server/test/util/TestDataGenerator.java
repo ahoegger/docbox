@@ -165,7 +165,7 @@ public final class TestDataGenerator {
   }
 
   public TestDataGenerator createBillingCycle(BigDecimal id, BigDecimal taxGroupId, LocalDate date) {
-    return createBillingCycle(id, taxGroupId, LocalDateUtility.DATE_FORMATTER_MMMM.format(date), date.with(TemporalAdjusters.firstDayOfMonth()), date.with(TemporalAdjusters.firstDayOfMonth()));
+    return createBillingCycle(id, taxGroupId, LocalDateUtility.DATE_FORMATTER_MMMM.format(date), date.with(TemporalAdjusters.firstDayOfMonth()), date.with(TemporalAdjusters.lastDayOfMonth()));
   }
 
   public TestDataGenerator createBillingCycle(BigDecimal id, BigDecimal taxGroupId, String name, LocalDate start, LocalDate end) {

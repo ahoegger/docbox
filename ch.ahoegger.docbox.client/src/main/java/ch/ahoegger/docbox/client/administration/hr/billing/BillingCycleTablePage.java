@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 import ch.ahoegger.docbox.client.administration.hr.taxgroup.ITaxGroupEntity;
@@ -186,6 +187,7 @@ public class BillingCycleTablePage extends AbstractDocboxPageWithTable<BillingCy
       protected boolean execComputeVisibility() {
         PayslipSearchFormData searchData = new PayslipSearchFormData();
         searchData.getBillingCycle().setValue(getTable().getIdColumn().getSelectedValue());
+        searchData.getFinalzedRadioGroup().setValue(TriState.TRUE);
         return !BEANS.get(IPayslipService.class).hasTableData(searchData);
       }
 

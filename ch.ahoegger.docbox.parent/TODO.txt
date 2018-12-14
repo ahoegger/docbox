@@ -1,2 +1,1 @@
-[ ] EmployerTaxGroup Finalize possible if not all EmployeeTaxGroup are finalized.
-[ ]
+[OK] BillingCylcle-edit: ensure no payslips are finalized and all entities are included in date range.

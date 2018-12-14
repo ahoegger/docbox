@@ -416,7 +416,7 @@ public class DevDataProvider extends DataBaseInitialization {
         .with(table.EMPLOYEE_NR, partnerId03_employee)
         .with(table.EMPLOYEE_TAX_GROUP_NR, employeeTaxGroupLastYear)
         .with(table.EMPLOYER_TAX_GROUP_NR, employerTaxGroupLastYear)
-        .with(table.END_DATE, LocalDateUtility.toDate(start))
+        .with(table.START_DATE, LocalDateUtility.toDate(start))
         .with(table.END_DATE, LocalDateUtility.toDate(end))
         .insert();
 
@@ -427,7 +427,7 @@ public class DevDataProvider extends DataBaseInitialization {
         .with(table.EMPLOYEE_NR, partnerId03_employee)
         .with(table.EMPLOYEE_TAX_GROUP_NR, employeeTaxGroupCurrentYear)
         .with(table.EMPLOYER_TAX_GROUP_NR, employerTaxGroupCurrentYear)
-        .with(table.END_DATE, LocalDateUtility.toDate(start))
+        .with(table.START_DATE, LocalDateUtility.toDate(start))
         .with(table.END_DATE, LocalDateUtility.toDate(end))
         .insert();
   }
