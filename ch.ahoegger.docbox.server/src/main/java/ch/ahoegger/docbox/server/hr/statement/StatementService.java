@@ -133,6 +133,7 @@ public class StatementService implements IService {
         .with(table.SOCIAL_INSURANCE_TAX, bean.getSocialInsuranceTax())
         .with(table.SOURCE_TAX, bean.getSourceTax())
         .with(table.SOURCE_TAX_RATE, bean.getSourceTaxRate())
+        .with(table.PENSIONS_FUND, bean.getPensionsFund())
         .with(table.STATEMENT_DATE, bean.getStatementDate())
         .with(table.STATEMENT_NR, bean.getStatementId())
         .with(table.TAX_TYPE, bean.getTaxType())
@@ -148,6 +149,7 @@ public class StatementService implements IService {
     fd.getNettoWage().setValue(bean.getNettoWage());
     fd.getSocialSecurityTax().setValue(bean.getSocialInsuranceTax());
     fd.getSourceTax().setValue(bean.getSourceTax());
+    fd.getPensionsFund().setValue(bean.getPensionsFund());
     fd.getVacationExtra().setValue(bean.getVacationExtra());
     fd.getWorkingHours().setValue(bean.getWorkingHours());
     return fd;

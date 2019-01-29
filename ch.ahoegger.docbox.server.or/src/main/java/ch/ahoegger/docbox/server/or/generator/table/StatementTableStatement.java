@@ -47,8 +47,11 @@ public class StatementTableStatement implements ITableStatement, IJooqTable, ISt
         .append(NETTO_WAGE_PAYOUT).append(" DECIMAL(9, 2), ")
         .append(SOURCE_TAX).append(" DECIMAL(9, 2), ")
         .append(SOCIAL_INSURANCE_TAX).append(" DECIMAL(9, 2), ")
+        .append(PENSIONS_FUND).append(" DECIMAL(9, 2), ")
         .append(VACATION_EXTRA).append(" DECIMAL(9, 2), ")
         .append(EXPENSES).append(" DECIMAL(9, 2), ")
+        .append(MANUAL_CORRECTION_REASON).append(" VARCHAR(").append(MANUAL_CORRECTION_REASON_LENGTH).append("), ")
+        .append(MANUAL_CORRECTION_AMOUNT).append(" DECIMAL(9, 2), ")
         .append("PRIMARY KEY (").append(STATEMENT_NR).append(")")
         .append(")");
     return statementBuilder.toString();

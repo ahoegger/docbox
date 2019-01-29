@@ -75,6 +75,7 @@ public class PayslipTableData extends AbstractTablePageData {
     public static final String netto = "netto";
     public static final String payout = "payout";
     public static final String sourceTax = "sourceTax";
+    public static final String pensionsFund = "pensionsFund";
     public static final String socialInsuranceTax = "socialInsuranceTax";
     public static final String vacationExtra = "vacationExtra";
     public static final String expenses = "expenses";
@@ -99,6 +100,7 @@ public class PayslipTableData extends AbstractTablePageData {
     private BigDecimal m_netto;
     private BigDecimal m_payout;
     private BigDecimal m_sourceTax;
+    private BigDecimal m_pensionsFund;
     private BigDecimal m_socialInsuranceTax;
     private BigDecimal m_vacationExtra;
     private BigDecimal m_expenses;
@@ -269,6 +271,14 @@ public class PayslipTableData extends AbstractTablePageData {
 
     public void setSourceTax(BigDecimal newSourceTax) {
       m_sourceTax = newSourceTax;
+    }
+
+    public BigDecimal getPensionsFund() {
+      return m_pensionsFund;
+    }
+
+    public void setPensionsFund(BigDecimal newPensionsFund) {
+      m_pensionsFund = newPensionsFund;
     }
 
     public BigDecimal getSocialInsuranceTax() {

@@ -1,6 +1,7 @@
 package ch.ahoegger.docbox.server.database;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,20 +61,27 @@ public class DataBaseInitialization implements IPlatformListener {
 
     final MigrationService migService = BEANS.get(MigrationService.class);
     // run migrations
-    if (BEANS.all(IMigrationTask.class).stream()
+
+    if (getAllMigrationTasks().stream()
+        .sorted((a, b) -> a.getVersion().compareTo(b.getVersion()))
         .filter(task -> migService.isUpdateRequired(task.getVersion()))
         .map(task -> {
           task.run();
+          migService.insert(task.getVersion());
           return true;
         }).reduce(false, (acc, val) -> acc || val).booleanValue()) {
       validateTables();
     }
   }
 
+  protected List<IMigrationTask> getAllMigrationTasks() {
+    return BEANS.all(IMigrationTask.class);
+  }
+
   /**
    *
    */
-  private void validateTables() {
+  protected void validateTables() {
 
     Set<Table<?>> logicalTables = BEANS.all(IJooqTable.class)
         .stream().map(t -> t.getJooqTable())

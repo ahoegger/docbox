@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Payslip extends TableImpl<PayslipRecord> {
 
-    private static final long serialVersionUID = -1465511941;
+    private static final long serialVersionUID = -80698723;
 
     /**
      * The reference instance of <code>APP.PAYSLIP</code>
@@ -106,7 +106,7 @@ public class Payslip extends TableImpl<PayslipRecord> {
      */
     @Override
     public UniqueKey<PayslipRecord> getPrimaryKey() {
-        return Keys.SQL181211162703390;
+        return Keys.SQL190128171032280;
     }
 
     /**
@@ -114,7 +114,7 @@ public class Payslip extends TableImpl<PayslipRecord> {
      */
     @Override
     public List<UniqueKey<PayslipRecord>> getKeys() {
-        return Arrays.<UniqueKey<PayslipRecord>>asList(Keys.SQL181211162703390, Keys.SQL181211162703391);
+        return Arrays.<UniqueKey<PayslipRecord>>asList(Keys.SQL190128171032280, Keys.SQL190128171032281);
     }
 
     /**

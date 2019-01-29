@@ -10,6 +10,7 @@ import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -26,6 +27,9 @@ import ch.ahoegger.docbox.client.administration.hr.taxgroup.AbstractTaxGroupSmar
 import ch.ahoegger.docbox.client.hr.billing.AbstractStatementBox;
 import ch.ahoegger.docbox.client.hr.billing.payslip.PayslipForm.MainBox.BillingCycleField;
 import ch.ahoegger.docbox.client.hr.billing.payslip.PayslipForm.MainBox.CancelButton;
+import ch.ahoegger.docbox.client.hr.billing.payslip.PayslipForm.MainBox.CorrectionBox;
+import ch.ahoegger.docbox.client.hr.billing.payslip.PayslipForm.MainBox.CorrectionBox.CorrectionAmountField;
+import ch.ahoegger.docbox.client.hr.billing.payslip.PayslipForm.MainBox.CorrectionBox.CorrectionReasonField;
 import ch.ahoegger.docbox.client.hr.billing.payslip.PayslipForm.MainBox.EmployeeField;
 import ch.ahoegger.docbox.client.hr.billing.payslip.PayslipForm.MainBox.OkButton;
 import ch.ahoegger.docbox.client.hr.billing.payslip.PayslipForm.MainBox.PayslipDocumentAbstractField;
@@ -38,6 +42,7 @@ import ch.ahoegger.docbox.client.hr.employee.AbstractEmployeeSmartField;
 import ch.ahoegger.docbox.client.hr.entity.AbstractEntityTable;
 import ch.ahoegger.docbox.client.templates.AbstractPeriodBox;
 import ch.ahoegger.docbox.or.definition.table.IDocumentTable;
+import ch.ahoegger.docbox.or.definition.table.IStatementTable;
 import ch.ahoegger.docbox.shared.administration.hr.billing.BillingCycleLookupCall;
 import ch.ahoegger.docbox.shared.administration.hr.billing.IBillingCycleService;
 import ch.ahoegger.docbox.shared.administration.hr.billingcycle.BillingCycleFormData;
@@ -129,6 +134,18 @@ public class PayslipForm extends AbstractForm {
 
   public EntitiesField getEntitiesField() {
     return getFieldByClass(EntitiesField.class);
+  }
+
+  public CorrectionBox getCorrectionBox() {
+    return getFieldByClass(CorrectionBox.class);
+  }
+
+  public CorrectionReasonField getCorrectionReasonField() {
+    return getFieldByClass(CorrectionReasonField.class);
+  }
+
+  public CorrectionAmountField getCorrectionAmountField() {
+    return getFieldByClass(CorrectionAmountField.class);
   }
 
   public OkButton getOkButton() {
@@ -286,6 +303,46 @@ public class PayslipForm extends AbstractForm {
       protected int getConfiguredMaxLength() {
         return IDocumentTable.ABSTRACT_LENGTH;
       }
+    }
+
+    @Order(6500)
+    public class CorrectionBox extends AbstractGroupBox {
+      @Override
+      protected String getConfiguredLabel() {
+        return TEXTS.get("Correction");
+      }
+
+      @Order(1000)
+      public class CorrectionReasonField extends AbstractStringField {
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("CorrectionReason");
+        }
+
+        @Override
+        protected int getConfiguredMaxLength() {
+          return IStatementTable.MANUAL_CORRECTION_REASON_LENGTH;
+        }
+      }
+
+      @Order(2000)
+      public class CorrectionAmountField extends AbstractBigDecimalField {
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("Amount");
+        }
+
+        @Override
+        protected BigDecimal getConfiguredMinValue() {
+          return IStatementTable.MANUAL_CORRECTION_AMOUNT_MIN;
+        }
+
+        @Override
+        protected BigDecimal getConfiguredMaxValue() {
+          return IStatementTable.MANUAL_CORRECTION_AMOUNT_MAX;
+        }
+      }
+
     }
 
     @Order(7000)

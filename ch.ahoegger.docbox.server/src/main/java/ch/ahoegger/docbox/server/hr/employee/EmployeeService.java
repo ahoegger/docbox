@@ -313,6 +313,7 @@ public class EmployeeService implements IEmployeeService {
     fd.getEmploymentBox().getHourlyWage().setValue(emp.HOURLY_WAGE.get(rec));
     fd.getEmploymentBox().getSocialInsuranceRate().setValue(emp.SOCIAL_INSURANCE_RATE.get(rec));
     fd.getEmploymentBox().getSourceTaxRate().setValue(emp.SOURCE_TAX_RATE.get(rec));
+    fd.getEmploymentBox().getPensionsFund().setValue(emp.PENSIONS_FUND_MONTHLY.get(rec));
     fd.getEmploymentBox().getVacationExtraRate().setValue(emp.VACATION_EXTRA_RATE.get(rec));
     return fd;
   }
@@ -336,6 +337,7 @@ public class EmployeeService implements IEmployeeService {
         .with(employee.HOURLY_WAGE, formData.getEmploymentBox().getHourlyWage().getValue())
         .with(employee.SOCIAL_INSURANCE_RATE, formData.getEmploymentBox().getSocialInsuranceRate().getValue())
         .with(employee.SOURCE_TAX_RATE, formData.getEmploymentBox().getSourceTaxRate().getValue())
+        .with(employee.PENSIONS_FUND_MONTHLY, formData.getEmploymentBox().getPensionsFund().getValue())
         .with(employee.VACATION_EXTRA_RATE, formData.getEmploymentBox().getVacationExtraRate().getValue());
 
   }

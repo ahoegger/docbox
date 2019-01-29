@@ -158,8 +158,17 @@ public class SalaryStatementService implements IService {
         acroForm.getField("8").setValue(m_integerFormatter.format(brutto));
         BigDecimal socialInsuranceTax = statement.getSocialInsuranceTax().setScale(0, RoundingMode.HALF_UP);
         acroForm.getField("9").setValue(m_integerFormatter.format(socialInsuranceTax));
-        BigDecimal netto = brutto.subtract(socialInsuranceTax).setScale(0, RoundingMode.HALF_UP);
+
+        if (formData.getWageBox().getPensionsFund().getValue() != null && !BigDecimal.ZERO.equals(formData.getWageBox().getPensionsFund().getValue())) {
+          acroForm.getField("10-1").setValue(m_integerFormatter.format(formData.getWageBox().getPensionsFund().getValue()));
+        }
+
+        BigDecimal netto = brutto
+            .subtract(socialInsuranceTax)
+            .subtract(formData.getWageBox().getPensionsFund().getValue())
+            .setScale(0, RoundingMode.HALF_UP);
         acroForm.getField("11").setValue(m_integerFormatter.format(netto));
+
         if (SourceTax.ID.equals(employeeData.getEmploymentBox().getTaxType().getValue())) {
           BigDecimal sourceTax = statement.getSourceTax().setScale(0, RoundingMode.HALF_UP);
           acroForm.getField("12").setValue(m_integerFormatter.format(sourceTax));

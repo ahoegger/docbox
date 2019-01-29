@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DocumentPermission extends TableImpl<DocumentPermissionRecord> {
 
-    private static final long serialVersionUID = -809639115;
+    private static final long serialVersionUID = 1801750183;
 
     /**
      * The reference instance of <code>APP.DOCUMENT_PERMISSION</code>
@@ -101,7 +101,7 @@ public class DocumentPermission extends TableImpl<DocumentPermissionRecord> {
      */
     @Override
     public UniqueKey<DocumentPermissionRecord> getPrimaryKey() {
-        return Keys.SQL181211162703050;
+        return Keys.SQL190128171032231;
     }
 
     /**
@@ -109,7 +109,7 @@ public class DocumentPermission extends TableImpl<DocumentPermissionRecord> {
      */
     @Override
     public List<UniqueKey<DocumentPermissionRecord>> getKeys() {
-        return Arrays.<UniqueKey<DocumentPermissionRecord>>asList(Keys.SQL181211162703050);
+        return Arrays.<UniqueKey<DocumentPermissionRecord>>asList(Keys.SQL190128171032231);
     }
 
     /**

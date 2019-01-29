@@ -58,8 +58,13 @@ public class MigrationService implements IService {
     if (MigrationUtility.getTableDesription(IMigrationTable.TABLE_NAME) == null) {
       return true;
     }
+    Version maxVersion = getLastMigrationVersion();
+    return version.compareTo(maxVersion) > 0;
+  }
+
+  public Version getLastMigrationVersion() {
     Migration table = Migration.MIGRATION.as("MIG");
-    Version maxVersion = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
+    return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .select(table.DOCBOX_VERSION)
         .from(table)
         .fetch()
@@ -67,6 +72,6 @@ public class MigrationService implements IService {
         .map(rec -> rec.get(table.DOCBOX_VERSION))
         .max((v1, v2) -> v1.compareTo(v2))
         .orElse(new Version(0, 0, 0));
-    return version.compareTo(maxVersion) > 0;
+
   }
 }

@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Address extends TableImpl<AddressRecord> {
 
-    private static final long serialVersionUID = 241698100;
+    private static final long serialVersionUID = 564879116;
 
     /**
      * The reference instance of <code>APP.ADDRESS</code>
@@ -111,7 +111,7 @@ public class Address extends TableImpl<AddressRecord> {
      */
     @Override
     public UniqueKey<AddressRecord> getPrimaryKey() {
-        return Keys.SQL181211162702820;
+        return Keys.SQL190128171032180;
     }
 
     /**
@@ -119,7 +119,7 @@ public class Address extends TableImpl<AddressRecord> {
      */
     @Override
     public List<UniqueKey<AddressRecord>> getKeys() {
-        return Arrays.<UniqueKey<AddressRecord>>asList(Keys.SQL181211162702820);
+        return Arrays.<UniqueKey<AddressRecord>>asList(Keys.SQL190128171032180);
     }
 
     /**

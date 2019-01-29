@@ -25,6 +25,7 @@ public class StatementBean {
   private BigDecimal m_nettoWage;
   private BigDecimal m_nettoWagePayout;
   private BigDecimal m_sourceTax;
+  private BigDecimal m_pensionsFund;
   private BigDecimal m_socialInsuranceTax;
   private BigDecimal m_vacationExtra;
   private BigDecimal m_expenses;
@@ -98,6 +99,15 @@ public class StatementBean {
 
   public StatementBean withSourceTaxRate(BigDecimal sourceTaxRate) {
     m_sourceTaxRate = sourceTaxRate;
+    return this;
+  }
+
+  public BigDecimal getPensionsFund() {
+    return m_pensionsFund;
+  }
+
+  public StatementBean withPensionsFund(BigDecimal pensionsFund) {
+    m_pensionsFund = pensionsFund;
     return this;
   }
 

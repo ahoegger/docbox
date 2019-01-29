@@ -39,7 +39,17 @@ public class WageCalculationService {
     else {
       result.withSourceTax(BigDecimal.ZERO);
     }
-    result.withNettoWage(result.getBruttoWage().add(result.getExpenses()).subtract(result.getSocialInsuranceTax()).subtract(result.getSourceTax()));
+    if (input.getPensionsFund() != null) {
+      result.withPensionsFund(input.getPensionsFund());
+    }
+    else {
+      result.withPensionsFund(BigDecimal.ZERO);
+    }
+    result.withNettoWage(result.getBruttoWage()
+        .add(result.getExpenses())
+        .subtract(result.getSocialInsuranceTax())
+        .subtract(result.getSourceTax())
+        .subtract(result.getPensionsFund()));
     result.withNettoWagePayout(BigDecimalUtilitiy.financeRound(result.getNettoWage(), BigDecimal.valueOf(0.05), RoundingMode.UP));
 
     return result;
@@ -54,6 +64,7 @@ public class WageCalculationService {
         .withNettoWagePayout(result.getNettoWagePayout())
         .withSocialInsuranceTax(result.getSocialInsuranceTax())
         .withSourceTax(result.getSourceTax())
+        .withPensionsFund(result.getPensionsFund())
         .withVacationExtra(result.getVacationExtra())
         .withWage(result.getWage())
         .withWorkingHours(result.getWorkingHours());

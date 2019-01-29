@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Migration extends TableImpl<MigrationRecord> {
 
-    private static final long serialVersionUID = -1389708152;
+    private static final long serialVersionUID = 410139086;
 
     /**
      * The reference instance of <code>APP.MIGRATION</code>
@@ -105,7 +105,7 @@ public class Migration extends TableImpl<MigrationRecord> {
      */
     @Override
     public UniqueKey<MigrationRecord> getPrimaryKey() {
-        return Keys.SQL181211162703330;
+        return Keys.SQL190128171032270;
     }
 
     /**
@@ -113,7 +113,7 @@ public class Migration extends TableImpl<MigrationRecord> {
      */
     @Override
     public List<UniqueKey<MigrationRecord>> getKeys() {
-        return Arrays.<UniqueKey<MigrationRecord>>asList(Keys.SQL181211162703330);
+        return Arrays.<UniqueKey<MigrationRecord>>asList(Keys.SQL190128171032270);
     }
 
     /**

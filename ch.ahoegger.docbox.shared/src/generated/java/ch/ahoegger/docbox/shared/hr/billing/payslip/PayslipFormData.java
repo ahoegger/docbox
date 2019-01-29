@@ -26,6 +26,14 @@ public class PayslipFormData extends AbstractFormData {
     return getFieldByClass(BillingCycle.class);
   }
 
+  public CorrectionAmount getCorrectionAmount() {
+    return getFieldByClass(CorrectionAmount.class);
+  }
+
+  public CorrectionReason getCorrectionReason() {
+    return getFieldByClass(CorrectionReason.class);
+  }
+
   public Employee getEmployee() {
     return getFieldByClass(Employee.class);
   }
@@ -101,6 +109,16 @@ public class PayslipFormData extends AbstractFormData {
   }
 
   public static class BillingCycle extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class CorrectionAmount extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class CorrectionReason extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
   }

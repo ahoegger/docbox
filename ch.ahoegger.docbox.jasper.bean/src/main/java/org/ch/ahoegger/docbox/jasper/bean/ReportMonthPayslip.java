@@ -27,6 +27,8 @@ public class ReportMonthPayslip {
   private String m_socialInsuracneAbsolute;
   private String m_vacationExtraPercentage;
   private String m_vacationExtraAbsolute;
+  private Boolean m_bvg;
+  private String m_bvgAbsolute;
   private Boolean m_sourceTax;
   private String m_sourceTaxAbsolute;
   private String m_sourceTaxProcentage;
@@ -176,6 +178,22 @@ public class ReportMonthPayslip {
 
   public void setIban(String iban) {
     m_iban = iban;
+  }
+
+  public Boolean getBvg() {
+    return m_bvg;
+  }
+
+  public void setBvg(Boolean bvg) {
+    m_bvg = bvg;
+  }
+
+  public String getBvgAbsolute() {
+    return m_bvgAbsolute;
+  }
+
+  public void setBvgAbsolute(String bvgAbsolute) {
+    m_bvgAbsolute = bvgAbsolute;
   }
 
   public Boolean getSourceTax() {

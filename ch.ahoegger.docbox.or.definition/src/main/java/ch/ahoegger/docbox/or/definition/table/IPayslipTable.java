@@ -16,5 +16,6 @@ public interface IPayslipTable {
 
   String EMPLOYEE_TAX_GROUP_NR = IEmployeeTaxGroupTable.EMPLOYEE_TAX_GROUP_NR; // FK
 
-  String STATEMENT_NR = IStatementTable.STATEMENT_NR;
+  String STATEMENT_NR = IStatementTable.STATEMENT_NR; // FK
+
 }

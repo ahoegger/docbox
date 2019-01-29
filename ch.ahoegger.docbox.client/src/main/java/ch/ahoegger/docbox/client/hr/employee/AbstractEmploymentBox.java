@@ -45,6 +45,10 @@ public class AbstractEmploymentBox extends AbstractGroupBox {
     return getFieldByClass(ReducedLunchField.class);
   }
 
+  public PensionsFundField getPensionsFundField() {
+    return getFieldByClass(PensionsFundField.class);
+  }
+
   public PlaceholderField getPlaceholderField() {
     return getFieldByClass(PlaceholderField.class);
   }
@@ -159,6 +163,24 @@ public class AbstractEmploymentBox extends AbstractGroupBox {
     @Override
     protected BigDecimal getConfiguredMaxValue() {
       return IEmployeeTable.SOURCE_TAX_RATE_MAX;
+    }
+  }
+
+  @Order(5500)
+  public class PensionsFundField extends AbstractBigDecimalField {
+    @Override
+    protected String getConfiguredLabel() {
+      return TEXTS.get("PensionsFund");
+    }
+
+    @Override
+    protected BigDecimal getConfiguredMinValue() {
+      return IEmployeeTable.PENSIONS_FUND_MONTHLY_MIN;
+    }
+
+    @Override
+    protected BigDecimal getConfiguredMaxValue() {
+      return IEmployeeTable.PENSIONS_FUND_MONTHLY_MAX;
     }
   }
 

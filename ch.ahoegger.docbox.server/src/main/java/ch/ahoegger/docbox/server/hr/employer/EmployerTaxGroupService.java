@@ -89,7 +89,7 @@ public class EmployerTaxGroupService implements IEmployerTaxGroupService {
     List<EmployerTaxGroupTableRowData> rows = DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .select(erTaxGroup.EMPLOYER_TAX_GROUP_NR, erTaxGroup.EMPLOYER_NR, erTaxGroup.TAX_GROUP_NR, erTaxGroup.STATEMENT_NR,
             statement.STATEMENT_NR, statement.DOCUMENT_NR, statement.TAX_TYPE, statement.STATEMENT_DATE, statement.ACCOUNT_NUMBER, statement.HOURLY_WAGE,
-            statement.SOCIAL_INSURANCE_RATE, statement.SOURCE_TAX_RATE, statement.VACATION_EXTRA_RATE, statement.WORKING_HOURS, statement.WAGE, statement.BRUTTO_WAGE, statement.NETTO_WAGE,
+            statement.SOCIAL_INSURANCE_RATE, statement.SOURCE_TAX_RATE, statement.PENSIONS_FUND, statement.VACATION_EXTRA_RATE, statement.WORKING_HOURS, statement.WAGE, statement.BRUTTO_WAGE, statement.NETTO_WAGE,
             statement.NETTO_WAGE_PAYOUT, statement.SOURCE_TAX, statement.SOCIAL_INSURANCE_TAX, statement.VACATION_EXTRA, statement.EXPENSES)
         .from(erTaxGroup)
         .leftOuterJoin(statement).on(erTaxGroup.STATEMENT_NR.eq(statement.STATEMENT_NR))
@@ -116,6 +116,7 @@ public class EmployerTaxGroupService implements IEmployerTaxGroupService {
           rd.setNetto(rec.get(statement.NETTO_WAGE));
           rd.setPayout(rec.get(statement.NETTO_WAGE_PAYOUT));
           rd.setSourceTax(rec.get(statement.SOURCE_TAX));
+          rd.setPensionsFund(rec.get(statement.PENSIONS_FUND));
           rd.setSocialInsuranceTax(rec.get(statement.SOCIAL_INSURANCE_TAX));
           rd.setVacationExtra(rec.get(statement.VACATION_EXTRA));
           rd.setExpenses(rec.get(statement.EXPENSES));
@@ -401,6 +402,7 @@ public class EmployerTaxGroupService implements IEmployerTaxGroupService {
           acc.setPayout(BigDecimalUtilitiy.nullSafeAdd(acc.getPayout(), row2.getPayout()));
           acc.setSocialInsuranceTax(BigDecimalUtilitiy.nullSafeAdd(acc.getSocialInsuranceTax(), row2.getSocialInsuranceTax()));
           acc.setSourceTax(BigDecimalUtilitiy.nullSafeAdd(acc.getSourceTax(), row2.getSourceTax()));
+          acc.setPensionsFund(BigDecimalUtilitiy.nullSafeAdd(acc.getPensionsFund(), row2.getPensionsFund()));
           acc.setVacationExtra(BigDecimalUtilitiy.nullSafeAdd(acc.getVacationExtra(), row2.getVacationExtra()));
           acc.setWage(BigDecimalUtilitiy.nullSafeAdd(acc.getWage(), row2.getWage()));
           acc.setWorkingHours(BigDecimalUtilitiy.nullSafeAdd(acc.getWorkingHours(), row2.getWorkingHours()));
@@ -414,6 +416,7 @@ public class EmployerTaxGroupService implements IEmployerTaxGroupService {
         .withNettoWagePayout(result.getPayout())
         .withSocialInsuranceTax(result.getSocialInsuranceTax())
         .withSourceTax(result.getSourceTax())
+        .withPensionsFund(result.getPensionsFund())
         .withVacationExtra(result.getVacationExtra())
         .withWage(result.getWage())
         .withWorkingHours(result.getWorkingHours());

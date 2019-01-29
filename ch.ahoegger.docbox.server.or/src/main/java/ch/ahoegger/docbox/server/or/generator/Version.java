@@ -80,7 +80,7 @@ public class Version implements Comparable<Version> {
 
     int serviceComp = Long.compare(getService(), o.getService());
     if (serviceComp != 0) {
-      return minorComp;
+      return serviceComp;
     }
     return 0;
   }

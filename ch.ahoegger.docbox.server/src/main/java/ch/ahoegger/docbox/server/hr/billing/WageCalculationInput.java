@@ -19,7 +19,9 @@ public class WageCalculationInput {
   private BigDecimal m_hourlyWage;
   private BigDecimal m_socialInsuranceRate;
   private BigDecimal m_sourceTaxRate;
+  private BigDecimal m_pensionsFund;
   private BigDecimal m_vacationExtraRate;
+  private BigDecimal m_manualCorrection;
   private List<EntityTableRowData> m_workEntities = CollectionUtility.emptyArrayList();
   private List<EntityTableRowData> m_expenseEntities = CollectionUtility.emptyArrayList();
 
@@ -59,12 +61,30 @@ public class WageCalculationInput {
     return this;
   }
 
+  public BigDecimal getPensionsFund() {
+    return m_pensionsFund;
+  }
+
+  public WageCalculationInput withPensionsFund(BigDecimal pensionsFund) {
+    m_pensionsFund = pensionsFund;
+    return this;
+  }
+
   public BigDecimal getVacationExtraRate() {
     return BigDecimalUtilitiy.orZero(m_vacationExtraRate);
   }
 
   public WageCalculationInput withVacationExtraRate(BigDecimal vacationExtraRate) {
     m_vacationExtraRate = vacationExtraRate;
+    return this;
+  }
+
+  public BigDecimal getManualCorrection() {
+    return m_manualCorrection;
+  }
+
+  public WageCalculationInput withManualCorrection(BigDecimal manualCorrection) {
+    m_manualCorrection = manualCorrection;
     return this;
   }
 

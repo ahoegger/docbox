@@ -15,6 +15,7 @@ public class WageCalculationResult {
   private BigDecimal m_nettoWagePayout;
   private BigDecimal m_sourceTax;
   private BigDecimal m_socialInsuranceTax;
+  private BigDecimal m_pensionsFund;
   private BigDecimal m_vacationExtra;
   private BigDecimal m_expenses;
 
@@ -69,6 +70,15 @@ public class WageCalculationResult {
 
   public WageCalculationResult withSourceTax(BigDecimal sourceTax) {
     m_sourceTax = sourceTax;
+    return this;
+  }
+
+  public BigDecimal getPensionsFund() {
+    return m_pensionsFund;
+  }
+
+  public WageCalculationResult withPensionsFund(BigDecimal pensionsFund) {
+    m_pensionsFund = pensionsFund;
     return this;
   }
 

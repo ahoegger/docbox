@@ -7,5 +7,5 @@ package ch.ahoegger.docbox.shared;
  */
 public interface DocboxVersion {
 
-  String VERSION = "1.1.8";
+  String VERSION = "1.2.1";
 }

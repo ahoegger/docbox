@@ -61,10 +61,10 @@ public class UserService implements IUserService, IUser {
   @Override
   public UserFormData load(UserFormData formData) {
 
-    DocboxUser user = DocboxUser.DOCBOX_USER.as("U");
+    DocboxUser user = DocboxUser.DOCBOX_USER;
     DefaultPermissionTable defaultPermission = DefaultPermissionTable.DEFAULT_PERMISSION_TABLE.as("DEF_PER");
 
-    Field<String> displayNameField = IUser.createDisplayNameForAlias(user);
+    Field<String> displayNameField = IUser.DISPLAY_NAME_FIELD;
     return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .select(user.FIRSTNAME, user.NAME, user.USERNAME, user.ACTIVE, user.ADMINISTRATOR, displayNameField)
         .select(defaultPermission.PERMISSION)

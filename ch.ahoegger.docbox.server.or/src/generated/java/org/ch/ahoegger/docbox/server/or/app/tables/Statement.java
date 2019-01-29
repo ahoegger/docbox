@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Statement extends TableImpl<StatementRecord> {
 
-    private static final long serialVersionUID = 1748197364;
+    private static final long serialVersionUID = -1742440151;
 
     /**
      * The reference instance of <code>APP.STATEMENT</code>
@@ -134,6 +134,11 @@ public class Statement extends TableImpl<StatementRecord> {
     public final TableField<StatementRecord, BigDecimal> SOCIAL_INSURANCE_TAX = createField("SOCIAL_INSURANCE_TAX", org.jooq.impl.SQLDataType.DECIMAL.precision(9, 2), this, "");
 
     /**
+     * The column <code>APP.STATEMENT.PENSIONS_FUND</code>.
+     */
+    public final TableField<StatementRecord, BigDecimal> PENSIONS_FUND = createField("PENSIONS_FUND", org.jooq.impl.SQLDataType.DECIMAL.precision(9, 2), this, "");
+
+    /**
      * The column <code>APP.STATEMENT.VACATION_EXTRA</code>.
      */
     public final TableField<StatementRecord, BigDecimal> VACATION_EXTRA = createField("VACATION_EXTRA", org.jooq.impl.SQLDataType.DECIMAL.precision(9, 2), this, "");
@@ -142,6 +147,16 @@ public class Statement extends TableImpl<StatementRecord> {
      * The column <code>APP.STATEMENT.EXPENSES</code>.
      */
     public final TableField<StatementRecord, BigDecimal> EXPENSES = createField("EXPENSES", org.jooq.impl.SQLDataType.DECIMAL.precision(9, 2), this, "");
+
+    /**
+     * The column <code>APP.STATEMENT.MANUAL_CORRECTION_REASON</code>.
+     */
+    public final TableField<StatementRecord, String> MANUAL_CORRECTION_REASON = createField("MANUAL_CORRECTION_REASON", org.jooq.impl.SQLDataType.VARCHAR.length(4800), this, "");
+
+    /**
+     * The column <code>APP.STATEMENT.MANUAL_CORRECTION_AMOUNT</code>.
+     */
+    public final TableField<StatementRecord, BigDecimal> MANUAL_CORRECTION_AMOUNT = createField("MANUAL_CORRECTION_AMOUNT", org.jooq.impl.SQLDataType.DECIMAL.precision(9, 2), this, "");
 
     /**
      * Create a <code>APP.STATEMENT</code> table reference
@@ -178,7 +193,7 @@ public class Statement extends TableImpl<StatementRecord> {
      */
     @Override
     public UniqueKey<StatementRecord> getPrimaryKey() {
-        return Keys.SQL181211162703540;
+        return Keys.SQL190128171032282;
     }
 
     /**
@@ -186,7 +201,7 @@ public class Statement extends TableImpl<StatementRecord> {
      */
     @Override
     public List<UniqueKey<StatementRecord>> getKeys() {
-        return Arrays.<UniqueKey<StatementRecord>>asList(Keys.SQL181211162703540);
+        return Arrays.<UniqueKey<StatementRecord>>asList(Keys.SQL190128171032282);
     }
 
     /**

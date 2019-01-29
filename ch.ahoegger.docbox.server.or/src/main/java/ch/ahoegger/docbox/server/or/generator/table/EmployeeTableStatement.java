@@ -45,6 +45,7 @@ public class EmployeeTableStatement implements ITableStatement, IJooqTable, IEmp
         .append(SOCIAL_INSURANCE_RATE).append(" DECIMAL(5, 3), ")
         .append(SOURCE_TAX_RATE).append(" DECIMAL(5, 3), ")
         .append(VACATION_EXTRA_RATE).append(" DECIMAL(5, 3), ")
+        .append(PENSIONS_FUND_MONTHLY).append(" DECIMAL(9, 2), ")
         .append("PRIMARY KEY (").append(EMPLOYEE_NR).append(")")
         .append(")");
     return statementBuilder.toString();

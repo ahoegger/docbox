@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BillingCycle extends TableImpl<BillingCycleRecord> {
 
-    private static final long serialVersionUID = -48890501;
+    private static final long serialVersionUID = 1994090999;
 
     /**
      * The reference instance of <code>APP.BILLING_CYCLE</code>
@@ -113,7 +113,7 @@ public class BillingCycle extends TableImpl<BillingCycleRecord> {
      */
     @Override
     public UniqueKey<BillingCycleRecord> getPrimaryKey() {
-        return Keys.SQL181211162702870;
+        return Keys.SQL190128171032200;
     }
 
     /**
@@ -121,7 +121,7 @@ public class BillingCycle extends TableImpl<BillingCycleRecord> {
      */
     @Override
     public List<UniqueKey<BillingCycleRecord>> getKeys() {
-        return Arrays.<UniqueKey<BillingCycleRecord>>asList(Keys.SQL181211162702870);
+        return Arrays.<UniqueKey<BillingCycleRecord>>asList(Keys.SQL190128171032200);
     }
 
     /**

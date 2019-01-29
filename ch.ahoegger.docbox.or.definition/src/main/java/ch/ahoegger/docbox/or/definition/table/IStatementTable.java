@@ -63,6 +63,10 @@ public interface IStatementTable {
   BigDecimal SOURCE_TAX_MIN = BigDecimal.valueOf(0d);
   BigDecimal SOURCE_TAX_MAX = BigDecimal.valueOf(9999999d);
 
+  String PENSIONS_FUND = "PENSIONS_FUND";
+  BigDecimal PENSIONS_FUND_MIN = BigDecimal.valueOf(0d);
+  BigDecimal PENSIONS_FUND_MAX = BigDecimal.valueOf(9999999d);
+
   String SOCIAL_INSURANCE_TAX = "SOCIAL_INSURANCE_TAX";
   BigDecimal SOCIAL_SECURITY_TAX_MIN = BigDecimal.valueOf(0d);
   BigDecimal SOCIAL_SECURITY_TAX_MAX = BigDecimal.valueOf(9999999d);
@@ -74,5 +78,12 @@ public interface IStatementTable {
   String EXPENSES = "EXPENSES";
   BigDecimal EXPENSES_MIN = BigDecimal.valueOf(0d);
   BigDecimal EXPENSES_MAX = BigDecimal.valueOf(9999999d);
+
+  String MANUAL_CORRECTION_REASON = "MANUAL_CORRECTION_REASON";
+  int MANUAL_CORRECTION_REASON_LENGTH = 4800;
+
+  String MANUAL_CORRECTION_AMOUNT = "MANUAL_CORRECTION_AMOUNT";
+  BigDecimal MANUAL_CORRECTION_AMOUNT_MIN = BigDecimal.valueOf(0d);
+  BigDecimal MANUAL_CORRECTION_AMOUNT_MAX = BigDecimal.valueOf(9999999d);
 
 }

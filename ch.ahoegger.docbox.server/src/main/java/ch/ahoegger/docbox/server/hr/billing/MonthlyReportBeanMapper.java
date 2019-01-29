@@ -88,6 +88,8 @@ public class MonthlyReportBeanMapper {
     reportBean.setSocialInsuracneAbsolute(m_formatFloat2FractionDigits.format(wageCalcResult.getSocialInsuranceTax().multiply(BigDecimal.valueOf(-1))));
     reportBean.setSocialInsuracnePercentage(m_formatFloat3FractionDigits.format(wageCalcInput.getSocialInsuranceRate().negate()));
     reportBean.setSourceTax(TaxCodeType.SourceTax.ID.equals(employeeData.getEmploymentBox().getTaxType().getValue()));
+    reportBean.setBvg(!wageCalcResult.getPensionsFund().equals(BigDecimal.ZERO));
+    reportBean.setBvgAbsolute(m_formatFloat2FractionDigits.format(wageCalcResult.getPensionsFund().multiply(BigDecimal.valueOf(-1))));
     reportBean.setSourceTaxAbsolute(m_formatFloat2FractionDigits.format(wageCalcResult.getSourceTax().negate()));
     reportBean.setSourceTaxProcentage(m_formatFloat2FractionDigits.format(wageCalcInput.getSourceTaxRate().multiply(BigDecimal.valueOf(-1))));
     reportBean.setTitle(payslipData.getTitle().getValue());

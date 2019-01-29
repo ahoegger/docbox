@@ -11,7 +11,5 @@ import org.jooq.impl.DSL;
  */
 public interface IUser {
 
-  public static Field<String> createDisplayNameForAlias(DocboxUser t) {
-    return DSL.concat(t.FIRSTNAME, DSL.val(" "), t.NAME, DSL.val(" ("), t.USERNAME, DSL.val(")")).as("DISPLAY_NAME");
-  }
+  Field<String> DISPLAY_NAME_FIELD = DSL.concat(DocboxUser.DOCBOX_USER.FIRSTNAME, DSL.val(" "), DocboxUser.DOCBOX_USER.NAME, DSL.val(" ("), DocboxUser.DOCBOX_USER.USERNAME, DSL.val(")"));
 }

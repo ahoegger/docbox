@@ -149,7 +149,7 @@ public class PayslipService implements IPayslipService {
         .select(payslip.PAYSLIP_NR, payslip.BILLING_CYCLE_NR, billingCycle.START_DATE, billingCycle.END_DATE, payslip.STATEMENT_NR, payslip.EMPLOYEE_TAX_GROUP_NR,
             eeTaxGroup.EMPLOYEE_TAX_GROUP_NR, eeTaxGroup.EMPLOYEE_NR,
             statement.DOCUMENT_NR, statement.TAX_TYPE, statement.STATEMENT_DATE, statement.ACCOUNT_NUMBER, statement.HOURLY_WAGE,
-            statement.SOCIAL_INSURANCE_RATE, statement.SOURCE_TAX_RATE, statement.VACATION_EXTRA_RATE, statement.WORKING_HOURS, statement.WAGE,
+            statement.SOCIAL_INSURANCE_RATE, statement.SOURCE_TAX_RATE, statement.PENSIONS_FUND, statement.VACATION_EXTRA_RATE, statement.WORKING_HOURS, statement.WAGE,
             statement.BRUTTO_WAGE, statement.NETTO_WAGE, statement.NETTO_WAGE_PAYOUT, statement.SOURCE_TAX, statement.SOCIAL_INSURANCE_TAX,
             statement.VACATION_EXTRA, statement.EXPENSES)
         .from(payslip)
@@ -185,6 +185,7 @@ public class PayslipService implements IPayslipService {
             rd.setNetto(rec.get(statement.NETTO_WAGE));
             rd.setPayout(rec.get(statement.NETTO_WAGE_PAYOUT));
             rd.setSourceTax(rec.get(statement.SOURCE_TAX));
+            rd.setPensionsFund(rec.get(statement.PENSIONS_FUND));
             rd.setSocialInsuranceTax(rec.get(statement.SOCIAL_INSURANCE_TAX));
             rd.setVacationExtra(rec.get(statement.VACATION_EXTRA));
             rd.setExpenses(rec.get(statement.EXPENSES));
@@ -390,6 +391,7 @@ public class PayslipService implements IPayslipService {
         .withHourlyWage(employeeData.getEmploymentBox().getHourlyWage().getValue())
         .withSocialInsuranceRate(employeeData.getEmploymentBox().getSocialInsuranceRate().getValue())
         .withSourceTaxRate(employeeData.getEmploymentBox().getSourceTaxRate().getValue())
+        .withPensionsFund(employeeData.getEmploymentBox().getPensionsFund().getValue())
         .withTaxType(employeeData.getEmploymentBox().getTaxType().getValue())
         .withVacationExtraRate(employeeData.getEmploymentBox().getVacationExtraRate().getValue())
         .withWorkEntities(workEntities);
@@ -585,6 +587,7 @@ public class PayslipService implements IPayslipService {
             .withHourlyWage(employeeData.getEmploymentBox().getHourlyWage().getValue())
             .withSocialInsuranceRate(employeeData.getEmploymentBox().getSocialInsuranceRate().getValue())
             .withSourceTaxRate(employeeData.getEmploymentBox().getSourceTaxRate().getValue())
+            .withPensionsFund(employeeData.getEmploymentBox().getPensionsFund().getValue())
             .withTaxType(employeeData.getEmploymentBox().getTaxType().getValue())
             .withVacationExtraRate(employeeData.getEmploymentBox().getVacationExtraRate().getValue())
             .withWorkEntities(workEntities));

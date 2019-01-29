@@ -40,6 +40,10 @@ public abstract class AbstractStatementBox extends AbstractGroupBox {
     return getFieldByClass(WorkingHoursField.class);
   }
 
+  public PensionsFundField getPensionsFundField() {
+    return getFieldByClass(PensionsFundField.class);
+  }
+
   public NettoWageField getNettoWageField() {
     return getFieldByClass(NettoWageField.class);
   }
@@ -135,6 +139,24 @@ public abstract class AbstractStatementBox extends AbstractGroupBox {
     @Override
     protected BigDecimal getConfiguredMaxValue() {
       return IStatementTable.SOURCE_TAX_MAX;
+    }
+  }
+
+  @Order(4500)
+  public class PensionsFundField extends AbstractBigDecimalField {
+    @Override
+    protected String getConfiguredLabel() {
+      return TEXTS.get("PensionsFund");
+    }
+
+    @Override
+    protected BigDecimal getConfiguredMinValue() {
+      return IStatementTable.EXPENSES_MIN;
+    }
+
+    @Override
+    protected BigDecimal getConfiguredMaxValue() {
+      return IStatementTable.EXPENSES_MAX;
     }
   }
 

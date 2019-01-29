@@ -9,7 +9,6 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.jooq.Condition;
-import org.jooq.Field;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
@@ -29,7 +28,7 @@ public class AbstractUserLookupService extends AbstractDocboxLookupService<Strin
 
   @Override
   public List<? extends ILookupRow<String>> getDataByTextInternal(ILookupCall<String> call) {
-    return getData(IUser.createDisplayNameForAlias(DocboxUser.DOCBOX_USER).likeIgnoreCase(call.getText()), call);
+    return getData(IUser.DISPLAY_NAME_FIELD.likeIgnoreCase(call.getText()), call);
   }
 
   @Override
@@ -48,16 +47,15 @@ public class AbstractUserLookupService extends AbstractDocboxLookupService<Strin
 
   protected List<? extends ILookupRow<String>> getData(Condition conditions, ILookupCall<String> call) {
     DocboxUser userTable = DocboxUser.DOCBOX_USER;
-    Field<String> displayNameField = IUser.createDisplayNameForAlias(DocboxUser.DOCBOX_USER);
     return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
-        .select(userTable.USERNAME, displayNameField, userTable.ACTIVE)
+        .select(userTable.USERNAME, IUser.DISPLAY_NAME_FIELD, userTable.ACTIVE)
         .from(userTable)
         .where(conditions)
         .and(getConfiguredCondition())
         .fetch()
         .stream()
         .map(rec -> {
-          LookupRow<String> row = new LookupRow<String>(rec.get(userTable.USERNAME), rec.get(displayNameField));
+          LookupRow<String> row = new LookupRow<String>(rec.get(userTable.USERNAME), rec.get(IUser.DISPLAY_NAME_FIELD));
           row.withActive(rec.get(userTable.ACTIVE));
           return row;
 

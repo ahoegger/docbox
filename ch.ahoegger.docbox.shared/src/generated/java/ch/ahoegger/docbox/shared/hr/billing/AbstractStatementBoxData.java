@@ -24,6 +24,10 @@ public abstract class AbstractStatementBoxData extends AbstractFormFieldData {
     return getFieldByClass(NettoWage.class);
   }
 
+  public PensionsFund getPensionsFund() {
+    return getFieldByClass(PensionsFund.class);
+  }
+
   public SocialSecurityTax getSocialSecurityTax() {
     return getFieldByClass(SocialSecurityTax.class);
   }
@@ -46,6 +50,11 @@ public abstract class AbstractStatementBoxData extends AbstractFormFieldData {
   }
 
   public static class NettoWage extends AbstractValueFieldData<BigDecimal> {
+
+    private static final long serialVersionUID = 1L;
+  }
+
+  public static class PensionsFund extends AbstractValueFieldData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
   }

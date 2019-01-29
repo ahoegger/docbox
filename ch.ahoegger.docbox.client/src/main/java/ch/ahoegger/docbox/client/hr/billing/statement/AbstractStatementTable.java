@@ -74,6 +74,10 @@ public abstract class AbstractStatementTable extends AbstractTable {
     return getColumnSet().getColumnByClass(VacationExtraRateColumn.class);
   }
 
+  public PensionsFundColumn getPensionsFundColumn() {
+    return getColumnSet().getColumnByClass(PensionsFundColumn.class);
+  }
+
   public NettoColumn getNettoColumn() {
     return getColumnSet().getColumnByClass(NettoColumn.class);
   }
@@ -318,6 +322,19 @@ public abstract class AbstractStatementTable extends AbstractTable {
     @Override
     protected boolean getConfiguredVisible() {
       return false;
+    }
+  }
+
+  @Order(63500)
+  public class PensionsFundColumn extends AbstractBigDecimalColumn {
+    @Override
+    protected String getConfiguredHeaderText() {
+      return TEXTS.get("PensionsFund");
+    }
+
+    @Override
+    protected int getConfiguredWidth() {
+      return 120;
     }
   }
 

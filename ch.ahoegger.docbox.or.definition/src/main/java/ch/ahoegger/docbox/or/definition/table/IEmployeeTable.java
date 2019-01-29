@@ -50,4 +50,8 @@ public interface IEmployeeTable {
   BigDecimal VACATION_EXTRA_RATE_MIN = BigDecimal.valueOf(0d);
   BigDecimal VACATION_EXTRA_RATE_MAX = BigDecimal.valueOf(100d);
 
+  String PENSIONS_FUND_MONTHLY = "PENSIONS_FUND_MONTHLY";
+  BigDecimal PENSIONS_FUND_MONTHLY_MIN = BigDecimal.valueOf(0d);
+  BigDecimal PENSIONS_FUND_MONTHLY_MAX = BigDecimal.valueOf(9999999d);
+
 }

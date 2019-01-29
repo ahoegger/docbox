@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TaxGroup extends TableImpl<TaxGroupRecord> {
 
-    private static final long serialVersionUID = 588083988;
+    private static final long serialVersionUID = 1621002644;
 
     /**
      * The reference instance of <code>APP.TAX_GROUP</code>
@@ -108,7 +108,7 @@ public class TaxGroup extends TableImpl<TaxGroupRecord> {
      */
     @Override
     public UniqueKey<TaxGroupRecord> getPrimaryKey() {
-        return Keys.SQL181211162703560;
+        return Keys.SQL190128171032283;
     }
 
     /**
@@ -116,7 +116,7 @@ public class TaxGroup extends TableImpl<TaxGroupRecord> {
      */
     @Override
     public List<UniqueKey<TaxGroupRecord>> getKeys() {
-        return Arrays.<UniqueKey<TaxGroupRecord>>asList(Keys.SQL181211162703560);
+        return Arrays.<UniqueKey<TaxGroupRecord>>asList(Keys.SQL190128171032283);
     }
 
     /**

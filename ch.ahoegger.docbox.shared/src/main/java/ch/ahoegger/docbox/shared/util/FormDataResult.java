@@ -1,5 +1,7 @@
 package ch.ahoegger.docbox.shared.util;
 
+import java.io.Serializable;
+
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 
 /**
@@ -7,7 +9,8 @@ import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
  *
  * @author aho
  */
-public class FormDataResult<T extends AbstractFormData, V> {
+public class FormDataResult<T extends AbstractFormData, V> implements Serializable {
+  private static final long serialVersionUID = 1L;
 
   private T m_formData;
   private V m_value;
