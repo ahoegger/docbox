@@ -49,7 +49,7 @@
     <url-pattern>/diagnostics</url-pattern>
   </servlet-mapping>
 
-  <session-config>
+ <session-config>
     <!-- Session timeout in minutes -->
     <session-timeout>60</session-timeout>
     <cookie-config>
