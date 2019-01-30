@@ -10,14 +10,14 @@ import ch.ahoegger.docbox.server.database.migration.MigrationUtility;
 import ch.ahoegger.docbox.server.or.generator.Version;
 
 /**
- * <h3>{@link DbMigrationTask_1_2_1}</h3><br>
+ * <h3>{@link DbMigrationTask_2_1_0}</h3><br>
  * <note>Ignored since it is already executed - safety first!</note>
  *
  * @author aho
  */
-public class DbMigrationTask_1_2_1 implements IMigrationTask {
+public class DbMigrationTask_2_1_0 implements IMigrationTask {
 
-  public static final Version TARGET_VERSION = new Version(1, 2, 1);
+  public static final Version TARGET_VERSION = new Version(2, 1, 0);
 
   @Override
   public Version getVersion() {
