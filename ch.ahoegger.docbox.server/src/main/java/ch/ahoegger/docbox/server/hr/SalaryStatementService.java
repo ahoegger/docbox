@@ -148,7 +148,9 @@ public class SalaryStatementService implements IService {
         acroForm.getField("D").setValue(LocalDateUtility.format(formData.getPeriodBox().getFrom().getValue(), LocalDateUtility.DATE_FORMATTER_yyyy));
         acroForm.getField("E-von").setValue(LocalDateUtility.format(formData.getPeriodBox().getFrom().getValue(), LocalDateUtility.DATE_FORMATTER_ddMMyyyy));
         acroForm.getField("E-bis").setValue(LocalDateUtility.format(formData.getPeriodBox().getTo().getValue(), LocalDateUtility.DATE_FORMATTER_ddMMyyyy));
-        ((PDCheckBox) acroForm.getField("G")).check(); // todo kantinenverpflegung
+        if (employeeData.getEmploymentBox().getReducedLunch().getValue()) {
+          ((PDCheckBox) acroForm.getField("G")).check();
+        }
         acroForm.getField("HName").setValue(employeeData.getEmployeeBox().getFirstName().getValue() + " " + employeeData.getEmployeeBox().getLastName().getValue());
         acroForm.getField("HAdresse").setValue(employeeData.getEmployeeBox().getAddressBox().getLine1().getValue());
         acroForm.getField("HWohnort").setValue(employeeData.getEmployeeBox().getAddressBox().getPlz().getValue() + " " + employeeData.getEmployeeBox().getAddressBox().getCity().getValue());
