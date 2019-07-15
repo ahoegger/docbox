@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 
 /**
  * <h3>{@link DocumentOcrServiceTest}</h3>
@@ -20,8 +21,7 @@ public class DocumentOcrServiceTest extends AbstractTestWithDatabase {
   private BigDecimal documentId = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
-
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
     BEANS.get(DocumentOcrService.class).insert(connection, documentId, "sample", true, 1, null);
 
   }

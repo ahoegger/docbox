@@ -14,6 +14,7 @@ import org.junit.Test;
 import ch.ahoegger.docbox.server.document.DocumentPartnerService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.partner.IPartnerService;
 import ch.ahoegger.docbox.shared.partner.PartnerSearchFormData;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
@@ -34,7 +35,7 @@ public class PartnerServiceSearchTest extends AbstractTestWithDatabase {
   private static final BigDecimal documentId03 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
     LocalDate today = LocalDate.now();
 
     BEANS.get(PartnerService.class).insert(connection, partnerId01, "partner01", "some notes",

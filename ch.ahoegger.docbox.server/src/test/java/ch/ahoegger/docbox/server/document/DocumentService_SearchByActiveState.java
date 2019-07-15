@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
@@ -33,7 +34,7 @@ public class DocumentService_SearchByActiveState extends AbstractTestWithDatabas
   private static final BigDecimal documentId05 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
 
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);

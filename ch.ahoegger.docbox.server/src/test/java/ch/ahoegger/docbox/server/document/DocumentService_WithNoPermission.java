@@ -17,6 +17,7 @@ import ch.ahoegger.docbox.server.administration.user.UserService;
 import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
@@ -39,7 +40,7 @@ public class DocumentService_WithNoPermission extends AbstractTestWithDatabase {
   private static final BigDecimal documentId03 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
 
     BEANS.get(UserService.class).insert(connection, "name02", "firstname02", username02, "secret", true, false);
     BEANS.get(UserService.class).insert(connection, "name03", "firstname03", username03, "secret", true, false);

@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.category.CategorySearchFormData;
 import ch.ahoegger.docbox.shared.category.ICategoryService;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
@@ -30,8 +31,7 @@ public class CategoryServiceSearchTest extends AbstractTestWithDatabase {
   private static final BigDecimal id03 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
-
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
     BEANS.get(CategoryService.class).insertRow(connection, id01, "cat01", "desc01",
         LocalDateUtility.toDate(LocalDate.now()), null);
     BEANS.get(CategoryService.class).insertRow(connection, id02, "cat02", "desc02",
@@ -39,7 +39,6 @@ public class CategoryServiceSearchTest extends AbstractTestWithDatabase {
     BEANS.get(CategoryService.class).insertRow(connection, id03, "cat03", "desc03",
         LocalDateUtility.toDate(LocalDate.now().minusDays(2)),
         LocalDateUtility.toDate(LocalDate.now().minusDays(1)));
-
   }
 
   @Test

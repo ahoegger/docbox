@@ -12,6 +12,7 @@ import org.junit.Test;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.conversation.ConversationFormData;
 import ch.ahoegger.docbox.shared.conversation.IConversationService;
 
@@ -27,7 +28,7 @@ public class ConversationServiceTest extends AbstractTestWithDatabase {
   private static final BigDecimal conversationId02 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
     Calendar cal = Calendar.getInstance();
     DateUtility.truncCalendar(cal);
     cal.set(1999, 04, 29);

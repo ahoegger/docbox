@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType.OwnerCode;
 import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType.ReadCode;
 import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType.WriteCode;
@@ -24,7 +25,7 @@ public class DefaultPermissionServiceTest extends AbstractTestWithDatabase {
   private static final String user03 = "user03";
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
 
     BEANS.get(DefaultPermissionService.class).insertRow(connection, user01, ReadCode.ID);
     BEANS.get(DefaultPermissionService.class).insertRow(connection, user02, WriteCode.ID);

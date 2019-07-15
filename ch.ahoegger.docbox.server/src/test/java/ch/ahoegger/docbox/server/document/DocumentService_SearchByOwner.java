@@ -15,6 +15,7 @@ import org.junit.Test;
 import ch.ahoegger.docbox.server.administration.user.UserService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.document.DocumentSearchFormData;
 import ch.ahoegger.docbox.shared.document.DocumentTableData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
@@ -37,7 +38,7 @@ public class DocumentService_SearchByOwner extends AbstractTestWithDatabase {
   private static final BigDecimal documentId05 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
 
 //    BEANS.get(UserService.class).insert(connection, "name01", "firstname01", username01, "secret", true, true);
     BEANS.get(UserService.class).insert(connection, "name02", "firstname02", admin02, "secret", true, true);

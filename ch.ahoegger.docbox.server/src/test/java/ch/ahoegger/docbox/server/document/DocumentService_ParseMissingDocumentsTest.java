@@ -23,6 +23,7 @@ import org.junit.Test;
 import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.server.test.util.TestDocumentStoreService;
 import ch.ahoegger.docbox.shared.document.OcrResultGroupBoxData;
 import ch.ahoegger.docbox.shared.document.store.IDocumentStoreService;
@@ -68,8 +69,7 @@ public class DocumentService_ParseMissingDocumentsTest extends AbstractTestWithD
   }
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
-
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
     // categories
     LocalDate today = LocalDate.now();
 

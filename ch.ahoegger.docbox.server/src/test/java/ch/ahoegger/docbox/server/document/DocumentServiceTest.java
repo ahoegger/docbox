@@ -22,6 +22,7 @@ import ch.ahoegger.docbox.server.partner.PartnerService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.document.DocumentFormData;
 import ch.ahoegger.docbox.shared.document.DocumentFormData.Partners.PartnersRowData;
 import ch.ahoegger.docbox.shared.document.IDocumentService;
@@ -47,7 +48,7 @@ public class DocumentServiceTest extends AbstractTestWithDatabase {
   private static final BigDecimal documentId04 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
 
     // categories
     Calendar cal = Calendar.getInstance();

@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.partner.IPartnerService;
 import ch.ahoegger.docbox.shared.partner.PartnerSearchFormData;
 import ch.ahoegger.docbox.shared.partner.PartnerTableData;
@@ -31,7 +32,7 @@ public class PartnerService_SearchByName extends AbstractTestWithDatabase {
   private static final BigDecimal partnerId04 = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
     LocalDate today = LocalDate.now();
 
     BEANS.get(PartnerService.class).insert(connection, partnerId01, "dook haagen", "some notes",

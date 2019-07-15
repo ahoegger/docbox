@@ -43,6 +43,7 @@ import ch.ahoegger.docbox.shared.template.AbstractAddressBoxData;
  * @author Andreas Hoegger
  */
 public class EmployeeService implements IEmployeeService {
+  @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(EmployeeService.class);
 
   public static Field<String> createDisplayNameForAlias(Employee t) {

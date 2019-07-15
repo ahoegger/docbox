@@ -23,6 +23,7 @@ import ch.ahoegger.docbox.server.document.store.DocumentStoreService;
 import ch.ahoegger.docbox.server.ocr.DocumentOcrService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.IdGenerateService;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.document.OcrResultGroupBoxData;
 import ch.ahoegger.docbox.shared.ocr.OcrLanguageCodeType;
 import ch.ahoegger.docbox.shared.util.LocalDateUtility;
@@ -40,7 +41,7 @@ public class DocumentService_MultipleOcrParseTest extends AbstractTestWithDataba
 //  private static final String FILE_NAME = "withoutTextInfo.pdf";
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
 
     for (int i = 0; i < 4; i++) {
       BigDecimal docId = BEANS.get(IdGenerateService.class).getNextIdBigDecimal();

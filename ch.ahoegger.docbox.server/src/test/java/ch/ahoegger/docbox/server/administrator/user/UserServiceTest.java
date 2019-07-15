@@ -12,6 +12,7 @@ import ch.ahoegger.docbox.server.administration.user.UserService;
 import ch.ahoegger.docbox.server.security.SecurityService;
 import ch.ahoegger.docbox.server.test.util.AbstractTestWithDatabase;
 import ch.ahoegger.docbox.server.test.util.DocboxAssert;
+import ch.ahoegger.docbox.server.test.util.TestDataGenerator;
 import ch.ahoegger.docbox.shared.administration.user.IUserService;
 import ch.ahoegger.docbox.shared.administration.user.UserFormData;
 import ch.ahoegger.docbox.shared.security.permission.PermissionCodeType;
@@ -29,7 +30,7 @@ public class UserServiceTest extends AbstractTestWithDatabase {
   private final String userId05 = "username05";
 
   @Override
-  protected void execSetupDb(Connection connection) throws Exception {
+  protected void execSetupDb(Connection connection, TestDataGenerator testDataGenerator) throws Exception {
     BEANS.get(UserService.class).insert(connection, "name02", "firstname02", userId02, passwordHash("secret02"), true, false);
     BEANS.get(UserService.class).insert(connection, "name03", "firstname03", userId03, passwordHash("secret03"), false, false);
     BEANS.get(UserService.class).insert(connection, "name04", "firstname04", userId04, passwordHash("secret04"), true, false);

@@ -3,13 +3,11 @@ package ch.ahoegger.docbox.server.hr.employee;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.ch.ahoegger.docbox.server.or.app.tables.Employee;
 import org.ch.ahoegger.docbox.server.or.app.tables.Employer;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -61,8 +59,6 @@ public class EmployeeLookupService extends AbstractDocboxLookupService<BigDecima
     Employee t = Employee.EMPLOYEE;
     Employer employer = Employer.EMPLOYER;
     Field<String> displayName = EmployeeService.createDisplayNameForAlias(t);
-
-    final Set<BigDecimal> employerIds = (eeLookupCall.getEmployerIds() == null) ? CollectionUtility.emptyHashSet() : eeLookupCall.getEmployerIds();
 
     return DSL.using(SQL.getConnection(), SQLDialect.DERBY)
         .select(t.EMPLOYEE_NR, displayName, employer.EMPLOYER_NR)
