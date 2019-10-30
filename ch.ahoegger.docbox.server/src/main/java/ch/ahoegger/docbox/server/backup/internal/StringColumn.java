@@ -1,5 +1,6 @@
 package ch.ahoegger.docbox.server.backup.internal;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 /**
@@ -25,7 +26,7 @@ public class StringColumn extends AbstractColumn<String> {
     if (value == null) {
       return "NULL";
     }
-    value = value.replace("'", "''");
+    value = StringEscapeUtils.escapeSql(value);
     return "'" + value + "'";
   }
 }
